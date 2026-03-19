@@ -6,6 +6,7 @@ Common reusable skills included in OpenCaw by category.
 
 - `plan-task` — Create or refine an implementation plan and keep task sequencing clear.
 - `update-memory` — Capture durable lessons in project-local memory files.
+- `clean-context` — Compress active context by archiving completed detail and refreshing a high-signal summary.
 - `debug-issue` — Diagnose an issue using logs, errors, tests, and observable evidence.
 - `review-code` — Review changes for correctness, maintainability, and alignment with architecture.
 - `refactor-code` — Improve structure while preserving behavior.
