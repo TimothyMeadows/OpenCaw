@@ -77,6 +77,22 @@
       "commands/generate-test-report.sh"
     ]
   },
+  "code-migrator": {
+    "skills": [
+      "framework-migration-plan",
+      "upgrade-dotnet-runtime",
+      "dependency-audit-dotnet",
+      "test-gap-analysis",
+      "regression-suite-update"
+    ],
+    "commands": [
+      "commands/dotnet-list-outdated-packages.sh",
+      "commands/dotnet-upgrade-assistant.sh",
+      "commands/dotnet-restore.sh",
+      "commands/dotnet-build.sh",
+      "commands/dotnet-test.sh"
+    ]
+  },
   "devops-engineer": {
     "skills": [
       "create-ci-pipeline",

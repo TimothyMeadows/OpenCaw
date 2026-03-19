@@ -22,6 +22,9 @@ OpenCaw role catalog with categories and common aliases.
 ### Quality & Testing
 - `qa-engineer`
 
+### Migration & Modernization
+- `code-migrator`
+
 ### Security & Reliability
 - `security-engineer`
 - `sre`
@@ -51,6 +54,7 @@ The following aliases may be used when requesting a role. Prefer exact role name
 - `ai-engineer`: `ai`, `ai engineer`, `ai-engineer`, `aiengineer`, `llm`, `ml`
 - `autonomous-optimization-architect`: `architect`, `autonomous optimization architect`, `autonomous-optimization-architect`, `autonomousoptimizationarchitect`
 - `backend-architect`: `api`, `api-architect`, `architect`, `backend`, `backend architect`, `backend-architect`, `backendarchitect`
+- `code-migrator`: `code migrator`, `code-migrator`, `codemigrator`, `migration-engineer`, `modernization-engineer`
 - `code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
 - `data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
