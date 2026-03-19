@@ -11,4 +11,28 @@ mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/TASKS/active ../.ai/TASKS/comp
 [[ -f ../.ai/FRAGMENTS/gotchas.md ]] || printf "# Gotchas\n\n" > ../.ai/FRAGMENTS/gotchas.md
 [[ -f ../.ai/LEARNINGS/workflows.md ]] || printf "# Workflows\n\n" > ../.ai/LEARNINGS/workflows.md
 [[ -f ../.ai/LEARNINGS/bugs.md ]] || printf "# Bug Patterns\n\n" > ../.ai/LEARNINGS/bugs.md
-[[ -f ../tasks/TODO.md ]] || printf "# TODO\n\n1. [ ] Example first task (`tasks/example-task/TASK.md`)\n" > ../tasks/TODO.md
+mkdir -p ../tasks/example-task
+
+if [[ ! -f ../tasks/TODO.md ]]; then
+  cat > ../tasks/TODO.md <<'EOF'
+# TODO
+
+1. [ ] Example first task (`tasks/example-task/TASK.md`)
+EOF
+fi
+
+[[ -f ../tasks/example-task/TASK.md ]] || cat > ../tasks/example-task/TASK.md <<'EOF'
+# Example first task
+
+## Goal
+
+## Scope
+
+## Assumptions
+
+## Work Instructions
+
+## Verification
+
+## Review
+EOF
