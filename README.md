@@ -331,6 +331,7 @@ Examples:
 
 - `backend-architect` → architecture review, service boundaries, dependency audits
 - `frontend-developer` → components, feature modules, rendering, accessibility
+- `fullstack-engineer` → end-to-end feature delivery, API/UI integration, full-flow verification
 - `security-engineer` → threat modeling, security audits, dependency vulnerability review
 - `sre` → incident analysis, resilience design, performance review
 
