@@ -16,6 +16,9 @@ OpenCaw role catalog with categories and common aliases.
 - `frontend-developer`
 - `mobile-app-builder`
 
+### Full Stack
+- `fullstack-engineer`
+
 ### Security & Reliability
 - `security-engineer`
 - `sre`
@@ -51,6 +54,7 @@ The following aliases may be used when requesting a role. Prefer exact role name
 - `devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`
 - `embedded-firmware-engineer`: `embedded firmware engineer`, `embedded-firmware-engineer`, `embeddedfirmwareengineer`
 - `frontend-developer`: `frontend`, `frontend developer`, `frontend-developer`, `frontenddeveloper`, `ui`, `web`
+- `fullstack-engineer`: `full stack`, `full-stack`, `fullstack`, `fullstack engineer`, `fullstack-engineer`, `fullstackengineer`
 - `git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
 - `mobile-app-builder`: `mobile app builder`, `mobile-app-builder`, `mobileappbuilder`
