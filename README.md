@@ -15,6 +15,8 @@ It provides a structured system that allows teams to:
 
 OpenCaw is designed so it can be installed into an existing repository as a **submodule or cloned tool directory** (such as `.codex`, `.cursor`, or `.claude`) while keeping project-specific artifacts separate from the shared instruction system.
 
+![](OpenCawFlow.png)
+
 ---
 
 # Table of Contents
