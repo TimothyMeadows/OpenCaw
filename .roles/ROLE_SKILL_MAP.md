@@ -96,6 +96,21 @@ Commands:
 - `commands/run-e2e.sh`
 - `commands/generate-test-report.sh`
 
+### code-migrator
+Skills:
+- `framework-migration-plan`
+- `upgrade-dotnet-runtime`
+- `dependency-audit-dotnet`
+- `test-gap-analysis`
+- `regression-suite-update`
+
+Commands:
+- `commands/dotnet-list-outdated-packages.sh`
+- `commands/dotnet-upgrade-assistant.sh`
+- `commands/dotnet-restore.sh`
+- `commands/dotnet-build.sh`
+- `commands/dotnet-test.sh`
+
 ### devops-engineer
 Skills:
 - `create-ci-pipeline`

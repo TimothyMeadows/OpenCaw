@@ -29,6 +29,11 @@ Common reusable skills included in OpenCaw by category.
 - `refactor-service` — Refactor a backend service or application workflow.
 - `optimize-query` — Improve data access or query efficiency safely.
 
+## Migration
+
+- `framework-migration-plan` — Define a phased migration strategy from legacy frameworks/runtimes to modern supported versions.
+- `upgrade-dotnet-runtime` — Execute .NET runtime/framework upgrades with verification-focused follow-through.
+
 ## Frontend
 
 - `generate-component` — Create or revise a frontend component with clear boundaries and responsibilities.
