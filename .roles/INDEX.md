@@ -19,6 +19,9 @@ OpenCaw role catalog with categories and common aliases.
 ### Full Stack
 - `fullstack-engineer`
 
+### Quality & Testing
+- `qa-engineer`
+
 ### Security & Reliability
 - `security-engineer`
 - `sre`
@@ -58,6 +61,7 @@ The following aliases may be used when requesting a role. Prefer exact role name
 - `git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
 - `mobile-app-builder`: `mobile app builder`, `mobile-app-builder`, `mobileappbuilder`
+- `qa-engineer`: `qa`, `qa engineer`, `qa-engineer`, `quality assurance`, `quality engineer`, `quality-engineer`, `test engineer`, `test-engineer`
 - `rapid-prototyper`: `rapid prototyper`, `rapid-prototyper`, `rapidprototyper`
 - `security-engineer`: `appsec`, `secure-coding`, `security`, `security engineer`, `security-engineer`, `securityengineer`
 - `senior-developer`: `senior developer`, `senior-developer`, `seniordeveloper`
