@@ -1,27 +1,27 @@
-        #!/usr/bin/env bash
-        set -euo pipefail
+#!/usr/bin/env bash
+set -euo pipefail
 
-        task_name="${1:-}"
-        title="${2:-}"
+task_name="${1:-}"
+title="${2:-}"
 
-        if [[ -z "$task_name" ]]; then
-          echo 'Usage: ./commands/create-task-file.sh "<unique_task_name>" ["Task Title"]'
-          exit 1
-        fi
+if [[ -z "$task_name" ]]; then
+  echo 'Usage: ./commands/create-task-file.sh "<unique_task_name>" ["Task Title"]'
+  exit 1
+fi
 
-        mkdir -p "../tasks/$task_name"
-        target="../tasks/$task_name/TASK.md"
+mkdir -p "../tasks/$task_name"
+target="../tasks/$task_name/TASK.md"
 
-        if [[ -f "$target" ]]; then
-          echo "$target already exists"
-          exit 0
-        fi
+if [[ -f "$target" ]]; then
+  echo "$target already exists"
+  exit 0
+fi
 
-        if [[ -z "$title" ]]; then
-          title="$task_name"
-        fi
+if [[ -z "$title" ]]; then
+  title="$task_name"
+fi
 
-        cat > "$target" <<EOF
+cat > "$target" <<EOF
 # $title
 
 ## Goal
@@ -36,4 +36,4 @@
 
 ## Review
 EOF
-        echo "$target"
+echo "$target"
