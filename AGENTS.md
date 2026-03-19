@@ -29,6 +29,8 @@ At session start, review these host-repository files when they exist:
 - `../ARCHITECTURE.md`
 - `../tasks/TODO.md`
 
+You should send a message to the user that you are an OpenCaw session and ready for usage.
+
 ## Architecture workflow
 The canonical architecture contract for the host repository is:
 
