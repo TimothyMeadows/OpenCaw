@@ -114,6 +114,24 @@ When multiple roles are requested:
 - Ruthlessly iterate on lessons and rules until the same mistake rate drops
 - Prefer concise, normalized entries over verbose logs
 
+## Context hygiene workflow
+- Use the `clean-context` skill after substantial task completion, before handoff, or when context artifacts become noisy.
+- Follow this flow:
+  1. Finish implementation and verification.
+  2. Run `record-correction-pattern` or `record-debug-resolution` when applicable.
+  3. Run a safe preview: `./commands/clean-context.sh --dry-run`.
+  4. Run cleanup: `./commands/clean-context.sh`.
+- Expected outputs:
+  - active items retained
+  - completed items archived
+  - memory entries merged
+  - duplicate rules removed
+  - debug notes compressed
+  - recommended context summary refreshed
+- Safety rules:
+  - never delete durable knowledge without archiving it first
+  - prefer summarization over destruction
+
 ## Verification before done
 - Never mark a task complete without proving it works through tests, logs, or browser/playwright verification when relevant
 - Diff behavior between main and your changes when relevant
@@ -142,6 +160,7 @@ When multiple roles are requested:
 5. Keep `../tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
 6. Store detailed implementation notes, task-specific instructions, and review results in the matching `../tasks/<unique_task_name>/TASK.md`
 7. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
+8. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
 
 ## Task file rules
 - `../tasks/TODO.md` is the active ordered checklist only
