@@ -29,13 +29,14 @@ while IFS= read -r -d '' cmd; do
     status=1
   fi
 
-  first_line="$(head -n1 "$cmd" || true)"
-  if [[ "$first_line" != "#!/usr/bin/env bash" ]]; then
+  first_nonempty_line="$(sed -e 's/\r$//' -e '/^[[:space:]]*$/d' "$cmd" | head -n1 || true)"
+  first_nonempty_line_trimmed="$(printf '%s' "$first_nonempty_line" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+  if [[ "$first_nonempty_line_trimmed" != "#!/usr/bin/env bash" ]]; then
     echo "Missing bash shebang in $cmd" >&2
     status=1
   fi
 
-  if ! grep -q '^set -euo pipefail' "$cmd"; then
+  if ! grep -Eq '^[[:space:]]*set -euo pipefail[[:space:]]*$' "$cmd"; then
     echo "Missing strict mode in $cmd" >&2
     status=1
   fi
