@@ -2,12 +2,12 @@
 set -euo pipefail
 
 ai_dir="../.ai"
-archive_dir="$ai_dir/TASKS/completed/context-snapshots"
+archive_dir="$ai_dir/archive/context-snapshots"
 memory_file="$ai_dir/MEMORY.md"
 rules_file="$ai_dir/RULES.md"
 debug_file="$ai_dir/DEBUG.md"
 summary_file="$ai_dir/CONTEXT_SUMMARY.md"
-todo_file="../tasks/TODO.md"
+todo_file="../.ai/tasks/TODO.md"
 architecture_file="../ARCHITECTURE.md"
 
 timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -107,15 +107,24 @@ list_pending_todo() {
   echo "$pending"
 }
 
-active_note_count="0"
-if [[ -d "$ai_dir/TASKS/active" ]]; then
-  active_note_count="$(find "$ai_dir/TASKS/active" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
-fi
+list_completed_todo() {
+  local limit="$1"
 
-completed_archive_count="0"
-if [[ -d "$ai_dir/TASKS/completed" ]]; then
-  completed_archive_count="$(find "$ai_dir/TASKS/completed" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
-fi
+  if [[ ! -f "$todo_file" ]]; then
+    echo '- TODO file not found.'
+    return
+  fi
+
+  local completed
+  completed="$(grep -E '^[0-9]+\.[[:space:]]+\[x\]' "$todo_file" | sed -E 's/^[0-9]+\.[[:space:]]+\[x\][[:space:]]+/- /' | head -n "$limit" || true)"
+
+  if [[ -z "$completed" ]]; then
+    echo '- none'
+    return
+  fi
+
+  echo "$completed"
+}
 
 architecture_status='ARCHITECTURE.md not found.'
 if [[ -f "$architecture_file" ]]; then
@@ -130,12 +139,14 @@ Generated: $timestamp
 ## Active Items Retained
 $(list_pending_todo 8)
 
+## Completed Items
+$(list_completed_todo 8)
+
 ## Current Constraints
 - $architecture_status
-- Active task notes: $active_note_count
+- Task index: $todo_file
 
 ## Archive Snapshot
-- Completed archive files: $completed_archive_count
 - Snapshot directory: $archive_dir
 
 ## Durable Memory

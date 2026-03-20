@@ -155,7 +155,7 @@ OpenCaw deterministically resolves your prompt into:
 
 1. **Roles activated** → sets perspective and priorities  
 2. **Skills selected** → plans and reasons about the work  
-3. **Tasks created/updated** → `tasks/TODO.md` + `tasks/<task>/TASK.md`  
+3. **Tasks created/updated** → `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md`
 4. **Architecture ensured** → generates `ARCHITECTURE.md` if missing  
 5. **Commands executed** → builds, tests, scans, or deploys  
 6. **Verification performed** → tests/logs prove correctness  
@@ -167,9 +167,9 @@ To be more specific it will:
 2. check whether `ARCHITECTURE.md` exists
 3. if missing, ask which architecture templates apply
 4. generate `ARCHITECTURE.md`
-5. update `tasks/TODO.md` with an ordered checklist
+5. update `.ai/tasks/TODO.md` with an ordered checklist
 6. create a task file such as:
-   - `tasks/create-calculator-app/TASK.md`
+   - `.ai/tasks/create-calculator-app/TASK.md`
 7. apply appropriate skills such as:
    - `plan-task`
    - `feature-end-to-end`
@@ -232,7 +232,6 @@ When contributing:
 - Follow existing file structure and conventions
 
 ---
-
 # Architecture Frameworks
 
 OpenCaw supports multi-architecture repositories.  
@@ -433,12 +432,12 @@ These validators check:
 
 # Task Management
 
-OpenCaw supports structured task tracking using the `tasks` directory.
+OpenCaw supports structured task tracking using the `.ai/tasks` directory.
 
 ```
-tasks/
-tasks/TODO.md
-tasks/<task-name>/TASK.md
+.ai/tasks/
+.ai/tasks/TODO.md
+.ai/tasks/<task-name>/TASK.md
 ```
 
 Rules:

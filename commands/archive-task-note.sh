@@ -9,9 +9,9 @@ if [[ -z "$src" ]]; then
   exit 1
 fi
 
-mkdir -p ../.ai/TASKS/completed
+mkdir -p ../.ai/archive/tasks
 if [[ -z "$name" ]]; then
   name="$(basename "$src")"
 fi
 
-cp "$src" "../.ai/TASKS/completed/$name"
+cp "$src" "../.ai/archive/tasks/$name"

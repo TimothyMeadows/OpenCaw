@@ -2,39 +2,21 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-todo_file="../tasks/TODO.md"
-active_dir="../.ai/TASKS/active"
-completed_dir="../.ai/TASKS/completed"
-
-archive_stale_active='false'
-stale_days='30'
+todo_file="../.ai/tasks/TODO.md"
+report_dir="../.ai/reports"
 dry_run='false'
 
 usage() {
   cat <<USAGE
-Usage: ./commands/clean-context.sh [--archive-stale-active] [--stale-days <days>] [--dry-run]
+Usage: ./commands/clean-context.sh [--dry-run]
 
 Options:
-  --archive-stale-active   Archive active notes older than stale-days (unless they contain KEEP_ACTIVE).
-  --stale-days <days>      Age threshold used with --archive-stale-active. Default: 30.
-  --dry-run                Print what would change without writing files.
+  --dry-run  Print what would change without writing files.
 USAGE
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --archive-stale-active)
-      archive_stale_active='true'
-      shift
-      ;;
-    --stale-days)
-      stale_days="${2:-}"
-      if [[ -z "$stale_days" || ! "$stale_days" =~ ^[0-9]+$ ]]; then
-        echo 'Expected integer after --stale-days.' >&2
-        exit 1
-      fi
-      shift 2
-      ;;
     --dry-run)
       dry_run='true'
       shift
@@ -51,19 +33,16 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-mkdir -p "$active_dir" "$completed_dir"
+mkdir -p "$report_dir"
 
 archived_task_count=0
-archived_active_count=0
-retained_active_count=0
 archived_task_names=''
-archived_active_names=''
 
 if [[ -f "$todo_file" ]]; then
   while IFS= read -r line; do
-    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`tasks/([^/]+)/TASK\.md\` ]]; then
-      task_name="${BASH_REMATCH[1]}"
-      task_file="../tasks/$task_name/TASK.md"
+    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`(\.\./)?\.ai/tasks/([^/]+)/TASK\.md\` ]]; then
+      task_name="${BASH_REMATCH[2]}"
+      task_file="../.ai/tasks/$task_name/TASK.md"
 
       if [[ -f "$task_file" ]]; then
         if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
@@ -86,41 +65,6 @@ if [[ -f "$todo_file" ]]; then
   done < "$todo_file"
 fi
 
-for note in "$active_dir"/*.md; do
-  [[ -e "$note" ]] || break
-
-  should_archive='false'
-
-  if grep -Eiq 'status:[[:space:]]*(completed|resolved)|^##[[:space:]]*Review' "$note"; then
-    should_archive='true'
-  fi
-
-  if [[ "$should_archive" == 'false' && "$archive_stale_active" == 'true' ]]; then
-    if ! grep -Eiq 'KEEP_ACTIVE|BLOCKER' "$note"; then
-      if find "$note" -mtime "+$stale_days" -print -quit | grep -q .; then
-        should_archive='true'
-      fi
-    fi
-  fi
-
-  if [[ "$should_archive" == 'true' ]]; then
-    note_name="$(basename "$note" .md)"
-    target="$completed_dir/${note_name}-$(date -u '+%Y%m%dT%H%M%SZ').md"
-
-    if [[ "$dry_run" == 'true' ]]; then
-      echo "DRY_RUN archive active note: $note -> $target"
-    else
-      cp "$note" "$target"
-      rm "$note"
-    fi
-
-    archived_active_count=$((archived_active_count + 1))
-    archived_active_names+="- $target\n"
-  else
-    retained_active_count=$((retained_active_count + 1))
-  fi
-done
-
 memory_merged=0
 rules_removed=0
 debug_compressed=0
@@ -136,7 +80,7 @@ if [[ "$dry_run" == 'false' ]]; then
   snapshot_dir="$(printf '%s\n' "$summarize_output" | awk -F= '/^SNAPSHOT_DIR=/{print $2; exit}')"
 fi
 
-report_file="$completed_dir/clean-context-report-$(date -u '+%Y%m%dT%H%M%SZ').md"
+report_file="$report_dir/clean-context-report-$(date -u '+%Y%m%dT%H%M%SZ').md"
 
 if [[ "$dry_run" == 'false' ]]; then
   cat > "$report_file" <<EOF
@@ -144,18 +88,11 @@ if [[ "$dry_run" == 'false' ]]; then
 
 Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
 
-## Active Items Retained
-- Active notes retained: $retained_active_count
+## Task Files Compacted
+- Task files compacted: $archived_task_count
 
-## Completed Items Archived
-- Completed tasks archived: $archived_task_count
-- Active notes archived: $archived_active_count
-
-### Archived Tasks
+### Compacted Tasks
 ${archived_task_names:-- none}
-
-### Archived Active Notes
-${archived_active_names:-- none}
 
 ## Memory Cleanup
 - Memory entries merged: $memory_merged
@@ -170,8 +107,7 @@ ${archived_active_names:-- none}
 EOF
 fi
 
-echo "ACTIVE_ITEMS_RETAINED=$retained_active_count"
-echo "COMPLETED_ITEMS_ARCHIVED=$((archived_task_count + archived_active_count))"
+echo "TASK_FILES_COMPACTED=$archived_task_count"
 echo "MEMORY_ENTRIES_MERGED=$memory_merged"
 echo "DUPLICATE_RULES_REMOVED=$rules_removed"
 echo "DEBUG_NOTES_COMPRESSED=$debug_compressed"

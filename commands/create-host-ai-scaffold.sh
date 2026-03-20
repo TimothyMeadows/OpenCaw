@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/TASKS/active ../.ai/TASKS/completed ../tasks
+mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/tasks ../.ai/archive/tasks ../.ai/archive/context-snapshots ../.ai/reports
 
 [[ -f ../.ai/MEMORY.md ]] || printf "# Project Memory\n\n" > ../.ai/MEMORY.md
 [[ -f ../.ai/RULES.md ]] || printf "# Rules\n\n" > ../.ai/RULES.md
@@ -11,17 +11,17 @@ mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/TASKS/active ../.ai/TASKS/comp
 [[ -f ../.ai/FRAGMENTS/gotchas.md ]] || printf "# Gotchas\n\n" > ../.ai/FRAGMENTS/gotchas.md
 [[ -f ../.ai/LEARNINGS/workflows.md ]] || printf "# Workflows\n\n" > ../.ai/LEARNINGS/workflows.md
 [[ -f ../.ai/LEARNINGS/bugs.md ]] || printf "# Bug Patterns\n\n" > ../.ai/LEARNINGS/bugs.md
-mkdir -p ../tasks/example-task
+mkdir -p ../.ai/tasks/example-task
 
-if [[ ! -f ../tasks/TODO.md ]]; then
-  cat > ../tasks/TODO.md <<'EOF'
+if [[ ! -f ../.ai/tasks/TODO.md ]]; then
+  cat > ../.ai/tasks/TODO.md <<'EOF'
 # TODO
 
-1. [ ] Example first task (`tasks/example-task/TASK.md`)
+1. [ ] Example first task (`.ai/tasks/example-task/TASK.md`)
 EOF
 fi
 
-[[ -f ../tasks/example-task/TASK.md ]] || cat > ../tasks/example-task/TASK.md <<'EOF'
+[[ -f ../.ai/tasks/example-task/TASK.md ]] || cat > ../.ai/tasks/example-task/TASK.md <<'EOF'
 # Example first task
 
 ## Goal
