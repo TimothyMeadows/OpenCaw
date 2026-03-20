@@ -4,6 +4,10 @@ This file maps common OpenCaw roles to their default skills and preferred comman
 
 Role casting should use this map to bias skill and command selection after a role is activated.
 
+Mapping key resolution:
+- prefer domain-qualified keys such as `computer-science/backend-architect` when present
+- fallback to unqualified keys such as `backend-architect` for backward compatibility
+
 ## Shared capabilities
 
 These skills and commands apply to all roles:

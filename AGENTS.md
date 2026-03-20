@@ -62,12 +62,24 @@ OpenCaw supports **role casting** using role definitions stored in:
 - role list index: `./.roles/INDEX.md`
 
 ### Activation rule
-If the user explicitly defines or requests a role whose name matches a folder in `./.roles/<domain>/`, load and apply that role definition for the session.
+If the user explicitly defines or requests a role, resolve it across `./.roles/<domain>/` and apply the matching role definition for the session.
+Role references may be:
+- unqualified role name, for example `backend-architect`
+- alias from `./.roles/INDEX.md`, for example `security`
+- domain-qualified role id, for example `computer-science/backend-architect`
+
+Resolution behavior:
+- If an unqualified role name or alias maps to exactly one role across all domains, activate it directly.
+- If an unqualified role name or alias maps to multiple roles across domains, pause and ask the user which domain-qualified role they mean before continuing.
+- If both an exact role-name match and alias match exist, prefer exact role-name match.
+- If no match exists, continue using normal OpenCaw baseline behavior.
+- Prefer deterministic resolution with `./commands/resolve-role.sh` when available.
 
 ### Alias support
 - Common aliases are listed in `./.roles/INDEX.md`
 - If the user provides a known alias, resolve it to the matching role name
 - Prefer exact role-name matches when both an alias and an exact role are present
+- If alias resolution is ambiguous across domains, ask for a domain-qualified role id before proceeding
 
 ### Multi-role composition
 Users may request more than one role, for example:
@@ -78,7 +90,7 @@ Users may request more than one role, for example:
 
 When multiple roles are requested:
 
-1. Resolve each requested name or alias to a role in `./.roles/`
+1. Resolve each requested name or alias to a role in `./.roles/<domain>/`
 2. Load the matching `ROLE.md` files
 3. Compose them in the order requested by the user
 4. Treat the first role as the primary perspective when rules overlap, unless the user explicitly sets a different priority
@@ -270,6 +282,7 @@ After a role is activated, bias behavior using the mappings defined in:
 - Prefer commands mapped to the active role when relevant
 - Apply shared skills and commands for all roles
 - Bias reasoning toward that role's domain expertise
+- Resolve mappings by trying `<domain>/<role>` first, then fallback to `<role>` for backward compatibility
 - When multiple roles are active, merge the mapped skills and commands in the same order as the active role composition
 - Use the first role as the primary bias when there is overlap, unless the user sets a different priority
 - Use stricter or safer guidance when role-specific skill choices conflict
