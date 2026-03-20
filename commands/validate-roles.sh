@@ -15,7 +15,9 @@ if [[ ! -f "$schema_file" ]]; then
 fi
 
 status=0
+role_count=0
 declare -A alias_seen
+declare -A role_name_seen
 
 trim_line() {
   local value="$1"
@@ -33,6 +35,27 @@ normalize_role_name() {
   printf '%s' "$value"
 }
 
+append_unique_pipe_value() {
+  local value="$1"
+  local existing="$2"
+
+  if [[ -z "$existing" ]]; then
+    printf '%s' "$value"
+    return
+  fi
+
+  local part
+  IFS='|' read -r -a parts <<< "$existing"
+  for part in "${parts[@]}"; do
+    if [[ "$part" == "$value" ]]; then
+      printf '%s' "$existing"
+      return
+    fi
+  done
+
+  printf '%s|%s' "$existing" "$value"
+}
+
 is_legacy_role_format() {
   local role_file="$1"
   local h1_count h2_count
@@ -42,7 +65,17 @@ is_legacy_role_format() {
 }
 
 while IFS= read -r -d '' role_md; do
+  role_count=$((role_count + 1))
+  domain_dir="$(basename "$(dirname "$(dirname "$role_md")")")"
   role_dir="$(basename "$(dirname "$role_md")")"
+  role_id="${domain_dir}/${role_dir}"
+
+  role_name_seen["$role_dir"]="$(append_unique_pipe_value "$role_id" "${role_name_seen[$role_dir]:-}")"
+
+  if [[ ! "$domain_dir" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+    echo "Invalid role domain folder name: $domain_dir ($role_md)" >&2
+    status=1
+  fi
 
   if [[ ! "$role_dir" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
     echo "Invalid role folder name: $role_dir" >&2
@@ -97,20 +130,44 @@ while IFS= read -r -d '' role_md; do
           echo "Invalid alias '$alias' in $role_md" >&2
           status=1
         fi
-        if [[ -n "${alias_seen[$alias]:-}" ]]; then
-          echo "Duplicate alias '$alias' found in $role_md and ${alias_seen[$alias]}" >&2
-          status=1
-        else
-          alias_seen[$alias]="$role_md"
-        fi
+        alias_seen["$alias"]="$(append_unique_pipe_value "$role_id" "${alias_seen[$alias]:-}")"
       fi
     fi
   done < "$role_md"
 
+done < <(find "$roles_dir" -mindepth 3 -maxdepth 3 -name ROLE.md -print0)
+
+while IFS= read -r -d '' legacy_role_md; do
+  echo "Legacy role layout detected (expected .roles/<domain>/<role>/ROLE.md): $legacy_role_md" >&2
+  status=1
 done < <(find "$roles_dir" -mindepth 2 -maxdepth 2 -name ROLE.md -print0)
+
+if [[ $role_count -eq 0 ]]; then
+  echo "No roles found under $roles_dir (expected .roles/<domain>/<role>/ROLE.md)." >&2
+  status=1
+fi
+
+ambiguous_names=0
+for role_name in "${!role_name_seen[@]}"; do
+  if [[ "${role_name_seen[$role_name]}" == *"|"* ]]; then
+    echo "Notice: ambiguous role name '$role_name' exists in multiple domains (${role_name_seen[$role_name]}). Activation must prompt for explicit domain-qualified role id." >&2
+    ambiguous_names=$((ambiguous_names + 1))
+  fi
+done
+
+ambiguous_aliases=0
+for alias in "${!alias_seen[@]}"; do
+  if [[ "${alias_seen[$alias]}" == *"|"* ]]; then
+    echo "Notice: ambiguous alias '$alias' maps to multiple roles (${alias_seen[$alias]}). Activation must prompt for explicit domain-qualified role id." >&2
+    ambiguous_aliases=$((ambiguous_aliases + 1))
+  fi
+done
 
 if [[ $status -eq 0 ]]; then
   echo "Roles validation passed."
+  if [[ $ambiguous_names -gt 0 || $ambiguous_aliases -gt 0 ]]; then
+    echo "Disambiguation notices: role-names=$ambiguous_names aliases=$ambiguous_aliases"
+  fi
 fi
 
 exit $status
