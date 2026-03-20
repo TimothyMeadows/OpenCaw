@@ -15,6 +15,7 @@ if [[ ! -f "$schema_file" ]]; then
 fi
 
 status=0
+role_count=0
 declare -A alias_seen
 
 trim_line() {
@@ -42,7 +43,14 @@ is_legacy_role_format() {
 }
 
 while IFS= read -r -d '' role_md; do
+  role_count=$((role_count + 1))
+  domain_dir="$(basename "$(dirname "$(dirname "$role_md")")")"
   role_dir="$(basename "$(dirname "$role_md")")"
+
+  if [[ ! "$domain_dir" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+    echo "Invalid role domain folder name: $domain_dir ($role_md)" >&2
+    status=1
+  fi
 
   if [[ ! "$role_dir" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
     echo "Invalid role folder name: $role_dir" >&2
@@ -107,7 +115,17 @@ while IFS= read -r -d '' role_md; do
     fi
   done < "$role_md"
 
+done < <(find "$roles_dir" -mindepth 3 -maxdepth 3 -name ROLE.md -print0)
+
+while IFS= read -r -d '' legacy_role_md; do
+  echo "Legacy role layout detected (expected .roles/<domain>/<role>/ROLE.md): $legacy_role_md" >&2
+  status=1
 done < <(find "$roles_dir" -mindepth 2 -maxdepth 2 -name ROLE.md -print0)
+
+if [[ $role_count -eq 0 ]]; then
+  echo "No roles found under $roles_dir (expected .roles/<domain>/<role>/ROLE.md)." >&2
+  status=1
+fi
 
 if [[ $status -eq 0 ]]; then
   echo "Roles validation passed."

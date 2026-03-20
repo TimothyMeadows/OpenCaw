@@ -273,7 +273,13 @@ OpenCaw includes a library of engineering roles in:
 Each role is stored as:
 
 ```text
-.roles/<role-name>/ROLE.md
+.roles/<domain>/<role-name>/ROLE.md
+```
+
+Current engineering catalog:
+
+```text
+.roles/computer-science/<role-name>/ROLE.md
 ```
 
 To browse available roles, categories, and aliases, see:

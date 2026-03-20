@@ -57,11 +57,12 @@ Architecture templates live in:
 
 OpenCaw supports **role casting** using role definitions stored in:
 
-- `./.roles/<role-name>/ROLE.md`
+- `./.roles/<domain>/<role-name>/ROLE.md`
+- current computer science catalog: `./.roles/computer-science/<role-name>/ROLE.md`
 - role list index: `./.roles/INDEX.md`
 
 ### Activation rule
-If the user explicitly defines or requests a role whose name matches a folder in `./.roles/`, load and apply that role definition for the session.
+If the user explicitly defines or requests a role whose name matches a folder in `./.roles/<domain>/`, load and apply that role definition for the session.
 
 ### Alias support
 - Common aliases are listed in `./.roles/INDEX.md`
