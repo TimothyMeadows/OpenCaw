@@ -9,8 +9,8 @@ if [[ -z "$task_name" ]]; then
   exit 1
 fi
 
-mkdir -p "../tasks/$task_name"
-target="../tasks/$task_name/TASK.md"
+mkdir -p "../.ai/tasks/$task_name"
+target="../.ai/tasks/$task_name/TASK.md"
 
 if [[ -f "$target" ]]; then
   echo "$target already exists"

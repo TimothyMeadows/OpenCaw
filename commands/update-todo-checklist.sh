@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-target="../tasks/TODO.md"
-mkdir -p ../tasks
+target="../.ai/tasks/TODO.md"
+mkdir -p ../.ai/tasks
 
 if [[ ! -f "$target" ]]; then
   printf "# TODO\n\n" > "$target"
