@@ -292,13 +292,28 @@ To browse available roles, categories, and aliases, see:
 
 To activate a role, the user can request a matching role name or a common alias.
 
+Role references may be:
+- unqualified role name, for example `backend-architect`
+- alias from `.roles/INDEX.md`, for example `security`
+- domain-qualified role id, for example `computer-science/backend-architect`
+
 Examples:
 
 - `use role backend-architect`
 - `use role security`
 - `act as sre`
 
-If a matching role exists, the agent should load the corresponding `ROLE.md` into the session.
+Resolution behavior:
+- If an unqualified role name or alias maps to exactly one role across all domains, activate it directly.
+- If an unqualified role name or alias maps to multiple roles across domains, prompt the user to choose a domain-qualified role before continuing.
+- If both an exact role-name match and alias match exist, exact role-name match wins.
+- If no matching role exists, continue with baseline behavior.
+
+Deterministic helper command:
+
+```text
+./commands/resolve-role.sh "<role-name|alias|domain/role-name>"
+```
 
 ## Multi-role composition
 
@@ -335,6 +350,7 @@ When a role is activated, OpenCaw should:
 - prefer commands associated with that role
 - apply shared skills such as planning, debugging, review, refactoring, and verification
 - bias reasoning toward the role's domain expertise
+- resolve bindings by checking `<domain>/<role>` first, then fallback to `<role>` for backward compatibility
 
 Examples:
 

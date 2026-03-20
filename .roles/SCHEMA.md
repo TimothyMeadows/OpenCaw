@@ -117,7 +117,9 @@ Rules:
 
 - Aliases must be lowercase
 - No spaces (use hyphen)
-- Must not conflict with other roles
+- Alias conflicts across domains are allowed, but they must be resolvable through explicit domain-qualified disambiguation at activation time
+
+Role-name conflicts across domains are also allowed and must be handled through explicit domain-qualified disambiguation when ambiguous.
 
 ---
 
