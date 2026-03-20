@@ -35,7 +35,7 @@ if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
   exit 0
 fi
 
-archive_dir="../.ai/tasks/completed"
+archive_dir="../.ai/archive/tasks"
 mkdir -p "$archive_dir"
 
 timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"

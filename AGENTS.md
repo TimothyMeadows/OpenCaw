@@ -17,7 +17,7 @@ Project-local knowledge belongs in the host repository:
 - debug history: `../.ai/DEBUG.md`
 - fragments: `../.ai/FRAGMENTS/`
 - learnings: `../.ai/LEARNINGS/`
-- task scratch notes: `../.ai/tasks/active/`
+- task notes: `../.ai/tasks/`
 
 Never write project-specific learned state into this mounted baseline unless the user explicitly asks to modify the shared baseline.
 
@@ -122,8 +122,7 @@ When multiple roles are requested:
   3. Run a safe preview: `./commands/clean-context.sh --dry-run`.
   4. Run cleanup: `./commands/clean-context.sh`.
 - Expected outputs:
-  - active items retained
-  - completed items archived
+  - completed task files compacted
   - memory entries merged
   - duplicate rules removed
   - debug notes compressed
@@ -228,7 +227,7 @@ When multiple roles are requested:
 ## Memory promotion policy
 Use a strict funnel:
 
-1. Temporary notes go to `../.ai/tasks/active/`
+1. Temporary notes go to `../.ai/tasks/<unique_task_name>/TASK.md`
 2. Only durable, reusable facts may be promoted
 3. Promote durable facts into:
    - `../.ai/FRAGMENTS/repo-map.md`
