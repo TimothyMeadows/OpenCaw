@@ -2,6 +2,10 @@
 
 OpenCaw role catalog with categories and common aliases.
 
+Current role catalog location:
+
+- `./.roles/computer-science/<role-name>/ROLE.md`
+
 ## Categories
 
 ### Architecture & Design

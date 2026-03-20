@@ -15,7 +15,7 @@ All roles must follow this schema to ensure:
 Each role must exist at:
 
 ```
-.roles/<role-name>/ROLE.md
+.roles/<domain>/<role-name>/ROLE.md
 ```
 
 ---
@@ -65,6 +65,7 @@ Describe what this role is responsible for.
 - Must be lowercase kebab-case
 - Must be unique
 - Must be descriptive
+- Domain folders must also be lowercase kebab-case
 
 Good:
 ```
@@ -125,6 +126,7 @@ Rules:
 A role is valid if:
 
 - ROLE.md exists
+- domain folder exists
 - required sections are present
 - metadata block exists
 - name matches folder
