@@ -2,12 +2,12 @@
 set -euo pipefail
 
 ai_dir="../.ai"
-archive_dir="$ai_dir/TASKS/completed/context-snapshots"
+archive_dir="$ai_dir/tasks/completed/context-snapshots"
 memory_file="$ai_dir/MEMORY.md"
 rules_file="$ai_dir/RULES.md"
 debug_file="$ai_dir/DEBUG.md"
 summary_file="$ai_dir/CONTEXT_SUMMARY.md"
-todo_file="../tasks/TODO.md"
+todo_file="../.ai/tasks/TODO.md"
 architecture_file="../ARCHITECTURE.md"
 
 timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -108,13 +108,13 @@ list_pending_todo() {
 }
 
 active_note_count="0"
-if [[ -d "$ai_dir/TASKS/active" ]]; then
-  active_note_count="$(find "$ai_dir/TASKS/active" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
+if [[ -d "$ai_dir/tasks/active" ]]; then
+  active_note_count="$(find "$ai_dir/tasks/active" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
 fi
 
 completed_archive_count="0"
-if [[ -d "$ai_dir/TASKS/completed" ]]; then
-  completed_archive_count="$(find "$ai_dir/TASKS/completed" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
+if [[ -d "$ai_dir/tasks/completed" ]]; then
+  completed_archive_count="$(find "$ai_dir/tasks/completed" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
 fi
 
 architecture_status='ARCHITECTURE.md not found.'

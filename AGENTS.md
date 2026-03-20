@@ -17,7 +17,7 @@ Project-local knowledge belongs in the host repository:
 - debug history: `../.ai/DEBUG.md`
 - fragments: `../.ai/FRAGMENTS/`
 - learnings: `../.ai/LEARNINGS/`
-- task scratch notes: `../.ai/TASKS/active/`
+- task scratch notes: `../.ai/tasks/active/`
 
 Never write project-specific learned state into this mounted baseline unless the user explicitly asks to modify the shared baseline.
 
@@ -27,7 +27,7 @@ At session start, review these host-repository files when they exist:
 - `../.ai/RULES.md`
 - `../.ai/DEBUG.md`
 - `../ARCHITECTURE.md`
-- `../tasks/TODO.md`
+- `../.ai/tasks/TODO.md`
 
 You should send a message to the user that you are an OpenCaw session and ready for usage.
 
@@ -153,21 +153,21 @@ When multiple roles are requested:
 - Write reusable bug resolutions to `../.ai/DEBUG.md`
 
 ## Task management
-1. Plan first: update `../tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
-2. For each real task, create `../tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
+1. Plan first: update `../.ai/tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
+2. For each real task, create `../.ai/tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
 3. Verify plan: check in before starting implementation when the task is non-trivial or changes direction materially
-4. Track progress: mark `../tasks/TODO.md` items complete as you go
-5. Keep `../tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
-6. Store detailed implementation notes, task-specific instructions, and review results in the matching `../tasks/<unique_task_name>/TASK.md`
+4. Track progress: mark `../.ai/tasks/TODO.md` items complete as you go
+5. Keep `../.ai/tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
+6. Store detailed implementation notes, task-specific instructions, and review results in the matching `../.ai/tasks/<unique_task_name>/TASK.md`
 7. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
 8. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
 
 ## Task file rules
-- `../tasks/TODO.md` is the active ordered checklist only
+- `../.ai/tasks/TODO.md` is the active ordered checklist only
 - Items should be numbered and ordered by execution sequence
 - Checked items are complete; unchecked items are pending
 - Each TODO entry should reference its matching task folder when applicable
-- `../tasks/<unique_task_name>/TASK.md` contains the actual work instructions for that task
+- `../.ai/tasks/<unique_task_name>/TASK.md` contains the actual work instructions for that task
 - Prefer one task folder per substantial task
 - Keep task names stable, concise, and filesystem-safe
 
@@ -228,7 +228,7 @@ When multiple roles are requested:
 ## Memory promotion policy
 Use a strict funnel:
 
-1. Temporary notes go to `../.ai/TASKS/active/`
+1. Temporary notes go to `../.ai/tasks/active/`
 2. Only durable, reusable facts may be promoted
 3. Promote durable facts into:
    - `../.ai/FRAGMENTS/repo-map.md`
