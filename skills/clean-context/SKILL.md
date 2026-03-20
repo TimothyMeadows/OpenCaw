@@ -27,4 +27,4 @@ Use when active context has grown noisy and you need to keep only high-signal ar
 - Never delete durable knowledge without archiving first.
 - Prefer summarization over destruction.
 - Keep `../.ai/MEMORY.md` short and high-value.
-- Preserve traceability via `../.ai/TASKS/completed/` snapshot and report files.
+- Preserve traceability via `../.ai/tasks/completed/` snapshot and report files.

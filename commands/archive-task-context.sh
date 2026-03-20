@@ -4,7 +4,7 @@ set -euo pipefail
 task_ref="${1:-}"
 
 if [[ -z "$task_ref" ]]; then
-  echo 'Usage: ./commands/archive-task-context.sh "<task-name|../tasks/<task-name>/TASK.md>"' >&2
+  echo 'Usage: ./commands/archive-task-context.sh "<task-name|../.ai/tasks/<task-name>/TASK.md>"' >&2
   exit 1
 fi
 
@@ -13,7 +13,12 @@ if [[ "$task_ref" == */TASK.md ]]; then
 elif [[ "$task_ref" == *.md ]]; then
   task_file="$task_ref"
 else
-  task_file="../tasks/$task_ref/TASK.md"
+  task_file="../.ai/tasks/$task_ref/TASK.md"
+fi
+
+if [[ "$task_file" != ../.ai/tasks/*/TASK.md && "$task_file" != ./.ai/tasks/*/TASK.md && "$task_file" != .ai/tasks/*/TASK.md && "$task_file" != */.ai/tasks/*/TASK.md ]]; then
+  echo "Task file must be under .ai/tasks: $task_file" >&2
+  exit 1
 fi
 
 if [[ ! -f "$task_file" ]]; then
@@ -30,7 +35,7 @@ if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
   exit 0
 fi
 
-archive_dir="../.ai/TASKS/completed"
+archive_dir="../.ai/tasks/completed"
 mkdir -p "$archive_dir"
 
 timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"

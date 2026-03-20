@@ -2,9 +2,9 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-todo_file="../tasks/TODO.md"
-active_dir="../.ai/TASKS/active"
-completed_dir="../.ai/TASKS/completed"
+todo_file="../.ai/tasks/TODO.md"
+active_dir="../.ai/tasks/active"
+completed_dir="../.ai/tasks/completed"
 
 archive_stale_active='false'
 stale_days='30'
@@ -61,9 +61,9 @@ archived_active_names=''
 
 if [[ -f "$todo_file" ]]; then
   while IFS= read -r line; do
-    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`tasks/([^/]+)/TASK\.md\` ]]; then
-      task_name="${BASH_REMATCH[1]}"
-      task_file="../tasks/$task_name/TASK.md"
+    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`(\.\./)?\.ai/tasks/([^/]+)/TASK\.md\` ]]; then
+      task_name="${BASH_REMATCH[2]}"
+      task_file="../.ai/tasks/$task_name/TASK.md"
 
       if [[ -f "$task_file" ]]; then
         if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
