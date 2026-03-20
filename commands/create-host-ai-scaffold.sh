@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/tasks/active ../.ai/tasks/completed ../.ai/tasks
+mkdir -p ../.ai/FRAGMENTS ../.ai/LEARNINGS ../.ai/tasks ../.ai/archive/tasks ../.ai/archive/context-snapshots ../.ai/reports
 
 [[ -f ../.ai/MEMORY.md ]] || printf "# Project Memory\n\n" > ../.ai/MEMORY.md
 [[ -f ../.ai/RULES.md ]] || printf "# Rules\n\n" > ../.ai/RULES.md
