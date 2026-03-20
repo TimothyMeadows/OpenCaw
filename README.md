@@ -125,7 +125,13 @@ This allows you to modify instructions without affecting the upstream repository
 
 # Examples
 
- These are some examples in how to use OpenCaw after it's been installed.
+First, while OpenCaw should auto load into sessions due AGENTS.md being standard. In the event this changes, or you just want to be sure. OpenCaw can be activated by first saying:
+
+```text
+activate opencaw in AGENTS.md
+```
+
+ These are some examples in how to use OpenCaw after it's been installed, and activated.
 
 ```text
 use role security-engineer + sre and review this repository for vulnerabilities and recommend fixes
