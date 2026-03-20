@@ -15,7 +15,7 @@ All roles must follow this schema to ensure:
 Each role must exist at:
 
 ```
-.roles/<role-name>/ROLE.md
+.roles/<domain>/<role-name>/ROLE.md
 ```
 
 ---
@@ -65,6 +65,7 @@ Describe what this role is responsible for.
 - Must be lowercase kebab-case
 - Must be unique
 - Must be descriptive
+- Domain folders must also be lowercase kebab-case
 
 Good:
 ```
@@ -116,7 +117,9 @@ Rules:
 
 - Aliases must be lowercase
 - No spaces (use hyphen)
-- Must not conflict with other roles
+- Alias conflicts across domains are allowed, but they must be resolvable through explicit domain-qualified disambiguation at activation time
+
+Role-name conflicts across domains are also allowed and must be handled through explicit domain-qualified disambiguation when ambiguous.
 
 ---
 
@@ -125,6 +128,7 @@ Rules:
 A role is valid if:
 
 - ROLE.md exists
+- domain folder exists
 - required sections are present
 - metadata block exists
 - name matches folder
