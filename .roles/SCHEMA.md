@@ -92,6 +92,8 @@ Recommended categories:
 - frontend
 - security
 - qa
+- arts
+- design
 - devops
 - sre
 - platform

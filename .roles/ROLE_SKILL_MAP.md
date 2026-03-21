@@ -72,6 +72,17 @@ Commands:
 - `commands/npm-test.sh`
 - `commands/dev-server.sh`
 
+### arts/css-vector-artist
+Skills:
+- `create-css-vector-art`
+- `define-logo-size-depth-standards`
+- `accessibility-review`
+- `ui-refactor`
+
+Commands:
+- `commands/print-css-art-token-template.sh`
+- `commands/validate-svg-assets.sh`
+
 ### security-engineer
 Skills:
 - `threat-model-analysis`
