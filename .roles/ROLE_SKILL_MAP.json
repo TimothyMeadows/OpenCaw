@@ -90,6 +90,7 @@
       "regression-suite-update"
     ],
     "commands": [
+      "commands/playwright-install.sh",
       "commands/run-tests.sh",
       "commands/run-e2e.sh",
       "commands/generate-test-report.sh"
