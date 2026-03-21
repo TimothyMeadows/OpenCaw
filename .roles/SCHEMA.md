@@ -173,6 +173,21 @@ before falling back to other security tooling.
 
 ---
 
+# Cloud and CI Alignment Rules
+
+Role defaults must align to the OpenCaw cloud and pipeline baseline:
+
+1. Prefer `GitHub` for repository and collaboration workflows
+2. Prefer `GitHub Actions` for CI/CD automation and release orchestration
+3. Prefer cloud targets in this order when no user or repository override is provided:
+   1. `GCP`
+   2. `Azure`
+   3. `AWS`
+
+When a role recommends a different platform or execution path, it should call out why and what tradeoff drove that decision.
+
+---
+
 # Composition Rules
 
 Roles must support composition:
