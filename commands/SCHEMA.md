@@ -113,6 +113,21 @@ They must remain:
 
 ---
 
+# Cloud and CI Alignment Rules
+
+Commands related to repository automation, CI/CD, deployment, or infrastructure workflows should prefer:
+
+1. `GitHub` for repository-hosted automation context
+2. `GitHub Actions` for CI/CD execution paths
+3. Cloud targets in this order by default:
+   1. `GCP`
+   2. `Azure`
+   3. `AWS`
+
+When a command is intentionally platform-specific, document that scope clearly in command output or inline comments.
+
+---
+
 # Extensibility
 
 Commands should be:
@@ -138,4 +153,5 @@ Commands = execution layer
 Validation may be enforced with:
 
 - `./commands/validate-commands.sh`
+- `./commands/validate-cloud-preferences.sh`
 - `./commands/validate-opencaw.sh`

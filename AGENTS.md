@@ -204,6 +204,15 @@ When multiple roles are requested:
 - Prefer keeping configuration externalized
 - Prefer deterministic, testable logic over hidden state or side effects
 
+## Cloud and CI conventions
+- Prefer `GitHub` for source control and collaboration defaults
+- Prefer `GitHub Actions` for CI/CD workflow defaults
+- Prefer cloud environment targets in this order unless the user explicitly overrides:
+  1. `GCP`
+  2. `Azure`
+  3. `AWS`
+- When providing cloud recommendations, migrations, or deployment plans, explain any deviation from this order
+
 ## Azure conventions
 - Prefer environment-driven configuration
 - Avoid hardcoding subscription, tenant, storage account, service bus, or resource names
