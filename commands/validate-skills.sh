@@ -33,7 +33,7 @@ while IFS= read -r -d '' skill_md; do
     echo "Missing name field in $skill_md" >&2
     status=1
   else
-    declared_name="$(grep '^name:[[:space:]]' "$skill_md" | head -n1 | sed 's/^name:[[:space:]]*//')"
+    declared_name="$(grep '^name:[[:space:]]' "$skill_md" | head -n1 | sed 's/^name:[[:space:]]*//' | tr -d '\r')"
     if [[ "$declared_name" != "$skill_dir" ]]; then
       echo "Skill name mismatch in $skill_md (folder=$skill_dir, name=$declared_name)" >&2
       status=1

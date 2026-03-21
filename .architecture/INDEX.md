@@ -5,6 +5,7 @@ Available templates in this OpenCaw baseline:
 - DOTNET
 - NODE
 - MAUI
+- EMBEDDED_FIRMWARE
 - REACT
 - ANGULAR
 - VUE
@@ -14,6 +15,7 @@ Available templates in this OpenCaw baseline:
 - EVENT_DRIVEN
 - PYTHON
 - NEXTJS
+- SOLIDITY
 
 Use one or more of these when generating `../ARCHITECTURE.md` for a host repository.
 
