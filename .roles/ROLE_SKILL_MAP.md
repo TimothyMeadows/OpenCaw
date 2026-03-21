@@ -113,6 +113,7 @@ Skills:
 - `regression-suite-update`
 
 Commands:
+- `commands/playwright-install.sh`
 - `commands/run-tests.sh`
 - `commands/run-e2e.sh`
 - `commands/generate-test-report.sh`
