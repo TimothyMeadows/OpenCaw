@@ -123,9 +123,27 @@ This allows you to modify instructions without affecting the upstream repository
 
 ---
 
+## First-run host bootstrap
+
+After installing OpenCaw, run:
+
+```bash
+./commands/create-host-ai-scaffold.sh
+```
+
+This command now:
+- creates the host repository `.ai` scaffold when missing
+- checks host root `AGENTS.md`
+- appends a managed OpenCaw bootstrap block only when missing
+
+If host `AGENTS.md` does not exist, it is created with the bootstrap block.
+If it exists, existing content is preserved and the bootstrap is appended idempotently.
+
+---
+
 # Examples
 
-First, while OpenCaw should auto load into sessions due AGENTS.md being standard. In the event this changes, or you just want to be sure. OpenCaw can be activated by first saying:
+OpenCaw should auto load in most sessions once the host bootstrap is present in root `AGENTS.md`. If needed, you can still force activation by saying:
 
 ```text
 activate opencaw in AGENTS.md
