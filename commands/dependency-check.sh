@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Run dependency vulnerability checks"
-echo "- Check package vulnerabilities for the active stack"
-echo "Implement repository-specific logic as needed."
+echo "Run dependency vulnerability checks (Snyk-first)"
+./commands/snyk-scan.sh
+
+echo "Optional supplemental dependency checks can run after Snyk"
+echo "- Implement repository-specific supplemental scanners as needed."
