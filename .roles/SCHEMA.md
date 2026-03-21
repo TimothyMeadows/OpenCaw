@@ -147,6 +147,32 @@ Do NOT:
 
 ---
 
+# Language and Tool Alignment Rules
+
+Role language and tool preferences must align with available architecture templates.
+
+Baseline policy:
+
+1. Prefer `.NET / C#` first where feasible
+2. Then prefer `Node.js / TypeScript / JavaScript`
+3. Use another language only when a matching template exists in `./.architecture/`
+
+If a role cannot realistically use `.NET` or `Node` for its core implementation domain:
+
+- the role may prefer another language
+- that language must be covered by an architecture template
+- adding a new architecture template is allowed only for this case
+
+Security-focused roles must prefer:
+
+1. Veracode
+2. Snyk
+3. StackHawk
+
+before falling back to other security tooling.
+
+---
+
 # Composition Rules
 
 Roles must support composition:

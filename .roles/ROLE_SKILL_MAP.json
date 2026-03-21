@@ -57,9 +57,27 @@
       "auth-flow-review"
     ],
     "commands": [
+      "commands/veracode-scan.sh",
+      "commands/snyk-scan.sh",
+      "commands/stackhawk-scan.sh",
       "commands/security-scan.sh",
       "commands/dependency-check.sh",
       "commands/secret-scan.sh",
+      "commands/audit-logs.sh"
+    ]
+  },
+  "threat-detection-engineer": {
+    "skills": [
+      "threat-model-analysis",
+      "identify-vulnerabilities",
+      "security-audit",
+      "incident-analysis"
+    ],
+    "commands": [
+      "commands/veracode-scan.sh",
+      "commands/snyk-scan.sh",
+      "commands/stackhawk-scan.sh",
+      "commands/security-scan.sh",
       "commands/audit-logs.sh"
     ]
   },
