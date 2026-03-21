@@ -22,7 +22,18 @@ Project-local knowledge belongs in the host repository:
 Never write project-specific learned state into this mounted baseline unless the user explicitly asks to modify the shared baseline.
 
 ## Session startup review
-At session start, review these host-repository files when they exist:
+At session start, ensure the host scaffold exists before loading host-repository memory.
+
+First-run host scaffold behavior:
+- If any of these files are missing, treat it as first-run and run `./commands/create-host-ai-scaffold.sh` automatically without waiting for user input:
+  - `../AGENTS.md`
+  - `../.ai/MEMORY.md`
+  - `../.ai/RULES.md`
+  - `../.ai/DEBUG.md`
+  - `../.ai/tasks/TODO.md`
+- This scaffold step is idempotent and safe to run multiple times.
+
+After scaffold checks, review these host-repository files when they exist:
 - `../.ai/MEMORY.md`
 - `../.ai/RULES.md`
 - `../.ai/DEBUG.md`
