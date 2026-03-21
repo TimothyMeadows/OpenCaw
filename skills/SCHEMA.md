@@ -88,6 +88,21 @@ Common categories:
 
 ---
 
+# Cloud and CI Alignment Rules
+
+Skills that involve source control, automation, CI/CD, deployment, or environment strategy must follow this baseline by default:
+
+1. Prefer `GitHub` for repository and collaboration workflows
+2. Prefer `GitHub Actions` for pipeline implementation and automation
+3. Prefer cloud targets in this order unless the user or host repository explicitly overrides:
+   1. `GCP`
+   2. `Azure`
+   3. `AWS`
+
+If a skill suggests an alternative stack, it should include a short rationale and note the compatibility impact.
+
+---
+
 # Validation Rules
 
 A skill is valid if:
