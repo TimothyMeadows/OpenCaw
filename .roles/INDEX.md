@@ -5,6 +5,7 @@ OpenCaw role catalog with categories and common aliases.
 Current role catalog location:
 
 - `./.roles/computer-science/<role-name>/ROLE.md`
+- `./.roles/arts/<role-name>/ROLE.md`
 
 ## Categories
 
@@ -19,6 +20,9 @@ Current role catalog location:
 ### Frontend & UX
 - `frontend-developer`
 - `mobile-app-builder`
+
+### Arts & Visual Design
+- `css-vector-artist`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -61,6 +65,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/backend-architect`: `api`, `api-architect`, `architect`, `backend`, `backend architect`, `backend-architect`, `backendarchitect`
 - `computer-science/code-migrator`: `code migrator`, `code-migrator`, `codemigrator`, `migration-engineer`, `modernization-engineer`
 - `computer-science/code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
+- `arts/css-vector-artist`: `css-vector-artist`, `css-vector`, `interface-vector-artist`, `logo-vector-artist`, `vector-ui-artist`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`

@@ -47,6 +47,30 @@
       "commands/dev-server.sh"
     ]
   },
+  "arts/css-vector-artist": {
+    "skills": [
+      "create-css-vector-art",
+      "define-logo-size-depth-standards",
+      "accessibility-review",
+      "ui-refactor"
+    ],
+    "commands": [
+      "commands/print-css-art-token-template.sh",
+      "commands/validate-svg-assets.sh"
+    ]
+  },
+  "css-vector-artist": {
+    "skills": [
+      "create-css-vector-art",
+      "define-logo-size-depth-standards",
+      "accessibility-review",
+      "ui-refactor"
+    ],
+    "commands": [
+      "commands/print-css-art-token-template.sh",
+      "commands/validate-svg-assets.sh"
+    ]
+  },
   "security-engineer": {
     "skills": [
       "threat-model-analysis",
