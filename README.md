@@ -243,6 +243,7 @@ Example supported frameworks include:
 - DOTNET
 - NODE
 - MAUI
+- EMBEDDED_FIRMWARE
 - PYTHON
 - NEXTJS
 - SPA
@@ -255,8 +256,15 @@ Example supported frameworks include:
 - HELM
 - MICROSERVICES
 - EVENT_DRIVEN
+- SOLIDITY
 - GITHUB_ACTIONS
 - AZURE_DEVOPS
+
+Language/tool alignment guidance is documented in:
+
+```
+.architecture/LANGUAGE_SUPPORT.md
+```
 
 Agents will ask which architectures apply if `ARCHITECTURE.md` does not exist and generate it automatically.
 

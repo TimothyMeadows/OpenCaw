@@ -82,9 +82,26 @@ Skills:
 - `auth-flow-review`
 
 Commands:
+- `commands/veracode-scan.sh`
+- `commands/snyk-scan.sh`
+- `commands/stackhawk-scan.sh`
 - `commands/security-scan.sh`
 - `commands/dependency-check.sh`
 - `commands/secret-scan.sh`
+- `commands/audit-logs.sh`
+
+### threat-detection-engineer
+Skills:
+- `threat-model-analysis`
+- `identify-vulnerabilities`
+- `security-audit`
+- `incident-analysis`
+
+Commands:
+- `commands/veracode-scan.sh`
+- `commands/snyk-scan.sh`
+- `commands/stackhawk-scan.sh`
+- `commands/security-scan.sh`
 - `commands/audit-logs.sh`
 
 ### qa-engineer
