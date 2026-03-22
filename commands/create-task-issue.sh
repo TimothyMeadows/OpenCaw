@@ -92,6 +92,47 @@ upsert_issue_section() {
   printf '%s\n' "$issue_url" >> "$task_file"
 }
 
+extract_task_markdown() {
+  local source_file="$1"
+  local source_virtual_path="$2"
+
+  if [[ ! -f "$source_file" ]]; then
+    printf '_Task file not found: `%s`._\n' "$source_virtual_path"
+    return
+  fi
+
+  awk -v virtual_path="$source_virtual_path" '
+    BEGIN {
+      in_issue = 0
+      emitted = 0
+    }
+    {
+      gsub(/\r/, "", $0)
+
+      if ($0 ~ /^##[[:space:]]+Issue[[:space:]]*$/) {
+        in_issue = 1
+        next
+      }
+
+      if (in_issue == 1) {
+        if ($0 ~ /^##[[:space:]]+/) {
+          in_issue = 0
+        } else {
+          next
+        }
+      }
+
+      print $0
+      emitted = 1
+    }
+    END {
+      if (emitted == 0) {
+        printf "_No task details found in `%s`._\n", virtual_path
+      }
+    }
+  ' "$source_file"
+}
+
 if [[ -z "$issue_title" ]]; then
   issue_title="Task: $task_name"
 fi
@@ -113,11 +154,16 @@ if [[ -n "$issue_body_file" ]]; then
   fi
   issue_body="$(cat "$issue_body_file")"
 else
+  task_markdown="$(extract_task_markdown "$task_file" "$task_virtual_path")"
   issue_body="$(cat <<EOF
 OpenCaw task issue for \`$task_name\`.
 
 Task file:
 \`$task_virtual_path\`
+
+Task details (from TASK.md):
+
+$task_markdown
 
 Use this issue as the canonical tracker for planning, implementation updates, QA evidence, and closure.
 EOF
