@@ -21,6 +21,7 @@ opencaw_root="$(cd "$script_dir/.." && pwd)"
 host_root="$(cd "$opencaw_root/.." && pwd)"
 host_tasks_dir="$host_root/.ai/tasks"
 task_file="$host_tasks_dir/$task_name/TASK.md"
+task_virtual_path=".ai/tasks/$task_name/TASK.md"
 open_issues_file="$host_tasks_dir/OPEN_ISSUES.md"
 
 resolve_gh() {
@@ -116,7 +117,7 @@ else
 OpenCaw task issue for \`$task_name\`.
 
 Task file:
-\`$task_file\`
+\`$task_virtual_path\`
 
 Use this issue as the canonical tracker for planning, implementation updates, QA evidence, and closure.
 EOF
