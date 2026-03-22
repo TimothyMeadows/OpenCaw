@@ -27,6 +27,7 @@ These skills and commands apply to all roles:
 - `commands/lint.sh`
 - `commands/format.sh`
 - `commands/create-task-issue.sh`
+- `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
 - `commands/link-pr-to-task-issue.sh`
 

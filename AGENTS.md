@@ -193,6 +193,12 @@ When multiple roles are requested:
 9. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
 10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
 
+## Issue-first task import
+- If the user prompt includes an issue reference (for example `Work on #123`), import that issue into task tracking first with `./commands/import-task-from-issue.sh "#123"`.
+- Accept issue references as `#123`, `123`, or a full GitHub issue URL.
+- Reuse the existing task file when the issue is already linked.
+- Keep imported issue URLs in `../.ai/tasks/OPEN_ISSUES.md` only while the issue state is open.
+
 ## Task file rules
 - `../.ai/tasks/TODO.md` is the active ordered checklist only
 - Items should be numbered and ordered by execution sequence

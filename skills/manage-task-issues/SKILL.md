@@ -15,6 +15,10 @@ Use when creating task plans, generating task files, or reviewing active task li
 - Prefer one issue per substantial task.
 - Track open issues as URLs only in `.ai/tasks/OPEN_ISSUES.md`.
 - Run sync before planning to prune closed issue URLs.
+- Import issue-backed tasks with `../commands/import-task-from-issue.sh "<issue-ref>"` when users ask to work from an existing issue number.
 
 ## Command
 ../commands/sync-task-issues.sh
+
+## Additional command
+../commands/import-task-from-issue.sh "<issue-ref>" [task_name]
