@@ -31,6 +31,7 @@ First-run host scaffold behavior:
   - `../.ai/RULES.md`
   - `../.ai/DEBUG.md`
   - `../.ai/tasks/TODO.md`
+  - `../.ai/tasks/OPEN_ISSUES.md`
 - This scaffold step is idempotent and safe to run multiple times.
 
 After scaffold checks, review these host-repository files when they exist:
@@ -39,6 +40,7 @@ After scaffold checks, review these host-repository files when they exist:
 - `../.ai/DEBUG.md`
 - `../ARCHITECTURE.md`
 - `../.ai/tasks/TODO.md`
+- `../.ai/tasks/OPEN_ISSUES.md`
 
 You should send a message to the user that you are an OpenCaw session and ready for usage.
 
@@ -161,6 +163,10 @@ When multiple roles are requested:
 - Ask: "Would a staff engineer approve this?"
 - Run tests, inspect logs, and demonstrate correctness before closing work
 - Do not present guesswork as verification
+- For QA workflows (especially Playwright), post a verification comment on the linked task issue with:
+  - pass/fail summary
+  - relevant command outputs
+  - screenshot/artifact references
 
 ## Demand elegance (balanced)
 - For non-trivial changes, pause and ask whether there is a more elegant solution
@@ -178,12 +184,14 @@ When multiple roles are requested:
 ## Task management
 1. Plan first: update `../.ai/tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
 2. For each real task, create `../.ai/tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
-3. Verify plan: check in before starting implementation when the task is non-trivial or changes direction materially
-4. Track progress: mark `../.ai/tasks/TODO.md` items complete as you go
-5. Keep `../.ai/tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
-6. Store detailed implementation notes, task-specific instructions, and review results in the matching `../.ai/tasks/<unique_task_name>/TASK.md`
-7. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
-8. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
+3. Create or link a matching GitHub issue for each real task and record only the issue URL in `../.ai/tasks/OPEN_ISSUES.md`
+4. Verify plan: check in before starting implementation when the task is non-trivial or changes direction materially
+5. Track progress: mark `../.ai/tasks/TODO.md` items complete as you go
+6. Keep `../.ai/tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
+7. Store detailed implementation notes, task-specific instructions, and review results in the matching `../.ai/tasks/<unique_task_name>/TASK.md`
+8. Sync task issues when reading active tasks and remove URLs for closed issues from `.ai/tasks` tracking
+9. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
+10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
 
 ## Task file rules
 - `../.ai/tasks/TODO.md` is the active ordered checklist only
@@ -191,6 +199,8 @@ When multiple roles are requested:
 - Checked items are complete; unchecked items are pending
 - Each TODO entry should reference its matching task folder when applicable
 - `../.ai/tasks/<unique_task_name>/TASK.md` contains the actual work instructions for that task
+- `../.ai/tasks/OPEN_ISSUES.md` stores only open GitHub issue URLs (one per line)
+- Each task should include a linked issue URL while open (for example in `## Issue`)
 - Prefer one task folder per substantial task
 - Keep task names stable, concise, and filesystem-safe
 
@@ -238,6 +248,7 @@ When multiple roles are requested:
 ## Branch and PR conventions
 - Do not commit unless explicitly asked
 - Do not open a pull request unless explicitly asked
+- Any PR created for task-backed work must be associated with its issue (for example `Closes #<issue-number>` in PR body)
 - When asked to commit, prefer conventional commits:
   - feat(scope): summary
   - fix(scope): summary

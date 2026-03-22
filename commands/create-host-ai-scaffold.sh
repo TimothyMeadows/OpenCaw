@@ -87,6 +87,8 @@ if [[ ! -f "$host_ai_dir/tasks/TODO.md" ]]; then
 EOF
 fi
 
+[[ -f "$host_ai_dir/tasks/OPEN_ISSUES.md" ]] || : > "$host_ai_dir/tasks/OPEN_ISSUES.md"
+
 [[ -f "$host_ai_dir/tasks/example-task/TASK.md" ]] || cat > "$host_ai_dir/tasks/example-task/TASK.md" <<'EOF'
 # Example first task
 
@@ -101,4 +103,6 @@ fi
 ## Verification
 
 ## Review
+
+## Issue
 EOF

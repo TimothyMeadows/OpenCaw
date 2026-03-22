@@ -151,13 +151,13 @@ use role fullstack-engineer and build a calculator app with a simple UI, basic a
 
 OpenCaw deterministically resolves your prompt into:
 
-1. **Roles activated** → sets perspective and priorities  
-2. **Skills selected** → plans and reasons about the work  
-3. **Tasks created/updated** → `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md`
-4. **Architecture ensured** → generates `ARCHITECTURE.md` if missing  
-5. **Commands executed** → builds, tests, scans, or deploys  
-6. **Verification performed** → tests/logs prove correctness  
-7. **Memory updated** → `.ai/` captures reusable lessons  
+1. **Roles activated** -> sets perspective and priorities  
+2. **Skills selected** -> plans and reasons about the work  
+3. **Tasks + issues created/updated** -> `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md` + `.ai/tasks/OPEN_ISSUES.md`  
+4. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing  
+5. **Commands executed** -> builds, tests, scans, or deploys  
+6. **Verification performed** -> tests/logs prove correctness  
+7. **Memory updated** -> `.ai/` captures reusable lessons  
 
 To be more specific it will:
 
@@ -168,20 +168,23 @@ To be more specific it will:
 5. update `.ai/tasks/TODO.md` with an ordered checklist
 6. create a task file such as:
    - `.ai/tasks/create-calculator-app/TASK.md`
-7. apply appropriate skills such as:
+7. create/link a matching GitHub issue and add the URL to `.ai/tasks/OPEN_ISSUES.md`
+8. apply appropriate skills such as:
    - `plan-task`
    - `feature-end-to-end`
    - `api-ui-integration` if relevant
    - `full-flow-testing`
    - `verify-changes`
-8. use appropriate commands based on the stack, such as:
+9. use appropriate commands based on the stack, such as:
    - `./commands/npm-install.sh`
    - `./commands/npm-build.sh`
    - `./commands/npm-test.sh`
-   - or `.NET` build/test commands if the chosen architecture includes .NET
-9. implement the application
-10. run validation and verification before completion
-11. update memory files if durable lessons are discovered
+   - or `.NET` build/test commands if the chosen architecture includes `.NET`
+10. implement the application
+11. associate any PR with the task issue (`Closes #<issue-number>`)
+12. run validation and verification before completion
+13. post QA/Playwright verification evidence as an issue comment (results + screenshots/artifacts)
+14. update memory files if durable lessons are discovered
 
 This is the intended OpenCaw experience:
 
@@ -466,13 +469,19 @@ OpenCaw supports structured task tracking using the `.ai/tasks` directory.
 .ai/tasks/
 .ai/tasks/TODO.md
 .ai/tasks/<task-name>/TASK.md
+.ai/tasks/OPEN_ISSUES.md
 ```
 
 Rules:
 
 - `TODO.md` contains the ordered list of tasks
 - Each task folder contains a detailed `TASK.md`
+- Each substantial task is backed by one GitHub issue
+- Track only open issue URLs (one per line) in `OPEN_ISSUES.md`
+- Sync and remove closed issue URLs from `.ai/tasks` tracking
 - Agents update progress as tasks are completed
+- PRs for task-backed work should include issue linkage (for example `Closes #123`)
+- QA/Playwright runs should post result comments to the linked issue, including screenshot/artifact references
 
 ---
 
@@ -601,6 +610,10 @@ run command dotnet-build
 | `dotnet-build.sh` | Build .NET project |
 | `dotnet-test.sh` | Run tests |
 | `run-tests.sh` | Run repo tests |
+| `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
+| `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
+| `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
+| `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
 | `deploy.sh` | Execute deployment |
 | `security-scan.sh` | Run security checks |
 
@@ -642,3 +655,4 @@ Then:
 | Command | Execution |
 
 ---
+

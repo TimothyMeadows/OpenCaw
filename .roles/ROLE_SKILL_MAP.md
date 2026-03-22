@@ -14,16 +14,21 @@ These skills and commands apply to all roles:
 
 ### Skills
 - `plan-task`
+- `manage-task-issues`
 - `update-memory`
 - `debug-issue`
 - `review-code`
 - `refactor-code`
 - `verify-changes`
+- `link-pr-to-task-issue`
 
 ### Commands
 - `commands/run-tests.sh`
 - `commands/lint.sh`
 - `commands/format.sh`
+- `commands/create-task-issue.sh`
+- `commands/sync-task-issues.sh`
+- `commands/link-pr-to-task-issue.sh`
 
 ## Role mappings
 
@@ -120,6 +125,7 @@ Skills:
 - `generate-test-cases`
 - `write-integration-tests`
 - `playwright-e2e-tests`
+- `comment-issue-test-results`
 - `test-gap-analysis`
 - `regression-suite-update`
 
@@ -128,6 +134,7 @@ Commands:
 - `commands/run-tests.sh`
 - `commands/run-e2e.sh`
 - `commands/generate-test-report.sh`
+- `commands/comment-issue-test-results.sh`
 
 ### code-migrator
 Skills:

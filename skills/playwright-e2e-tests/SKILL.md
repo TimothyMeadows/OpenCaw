@@ -31,3 +31,7 @@ Produce a concise QA package that includes:
 - Treat flaky tests as defects:
   - Capture traces and retries for diagnosis.
   - Record likely root cause and ownership for stabilization.
+- Post QA evidence to the linked task issue:
+  - include pass/fail summary
+  - include screenshot/artifact references (especially Playwright screenshots)
+  - use `../commands/comment-issue-test-results.sh` to keep issue history complete

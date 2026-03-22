@@ -110,6 +110,7 @@
       "generate-test-cases",
       "write-integration-tests",
       "playwright-e2e-tests",
+      "comment-issue-test-results",
       "test-gap-analysis",
       "regression-suite-update"
     ],
@@ -117,7 +118,8 @@
       "commands/playwright-install.sh",
       "commands/run-tests.sh",
       "commands/run-e2e.sh",
-      "commands/generate-test-report.sh"
+      "commands/generate-test-report.sh",
+      "commands/comment-issue-test-results.sh"
     ]
   },
   "code-migrator": {
@@ -224,16 +226,21 @@
   "__shared__": {
     "skills": [
       "plan-task",
+      "manage-task-issues",
       "update-memory",
       "debug-issue",
       "review-code",
       "refactor-code",
-      "verify-changes"
+      "verify-changes",
+      "link-pr-to-task-issue"
     ],
     "commands": [
       "commands/run-tests.sh",
       "commands/lint.sh",
-      "commands/format.sh"
+      "commands/format.sh",
+      "commands/create-task-issue.sh",
+      "commands/sync-task-issues.sh",
+      "commands/link-pr-to-task-issue.sh"
     ]
   }
 }
