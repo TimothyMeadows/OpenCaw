@@ -46,6 +46,12 @@ Common reusable skills included in OpenCaw by category.
 - `ui-refactor` - Refactor UI code for clarity, reuse, and maintainability.
 - `accessibility-review` - Review UI for accessibility issues and improvements.
 
+## Arts
+
+- `generate-art-with-native-tools` - Generate images with the active model's built-in art tooling.
+- `iterate-art-to-sanity` - Iterate generated images until anatomy, text, language, and safety checks pass.
+- `enforce-art-language-safety` - Enforce text-language policy and core visual safety constraints.
+
 ## Security
 
 - `threat-model-analysis` - Analyze threats, abuse paths, and trust boundaries.
