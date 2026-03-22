@@ -23,6 +23,7 @@ Current role catalog location:
 
 ### Arts & Visual Design
 - `css-vector-artist`
+- `generative-art-designer`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -66,6 +67,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/code-migrator`: `code migrator`, `code-migrator`, `codemigrator`, `migration-engineer`, `modernization-engineer`
 - `computer-science/code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
 - `arts/css-vector-artist`: `css-vector-artist`, `css-vector`, `interface-vector-artist`, `logo-vector-artist`, `vector-ui-artist`
+- `arts/generative-art-designer`: `generative-art-designer`, `generative-art`, `ai-image-designer`, `art-iteration-designer`, `image-prompt-designer`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`

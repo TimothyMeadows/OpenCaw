@@ -59,6 +59,17 @@
       "commands/validate-svg-assets.sh"
     ]
   },
+  "arts/generative-art-designer": {
+    "skills": [
+      "generate-art-with-native-tools",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
   "css-vector-artist": {
     "skills": [
       "create-css-vector-art",
@@ -69,6 +80,17 @@
     "commands": [
       "commands/print-css-art-token-template.sh",
       "commands/validate-svg-assets.sh"
+    ]
+  },
+  "generative-art-designer": {
+    "skills": [
+      "generate-art-with-native-tools",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
     ]
   },
   "security-engineer": {
