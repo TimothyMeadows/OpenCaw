@@ -88,6 +88,16 @@ Commands:
 - `commands/print-css-art-token-template.sh`
 - `commands/validate-svg-assets.sh`
 
+### arts/generative-art-designer
+Skills:
+- `generate-art-with-native-tools`
+- `iterate-art-to-sanity`
+- `enforce-art-language-safety`
+
+Commands:
+- `commands/art-sanity-checklist.sh`
+- `commands/validate-art-sanity-report.sh`
+
 ### security-engineer
 Skills:
 - `threat-model-analysis`
