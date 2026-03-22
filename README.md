@@ -147,6 +147,10 @@ use role devops-engineer and create a CI/CD pipeline as a github action for gcp 
 use role fullstack-engineer and build a calculator app with a simple UI, basic arithmetic operations, tests, task tracking, architecture generation if missing, and final verification
 ```
 
+```text
+work on #123 and implement the fix with tests and verification evidence
+```
+
 ## What happens?
 
 OpenCaw deterministically resolves your prompt into:
@@ -166,9 +170,9 @@ To be more specific it will:
 3. if missing, ask which architecture templates apply
 4. generate `ARCHITECTURE.md`
 5. update `.ai/tasks/TODO.md` with an ordered checklist
-6. create a task file such as:
+6. create or import a task file such as:
    - `.ai/tasks/create-calculator-app/TASK.md`
-7. create/link a matching GitHub issue and add the URL to `.ai/tasks/OPEN_ISSUES.md`
+7. create/link a matching GitHub issue, or import an existing one from a prompt like `Work on #123`, and add the URL to `.ai/tasks/OPEN_ISSUES.md`
 8. apply appropriate skills such as:
    - `plan-task`
    - `feature-end-to-end`
@@ -477,6 +481,7 @@ Rules:
 - `TODO.md` contains the ordered list of tasks
 - Each task folder contains a detailed `TASK.md`
 - Each substantial task is backed by one GitHub issue
+- Existing GitHub issues can be imported directly with `./commands/import-task-from-issue.sh "<issue-ref>"` where `<issue-ref>` can be `#123`, `123`, or a full issue URL
 - Track only open issue URLs (one per line) in `OPEN_ISSUES.md`
 - Sync and remove closed issue URLs from `.ai/tasks` tracking
 - Agents update progress as tasks are completed
@@ -611,6 +616,7 @@ run command dotnet-build
 | `dotnet-test.sh` | Run tests |
 | `run-tests.sh` | Run repo tests |
 | `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
+| `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
 | `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
 | `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
