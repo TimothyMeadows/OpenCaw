@@ -1,89 +1,36 @@
 # Role Skill Map
 
-This file maps common OpenCaw roles to their default skills and preferred commands.
-
-Role casting should use this map to bias skill and command selection after a role is activated.
+This file maps OpenCaw roles to curated default skills and preferred commands.
 
 Mapping key resolution:
-- prefer domain-qualified keys such as `computer-science/backend-architect` when present
-- fallback to unqualified keys such as `backend-architect` for backward compatibility
+- prefer domain-qualified keys such as `arts/css-vector-artist` when present
+- fallback to unqualified keys such as `qa-engineer` for backward compatibility
 
 ## Shared capabilities
 
-These skills and commands apply to all roles:
+These skills and commands apply to all roles.
 
 ### Skills
-- `plan-task`
+- `create-task-file`
 - `manage-task-issues`
-- `update-memory`
-- `debug-issue`
-- `review-code`
-- `refactor-code`
-- `verify-changes`
+- `clean-context`
 - `link-pr-to-task-issue`
+- `record-correction-pattern`
+- `record-debug-resolution`
 
 ### Commands
-- `commands/run-tests.sh`
-- `commands/lint.sh`
-- `commands/format.sh`
+- `commands/create-task-file.sh`
 - `commands/create-task-issue.sh`
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
 - `commands/link-pr-to-task-issue.sh`
+- `commands/update-todo-checklist.sh`
 
 ## Role mappings
 
-### backend-architect
-Skills:
-- `design-system-architecture`
-- `review-architecture`
-- `define-service-boundaries`
-- `generate-clean-architecture`
-- `evaluate-scalability`
-- `dependency-audit`
-
-Commands:
-- `commands/generate-architecture.sh`
-- `commands/solution-structure.sh`
-- `commands/dependency-graph.sh`
-- `commands/validate-architecture.sh`
-
-### backend-developer
-Skills:
-- `implement-endpoint`
-- `generate-mediatr-handler`
-- `create-domain-entity`
-- `write-unit-tests`
-- `refactor-service`
-- `optimize-query`
-
-Commands:
-- `commands/dotnet-build.sh`
-- `commands/dotnet-test.sh`
-- `commands/add-endpoint.sh`
-- `commands/run-local-api.sh`
-
-### frontend-developer
-Skills:
-- `generate-component`
-- `create-feature-module`
-- `state-management-setup`
-- `optimize-rendering`
-- `ui-refactor`
-- `accessibility-review`
-
-Commands:
-- `commands/npm-install.sh`
-- `commands/npm-build.sh`
-- `commands/npm-test.sh`
-- `commands/dev-server.sh`
-
 ### arts/css-vector-artist
 Skills:
-- `create-css-vector-art`
-- `define-logo-size-depth-standards`
-- `accessibility-review`
-- `ui-refactor`
+- `enforce-art-language-safety`
 
 Commands:
 - `commands/print-css-art-token-template.sh`
@@ -91,7 +38,6 @@ Commands:
 
 ### arts/generative-art-designer
 Skills:
-- `generate-art-with-native-tools`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
 
@@ -99,61 +45,13 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
-### security-engineer
-Skills:
-- `threat-model-analysis`
-- `security-audit`
-- `identify-vulnerabilities`
-- `secure-api-review`
-- `dependency-vulnerability-scan`
-- `auth-flow-review`
-
-Commands:
-- `commands/veracode-scan.sh`
-- `commands/snyk-scan.sh`
-- `commands/stackhawk-scan.sh`
-- `commands/security-scan.sh`
-- `commands/dependency-check.sh`
-- `commands/secret-scan.sh`
-- `commands/audit-logs.sh`
-
-### threat-detection-engineer
-Skills:
-- `threat-model-analysis`
-- `identify-vulnerabilities`
-- `security-audit`
-- `incident-analysis`
-
-Commands:
-- `commands/veracode-scan.sh`
-- `commands/snyk-scan.sh`
-- `commands/stackhawk-scan.sh`
-- `commands/security-scan.sh`
-- `commands/audit-logs.sh`
-
-### qa-engineer
-Skills:
-- `generate-test-cases`
-- `write-integration-tests`
-- `playwright-e2e-tests`
-- `comment-issue-test-results`
-- `test-gap-analysis`
-- `regression-suite-update`
-
-Commands:
-- `commands/playwright-install.sh`
-- `commands/run-tests.sh`
-- `commands/run-e2e.sh`
-- `commands/generate-test-report.sh`
-- `commands/comment-issue-test-results.sh`
-
 ### code-migrator
 Skills:
-- `framework-migration-plan`
-- `upgrade-dotnet-runtime`
 - `dependency-audit-dotnet`
-- `test-gap-analysis`
-- `regression-suite-update`
+- `upgrade-dotnet-runtime`
+- `test-dotnet`
+- `format-dotnet`
+- `clean-rebuild-dotnet`
 
 Commands:
 - `commands/dotnet-list-outdated-packages.sh`
@@ -161,82 +59,69 @@ Commands:
 - `commands/dotnet-restore.sh`
 - `commands/dotnet-build.sh`
 - `commands/dotnet-test.sh`
+- `commands/dotnet-format.sh`
+- `commands/dotnet-clean-rebuild.sh`
 
-### devops-engineer
+### qa-engineer
 Skills:
-- `create-ci-pipeline`
-- `optimize-pipeline`
-- `infrastructure-review`
-- `deployment-strategy`
-- `artifact-flow-design`
+- `playwright-e2e-tests`
+- `comment-issue-test-results`
+- `test-dotnet`
 
 Commands:
-- `commands/deploy.sh`
-- `commands/build-artifact.sh`
-- `commands/pipeline-validate.sh`
-- `commands/release.sh`
+- `commands/dotnet-test.sh`
+- `commands/comment-issue-test-results.sh`
 
-### sre
+### senior-developer
 Skills:
-- `incident-analysis`
-- `define-slo-sla`
-- `performance-analysis`
-- `failure-mode-analysis`
-- `resilience-design`
+- `solution-restore`
+- `solution-build`
+- `test-dotnet`
+- `format-dotnet`
 
 Commands:
-- `commands/check-health.sh`
-- `commands/metrics-dump.sh`
-- `commands/logs-tail.sh`
-- `commands/load-test.sh`
-
-### platform-engineer
-Skills:
-- `internal-tooling-design`
-- `developer-experience-review`
-- `platform-standardization`
-- `infra-abstraction-design`
-
-Commands:
-- `commands/bootstrap-project.sh`
-- `commands/generate-template.sh`
-- `commands/validate-platform.sh`
-
-### ai-engineer
-Skills:
-- `prompt-engineering`
-- `model-selection`
-- `embedding-design`
-- `rag-pipeline-design`
-- `inference-optimization`
-
-Commands:
-- `commands/run-inference.sh`
-- `commands/train-model.sh`
-- `commands/convert-model.sh`
-- `commands/evaluate-model.sh`
-
-### data-engineer
-Skills:
-- `pipeline-design`
-- `etl-optimization`
-- `data-modeling`
-- `schema-validation`
-- `data-quality-analysis`
-
-Commands:
-- `commands/run-etl.sh`
-- `commands/validate-schema.sh`
-- `commands/data-migration.sh`
+- `commands/dotnet-restore.sh`
+- `commands/dotnet-build.sh`
+- `commands/dotnet-test.sh`
+- `commands/dotnet-format.sh`
 
 ### fullstack-engineer
 Skills:
-- `feature-end-to-end`
-- `api-ui-integration`
-- `full-flow-testing`
-- `cross-layer-debugging`
+- `generate-architecture`
+- `solution-build`
+- `test-dotnet`
 
 Commands:
-- `commands/full-build.sh`
-- `commands/dev-all.sh`
-- `commands/test-all.sh`
+- `commands/generate-architecture.sh`
+- `commands/dotnet-build.sh`
+- `commands/dotnet-test.sh`
+
+### devops-automator
+Skills:
+- `generate-architecture`
+- `create-host-ai-scaffold`
+
+Commands:
+- `commands/generate-architecture.sh`
+- `commands/create-host-ai-scaffold.sh`
+
+### security-engineer
+Skills:
+- `apim-change-review`
+
+Commands:
+- `commands/veracode-scan.sh`
+- `commands/snyk-scan.sh`
+- `commands/stackhawk-scan.sh`
+- `commands/security-scan.sh`
+- `commands/dependency-check.sh`
+
+### threat-detection-engineer
+Skills:
+- `apim-change-review`
+
+Commands:
+- `commands/veracode-scan.sh`
+- `commands/snyk-scan.sh`
+- `commands/stackhawk-scan.sh`
+- `commands/security-scan.sh`

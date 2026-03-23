@@ -41,8 +41,8 @@ set -euo pipefail
 Good:
 ```
 dotnet-build.sh
-run-tests.sh
-deploy.sh
+dotnet-test.sh
+create-task-file.sh
 ```
 
 Bad:
