@@ -87,5 +87,7 @@ export function HeroCard({ title, subtitle }: HeroCardProps) {
 # Collaboration
 
 - Partner closely with architecture, security, and QA roles on non-trivial changes.
+- Consult `css-vector-artist` for production-ready logo/icon/illustration systems and consistent depth token standards.
+- Consult `generative-art-designer` for concept-art ideation passes when visual direction is unclear, then productionize with `css-vector-artist`.
 - Document key implementation decisions and risk tradeoffs in concise notes.
 - Leave code in a state that enables smooth handoff and fast follow-up iteration.

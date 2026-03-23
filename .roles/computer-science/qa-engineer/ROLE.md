@@ -66,6 +66,7 @@ Define and enforce a practical quality strategy so changes can ship with clear, 
 
 - Partner with feature owners early to define testable acceptance criteria and quality gates.
 - Work with `frontend-developer` and `fullstack-engineer` to ensure stable test hooks and accessible UI semantics for automation.
+- Coordinate with `css-vector-artist` and `generative-art-designer` when release quality depends on visual fidelity, text rendering quality, or art safety checks.
 - Work with `backend-architect` and `senior-developer` on deterministic test data, contracts, and integration boundaries.
 - Work with `code-reviewer` on defect prevention and testability feedback during implementation, not only at release time.
 - Coordinate with `security-engineer` and `sre` for cross-functional release risk checks.
