@@ -225,11 +225,6 @@ When multiple roles are requested:
 - Restore before build when needed
 - Build before concluding implementation is complete
 - Prefer targeted tests before broad test runs when the request is narrow
-- Preserve existing solution and project structure unless change is required
-- Avoid introducing new dependencies unless necessary
-- Prefer explicit null handling and defensive guards at integration boundaries
-- Prefer keeping configuration externalized
-- Prefer deterministic, testable logic over hidden state or side effects
 
 ## Cloud and CI conventions
 - Prefer `GitHub` for source control and collaboration defaults

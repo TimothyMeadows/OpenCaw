@@ -140,7 +140,7 @@ use role qa-engineer and generate full test coverage for the current feature inc
 ```
 
 ```text
-use role devops-engineer and create a CI/CD pipeline as a github action for gcp with build, test, and deploy stages for this repository
+use role devops-automator and create a CI/CD pipeline as a github action for gcp with build, test, and deploy stages for this repository
 ```
 
 ```text
@@ -174,16 +174,16 @@ To be more specific it will:
    - `.ai/tasks/create-calculator-app/TASK.md`
 7. create/link a matching GitHub issue, or import an existing one from a prompt like `Work on #123`, and add the URL to `.ai/tasks/OPEN_ISSUES.md`
 8. apply appropriate skills such as:
-   - `plan-task`
-   - `feature-end-to-end`
-   - `api-ui-integration` if relevant
-   - `full-flow-testing`
-   - `verify-changes`
+   - `create-task-file`
+   - `manage-task-issues`
+   - `generate-architecture`
+   - `solution-build`
+   - `test-dotnet`
 9. use appropriate commands based on the stack, such as:
-   - `./commands/npm-install.sh`
-   - `./commands/npm-build.sh`
-   - `./commands/npm-test.sh`
-   - or `.NET` build/test commands if the chosen architecture includes `.NET`
+   - `./commands/dotnet-restore.sh`
+   - `./commands/dotnet-build.sh`
+   - `./commands/dotnet-test.sh`
+   - `./commands/comment-issue-test-results.sh` for QA evidence
 10. implement the application
 11. associate any PR with the task issue (`Closes #<issue-number>`)
 12. run validation and verification before completion
@@ -392,8 +392,8 @@ Example skill locations:
 ```
 skills/
 skills/generate-architecture/
-skills/dotnet-build/
-skills/test-runner/
+skills/create-task-file/
+skills/test-dotnet/
 ```
 
 Skills should:
@@ -412,11 +412,12 @@ Examples include:
 
 ```
 commands/generate-architecture.sh
+commands/create-task-file.sh
+commands/dotnet-restore.sh
 commands/dotnet-build.sh
 commands/dotnet-test.sh
 commands/security-scan.sh
-commands/deploy.sh
-commands/run-inference.sh
+commands/clean-context.sh
 ```
 
 Commands should remain:
@@ -543,26 +544,26 @@ They are automatically used by the agent when relevant or when a role is active.
 You can explicitly invoke a skill:
 
 ```
-use skill plan-task
-use skill debug-issue
-use skill review-code
+use skill create-task-file
+use skill manage-task-issues
+use skill clean-context
 ```
 
 Or combine them:
 
 ```
-use skill plan-task + review-code + verify-changes
+use skill create-task-file + manage-task-issues + test-dotnet
 ```
 
 ### Common Skills
 
 | Skill | Purpose |
 |------|--------|
-| `plan-task` | Create structured implementation plan |
-| `debug-issue` | Diagnose bugs using evidence |
-| `review-code` | Evaluate quality and risks |
-| `refactor-code` | Improve structure without changing behavior |
-| `verify-changes` | Prove correctness via tests/logs |
+| `create-task-file` | Create a task file and link a matching issue |
+| `manage-task-issues` | Sync and prune open issue tracking |
+| `clean-context` | Compact context after substantial work |
+| `solution-build` | Build the .NET solution |
+| `test-dotnet` | Run .NET tests for verification |
 
 ### Role-Driven Skills
 
@@ -574,9 +575,9 @@ use role backend-architect
 
 Skills are automatically prioritized:
 
-- architecture design
-- dependency analysis
-- scalability evaluation
+- task tracking
+- verification workflows
+- role-specific command selection
 
 ---
 
@@ -612,15 +613,16 @@ run command dotnet-build
 | Command | Purpose |
 |--------|--------|
 | `validate-opencaw.sh` | Validate entire OpenCaw setup |
+| `dotnet-restore.sh` | Restore .NET dependencies |
 | `dotnet-build.sh` | Build .NET project |
 | `dotnet-test.sh` | Run tests |
-| `run-tests.sh` | Run repo tests |
+| `create-task-file.sh` | Create a task file and optionally link/create an issue |
 | `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
 | `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
 | `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
 | `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
-| `deploy.sh` | Execute deployment |
+| `clean-context.sh` | Compress context and refresh high-signal summaries |
 | `security-scan.sh` | Run security checks |
 
 ---
@@ -630,8 +632,8 @@ run command dotnet-build
 Example:
 
 ```
-use role backend-developer
-use skill plan-task
+use role code-migrator
+use skill dependency-audit-dotnet
 ```
 
 Then:
