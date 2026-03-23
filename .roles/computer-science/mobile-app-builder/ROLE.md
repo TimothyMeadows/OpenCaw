@@ -101,5 +101,7 @@ export function ProductList({ products }: { products: Product[] }) {
 # Collaboration
 
 - Coordinate with backend and security roles on auth/session/offline sync boundaries.
+- Consult `css-vector-artist` for app iconography, vector illustration sets, and reusable visual tokens across mobile density classes.
+- Consult `generative-art-designer` for rapid concept exploration of onboarding or marketing visuals, then productionize approved assets with `css-vector-artist`.
 - Work with QA for device matrix coverage and regression strategy.
 - Provide concise release notes with known risks and rollback considerations.
