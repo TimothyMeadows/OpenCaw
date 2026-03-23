@@ -134,7 +134,6 @@ A role is valid if:
 - required sections are present
 - metadata block exists
 - name matches folder
-- aliases are unique across all roles
 
 ---
 
