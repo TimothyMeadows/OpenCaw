@@ -105,6 +105,26 @@ Commands:
 - `commands/generate-architecture.sh`
 - `commands/create-host-ai-scaffold.sh`
 
+### data-engineer
+Skills:
+- `install-database-cli-tools`
+- `database-cli-query`
+- `generate-architecture`
+
+Commands:
+- `commands/install-database-cli-tools.sh`
+- `commands/database-cli-query.sh`
+- `commands/generate-architecture.sh`
+
+### database-optimizer
+Skills:
+- `install-database-cli-tools`
+- `database-cli-query`
+
+Commands:
+- `commands/install-database-cli-tools.sh`
+- `commands/database-cli-query.sh`
+
 ### security-engineer
 Skills:
 - `apim-change-review`
