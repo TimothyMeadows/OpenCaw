@@ -24,6 +24,13 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | SPA | JavaScript, TypeScript |
 | PYTHON | Python |
 | SOLIDITY | Solidity, TypeScript (tooling/scripts) |
+| MSSQL | SQL, T-SQL |
+| MYSQL | SQL |
+| POSTGRESDB | SQL, PL/pgSQL |
+| SQLITE | SQL |
+| COSMOSDB | SQL API query syntax, JavaScript (stored procedures) |
+| AZURE_STORAGE_TABLES | OData-style filters, JSON payload modeling |
+| DATABRICKS | SQL, Python, Scala |
 | EMBEDDED_FIRMWARE | C, C++, CMake/RTOS configs |
 | TERRAFORM | HCL |
 | KUBERNETES | YAML |

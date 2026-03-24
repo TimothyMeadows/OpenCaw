@@ -262,6 +262,13 @@ Example supported frameworks include:
 - ANGULAR
 - VUE
 - AZURE
+- MSSQL
+- MYSQL
+- POSTGRESDB
+- SQLITE
+- COSMOSDB
+- AZURE_STORAGE_TABLES
+- DATABRICKS
 - TERRAFORM
 - KUBERNETES
 - HELM
@@ -564,6 +571,8 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `clean-context` | Compact context after substantial work |
 | `solution-build` | Build the .NET solution |
 | `test-dotnet` | Run .NET tests for verification |
+| `install-database-cli-tools` | Install or preview database CLI tooling setup |
+| `database-cli-query` | Run database connect/query workflows by engine |
 
 ### Role-Driven Skills
 
@@ -624,6 +633,8 @@ run command dotnet-build
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
 | `clean-context.sh` | Compress context and refresh high-signal summaries |
 | `security-scan.sh` | Run security checks |
+| `install-database-cli-tools.sh` | Print or execute database CLI install commands |
+| `database-cli-query.sh` | Execute engine-specific database query/connect commands |
 
 ---
 

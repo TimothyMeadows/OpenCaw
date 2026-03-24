@@ -43,6 +43,11 @@ Curated reusable skills included in OpenCaw.
 - `servicebus-checklist` - Validate Service Bus configuration and integration assumptions.
 - `storage-checklist` - Validate storage configuration and data-safety assumptions.
 
+## Data Platforms
+
+- `install-database-cli-tools` - Install or preview install commands for CLI clients across supported database engines.
+- `database-cli-query` - Run engine-specific database CLI connect/query workflows and capture deterministic command usage.
+
 ## QA And UI Verification
 
 - `playwright-e2e-tests` - Design or run Playwright end-to-end verification.

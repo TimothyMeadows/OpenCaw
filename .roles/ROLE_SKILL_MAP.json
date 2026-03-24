@@ -83,6 +83,28 @@
       "commands/create-host-ai-scaffold.sh"
     ]
   },
+  "data-engineer": {
+    "skills": [
+      "install-database-cli-tools",
+      "database-cli-query",
+      "generate-architecture"
+    ],
+    "commands": [
+      "commands/install-database-cli-tools.sh",
+      "commands/database-cli-query.sh",
+      "commands/generate-architecture.sh"
+    ]
+  },
+  "database-optimizer": {
+    "skills": [
+      "install-database-cli-tools",
+      "database-cli-query"
+    ],
+    "commands": [
+      "commands/install-database-cli-tools.sh",
+      "commands/database-cli-query.sh"
+    ]
+  },
   "security-engineer": {
     "skills": [
       "apim-change-review"
