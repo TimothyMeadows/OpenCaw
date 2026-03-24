@@ -262,6 +262,7 @@ Example supported frameworks include:
 - ANGULAR
 - VUE
 - AZURE
+- SIGNALR_WEBSOCKETS
 - MSSQL
 - MYSQL
 - POSTGRESDB

@@ -22,6 +22,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | ANGULAR | TypeScript, JavaScript |
 | VUE | JavaScript, TypeScript |
 | SPA | JavaScript, TypeScript |
+| SIGNALR_WEBSOCKETS | C#, JavaScript, TypeScript |
 | PYTHON | Python |
 | SOLIDITY | Solidity, TypeScript (tooling/scripts) |
 | MSSQL | SQL, T-SQL |
