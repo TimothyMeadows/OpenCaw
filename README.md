@@ -126,7 +126,7 @@ This allows you to modify instructions without affecting the upstream repository
 OpenCaw should auto load in most sessions once the host bootstrap is present in root `AGENTS.md`. If needed, you can still force activation by saying:
 
 ```text
-activate opencaw in AGENTS.md
+Read AGENTS.md instructions
 ```
 
  These are some examples in how to use OpenCaw after it's been installed, and activated.
