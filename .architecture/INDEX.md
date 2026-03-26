@@ -9,6 +9,7 @@ Available templates in this OpenCaw baseline:
 - COSMOSDB
 - DATABRICKS
 - DOTNET
+- DOTNET_ASPIRE
 - EMBEDDED_FIRMWARE
 - EVENT_DRIVEN
 - GITHUB_ACTIONS
