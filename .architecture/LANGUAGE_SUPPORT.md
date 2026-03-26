@@ -15,6 +15,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | Architecture Template | Supported Languages |
 | --- | --- |
 | DOTNET | C#, .NET |
+| DOTNET_ASPIRE | C#, .NET |
 | MAUI | C#, .NET |
 | NODE | JavaScript, TypeScript, Node.js |
 | REACT | JavaScript, TypeScript |
