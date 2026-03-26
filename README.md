@@ -249,7 +249,7 @@ Frameworks are located in:
 
 These frameworks allow AI agents to generate a unified `ARCHITECTURE.md` file for a repository by combining multiple architecture standards.
 
-By default, generation is link-based so `ARCHITECTURE.md` stays concise and references selected template files in `./.architecture/`. Use inline generation only when full embedded content is explicitly required.
+By default, generation is read-reference based so `ARCHITECTURE.md` stays concise and contains directives such as `Read \`./<mount>/.architecture/DOTNET.md\` instructions`. Use inline generation only when full embedded content is explicitly required.
 
 Example supported frameworks include:
 

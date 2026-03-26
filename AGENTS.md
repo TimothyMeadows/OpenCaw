@@ -59,12 +59,14 @@ Architecture templates live in:
 ### When `../ARCHITECTURE.md` is missing
 - Ask the user which architecture templates in `./.architecture/` apply to the repository.
 - Support selecting multiple templates for multi-architecture repositories.
-- After the user answers, generate `../ARCHITECTURE.md` by composing the selected templates.
+- After the user answers, generate `../ARCHITECTURE.md` with `./commands/generate-architecture.sh "<TEMPLATE1>" ["TEMPLATE2" ...]`.
+- Default generation must use concise read directives (for example `Read \`./<mount>/.architecture/DOTNET.md\` instructions`) instead of inlining template text.
+- Use `--inline` only when the user explicitly asks for fully embedded template content.
 - Once generated, use `../ARCHITECTURE.md` as the authoritative architecture contract.
 
 ### When regenerating architecture later
 - Ask the user again which templates apply.
-- Regenerate `../ARCHITECTURE.md` from the selected templates.
+- Regenerate `../ARCHITECTURE.md` with the same default read-directive mode unless inline output is explicitly requested.
 
 ## Role casting
 
