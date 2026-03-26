@@ -56,7 +56,9 @@ arch_target="$host_root/ARCHITECTURE.md"
 
 selected=()
 for name in "${templates[@]}"; do
-  upper_name="${name^^}"
+  normalized_name="${name//-/_}"
+  normalized_name="${normalized_name// /_}"
+  upper_name="${normalized_name^^}"
   template_path="$opencaw_root/.architecture/${upper_name}.md"
   if [[ ! -f "$template_path" ]]; then
     echo "Missing architecture template: $template_path" >&2
@@ -79,15 +81,15 @@ done
   echo
 
   if [[ "$mode" == 'link' ]]; then
-    echo "This document intentionally stays concise by linking selected templates."
+    echo "This document intentionally stays concise by referencing selected templates."
     echo
-    echo "## Selected Template Links"
+    echo "## Read Template Instructions"
     echo
     for name in "${selected[@]}"; do
-      echo "- [$name](${mount_path_from_host}/.architecture/${name}.md)"
+      echo "Read \`${mount_path_from_host}/.architecture/${name}.md\` instructions"
     done
     echo
-    echo "Use the linked template files as the authoritative architecture details."
+    echo "Add repository-specific architecture instructions below these read directives."
   else
     echo "## Inlined Templates"
     echo
