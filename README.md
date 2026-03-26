@@ -254,6 +254,7 @@ By default, generation is link-based so `ARCHITECTURE.md` stays concise and refe
 Example supported frameworks include:
 
 - DOTNET
+- DOTNET_ASPIRE
 - NODE
 - MAUI
 - EMBEDDED_FIRMWARE
