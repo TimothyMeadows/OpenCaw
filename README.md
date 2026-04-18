@@ -3,6 +3,12 @@
 
 ![](OpenCaw.png)
 
+
+
+https://github.com/user-attachments/assets/eb32b378-7269-4aa7-90d4-cbc0cba535f9
+
+
+
 OpenCaw is an **open source framework library for AI-assisted development** that standardizes instructions, skills, commands, and architecture guidance for tools such as **Cursor, Codex, and Claude**.
 
 It provides a structured system that allows teams to:
