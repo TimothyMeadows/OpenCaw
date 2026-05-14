@@ -18,6 +18,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | DOTNET_ASPIRE | C#, .NET |
 | MAUI | C#, .NET |
 | NODE | JavaScript, TypeScript, Node.js |
+| PLAYWRIGHT | TypeScript, JavaScript |
 | REACT | JavaScript, TypeScript |
 | NEXTJS | JavaScript, TypeScript |
 | ANGULAR | TypeScript, JavaScript |

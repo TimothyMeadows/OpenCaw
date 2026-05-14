@@ -9,7 +9,9 @@ Curated reusable skills included in OpenCaw.
 - `manage-task-issues` - Maintain one GitHub issue per task and keep only open issue URLs in tracking.
 - `update-todo-checklist` - Maintain concise numbered TODO checklist state for active tasks.
 - `archive-task-note` - Archive task notes into long-term context storage.
+- `pr-readiness-gate` - Stop before push/PR creation, summarize readiness, and ask for human PR approval.
 - `link-pr-to-task-issue` - Ensure PR bodies include issue-closing linkage.
+- `post-pr-qa` - Run post-PR QA and post PR comments with pass/fail evidence and inline screenshot links.
 - `comment-issue-test-results` - Post QA/Playwright outcomes and artifacts to linked issue threads.
 
 ## Memory And Context
@@ -51,6 +53,9 @@ Curated reusable skills included in OpenCaw.
 ## QA And UI Verification
 
 - `playwright-e2e-tests` - Design or run Playwright end-to-end verification.
+- `playwright-browser-discovery` - Discover live UI selectors, fields, and conditional behavior before authoring tests.
+- `playwright-test-refinement` - Diagnose, rerun, and stabilize Playwright tests.
+- `playwright-reporting` - Generate non-interactive Playwright evidence reports from JSON results and artifacts.
 
 ## Art Safety
 

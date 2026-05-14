@@ -23,6 +23,7 @@ Available templates in this OpenCaw baseline:
 - NODE
 - POSTGRESDB
 - PYTHON
+- PLAYWRIGHT
 - REACT
 - SIGNALR_WEBSOCKETS
 - SOLIDITY
