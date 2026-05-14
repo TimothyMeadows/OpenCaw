@@ -3,12 +3,6 @@
 
 ![](OpenCaw.png)
 
-
-
-https://github.com/user-attachments/assets/eb32b378-7269-4aa7-90d4-cbc0cba535f9
-
-
-
 OpenCaw is an **open source framework library for AI-assisted development** that standardizes instructions, skills, commands, and architecture guidance for tools such as **Cursor, Codex, and Claude**.
 
 It provides a structured system that allows teams to:
@@ -189,12 +183,16 @@ To be more specific it will:
    - `./commands/dotnet-restore.sh`
    - `./commands/dotnet-build.sh`
    - `./commands/dotnet-test.sh`
-   - `./commands/comment-issue-test-results.sh` for QA evidence
+   - `./commands/comment-issue-test-results.sh` for task issue QA evidence
 10. implement the application
-11. associate any PR with the task issue (`Closes #<issue-number>`)
-12. run validation and verification before completion
-13. post QA/Playwright verification evidence as an issue comment (results + screenshots/artifacts)
-14. update memory files if durable lessons are discovered
+11. run validation and verification before completion
+12. create a PR readiness report and ask the user whether they are ready for the branch to be pushed and a PR opened
+13. only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
+14. associate the PR with the task issue (`Closes #<issue-number>`)
+15. immediately run post-PR QA once the PR is confirmed available
+16. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
+17. notify the user that the PR is ready for review and the agent can move to the next task if any remain
+18. update memory files if durable lessons are discovered
 
 This is the intended OpenCaw experience:
 
@@ -231,10 +229,9 @@ After making changes:
 ```bash
 git add .
 git commit -m "Add new architecture framework"
-git push origin feature/add-architecture-framework
 ```
 
-Then open a pull request against the main repository.
+Before pushing or opening a pull request, stop and confirm the branch is ready for human review. After confirmation, prefer `gh` for GitHub PR work, fall back to an available `github` CLI/wrapper, and use GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable. Once the PR is available, run QA and post the result as a GitHub PR comment.
 
 When contributing:
 
@@ -265,6 +262,7 @@ Example supported frameworks include:
 - MAUI
 - EMBEDDED_FIRMWARE
 - PYTHON
+- PLAYWRIGHT
 - NEXTJS
 - SPA
 - REACT
@@ -443,6 +441,22 @@ Commands should remain:
 - platform-safe
 - clearly documented
 
+## Bundled Assets
+
+OpenCaw may include reusable assets under:
+
+```text
+assets/
+```
+
+Current testing assets include:
+
+- `assets/playwright/` - Playwright config, package-script, and Azure DevOps starter templates.
+- `assets/playwright/reports/` - Markdown report templates for non-interactive test evidence.
+- `assets/playwright-cli/references/` - Playwright CLI reference notes for discovery workflows.
+
+Host repositories still own real tests, credentials, app-specific artifacts, and generated reports.
+
 ---
 
 # Validation
@@ -503,8 +517,11 @@ Rules:
 - Track only open issue URLs (one per line) in `OPEN_ISSUES.md`
 - Sync and remove closed issue URLs from `.ai/tasks` tracking
 - Agents update progress as tasks are completed
+- Agents ask for human PR readiness approval before pushing or opening a PR
 - PRs for task-backed work should include issue linkage (for example `Closes #123`)
-- QA/Playwright runs should post result comments to the linked issue, including screenshot/artifact references
+- GitHub PR operations should prefer `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
+- After a PR is confirmed available, QA should start immediately and post result comments to the PR, including inline screenshot URLs when screenshots are part of the evidence
+- QA/Playwright runs may also post or link result comments to the linked issue for task history
 
 ---
 
@@ -579,8 +596,14 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `create-task-file` | Create a task file and link a matching issue |
 | `manage-task-issues` | Sync and prune open issue tracking |
 | `clean-context` | Compact context after substantial work |
+| `pr-readiness-gate` | Require human confirmation before push or PR creation |
+| `post-pr-qa` | Run QA after PR availability and post PR evidence comments |
 | `solution-build` | Build the .NET solution |
 | `test-dotnet` | Run .NET tests for verification |
+| `playwright-e2e-tests` | Design or run Playwright browser verification |
+| `playwright-browser-discovery` | Discover selectors and dynamic browser behavior before test authoring |
+| `playwright-test-refinement` | Diagnose, rerun, and stabilize Playwright tests |
+| `playwright-reporting` | Generate non-interactive Playwright evidence reports |
 | `install-database-cli-tools` | Install or preview database CLI tooling setup |
 | `database-cli-query` | Run database connect/query workflows by engine |
 
@@ -635,11 +658,20 @@ run command dotnet-build
 | `dotnet-restore.sh` | Restore .NET dependencies |
 | `dotnet-build.sh` | Build .NET project |
 | `dotnet-test.sh` | Run tests |
+| `playwright-install.sh` | Install Playwright browsers in a host repository |
+| `playwright-test.sh` | Run Playwright tests with project/grep/headed options |
+| `playwright-show-report.sh` | Generate non-interactive report summaries from Playwright outputs |
+| `playwright-report-summary.sh` | Convert Playwright JSON results into a Markdown run report |
+| `playwright-artifact-index.sh` | Index screenshots, traces, videos, logs, and report artifacts |
+| `playwright-discovery-report.sh` | Summarize `.playwright-cli` discovery snapshots and artifacts |
+| `playwright-evidence-report.sh` | Generate a bundle report linking all Playwright evidence reports |
 | `create-task-file.sh` | Create a task file and optionally link/create an issue |
 | `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
 | `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
 | `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
+| `pr-readiness-check.sh` | Create a non-destructive readiness report and required PR approval prompt |
 | `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
+| `comment-pr-qa-results.sh` | Post QA evidence to a PR comment with inline screenshot URL support |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
 | `clean-context.sh` | Compress context and refresh high-signal summaries |
 | `security-scan.sh` | Run security checks |
