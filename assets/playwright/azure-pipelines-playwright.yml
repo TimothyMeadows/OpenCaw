@@ -5,7 +5,7 @@ parameters:
   - name: poolName
     displayName: Agent Pool
     type: string
-    default: TOH-Prod
+    default: p
   - name: environment
     displayName: Environment
     type: string
