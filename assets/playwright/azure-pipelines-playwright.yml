@@ -1,0 +1,72 @@
+trigger: none
+pr: none
+
+parameters:
+  - name: poolName
+    displayName: Agent Pool
+    type: string
+    default: TOH-Prod
+  - name: environment
+    displayName: Environment
+    type: string
+    default: Test
+  - name: grep
+    displayName: Playwright grep/tag filter
+    type: string
+    default: ''
+
+variables:
+  CI: true
+
+jobs:
+  - job: Playwright
+    displayName: Playwright Browser Tests
+    pool:
+      name: ${{ parameters.poolName }}
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '22.x'
+        displayName: Install Node.js
+
+      - script: npm ci
+        displayName: Install dependencies
+
+      - script: npx playwright install --with-deps
+        displayName: Install Playwright browsers
+
+      - task: PowerShell@2
+        displayName: Run Playwright
+        inputs:
+          targetType: inline
+          script: |
+            $ErrorActionPreference = "Stop"
+            $env:ENVIRONMENT = "${{ parameters.environment }}"
+            $grep = "${{ parameters.grep }}"
+            if ([string]::IsNullOrWhiteSpace($grep)) {
+              npx playwright test --project=chromium-ci
+            } else {
+              npx playwright test --project=chromium-ci --grep "$grep"
+            }
+
+      - task: PublishTestResults@2
+        condition: always()
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: '**/test-results/**/*.xml'
+          mergeTestResults: true
+          failTaskOnFailedTests: false
+
+      - task: PublishPipelineArtifact@1
+        condition: always()
+        continueOnError: true
+        inputs:
+          targetPath: playwright-report
+          artifact: playwright-report
+
+      - task: PublishPipelineArtifact@1
+        condition: always()
+        continueOnError: true
+        inputs:
+          targetPath: test-results
+          artifact: test-results

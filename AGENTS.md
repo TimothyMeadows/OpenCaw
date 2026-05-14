@@ -165,10 +165,25 @@ When multiple roles are requested:
 - Ask: "Would a staff engineer approve this?"
 - Run tests, inspect logs, and demonstrate correctness before closing work
 - Do not present guesswork as verification
-- For QA workflows (especially Playwright), post a verification comment on the linked task issue with:
+- During task work, post a verification comment on the linked task issue when a task issue exists, especially for Playwright or other QA workflows:
   - pass/fail summary
   - relevant command outputs
   - screenshot/artifact references
+
+## PR readiness gate and post-PR QA
+- Completing a task does not imply approval to push or open a PR
+- Before any PR-related push or PR creation, summarize completed work and validation, then ask the user whether they are ready for a PR
+- Do not run `git push`, `gh pr create`, `github` CLI PR creation, GitHub MCP/connector PR creation tools, draft PR creation, PR branch updates, auto-merge, or PR publishing skills until the user explicitly confirms readiness after the implementation is complete
+- Prefer `./commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]` to create a durable readiness report and exact user prompt
+- For GitHub PR operations and metadata lookups, choose tools in this order:
+  1. `gh` from the local shell
+  2. an available `github` CLI executable or repository-provided GitHub CLI wrapper
+  3. GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
+- After the user approves and the PR number or URL is confirmed available, start QA immediately without waiting for another prompt
+- Post QA pass/fail evidence to the PR using GitHub comments; when screenshots are part of the evidence, include inline screenshot URLs in the comment
+- Prefer `./commands/comment-pr-qa-results.sh "<pr_number_or_url>" "<results_summary_file>" [screenshot_or_artifact ...]` for the PR QA comment
+- Mirror or link QA evidence to the task issue when a task issue exists, but the PR comment is the primary post-PR signal
+- Once QA is complete, notify the user that the PR is ready for review and that you can move to the next task if any remain
 
 ## Demand elegance (balanced)
 - For non-trivial changes, pause and ask whether there is a more elegant solution
@@ -250,7 +265,7 @@ When multiple roles are requested:
 
 ## Branch and PR conventions
 - Do not commit unless explicitly asked
-- Do not open a pull request unless explicitly asked
+- Do not push or open a pull request until the PR readiness gate has been presented and the user explicitly confirms they are ready
 - Any PR created for task-backed work must be associated with its issue (for example `Closes #<issue-number>` in PR body)
 - When asked to commit, prefer conventional commits:
   - feat(scope): summary

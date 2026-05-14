@@ -14,7 +14,9 @@ These skills and commands apply to all roles.
 - `create-task-file`
 - `manage-task-issues`
 - `clean-context`
+- `pr-readiness-gate`
 - `link-pr-to-task-issue`
+- `post-pr-qa`
 - `record-correction-pattern`
 - `record-debug-resolution`
 
@@ -23,7 +25,9 @@ These skills and commands apply to all roles.
 - `commands/create-task-issue.sh`
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
+- `commands/pr-readiness-check.sh`
 - `commands/link-pr-to-task-issue.sh`
+- `commands/comment-pr-qa-results.sh`
 - `commands/update-todo-checklist.sh`
 
 ## Role mappings
@@ -65,11 +69,23 @@ Commands:
 ### qa-engineer
 Skills:
 - `playwright-e2e-tests`
+- `playwright-browser-discovery`
+- `playwright-test-refinement`
+- `playwright-reporting`
+- `post-pr-qa`
 - `comment-issue-test-results`
 - `test-dotnet`
 
 Commands:
+- `commands/playwright-install.sh`
+- `commands/playwright-test.sh`
+- `commands/playwright-show-report.sh`
+- `commands/playwright-report-summary.sh`
+- `commands/playwright-artifact-index.sh`
+- `commands/playwright-discovery-report.sh`
+- `commands/playwright-evidence-report.sh`
 - `commands/dotnet-test.sh`
+- `commands/comment-pr-qa-results.sh`
 - `commands/comment-issue-test-results.sh`
 
 ### senior-developer

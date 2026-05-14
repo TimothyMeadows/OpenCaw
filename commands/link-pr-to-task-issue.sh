@@ -26,7 +26,8 @@ resolve_gh() {
     return
   fi
 
-  echo "GitHub CLI (gh) is required to link PRs to issues." >&2
+  echo "GitHub CLI (gh) is required by this script to link PRs to issues." >&2
+  echo "If gh is unavailable, follow the PR process fallback: use an available github CLI/wrapper, then GitHub MCP/app connector tools." >&2
   exit 1
 }
 
