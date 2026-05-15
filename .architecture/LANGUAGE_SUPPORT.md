@@ -40,6 +40,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | HELM | YAML, Go templates |
 | GITHUB_ACTIONS | YAML |
 | AZURE_DEVOPS | YAML |
+| MARKDOWN | GitHub-flavored Markdown |
 
 ## Enforcement Rules
 
