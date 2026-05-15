@@ -16,6 +16,7 @@ Available templates in this OpenCaw baseline:
 - HELM
 - KUBERNETES
 - MAUI
+- MARKDOWN
 - MICROSERVICES
 - MSSQL
 - MYSQL
