@@ -88,6 +88,23 @@ Commands:
 - `commands/comment-pr-qa-results.sh`
 - `commands/comment-issue-test-results.sh`
 
+### computer-science/project-manager
+Skills:
+- `create-task-file`
+- `manage-task-issues`
+- `pr-readiness-gate`
+- `post-pr-qa`
+- `clean-context`
+
+Commands:
+- `commands/create-task-file.sh`
+- `commands/create-task-issue.sh`
+- `commands/import-task-from-issue.sh`
+- `commands/sync-task-issues.sh`
+- `commands/update-todo-checklist.sh`
+- `commands/pr-readiness-check.sh`
+- `commands/comment-pr-qa-results.sh`
+
 ### senior-developer
 Skills:
 - `solution-restore`

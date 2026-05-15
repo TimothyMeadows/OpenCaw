@@ -127,6 +127,8 @@ When multiple roles are requested:
 - Enter plan mode for any non-trivial task
 - Treat a task as non-trivial when it has 3+ steps, architectural decisions, cross-cutting impact, verification complexity, or ambiguity
 - Use plan mode for verification work, not just implementation
+- When the user specifies a developer count, agent count, worker count, or explicit parallel execution target, apply the `computer-science/project-manager` planning lens to align tasks into safe parallel lanes before implementation
+- Count-based plans should name lane ownership, scope, dependencies, verification, integration order, and any reason the effective parallelism is smaller than the requested count
 - Write detailed specs up front to reduce ambiguity
 - If something goes sideways, stop and re-plan immediately instead of pushing through a stale plan
 

@@ -31,6 +31,9 @@ Current role catalog location:
 ### Quality & Testing
 - `qa-engineer`
 
+### Project & Delivery
+- `project-manager`
+
 ### Migration & Modernization
 - `code-migrator`
 
@@ -77,6 +80,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `computer-science/incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
 - `computer-science/mobile-app-builder`: `mobile app builder`, `mobile-app-builder`, `mobileappbuilder`
+- `computer-science/project-manager`: `agent-coordinator`, `delivery-lead`, `delivery-manager`, `multi-agent-coordinator`, `pm`, `project manager`, `project-manager`, `projectmanager`
 - `computer-science/qa-engineer`: `qa`, `qa engineer`, `qa-engineer`, `quality assurance`, `quality engineer`, `quality-engineer`, `test engineer`, `test-engineer`
 - `computer-science/rapid-prototyper`: `rapid prototyper`, `rapid-prototyper`, `rapidprototyper`
 - `computer-science/security-engineer`: `appsec`, `secure-coding`, `security`, `security engineer`, `security-engineer`, `securityengineer`
