@@ -59,6 +59,24 @@
       "commands/comment-issue-test-results.sh"
     ]
   },
+  "computer-science/project-manager": {
+    "skills": [
+      "create-task-file",
+      "manage-task-issues",
+      "pr-readiness-gate",
+      "post-pr-qa",
+      "clean-context"
+    ],
+    "commands": [
+      "commands/create-task-file.sh",
+      "commands/create-task-issue.sh",
+      "commands/import-task-from-issue.sh",
+      "commands/sync-task-issues.sh",
+      "commands/update-todo-checklist.sh",
+      "commands/pr-readiness-check.sh",
+      "commands/comment-pr-qa-results.sh"
+    ]
+  },
   "senior-developer": {
     "skills": [
       "solution-restore",
