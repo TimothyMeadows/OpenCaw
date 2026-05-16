@@ -4,9 +4,11 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage: ./commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]
+       ./commands/pr-readiness-check.sh --goal [task_or_issue_ref] [validation_summary_file]
 
 Creates a non-destructive PR readiness report and prints the required user
-confirmation prompt. This command never commits, pushes, or opens a PR.
+confirmation prompt unless --goal is supplied. This command never commits,
+pushes, or opens a PR.
 EOF
 }
 
@@ -15,9 +17,25 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
-task_ref="${1:-Unspecified task}"
-validation_summary_file="${2:-}"
+goal_flow=0
 invocation_dir="$(pwd)"
+
+args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --goal)
+      goal_flow=1
+      shift
+      ;;
+    *)
+      args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+task_ref="${args[0]:-Unspecified task}"
+validation_summary_file="${args[1]:-}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 opencaw_root="$(cd "$script_dir/.." && pwd)"
@@ -75,6 +93,45 @@ fi
 stamp="$(date -u +"%Y%m%d-%H%M%S")"
 report_file="$output_dir/pr-readiness-$stamp.md"
 
+if [[ $goal_flow -eq 1 ]]; then
+  checkpoint_heading="## Goal Flow Automation Checkpoint"
+  checkpoint_body="Goal flow is active for this task. This is the only OpenCaw exception to the human PR readiness approval prompt.
+
+Because the user explicitly selected goal flow, the agent may automatically push/open a PR for this completed task after local validation is complete. Goal flow must not merge PRs, approve PRs, or enable auto-merge.
+
+The agent must still:
+
+1. Confirm the PR is available using the GitHub tool priority below.
+2. Start post-PR QA immediately.
+3. Post QA pass/fail evidence to the PR.
+4. Record branch dependency when a later goal task should be based on this task branch or PR head.
+5. Stop goal automation if PR creation or post-PR QA fails.
+6. Move to the next goal task only after post-PR QA completes."
+  next_steps_heading="## Automated Goal-Flow Next Steps"
+  next_steps_body="1. Push/open the PR after local validation is complete.
+2. Confirm the PR is available using the GitHub tool priority above.
+3. Start task QA immediately.
+4. Post QA pass/fail evidence to the PR using GitHub comments.
+5. Include inline screenshot URLs when screenshots are part of the evidence.
+6. If the next goal task depends on this unmerged work or risks conflicts later, branch it from this task branch or PR head.
+7. Move to the next goal task only after QA is complete.
+8. Never merge, approve, or enable auto-merge from goal flow."
+else
+  checkpoint_heading="## Required Human Checkpoint"
+  checkpoint_body="Before any PR-related push or PR creation, ask the user:
+
+> The implementation is complete enough for your validation. Are you ready for me to push this branch and open a pull request?
+
+Do not run \`git push\`, \`gh pr create\`, \`github\` CLI PR creation, GitHub MCP/connector PR creation tools, auto-merge, or PR update automation until the user explicitly confirms."
+  next_steps_heading="## After Confirmation"
+  next_steps_body="1. Push/open the PR only after the user confirms readiness.
+2. Confirm the PR is available using the GitHub tool priority above.
+3. Start task QA immediately.
+4. Post QA pass/fail evidence to the PR using GitHub comments.
+5. Include inline screenshot URLs when screenshots are part of the evidence.
+6. Notify the user when QA is complete and the PR is ready for review."
+fi
+
 cat >"$report_file" <<EOF
 # PR Readiness Gate
 
@@ -88,6 +145,7 @@ cat >"$report_file" <<EOF
 - Upstream: \`${upstream:-none}\`
 - Ahead/behind: \`$ahead_behind\`
 - Last commit: \`$last_commit\`
+- Goal flow: \`$([[ $goal_flow -eq 1 ]] && printf 'enabled' || printf 'disabled')\`
 
 ## Working Tree
 
@@ -101,13 +159,9 @@ $status_short
 $validation_summary
 \`\`\`
 
-## Required Human Checkpoint
+$checkpoint_heading
 
-Before any PR-related push or PR creation, ask the user:
-
-> The implementation is complete enough for your validation. Are you ready for me to push this branch and open a pull request?
-
-Do not run \`git push\`, \`gh pr create\`, \`github\` CLI PR creation, GitHub MCP/connector PR creation tools, auto-merge, or PR update automation until the user explicitly confirms.
+$checkpoint_body
 
 ## GitHub Tool Priority
 
@@ -117,18 +171,20 @@ When choosing a tool for GitHub PR work, use:
 2. an available \`github\` CLI executable or repository-provided GitHub CLI wrapper
 3. GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
 
-## After Confirmation
+$next_steps_heading
 
-1. Push/open the PR only after the user confirms readiness.
-2. Confirm the PR is available using the GitHub tool priority above.
-3. Start task QA immediately.
-4. Post QA pass/fail evidence to the PR using GitHub comments.
-5. Include inline screenshot URLs when screenshots are part of the evidence.
-6. Notify the user when QA is complete and the PR is ready for review.
+$next_steps_body
 EOF
 
 popd >/dev/null
 
 echo "REPORT_FILE=$report_file"
-echo "USER_CONFIRMATION_REQUIRED=YES"
-echo "PROMPT=The implementation is complete enough for your validation. Are you ready for me to push this branch and open a pull request?"
+if [[ $goal_flow -eq 1 ]]; then
+  echo "USER_CONFIRMATION_REQUIRED=NO"
+  echo "GOAL_FLOW_AUTOMATION=YES"
+  echo "PROMPT=Goal flow is active. Automatically push/open the PR for this completed task, run post-PR QA, then continue to the next goal task only after QA completes."
+else
+  echo "USER_CONFIRMATION_REQUIRED=YES"
+  echo "GOAL_FLOW_AUTOMATION=NO"
+  echo "PROMPT=The implementation is complete enough for your validation. Are you ready for me to push this branch and open a pull request?"
+fi

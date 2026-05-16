@@ -62,6 +62,7 @@
   "computer-science/project-manager": {
     "skills": [
       "create-task-file",
+      "goal-flow",
       "manage-task-issues",
       "orchestrate-subagents",
       "pr-readiness-gate",
@@ -69,6 +70,8 @@
       "clean-context"
     ],
     "commands": [
+      "commands/create-goal-file.sh",
+      "commands/create-goal-completion-report.sh",
       "commands/create-task-file.sh",
       "commands/create-task-issue.sh",
       "commands/create-subagent-plan.sh",
