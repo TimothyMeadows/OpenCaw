@@ -29,6 +29,7 @@ OpenCaw is designed so it can be installed into an existing repository as a **su
 - [Architecture Frameworks](#architecture-frameworks)
 - [Roles](#roles)
 - [Role-Skill Bindings](#role-skill-bindings)
+- [Sub-Agent Orchestration](#sub-agent-orchestration)
 - [Skills](#skills)
 - [Commands](#commands)
 - [Skills & Commands Guide](#skills--commands-guide)
@@ -150,6 +151,10 @@ use role fullstack-engineer and build a calculator app with a simple UI, basic a
 ```
 
 ```text
+use 4 agents with project-manager + fullstack-engineer + qa-engineer to split the checkout refactor into safe parallel lanes, then integrate and verify the result
+```
+
+```text
 work on #123 and implement the fix with tests and verification evidence
 ```
 
@@ -157,13 +162,14 @@ work on #123 and implement the fix with tests and verification evidence
 
 OpenCaw deterministically resolves your prompt into:
 
-1. **Roles activated** -> sets perspective and priorities  
-2. **Skills selected** -> plans and reasons about the work  
-3. **Tasks + issues created/updated** -> `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md` + `.ai/tasks/OPEN_ISSUES.md`  
-4. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing  
-5. **Commands executed** -> builds, tests, scans, or deploys  
-6. **Verification performed** -> tests/logs prove correctness  
-7. **Memory updated** -> `.ai/` captures reusable lessons  
+1. **Roles activated** -> sets perspective and priorities
+2. **Skills selected** -> plans and reasons about the work
+3. **Tasks + issues created/updated** -> `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md` + `.ai/tasks/OPEN_ISSUES.md`
+4. **Sub-agent lanes planned when useful** -> `.ai/tasks/<task>/SUBAGENTS.md` captures parallel lanes, roles, ownership, and verification
+5. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing
+6. **Commands executed** -> builds, tests, scans, or deploys
+7. **Verification performed** -> tests/logs prove correctness
+8. **Memory updated** -> `.ai/` captures reusable lessons
 
 To be more specific it will:
 
@@ -175,26 +181,32 @@ To be more specific it will:
 6. create or import a task file such as:
    - `.ai/tasks/create-calculator-app/TASK.md`
 7. create/link a matching GitHub issue, or import an existing one from a prompt like `Work on #123`, and add the URL to `.ai/tasks/OPEN_ISSUES.md`
-8. apply appropriate skills such as:
+8. if the prompt requests multiple agents/developers/workers, or the task has safe natural parallelism, create a lane plan such as:
+   - `.ai/tasks/create-calculator-app/SUBAGENTS.md`
+9. validate that each lane has a resolved role, safe ownership boundaries, dependencies, expected output, and verification path
+10. apply appropriate skills such as:
    - `create-task-file`
    - `manage-task-issues`
+   - `orchestrate-subagents`
    - `generate-architecture`
    - `solution-build`
    - `test-dotnet`
-9. use appropriate commands based on the stack, such as:
+11. use appropriate commands based on the stack, such as:
    - `./commands/dotnet-restore.sh`
    - `./commands/dotnet-build.sh`
    - `./commands/dotnet-test.sh`
+   - `./commands/create-subagent-plan.sh` and `./commands/validate-subagent-plan.sh` for parallel lane planning
    - `./commands/comment-issue-test-results.sh` for task issue QA evidence
-10. implement the application
-11. run validation and verification before completion
-12. create a PR readiness report and ask the user whether they are ready for the branch to be pushed and a PR opened
-13. only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
-14. associate the PR with the task issue (`Closes #<issue-number>`)
-15. immediately run post-PR QA once the PR is confirmed available
-16. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
-17. notify the user that the PR is ready for review and the agent can move to the next task if any remain
-18. update memory files if durable lessons are discovered
+12. implement the application, using sub-agents only for lanes that can run safely in parallel
+13. record sub-agent lane results when a task-backed `SUBAGENTS.md` exists
+14. run validation and verification before completion
+15. create a PR readiness report and ask the user whether they are ready for the branch to be pushed and a PR opened
+16. only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
+17. associate the PR with the task issue (`Closes #<issue-number>`)
+18. immediately run post-PR QA once the PR is confirmed available
+19. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
+20. notify the user that the PR is ready for review and the agent can move to the next task if any remain
+21. update memory files if durable lessons are discovered
 
 This is the intended OpenCaw experience:
 
@@ -400,6 +412,93 @@ Multi-role sessions should merge bindings in the same order as the requested rol
 
 ---
 
+# Sub-Agent Orchestration
+
+OpenCaw supports a portable sub-agent flow for complex tasks that have safe parallel work. The flow is centered on the `computer-science/project-manager` role and the `orchestrate-subagents` skill.
+
+Use sub-agents when:
+
+- the user explicitly requests a number of agents, developers, workers, or parallel lanes
+- the task has independent research, implementation, QA, documentation, or review work
+- each lane can have a clear owner, role, scope, expected output, and verification path
+- implementation lanes can declare non-overlapping write sets
+
+Avoid sub-agents when:
+
+- the next step is a critical-path blocker the main agent needs immediately
+- multiple lanes would edit the same files without an integration strategy
+- the role, scope, output, or verification path is unclear
+- the overhead of coordination is larger than the work itself
+
+## Durable lane artifact
+
+For substantial task-backed work, OpenCaw stores the lane plan in:
+
+```text
+.ai/tasks/<task-name>/SUBAGENTS.md
+```
+
+`SUBAGENTS.md` captures:
+
+- requested and effective capacity
+- lane IDs such as `lane-1`, `lane-2`, and `lane-3`
+- resolved OpenCaw role for each lane
+- agent type: `explorer`, `worker`, or `default`
+- scope and write set
+- dependencies between lanes
+- expected output and verification evidence
+- integration order, conflict risks, and final verification
+- lane results after agents finish
+
+## Planning flow
+
+For complex prompts, the project-manager planning flow is:
+
+1. Identify the requested agent/developer count, if one was provided.
+2. Determine the task's natural parallelism.
+3. Create at most the requested number of active lanes.
+4. Assign each lane a resolved OpenCaw role.
+5. Use `explorer` lanes for read-only investigation and `worker` lanes for implementation.
+6. Require worker lanes to declare disjoint write sets.
+7. Keep the main agent responsible for orchestration, blockers, integration, final verification, and user communication.
+8. Record lane outputs and verification evidence before final handoff.
+
+Helper commands:
+
+```bash
+./commands/create-subagent-plan.sh "<task_name>" ["agent_count"] [--dry-run]
+./commands/validate-subagent-plan.sh "<task_name|path>"
+./commands/record-subagent-result.sh "<task_name>" "<lane_id>" "<status>" "<summary_file>" [--dry-run]
+```
+
+## Best prompts for complex tasks
+
+Good prompts make capacity and ownership expectations explicit:
+
+```text
+use 3 agents with project-manager + backend-architect + qa-engineer to plan and implement #123. Split only safe parallel lanes, keep write sets separate, then integrate and verify.
+```
+
+```text
+use 4 workers for this migration. Have project-manager create the SUBAGENTS.md lane plan first, use specialist roles for each lane, and reserve one lane for QA/review if implementation cannot safely use all four.
+```
+
+```text
+act as project-manager + senior-developer. Break this feature into sub-agent lanes, use explorer agents for investigation, worker agents for non-overlapping patches, and record lane evidence before final verification.
+```
+
+## Best practices
+
+- Ask for a specific agent count only when there is enough work to split cleanly.
+- Prefer fewer high-quality lanes over filling every requested seat.
+- Use specialist roles for specialist lanes, such as `qa-engineer` for verification or `security-engineer` for threat review.
+- Keep each worker lane's write set narrow and explicit.
+- Put cross-cutting or risky changes behind the main agent or a single owner.
+- Validate the lane plan before spawning or assigning work.
+- Integrate lane outputs deliberately, then run the final verification from the main agent.
+
+---
+
 # Skills
 
 Skills provide reusable instructions for AI agents to perform structured tasks.
@@ -597,6 +696,7 @@ use skill create-task-file + manage-task-issues + test-dotnet
 |------|--------|
 | `create-task-file` | Create a task file and link a matching issue |
 | `manage-task-issues` | Sync and prune open issue tracking |
+| `orchestrate-subagents` | Plan and coordinate parallel sub-agent lanes with OpenCaw roles |
 | `clean-context` | Compact context after substantial work |
 | `pr-readiness-gate` | Require human confirmation before push or PR creation |
 | `post-pr-qa` | Run QA after PR availability and post PR evidence comments |
@@ -669,6 +769,9 @@ run command dotnet-build
 | `playwright-evidence-report.sh` | Generate a bundle report linking all Playwright evidence reports |
 | `create-task-file.sh` | Create a task file and optionally link/create an issue |
 | `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
+| `create-subagent-plan.sh` | Create a task-backed `SUBAGENTS.md` lane plan |
+| `validate-subagent-plan.sh` | Validate sub-agent lane roles, fields, dependencies, and write sets |
+| `record-subagent-result.sh` | Append lane result evidence to `SUBAGENTS.md` |
 | `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
 | `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
 | `pr-readiness-check.sh` | Create a non-destructive readiness report and required PR approval prompt |
