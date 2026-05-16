@@ -6,6 +6,7 @@ Curated reusable skills included in OpenCaw.
 
 - `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding and OpenCaw bootstrap wiring are in place.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
+- `goal-flow` - Manage explicitly requested automated goals across task completion, automatic PR creation, post-PR QA, branch chaining, and final human approval reporting.
 - `manage-task-issues` - Maintain one GitHub issue per task and keep only open issue URLs in tracking.
 - `update-todo-checklist` - Maintain concise numbered TODO checklist state for active tasks.
 - `archive-task-note` - Archive task notes into long-term context storage.

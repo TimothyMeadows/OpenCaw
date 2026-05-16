@@ -30,6 +30,7 @@ OpenCaw is designed so it can be installed into an existing repository as a **su
 - [Roles](#roles)
 - [Role-Skill Bindings](#role-skill-bindings)
 - [Sub-Agent Orchestration](#sub-agent-orchestration)
+- [Goals](#goals)
 - [Skills](#skills)
 - [Commands](#commands)
 - [Skills & Commands Guide](#skills--commands-guide)
@@ -155,6 +156,10 @@ use 4 agents with project-manager + fullstack-engineer + qa-engineer to split th
 ```
 
 ```text
+goal: modernize the reporting module across these five tasks. Automatically raise each task PR after validation, run post-PR QA, then continue to the next task. Do not merge PRs automatically.
+```
+
+```text
 work on #123 and implement the fix with tests and verification evidence
 ```
 
@@ -166,10 +171,11 @@ OpenCaw deterministically resolves your prompt into:
 2. **Skills selected** -> plans and reasons about the work
 3. **Tasks + issues created/updated** -> `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md` + `.ai/tasks/OPEN_ISSUES.md`
 4. **Sub-agent lanes planned when useful** -> `.ai/tasks/<task>/SUBAGENTS.md` captures parallel lanes, roles, ownership, and verification
-5. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing
-6. **Commands executed** -> builds, tests, scans, or deploys
-7. **Verification performed** -> tests/logs prove correctness
-8. **Memory updated** -> `.ai/` captures reusable lessons
+5. **Goal flow selected when explicit** -> `.ai/goals/<goal>/GOAL.md` governs automatic task-to-PR-to-QA progression
+6. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing
+7. **Commands executed** -> builds, tests, scans, or deploys
+8. **Verification performed** -> tests/logs prove correctness
+9. **Memory updated** -> `.ai/` captures reusable lessons
 
 To be more specific it will:
 
@@ -201,12 +207,16 @@ To be more specific it will:
 13. record sub-agent lane results when a task-backed `SUBAGENTS.md` exists
 14. run validation and verification before completion
 15. create a PR readiness report and ask the user whether they are ready for the branch to be pushed and a PR opened
-16. only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
-17. associate the PR with the task issue (`Closes #<issue-number>`)
-18. immediately run post-PR QA once the PR is confirmed available
-19. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
-20. notify the user that the PR is ready for review and the agent can move to the next task if any remain
-21. update memory files if durable lessons are discovered
+16. if explicit goal flow is active, use `./commands/pr-readiness-check.sh --goal` and automatically push/open the task PR without asking for PR readiness confirmation
+17. otherwise, only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
+18. associate the PR with the task issue (`Closes #<issue-number>`)
+19. immediately run post-PR QA once the PR is confirmed available
+20. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
+21. in goal flow, move to the next task only after post-PR QA completes successfully
+22. when a later goal task depends on a previous unmerged task or risks conflicts, branch from the previous task branch or PR head and record the dependency
+23. at goal completion, generate a report with PR links in approval order, branch dependencies, QA evidence, and conflict-risk notes for human approval
+24. notify the user that the PR is ready for review and the agent can move to the next task if any remain
+25. update memory files if durable lessons are discovered
 
 This is the intended OpenCaw experience:
 
@@ -499,6 +509,108 @@ act as project-manager + senior-developer. Break this feature into sub-agent lan
 
 ---
 
+# Goals
+
+A **goal** is an explicitly requested automated multi-task delivery flow.
+
+Normal task flow is conservative:
+
+- tasks run one by one unless the project-manager role identifies safe parallel lanes
+- PR creation waits for the human readiness confirmation gate
+- post-PR QA runs after the PR is available
+
+Goal flow is different:
+
+- tasks still require planning, implementation, validation, PR creation, and post-PR QA
+- after each task completes local validation, OpenCaw may automatically raise the task PR
+- post-PR QA still runs immediately after the PR is available
+- the next goal task does not start until post-PR QA completes
+- if a later task depends on earlier unmerged work or is likely to conflict later, OpenCaw should branch from the earlier task branch or PR head and record that chain
+
+Goal flow is the **only** exception to the normal human PR readiness confirmation prompt. It never means auto-merge, merge approval, or auto-merge enablement, and it does not skip QA.
+
+## Activating a goal
+
+Goal flow activates only when the user explicitly requests it, for example:
+
+```text
+goal: finish the onboarding cleanup across the planned tasks, raising each PR automatically after validation and QA before moving on
+```
+
+```text
+use goal flow for this migration plan
+```
+
+Task planning may also mark the mode explicitly:
+
+```text
+Flow: goal
+Goal Flow: enabled
+```
+
+The ordinary `## Goal` section inside a `TASK.md` file does not activate automated goal flow by itself.
+
+## Goal artifact
+
+Goal files live in:
+
+```text
+.ai/goals/<goal-name>/GOAL.md
+```
+
+Create one with:
+
+```bash
+./commands/create-goal-file.sh "<goal_name>" ["Goal Title"] [--dry-run]
+```
+
+Each goal file tracks:
+
+- goal outcome and success criteria
+- ordered task queue
+- current task
+- branch chain for dependent or conflict-prone PRs
+- automation rules
+- PRs raised per task
+- post-PR QA evidence
+- stop conditions and review notes
+- final completion report path and approval order
+
+## Goal flow PR behavior
+
+For each completed goal task:
+
+1. Run local validation.
+2. Generate readiness evidence with `./commands/pr-readiness-check.sh --goal`.
+3. Automatically push/open the PR.
+4. Confirm the PR is available.
+5. Run post-PR QA.
+6. Post QA evidence to the PR.
+7. If the next task depends on this unmerged work or risks conflict, base that next task on this task branch or PR head.
+8. Continue to the next goal task only after post-PR QA completes.
+
+Stop goal automation if validation fails, PR creation fails, post-PR QA fails, a merge conflict blocks progress, role resolution is ambiguous, or a required product/security decision was not already covered by the goal plan.
+
+## Goal completion report
+
+When all goal tasks have completed post-PR QA, generate a completion report:
+
+```bash
+./commands/create-goal-completion-report.sh "<goal_name|goal_dir|goal_file>" [--dry-run]
+```
+
+The report is the human approval packet. It should include:
+
+- PR links in dependency/approval order
+- branch base/head notes for each PR
+- stacked branch dependencies
+- post-PR QA evidence links
+- merge-conflict risk notes
+
+Humans can then approve and merge in order, reducing conflict risk across dependent PRs. Goal flow does not merge the PRs itself.
+
+---
+
 # Skills
 
 Skills provide reusable instructions for AI agents to perform structured tasks.
@@ -695,6 +807,7 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | Skill | Purpose |
 |------|--------|
 | `create-task-file` | Create a task file and link a matching issue |
+| `goal-flow` | Manage explicit automated goals across task PRs, post-PR QA, branch chaining, and final approval reporting |
 | `manage-task-issues` | Sync and prune open issue tracking |
 | `orchestrate-subagents` | Plan and coordinate parallel sub-agent lanes with OpenCaw roles |
 | `clean-context` | Compact context after substantial work |
@@ -767,6 +880,8 @@ run command dotnet-build
 | `playwright-artifact-index.sh` | Index screenshots, traces, videos, logs, and report artifacts |
 | `playwright-discovery-report.sh` | Summarize `.playwright-cli` discovery snapshots and artifacts |
 | `playwright-evidence-report.sh` | Generate a bundle report linking all Playwright evidence reports |
+| `create-goal-completion-report.sh` | Create the final human approval report for a completed goal |
+| `create-goal-file.sh` | Create a task-backed automated goal file under `.ai/goals` |
 | `create-task-file.sh` | Create a task file and optionally link/create an issue |
 | `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
 | `create-subagent-plan.sh` | Create a task-backed `SUBAGENTS.md` lane plan |
@@ -774,7 +889,7 @@ run command dotnet-build
 | `record-subagent-result.sh` | Append lane result evidence to `SUBAGENTS.md` |
 | `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
 | `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
-| `pr-readiness-check.sh` | Create a non-destructive readiness report and required PR approval prompt |
+| `pr-readiness-check.sh` | Create a non-destructive readiness report and required PR approval prompt, or record goal-flow automation with `--goal` |
 | `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
 | `comment-pr-qa-results.sh` | Post QA evidence to a PR comment with inline screenshot URL support |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
