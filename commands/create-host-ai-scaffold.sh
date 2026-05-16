@@ -63,7 +63,9 @@ ensure_host_agents_bootstrap
 mkdir -p \
   "$host_ai_dir/FRAGMENTS" \
   "$host_ai_dir/LEARNINGS" \
+  "$host_ai_dir/goals" \
   "$host_ai_dir/tasks" \
+  "$host_ai_dir/archive/goals" \
   "$host_ai_dir/archive/tasks" \
   "$host_ai_dir/archive/context-snapshots" \
   "$host_ai_dir/reports"

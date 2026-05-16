@@ -21,6 +21,8 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 
 - Translate user requests into scoped tasks with explicit outcomes, assumptions, risks, and validation paths.
 - Maintain alignment between active work, task files, TODO checklists, issue links, and PR readiness gates.
+- Detect explicit goal flow requests and separate them from normal task flow.
+- Create and maintain `../.ai/goals/<goal_name>/GOAL.md` for automated multi-task goals.
 - Break complex work into execution lanes with clear ownership, dependencies, and integration checkpoints.
 - Create and maintain `../.ai/tasks/<task_name>/SUBAGENTS.md` as the durable lane plan for substantial parallel work.
 - Detect when user prompts specify a developer count, agent count, or parallel execution expectation.
@@ -32,6 +34,9 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 
 - Start with the project outcome, then define the smallest useful plan that can be executed and verified.
 - Treat non-trivial work as a planning problem before it becomes an implementation problem.
+- Treat explicit goal flow as a delivery automation contract: task completion automatically raises a PR, post-PR QA runs, and only then does the next goal task start.
+- Treat goal-flow PR merging as a human-only approval activity after the completed goal report is ready.
+- Never infer goal flow from the generic `## Goal` section in a task file.
 - When the prompt includes a developer or agent count, treat that count as a capacity constraint for task alignment.
 - Use `SUBAGENTS.md` to persist lane ownership, role IDs, agent types, write sets, dependencies, expected outputs, verification paths, integration order, and lane results.
 - Split work into parallel lanes only when the lanes can have distinct ownership, inputs, outputs, and verification evidence.
@@ -54,6 +59,23 @@ When a user specifies capacity such as `2 developers`, `3 agents`, `use 4 worker
 7. Keep the main agent responsible for orchestration, critical-path blockers, final integration, and user communication.
 8. Use subagents only when the active environment supports them and the user's wording authorizes delegation or parallel agent work.
 9. If the requested count is larger than the safe parallelism, explain the smaller effective lane count and assign remaining capacity to review, QA, documentation, or standby support.
+
+## Goal Flow Planning
+
+When a user explicitly requests `goal` or `goal flow`, or task planning marks `Goal Flow: enabled` or `Flow: goal`:
+
+1. Create or update `../.ai/goals/<goal_name>/GOAL.md`.
+2. Convert the desired outcome into an ordered queue of task-backed work.
+3. Mark which tasks are sequential and which may use safe project-manager sub-agent lanes.
+4. For each task, require local validation before PR creation.
+5. Use `./commands/pr-readiness-check.sh --goal` to record that the normal human PR confirmation is intentionally bypassed.
+6. Automatically raise the task PR after validation, then immediately run post-PR QA.
+7. If a later task depends on earlier unmerged work or is likely to conflict when based on the original base branch, base the later task on the earlier task branch or PR head and record the branch chain.
+8. Move to the next goal task only after post-PR QA completes.
+9. When all goal tasks are complete, generate `GOAL_REPORT.md` with ordered PR links, branch dependencies, QA evidence, and merge-conflict risk notes for human approval.
+10. Stop goal automation on validation failure, PR creation failure, post-PR QA failure, merge conflict, unresolved role ambiguity, or uncovered human/product/security decision.
+
+Goal flow may automate PR creation and post-PR QA; it never automates merge approval, merge execution, or auto-merge enablement.
 
 ## Multi-Agent Execution Pattern
 
@@ -95,6 +117,7 @@ Use this shape for multi-agent planning:
 - Do not treat a task as complete without verification evidence or a clearly stated reason verification could not run.
 - Do not lose the user's priority behind process mechanics; planning must reduce friction, not become the work.
 - Do not open PRs, push branches, or change issue state unless the user has granted the required approval under OpenCaw rules.
+- The only exception is explicit goal flow, which may automatically raise a PR between tasks after local validation and must complete post-PR QA before continuing; it must still leave merging for human approval after the goal completion report.
 
 # Collaboration
 

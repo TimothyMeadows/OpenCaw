@@ -91,6 +91,7 @@ Commands:
 ### computer-science/project-manager
 Skills:
 - `create-task-file`
+- `goal-flow`
 - `manage-task-issues`
 - `orchestrate-subagents`
 - `pr-readiness-gate`
@@ -98,6 +99,8 @@ Skills:
 - `clean-context`
 
 Commands:
+- `commands/create-goal-file.sh`
+- `commands/create-goal-completion-report.sh`
 - `commands/create-task-file.sh`
 - `commands/create-task-issue.sh`
 - `commands/create-subagent-plan.sh`

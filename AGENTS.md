@@ -129,6 +129,8 @@ When multiple roles are requested:
 - Use plan mode for verification work, not just implementation
 - When the user specifies a developer count, agent count, worker count, or explicit parallel execution target, apply the `computer-science/project-manager` planning lens to align tasks into safe parallel lanes before implementation
 - Count-based plans should name lane ownership, scope, dependencies, verification, integration order, and any reason the effective parallelism is smaller than the requested count
+- When the user explicitly requests a `goal`, says `goal flow`, or a task planning artifact marks `Goal Flow: enabled` or `Flow: goal`, use goal flow instead of normal task flow
+- Do not activate goal flow from the generic `## Goal` section in `TASK.md`; that field describes task intent and is not the automated goal feature
 - Write detailed specs up front to reduce ambiguity
 - If something goes sideways, stop and re-plan immediately instead of pushing through a stale plan
 
@@ -180,6 +182,10 @@ When multiple roles are requested:
 - Before any PR-related push or PR creation, summarize completed work and validation, then ask the user whether they are ready for a PR
 - Do not run `git push`, `gh pr create`, `github` CLI PR creation, GitHub MCP/connector PR creation tools, draft PR creation, PR branch updates, auto-merge, or PR publishing skills until the user explicitly confirms readiness after the implementation is complete
 - Prefer `./commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]` to create a durable readiness report and exact user prompt
+- Goal flow is the only exception to the human PR readiness confirmation requirement; use `./commands/pr-readiness-check.sh --goal [task_or_issue_ref] [validation_summary_file]` to record the exception before automatic PR creation
+- Goal flow may automatically push/open a PR for the completed task, but it must still run post-PR QA before moving to the next goal task
+- Goal flow never auto-merges PRs, enables auto-merge, or grants merge approval; it only auto-raises PRs and runs/reports post-PR QA
+- Goal flow does not suppress validation, PR evidence, issue linkage, or post-PR QA
 - For GitHub PR operations and metadata lookups, choose tools in this order:
   1. `gh` from the local shell
   2. an available `github` CLI executable or repository-provided GitHub CLI wrapper
@@ -214,6 +220,17 @@ When multiple roles are requested:
 8. Sync task issues when reading active tasks and remove URLs for closed issues from `.ai/tasks` tracking
 9. Capture lessons: update `../.ai/MEMORY.md` after corrections or durable discoveries
 10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
+
+## Goal flow
+- A goal is an explicitly requested automated multi-task delivery flow, not the generic `## Goal` field in a task file
+- Goal files live under `../.ai/goals/<goal_name>/GOAL.md`; create them with `./commands/create-goal-file.sh "<goal_name>" ["Goal Title"]`
+- In normal task flow, tasks proceed one by one unless the project-manager role defines safe parallel sub-agent lanes
+- In goal flow, tasks still proceed through planning, implementation, validation, PR creation, and post-PR QA, but the PR readiness human confirmation prompt is skipped
+- After each completed goal task, automatically raise the PR, confirm it is available, run post-PR QA, post QA evidence to the PR, then move to the next goal task
+- If a future goal task depends on a previous task or risks merge conflicts later, base that task on the previous task branch or PR head and record the dependency in the goal branch chain
+- When all goal tasks complete, generate a goal completion report with PR links in approval order, branch dependencies, QA evidence, and conflict-risk notes before asking for human approval
+- Do not continue to the next goal task if local validation fails, PR creation fails, post-PR QA fails, role resolution is ambiguous, a merge conflict blocks the PR path, or a required human/product/security decision was not already covered by the goal plan
+- Goal flow never grants automatic merge approval; merging remains governed by repository policy
 
 ## Issue-first task import
 - If the user prompt includes an issue reference (for example `Work on #123`), import that issue into task tracking first with `./commands/import-task-from-issue.sh "#123"`.
@@ -271,6 +288,7 @@ When multiple roles are requested:
 ## Branch and PR conventions
 - Do not commit unless explicitly asked
 - Do not push or open a pull request until the PR readiness gate has been presented and the user explicitly confirms they are ready
+- The only exception is explicit goal flow, where PR creation is automatic between goal tasks after `./commands/pr-readiness-check.sh --goal` records validation and before post-PR QA runs; merging remains human-approved after the goal completion report
 - Any PR created for task-backed work must be associated with its issue (for example `Closes #<issue-number>` in PR body)
 - When asked to commit, prefer conventional commits:
   - feat(scope): summary
