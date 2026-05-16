@@ -133,10 +133,13 @@ When multiple roles are requested:
 - If something goes sideways, stop and re-plan immediately instead of pushing through a stale plan
 
 ## Subagent strategy
-- Use subagents liberally to keep the main context window clean
-- Offload research, exploration, parallel analysis, and focused investigations to subagents
-- For complex problems, throw more compute at the problem via subagents
-- Use one task per subagent for focused execution
+- Use the `computer-science/project-manager` planning lens before subagent execution when the user requests multiple agents/developers/workers or when natural parallelism is clear
+- Create or update `../.ai/tasks/<task_name>/SUBAGENTS.md` for substantial parallel work using `./commands/create-subagent-plan.sh`, then validate it with `./commands/validate-subagent-plan.sh`
+- Resolve every lane role with `./commands/resolve-role.sh` before assigning work; do not spawn a lane with unresolved role ambiguity, missing verification, overlapping write scope, or an immediate critical-path dependency
+- For Codex, map read-only investigation lanes to `explorer` agents and implementation lanes to `worker` agents with disjoint write sets
+- For non-Codex tools, use the same `SUBAGENTS.md` lane plan as portable delegation guidance or sequential fallback
+- Keep the main agent responsible for orchestration, critical-path blockers, final integration, final verification, and user communication
+- Record completed lane evidence with `./commands/record-subagent-result.sh` when a task-backed `SUBAGENTS.md` exists
 
 ## Self-improvement loop
 - After any user correction, update `../.ai/MEMORY.md` with the learned pattern

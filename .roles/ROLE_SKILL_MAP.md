@@ -92,6 +92,7 @@ Commands:
 Skills:
 - `create-task-file`
 - `manage-task-issues`
+- `orchestrate-subagents`
 - `pr-readiness-gate`
 - `post-pr-qa`
 - `clean-context`
@@ -99,6 +100,9 @@ Skills:
 Commands:
 - `commands/create-task-file.sh`
 - `commands/create-task-issue.sh`
+- `commands/create-subagent-plan.sh`
+- `commands/validate-subagent-plan.sh`
+- `commands/record-subagent-result.sh`
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
 - `commands/update-todo-checklist.sh`

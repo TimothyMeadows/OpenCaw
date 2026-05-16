@@ -22,6 +22,7 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 - Translate user requests into scoped tasks with explicit outcomes, assumptions, risks, and validation paths.
 - Maintain alignment between active work, task files, TODO checklists, issue links, and PR readiness gates.
 - Break complex work into execution lanes with clear ownership, dependencies, and integration checkpoints.
+- Create and maintain `../.ai/tasks/<task_name>/SUBAGENTS.md` as the durable lane plan for substantial parallel work.
 - Detect when user prompts specify a developer count, agent count, or parallel execution expectation.
 - Convert count-based prompts into a practical multi-agent or multi-developer plan without creating unnecessary coordination overhead.
 - Keep the main execution path focused on blockers, integration, verification, and user-visible decisions.
@@ -32,6 +33,7 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 - Start with the project outcome, then define the smallest useful plan that can be executed and verified.
 - Treat non-trivial work as a planning problem before it becomes an implementation problem.
 - When the prompt includes a developer or agent count, treat that count as a capacity constraint for task alignment.
+- Use `SUBAGENTS.md` to persist lane ownership, role IDs, agent types, write sets, dependencies, expected outputs, verification paths, integration order, and lane results.
 - Split work into parallel lanes only when the lanes can have distinct ownership, inputs, outputs, and verification evidence.
 - Prefer one owner per lane, with non-overlapping write scopes for implementation work.
 - Reserve one lane for integration, review, QA, or documentation when the requested count exceeds useful implementation parallelism.
@@ -47,9 +49,11 @@ When a user specifies capacity such as `2 developers`, `3 agents`, `use 4 worker
 2. Determine the natural parallelism in the task before assigning lanes.
 3. Create at most the requested number of active lanes unless the user explicitly asks for reserve or stretch lanes.
 4. Assign each lane a purpose, owned files or responsibility area, expected output, verification path, and dependency notes.
-5. Keep the main agent responsible for orchestration, critical-path blockers, final integration, and user communication.
-6. Use subagents only when the active environment supports them and the user's wording authorizes delegation or parallel agent work.
-7. If the requested count is larger than the safe parallelism, explain the smaller effective lane count and assign remaining capacity to review, QA, documentation, or standby support.
+5. Record the lane plan in `../.ai/tasks/<task_name>/SUBAGENTS.md` for substantial task-backed work.
+6. Validate lane roles, write sets, and required fields before delegation.
+7. Keep the main agent responsible for orchestration, critical-path blockers, final integration, and user communication.
+8. Use subagents only when the active environment supports them and the user's wording authorizes delegation or parallel agent work.
+9. If the requested count is larger than the safe parallelism, explain the smaller effective lane count and assign remaining capacity to review, QA, documentation, or standby support.
 
 ## Multi-Agent Execution Pattern
 
@@ -64,22 +68,28 @@ Use this shape for multi-agent planning:
 - Reason: <natural parallelism and constraints>
 
 ## Lanes
-1. <Lane name>
-   Owner: <agent/developer role>
-   Scope: <files, module, or responsibility>
-   Output: <deliverable>
-   Verification: <test, review, artifact, or evidence>
-   Dependencies: <none or named blockers>
+### lane-1
+- Role: <resolved role id or alias>
+- Agent type: <explorer|worker|default>
+- Status: planned
+- Scope: <files, module, or responsibility>
+- Write set: <none or comma-separated paths>
+- Dependencies: <none or lane IDs>
+- Expected output: <deliverable>
+- Verification: <test, review, artifact, or evidence>
 
 ## Integration
 - Merge order:
 - Conflict risks:
 - Final verification:
+
+## Results
 ```
 
 # Constraints
 
 - Do not create parallel lanes that require multiple agents to edit the same files without an explicit integration strategy.
+- Do not spawn or assign a lane until its role resolves and its `SUBAGENTS.md` fields validate.
 - Do not delegate the critical-path blocker when the main agent's next action depends on that result immediately.
 - Do not inflate plans to match a requested count when the work is safer as a smaller sequence.
 - Do not treat a task as complete without verification evidence or a clearly stated reason verification could not run.
