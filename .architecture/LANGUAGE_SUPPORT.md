@@ -34,6 +34,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | COSMOSDB | SQL API query syntax, JavaScript (stored procedures) |
 | AZURE_STORAGE_TABLES | OData-style filters, JSON payload modeling |
 | DATABRICKS | SQL, Python, Scala |
+| DOCKER | Dockerfile syntax, Docker Compose YAML, shell |
 | EMBEDDED_FIRMWARE | C, C++, CMake/RTOS configs |
 | TERRAFORM | HCL |
 | KUBERNETES | YAML |

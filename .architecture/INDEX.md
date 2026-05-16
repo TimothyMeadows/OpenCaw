@@ -8,6 +8,7 @@ Available templates in this OpenCaw baseline:
 - AZURE_STORAGE_TABLES
 - COSMOSDB
 - DATABRICKS
+- DOCKER
 - DOTNET
 - DOTNET_ASPIRE
 - EMBEDDED_FIRMWARE
