@@ -49,6 +49,24 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
+### arts/pixel-artist
+Skills:
+- `iterate-art-to-sanity`
+- `enforce-art-language-safety`
+
+Commands:
+- `commands/art-sanity-checklist.sh`
+- `commands/validate-art-sanity-report.sh`
+
+### arts/tile-set-artist
+Skills:
+- `iterate-art-to-sanity`
+- `enforce-art-language-safety`
+
+Commands:
+- `commands/art-sanity-checklist.sh`
+- `commands/validate-art-sanity-report.sh`
+
 ### code-migrator
 Skills:
 - `dependency-audit-dotnet`
@@ -135,6 +153,15 @@ Commands:
 - `commands/generate-architecture.sh`
 - `commands/dotnet-build.sh`
 - `commands/dotnet-test.sh`
+
+### computer-science/game-designer
+Skills:
+- `create-task-file`
+- `manage-task-issues`
+
+Commands:
+- `commands/create-task-file.sh`
+- `commands/update-todo-checklist.sh`
 
 ### devops-automator
 Skills:
