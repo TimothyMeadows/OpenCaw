@@ -19,11 +19,14 @@ Current role catalog location:
 
 ### Frontend & UX
 - `frontend-developer`
+- `game-designer`
 - `mobile-app-builder`
 
 ### Arts & Visual Design
 - `css-vector-artist`
 - `generative-art-designer`
+- `pixel-artist`
+- `tile-set-artist`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -71,11 +74,14 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
 - `arts/css-vector-artist`: `css-vector-artist`, `css-vector`, `interface-vector-artist`, `logo-vector-artist`, `vector-ui-artist`
 - `arts/generative-art-designer`: `generative-art-designer`, `generative-art`, `ai-image-designer`, `art-iteration-designer`, `image-prompt-designer`
+- `arts/pixel-artist`: `pixel-artist`, `pixel-art`, `sprite-artist`, `sprite-sheet-artist`, `raster-game-artist`
+- `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`
 - `computer-science/embedded-firmware-engineer`: `embedded firmware engineer`, `embedded-firmware-engineer`, `embeddedfirmwareengineer`
 - `computer-science/frontend-developer`: `frontend`, `frontend developer`, `frontend-developer`, `frontenddeveloper`, `ui`, `web`
+- `computer-science/game-designer`: `game-designer`, `game-design`, `gameplay-designer`, `systems-designer`, `encounter-designer`
 - `computer-science/fullstack-engineer`: `full stack`, `full-stack`, `fullstack`, `fullstack engineer`, `fullstack-engineer`, `fullstackengineer`
 - `computer-science/git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `computer-science/incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
