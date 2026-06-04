@@ -18,6 +18,26 @@
       "commands/validate-art-sanity-report.sh"
     ]
   },
+  "arts/pixel-artist": {
+    "skills": [
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/tile-set-artist": {
+    "skills": [
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
   "code-migrator": {
     "skills": [
       "dependency-audit-dotnet",
@@ -108,6 +128,16 @@
       "commands/generate-architecture.sh",
       "commands/dotnet-build.sh",
       "commands/dotnet-test.sh"
+    ]
+  },
+  "computer-science/game-designer": {
+    "skills": [
+      "create-task-file",
+      "manage-task-issues"
+    ],
+    "commands": [
+      "commands/create-task-file.sh",
+      "commands/update-todo-checklist.sh"
     ]
   },
   "devops-automator": {
