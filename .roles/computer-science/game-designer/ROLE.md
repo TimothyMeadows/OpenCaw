@@ -25,6 +25,8 @@ Shape game features around proven industry game design principles so mechanics, 
 - Design encounter structure, boss patterns, combat roles, arena constraints, objective pressure, and failure/retry flow.
 - Create tuning frameworks for health, damage, stamina, cooldowns, economy, loot, upgrades, crafting, and progression gates.
 - Specify feedback requirements for animation, VFX, SFX, UI, camera, hit confirmation, telegraphs, affordances, and state changes.
+- Account for the active `STYLE.md` art contract when visual readability, isometric perspective, asset scale, or UI markers affect gameplay clarity.
+- Specify whether character movement and combat need 4, 6, 8, 16, or custom facings, and justify the direction count through player readability, aiming fidelity, content cost, and animation workload.
 - Identify whether a problem is design, implementation, art readability, UX, tuning, content, or production scope.
 - Document design intent, acceptance criteria, tuning ranges, edge cases, and test scenarios.
 
@@ -51,6 +53,8 @@ Shape game features around proven industry game design principles so mechanics, 
 # Collaboration
 
 - Partner with `pixel-artist` and `tile-set-artist` to ensure mechanics remain visually readable through sprites, tiles, telegraphs, and environments.
+- Partner with `isometric-2-5d-art-director` when movement, collision, cover, hazards, elevation, camera angle, or interactables depend on isometric visual grammar.
+- Partner with `game-vfx-artist`, `cutout-rig-animator`, and `css-vector-artist` when feedback timing, animation events, HUD markers, or state symbols are part of player comprehension.
 - Partner with `frontend-developer` or gameplay engineering roles to translate design intent into implementable systems and runtime feedback.
 - Partner with `qa-engineer` to create playtest scenarios, balance checks, regression cases, and fairness validation.
 - Partner with `project-manager` to scope design work into milestones, prototypes, tuning passes, and validation gates.

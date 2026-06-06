@@ -39,6 +39,7 @@ After scaffold checks, review these host-repository files when they exist:
 - `../.ai/RULES.md`
 - `../.ai/DEBUG.md`
 - `../ARCHITECTURE.md`
+- `../STYLE.md`
 - `../.ai/tasks/TODO.md`
 - `../.ai/tasks/OPEN_ISSUES.md`
 
@@ -67,6 +68,32 @@ Architecture templates live in:
 ### When regenerating architecture later
 - Ask the user again which templates apply.
 - Regenerate `../ARCHITECTURE.md` with the same default read-directive mode unless inline output is explicitly requested.
+
+## Art style workflow
+The canonical art style contract for the host repository is:
+
+- `../STYLE.md`
+
+Style templates live in:
+
+- `./.styles/`
+
+### When `../STYLE.md` exists
+- Read it and follow it as the authoritative art style contract for visual, game-art, generated-image, UI-art, and asset-production work.
+
+### When `../STYLE.md` is missing
+- Ask the user which style templates in `./.styles/` apply to the repository, unless the user already named the desired style.
+- Support selecting multiple templates for mixed-style repositories.
+- After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh "<STYLE1>" ["STYLE2" ...]`.
+- Default generation must use concise read directives (for example `Read \`./<mount>/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
+- Use `--inline` only when the user explicitly asks for fully embedded template content.
+- Validate generated or edited style contracts with `./commands/validate-style-contract.sh`.
+- Once generated, use `../STYLE.md` as the authoritative art style contract.
+
+### When regenerating style later
+- Ask the user again which style templates apply unless they already named the replacement style set.
+- Regenerate `../STYLE.md` with the same default read-directive mode unless inline output is explicitly requested.
+- Validate the regenerated contract with `./commands/validate-style-contract.sh`.
 
 ## Role casting
 
@@ -366,6 +393,7 @@ OpenCaw includes schema validation commands for roles, skills, and commands:
 - `./commands/validate-roles.sh`
 - `./commands/validate-skills.sh`
 - `./commands/validate-commands.sh`
+- `./commands/validate-styles.sh`
 - `./commands/validate-opencaw.sh`
 
 Use these when:

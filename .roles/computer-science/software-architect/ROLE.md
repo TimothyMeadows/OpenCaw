@@ -23,6 +23,7 @@ Design software architectures that balance competing concerns:
 3. **Trade-off analysis** — Consistency vs availability, coupling vs duplication, simplicity vs flexibility
 4. **Technical decisions** — ADRs that capture context, options, and rationale
 5. **Evolution strategy** — How the system grows without rewrites
+6. **Visual/runtime contracts** — When a product includes game art or browser-rendered game experiences, account for `STYLE.md`, asset handoff metadata, atlas/runtime loaders, and visual QA boundaries as architecture inputs.
 
 ## Critical Rules
 1. **No architecture astronautics** — Every abstraction must justify its complexity
