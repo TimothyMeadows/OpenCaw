@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Game Art Sheets"
+  short_description: "Plan tilesets and directional character animation sheets."
+  default_prompt: "Plan a production-ready tileset or directional animation sheet with frame, atlas, anchor, and validation metadata."

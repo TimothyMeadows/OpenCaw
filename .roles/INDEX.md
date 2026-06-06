@@ -24,8 +24,16 @@ Current role catalog location:
 
 ### Arts & Visual Design
 - `css-vector-artist`
+- `cutout-rig-animator`
+- `flat-minimalist-game-artist`
+- `game-vfx-artist`
 - `generative-art-designer`
+- `illustrative-2d-artist`
+- `isometric-2-5d-art-director`
+- `isometric-2-5d-environment-artist`
+- `parallax-background-artist`
 - `pixel-artist`
+- `pre-rendered-2-5d-artist`
 - `tile-set-artist`
 
 ### Full Stack
@@ -73,8 +81,16 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/code-migrator`: `code migrator`, `code-migrator`, `codemigrator`, `migration-engineer`, `modernization-engineer`
 - `computer-science/code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
 - `arts/css-vector-artist`: `css-vector-artist`, `css-vector`, `interface-vector-artist`, `logo-vector-artist`, `vector-ui-artist`
+- `arts/cutout-rig-animator`: `cutout-rig-animator`, `cutout-animator`, `skeletal-2d-animator`, `puppet-animation-artist`, `bone-rig-artist`, `sprite-rig-animator`
+- `arts/flat-minimalist-game-artist`: `flat-minimalist-game-artist`, `flat-game-artist`, `minimalist-game-artist`, `geometric-game-artist`, `monochrome-game-artist`, `simple-shape-artist`
+- `arts/game-vfx-artist`: `game-vfx-artist`, `2d-vfx-artist`, `sprite-vfx-artist`, `particle-vfx-artist`, `flipbook-vfx-artist`, `effects-artist`
 - `arts/generative-art-designer`: `generative-art-designer`, `generative-art`, `ai-image-designer`, `art-iteration-designer`, `image-prompt-designer`
+- `arts/illustrative-2d-artist`: `illustrative-2d-artist`, `hand-drawn-game-artist`, `painterly-2d-artist`, `painted-sprite-artist`, `concept-to-sprite-artist`
+- `arts/isometric-2-5d-art-director`: `isometric-2-5d-art-director`, `isometric-art-director`, `iso-art-director`, `isometric-game-art`, `isometric-style-director`, `isometric`
+- `arts/isometric-2-5d-environment-artist`: `isometric-2-5d-environment-artist`, `isometric-environment-artist`, `iso-environment-artist`, `isometric-world-artist`, `isometric-prop-artist`, `isometric-tiles-artist`
+- `arts/parallax-background-artist`: `parallax-background-artist`, `parallax-artist`, `background-layer-artist`, `scrolling-background-artist`, `atmospheric-background-artist`
 - `arts/pixel-artist`: `pixel-artist`, `pixel-art`, `sprite-artist`, `sprite-sheet-artist`, `raster-game-artist`
+- `arts/pre-rendered-2-5d-artist`: `pre-rendered-2-5d-artist`, `prerendered-2-5d-artist`, `hd-2d-artist`, `rendered-sprite-artist`, `orthographic-render-artist`, `3d-to-2d-artist`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`

@@ -40,6 +40,7 @@ Curated reusable skills included in OpenCaw.
 ## Architecture And Integration
 
 - `generate-architecture` - Generate `ARCHITECTURE.md` from selected templates.
+- `generate-style` - Generate `STYLE.md` from selected art style templates.
 - `apim-change-review` - Review Azure API Management changes for compatibility and risk.
 - `azure-settings-checklist` - Validate required Azure app settings and environment assumptions.
 - `function-app-checklist` - Validate Function App operational and deployment expectations.
@@ -58,7 +59,11 @@ Curated reusable skills included in OpenCaw.
 - `playwright-test-refinement` - Diagnose, rerun, and stabilize Playwright tests.
 - `playwright-reporting` - Generate non-interactive Playwright evidence reports from JSON results and artifacts.
 
-## Art Safety
+## Art Production
 
+- `maintain-art-style-contract` - Maintain, generate, or validate `STYLE.md` against selected `.styles` templates.
+- `review-isometric-production` - Review isometric art for projection, anchors, depth sorting, occlusion, and gameplay readability.
+- `prepare-game-art-handoff` - Prepare game art assets for engine/runtime handoff with metadata and validation checks.
+- `create-game-art-sheets` - Plan tilesets, environment sheets, prop atlases, and directional animation sheets.
 - `iterate-art-to-sanity` - Iterate generated art until sanity checks pass.
 - `enforce-art-language-safety` - Enforce language and visual safety constraints for generated art.
