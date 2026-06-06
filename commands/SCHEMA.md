@@ -153,5 +153,7 @@ Commands = execution layer
 Validation may be enforced with:
 
 - `./commands/validate-commands.sh`
+- `./commands/validate-styles.sh`
+- `./commands/validate-style-contract.sh`
 - `./commands/validate-cloud-preferences.sh`
 - `./commands/validate-opencaw.sh`

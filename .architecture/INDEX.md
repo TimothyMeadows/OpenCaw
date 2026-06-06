@@ -6,6 +6,8 @@ Available templates in this OpenCaw baseline:
 - AZURE
 - AZURE_DEVOPS
 - AZURE_STORAGE_TABLES
+- BABYLONJS
+- COLYSEUS
 - COSMOSDB
 - DATABRICKS
 - DOCKER
@@ -23,6 +25,7 @@ Available templates in this OpenCaw baseline:
 - MYSQL
 - NEXTJS
 - NODE
+- PHASERJS
 - POSTGRESDB
 - PYTHON
 - PLAYWRIGHT
@@ -32,6 +35,8 @@ Available templates in this OpenCaw baseline:
 - SPA
 - SQLITE
 - TERRAFORM
+- THREEJS
+- TILED
 - VUE
 
 Use one or more of these when generating `../ARCHITECTURE.md` for a host repository.

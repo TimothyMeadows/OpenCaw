@@ -17,13 +17,17 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | DOTNET | C#, .NET |
 | DOTNET_ASPIRE | C#, .NET |
 | MAUI | C#, .NET |
+| BABYLONJS | TypeScript, JavaScript, WebGL, WebGPU, WGSL / GLSL shader code |
+| COLYSEUS | TypeScript, JavaScript, Node.js, WebSocket, Redis-backed scaling |
 | NODE | JavaScript, TypeScript, Node.js |
+| PHASERJS | JavaScript, TypeScript, HTML5 Canvas, WebGL |
 | PLAYWRIGHT | TypeScript, JavaScript |
 | REACT | JavaScript, TypeScript |
 | NEXTJS | JavaScript, TypeScript |
 | ANGULAR | TypeScript, JavaScript |
 | VUE | JavaScript, TypeScript |
 | SPA | JavaScript, TypeScript |
+| THREEJS | JavaScript, TypeScript, WebGL, WebGPU, GLSL / shader code |
 | SIGNALR_WEBSOCKETS | C#, JavaScript, TypeScript |
 | PYTHON | Python |
 | SOLIDITY | Solidity, TypeScript (tooling/scripts) |
@@ -37,6 +41,7 @@ For implementation work, prefer this order unless the role cannot reasonably use
 | DOCKER | Dockerfile syntax, Docker Compose YAML, shell |
 | EMBEDDED_FIRMWARE | C, C++, CMake/RTOS configs |
 | TERRAFORM | HCL |
+| TILED | TMX/XML, JSON, TSX, TX, JavaScript/TypeScript scripting, Lua/CSV exports |
 | KUBERNETES | YAML |
 | HELM | YAML, Go templates |
 | GITHUB_ACTIONS | YAML |

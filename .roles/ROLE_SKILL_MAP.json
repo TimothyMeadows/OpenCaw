@@ -1,39 +1,203 @@
 {
   "arts/css-vector-artist": {
     "skills": [
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff",
       "enforce-art-language-safety"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
       "commands/print-css-art-token-template.sh",
       "commands/validate-svg-assets.sh"
     ]
   },
-  "arts/generative-art-designer": {
+  "arts/cutout-rig-animator": {
     "skills": [
+      "maintain-art-style-contract",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
       "iterate-art-to-sanity",
       "enforce-art-language-safety"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/flat-minimalist-game-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/game-vfx-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/generative-art-designer": {
+    "skills": [
+      "maintain-art-style-contract",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/illustrative-2d-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/isometric-2-5d-art-director": {
+    "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-tileset-sheet-template.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/isometric-2-5d-environment-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/print-tileset-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/parallax-background-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
       "commands/art-sanity-checklist.sh",
       "commands/validate-art-sanity-report.sh"
     ]
   },
   "arts/pixel-artist": {
     "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
       "iterate-art-to-sanity",
       "enforce-art-language-safety"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/pre-rendered-2-5d-artist": {
+    "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/print-tileset-sheet-template.sh",
+      "commands/print-directional-animation-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
       "commands/art-sanity-checklist.sh",
       "commands/validate-art-sanity-report.sh"
     ]
   },
   "arts/tile-set-artist": {
     "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "create-game-art-sheets",
+      "prepare-game-art-handoff",
       "iterate-art-to-sanity",
       "enforce-art-language-safety"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/print-tileset-sheet-template.sh",
+      "commands/print-game-art-handoff-template.sh",
       "commands/art-sanity-checklist.sh",
       "commands/validate-art-sanity-report.sh"
     ]
@@ -58,6 +222,9 @@
   },
   "qa-engineer": {
     "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
+      "prepare-game-art-handoff",
       "playwright-e2e-tests",
       "playwright-browser-discovery",
       "playwright-test-refinement",
@@ -67,6 +234,10 @@
       "test-dotnet"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/inspect-animation-sheet-folder.sh",
       "commands/playwright-install.sh",
       "commands/playwright-test.sh",
       "commands/playwright-show-report.sh",
@@ -121,21 +292,42 @@
   "fullstack-engineer": {
     "skills": [
       "generate-architecture",
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff",
       "solution-build",
       "test-dotnet"
     ],
     "commands": [
       "commands/generate-architecture.sh",
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/inspect-animation-sheet-folder.sh",
       "commands/dotnet-build.sh",
       "commands/dotnet-test.sh"
     ]
   },
+  "computer-science/frontend-developer": {
+    "skills": [
+      "maintain-art-style-contract",
+      "prepare-game-art-handoff"
+    ],
+    "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-game-art-handoff-template.sh",
+      "commands/inspect-animation-sheet-folder.sh",
+      "commands/validate-svg-assets.sh"
+    ]
+  },
   "computer-science/game-designer": {
     "skills": [
+      "maintain-art-style-contract",
+      "review-isometric-production",
       "create-task-file",
       "manage-task-issues"
     ],
     "commands": [
+      "commands/validate-style-contract.sh",
+      "commands/print-isometric-production-checklist.sh",
       "commands/create-task-file.sh",
       "commands/update-todo-checklist.sh"
     ]
