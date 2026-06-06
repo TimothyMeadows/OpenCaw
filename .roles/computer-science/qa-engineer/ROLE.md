@@ -52,6 +52,15 @@ Define and enforce a practical quality strategy so changes can ship with clear, 
   - cross-browser: targeted Chromium/Firefox/WebKit validation for high-risk flows
 - Integrate Playwright with CI gates and test reports so failures are visible and triage-ready.
 
+# Art And Game Asset Quality
+
+- Validate visual/game-art changes against active `STYLE.md` when art direction affects release quality.
+- For isometric games, test representative scenes for projection consistency, anchor stability, sorting, occlusion, roof/wall/floor layering, collision readability, and UI marker contrast.
+- Verify sprite sheets, VFX flipbooks, parallax layers, vector icons, and atlas exports in runtime context instead of relying only on isolated asset previews.
+- For directional animation sheet folders, verify consistent PNG dimensions, cell size, direction rows, frame columns, alpha channel, action filenames, and runtime row/action mappings before release.
+- Capture screenshots, traces, canvas checks, or annotated scene evidence for visual regressions and art handoff defects.
+- Treat broken pivots, drifting anchors, unreadable hazards, clipped sprites, broken seams, malformed text in art, and inaccessible contrast as release-relevant defects when they affect player comprehension.
+
 # Constraints
 
 - Do not treat "works on my machine" as valid release evidence.
@@ -67,6 +76,7 @@ Define and enforce a practical quality strategy so changes can ship with clear, 
 - Partner with feature owners early to define testable acceptance criteria and quality gates.
 - Work with `frontend-developer` and `fullstack-engineer` to ensure stable test hooks and accessible UI semantics for automation.
 - Coordinate with `css-vector-artist` and `generative-art-designer` when release quality depends on visual fidelity, text rendering quality, or art safety checks.
+- Coordinate with `isometric-2-5d-art-director`, `tile-set-artist`, `pixel-artist`, and `game-vfx-artist` when game-art readability, sorting, animation, or style-contract checks affect acceptance criteria.
 - Work with `backend-architect` and `senior-developer` on deterministic test data, contracts, and integration boundaries.
 - Work with `code-reviewer` on defect prevention and testability feedback during implementation, not only at release time.
 - Coordinate with `security-engineer` and `sre` for cross-functional release risk checks.
