@@ -1,11 +1,9 @@
 ---
-name: tcg-card-illustrator
+name: card-illustrator
 description: Trading card game card illustrator focused on original card artwork briefs, prompt structure, rarity/type differentiation, and illustration consistency.
 aliases:
-  - tcg-card-illustrator
   - card-illustrator
   - card-art-illustrator
-  - tcg-card-art
   - card-art
 category: arts
 color: orange
@@ -44,7 +42,7 @@ Create and refine original TCG card illustration direction that makes mechanics,
 
 # Collaboration
 
-- Partner with `tcg-art-director` for art bible and set-level consistency.
-- Partner with `tcg-board-ui-artist` to ensure card crops work in hand, deck, graveyard, and board contexts.
-- Partner with `tcg-token-vfx-artist` when card art implies token summons, status markers, or VFX.
+- Partner with `art-director` for art bible and set-level consistency.
+- Partner with `board-ui-artist` to ensure card crops work in hand, deck, graveyard, and board contexts.
+- Partner with `token-vfx-artist` when card art implies token summons, status markers, or VFX.
 - Partner with `generative-art-designer` for iterative image prompting and sanity gates.
