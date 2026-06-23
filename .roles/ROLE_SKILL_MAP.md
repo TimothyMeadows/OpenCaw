@@ -227,12 +227,14 @@ Commands:
 
 ### arts/art-director
 Skills:
-- `tcg-art-direction`
+- `maintain-art-style-contract`
+- `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
 
 Commands:
-- `commands/print-tcg-art-style-template.sh`
+- `commands/validate-style-contract.sh`
+- `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
