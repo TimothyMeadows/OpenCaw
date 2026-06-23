@@ -225,7 +225,7 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
-### arts/tcg-art-director
+### arts/art-director
 Skills:
 - `tcg-art-direction`
 - `iterate-art-to-sanity`
@@ -236,7 +236,7 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
-### arts/tcg-card-illustrator
+### arts/card-illustrator
 Skills:
 - `tcg-art-direction`
 - `iterate-art-to-sanity`
@@ -247,7 +247,7 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 
-### arts/tcg-board-ui-artist
+### arts/board-ui-artist
 Skills:
 - `tcg-art-direction`
 - `enforce-art-language-safety`
@@ -256,7 +256,7 @@ Commands:
 - `commands/print-tcg-art-style-template.sh`
 - `commands/validate-svg-assets.sh`
 
-### arts/tcg-token-vfx-artist
+### arts/token-vfx-artist
 Skills:
 - `tcg-art-direction`
 - `iterate-art-to-sanity`

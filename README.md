@@ -152,7 +152,7 @@ use role fullstack-engineer and build a calculator app with a simple UI, basic a
 ```
 
 ```text
-use role tcg-art-director and create an original Hearthstone-like warm fantasy card-game art bible with cards in hand, deck, graveyard, board tokens, and VFX guidance
+use role art-director and create an original Hearthstone-like warm fantasy card-game art bible with cards in hand, deck, graveyard, board tokens, and VFX guidance
 ```
 
 ```text
@@ -422,7 +422,7 @@ Examples:
 - `fullstack-engineer` → end-to-end feature delivery, API/UI integration, full-flow verification
 - `security-engineer` → threat modeling, security audits, dependency vulnerability review
 - `sre` → incident analysis, resilience design, performance review
-- `tcg-art-director` → TCG art bible, card/board/token style direction, and IP-safe genre translation
+- `art-director` → TCG art bible, card/board/token style direction, and IP-safe genre translation
 
 Multi-role sessions should merge bindings in the same order as the requested roles.
 
