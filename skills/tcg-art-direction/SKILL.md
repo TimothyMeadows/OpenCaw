@@ -23,7 +23,7 @@ Use when the task asks for trading card game, collectible card game, deck-builde
 4. Use `references/asset-brief-template.md` to produce a handoff-ready brief.
 5. Preserve gameplay readability: hand, deck, graveyard/discard, battlefield tokens, counters, targeting, and active prompts must remain inspectable.
 6. For generated images, compose with `generative-art-designer`, `iterate-art-to-sanity`, and `enforce-art-language-safety`.
-7. For UI/vector implementation, compose with `tcg-board-ui-artist`, `css-vector-artist`, and `frontend-developer`.
+7. For UI/vector implementation, compose with `board-ui-artist`, `css-vector-artist`, and `frontend-developer`.
 
 ## Notes
 
