@@ -65,5 +65,6 @@ Curated reusable skills included in OpenCaw.
 - `review-isometric-production` - Review isometric art for projection, anchors, depth sorting, occlusion, and gameplay readability.
 - `prepare-game-art-handoff` - Prepare game art assets for engine/runtime handoff with metadata and validation checks.
 - `create-game-art-sheets` - Plan tilesets, environment sheets, prop atlases, and directional animation sheets.
+- `tcg-art-direction` - Plan original TCG/CCG card frames, board styling, tokens/minions, hand/deck/graveyard zones, VFX, and IP-safe fantasy card-game art direction.
 - `iterate-art-to-sanity` - Iterate generated art until sanity checks pass.
 - `enforce-art-language-safety` - Enforce language and visual safety constraints for generated art.

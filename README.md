@@ -152,6 +152,10 @@ use role fullstack-engineer and build a calculator app with a simple UI, basic a
 ```
 
 ```text
+use role tcg-art-director and create an original Hearthstone-like warm fantasy card-game art bible with cards in hand, deck, graveyard, board tokens, and VFX guidance
+```
+
+```text
 use 4 agents with project-manager + fullstack-engineer + qa-engineer to split the checkout refactor into safe parallel lanes, then integrate and verify the result
 ```
 
@@ -334,10 +338,11 @@ Each role is stored as:
 .roles/<domain>/<role-name>/ROLE.md
 ```
 
-Current engineering catalog:
+Current role catalogs:
 
 ```text
 .roles/computer-science/<role-name>/ROLE.md
+.roles/arts/<role-name>/ROLE.md
 ```
 
 To browse available roles, categories, and aliases, see:
@@ -417,6 +422,7 @@ Examples:
 - `fullstack-engineer` → end-to-end feature delivery, API/UI integration, full-flow verification
 - `security-engineer` → threat modeling, security audits, dependency vulnerability review
 - `sre` → incident analysis, resilience design, performance review
+- `tcg-art-director` → TCG art bible, card/board/token style direction, and IP-safe genre translation
 
 Multi-role sessions should merge bindings in the same order as the requested roles.
 
@@ -821,6 +827,7 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `playwright-reporting` | Generate non-interactive Playwright evidence reports |
 | `install-database-cli-tools` | Install or preview database CLI tooling setup |
 | `database-cli-query` | Run database connect/query workflows by engine |
+| `tcg-art-direction` | Plan original TCG/CCG card frames, board styling, tokens, VFX, and IP-safe card-game art direction |
 
 ### Role-Driven Skills
 
@@ -897,6 +904,7 @@ run command dotnet-build
 | `security-scan.sh` | Run security checks |
 | `install-database-cli-tools.sh` | Print or execute database CLI install commands |
 | `database-cli-query.sh` | Execute engine-specific database query/connect commands |
+| `print-tcg-art-style-template.sh` | Print a reusable TCG art style brief for cards, boards, tokens, graveyards, and VFX |
 
 ---
 
