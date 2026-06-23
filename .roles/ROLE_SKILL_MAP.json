@@ -68,7 +68,8 @@
       "create-game-art-sheets",
       "prepare-game-art-handoff",
       "iterate-art-to-sanity",
-      "enforce-art-language-safety"
+      "enforce-art-language-safety",
+      "tcg-art-direction"
     ],
     "commands": [
       "commands/validate-style-contract.sh",
@@ -198,6 +199,52 @@
       "commands/print-isometric-production-checklist.sh",
       "commands/print-tileset-sheet-template.sh",
       "commands/print-game-art-handoff-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/tcg-art-director": {
+    "skills": [
+      "tcg-art-direction",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/print-tcg-art-style-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/tcg-card-illustrator": {
+    "skills": [
+      "tcg-art-direction",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/print-tcg-art-style-template.sh",
+      "commands/art-sanity-checklist.sh",
+      "commands/validate-art-sanity-report.sh"
+    ]
+  },
+  "arts/tcg-board-ui-artist": {
+    "skills": [
+      "tcg-art-direction",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/print-tcg-art-style-template.sh",
+      "commands/validate-svg-assets.sh"
+    ]
+  },
+  "arts/tcg-token-vfx-artist": {
+    "skills": [
+      "tcg-art-direction",
+      "iterate-art-to-sanity",
+      "enforce-art-language-safety"
+    ],
+    "commands": [
+      "commands/print-tcg-art-style-template.sh",
       "commands/art-sanity-checklist.sh",
       "commands/validate-art-sanity-report.sh"
     ]
