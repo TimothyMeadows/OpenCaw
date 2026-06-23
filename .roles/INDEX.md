@@ -35,6 +35,10 @@ Current role catalog location:
 - `pixel-artist`
 - `pre-rendered-2-5d-artist`
 - `tile-set-artist`
+- `tcg-art-director`
+- `tcg-board-ui-artist`
+- `tcg-card-illustrator`
+- `tcg-token-vfx-artist`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -92,6 +96,10 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `arts/pixel-artist`: `pixel-artist`, `pixel-art`, `sprite-artist`, `sprite-sheet-artist`, `raster-game-artist`
 - `arts/pre-rendered-2-5d-artist`: `pre-rendered-2-5d-artist`, `prerendered-2-5d-artist`, `hd-2d-artist`, `rendered-sprite-artist`, `orthographic-render-artist`, `3d-to-2d-artist`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
+- `arts/tcg-art-director`: `tcg-art-director`, `tcg`, `tcg-art`, `card-game-art`, `tcg-style-director`
+- `arts/tcg-board-ui-artist`: `tcg-board-ui-artist`, `board-ui`, `card-board-ui`, `battlefield-ui`, `tcg-board-artist`
+- `arts/tcg-card-illustrator`: `tcg-card-illustrator`, `card-illustrator`, `card-art-illustrator`, `tcg-card-art`, `card-art`
+- `arts/tcg-token-vfx-artist`: `tcg-token-vfx-artist`, `token-vfx`, `token-artist`, `minion-artist`, `card-vfx`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`
