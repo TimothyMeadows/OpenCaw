@@ -2,8 +2,12 @@
 
 Available OpenCaw art style templates:
 
+- ABYSSAL_MONSTER_GROTESQUE
 - ARCANE_ARENA_CLARITY
+- ASHEN_GOTHIC_FANTASY
+- CATHEDRAL_SHADOW_HORROR
 - CEL_SHADED_COMIC
+- CURSED_RELIC_BAROQUE
 - CUTOUT_RIGGED
 - DOODLE_SKETCH
 - FLAT_MINIMALIST
@@ -20,6 +24,7 @@ Available OpenCaw art style templates:
 - PARALLAX_BACKGROUND
 - PIXEL_ART
 - PRE_RENDERED_2_5D
+- RUINED_MEDIEVAL_REALISM
 - SCIENCE_FANTASY
 - TACTICAL_UI_HUD
 - TILESET_ENVIRONMENT
@@ -33,6 +38,7 @@ Use one or more of these when generating `../STYLE.md` for a host repository.
 - Isometric tactics, town builders, ARPGs, and 2.5D exploration: `ISOMETRIC_2_5D`
 - Pixel games: `PIXEL_ART` plus `TILESET_ENVIRONMENT`
 - Hand-painted games: `HAND_DRAWN_ILLUSTRATIVE` or `PAINTERLY_2D`
+- Dark fantasy, gothic ruins, cursed medieval worlds, and boss-heavy horror: start with one of `ASHEN_GOTHIC_FANTASY`, `RUINED_MEDIEVAL_REALISM`, `CATHEDRAL_SHADOW_HORROR`, `CURSED_RELIC_BAROQUE`, or `ABYSSAL_MONSTER_GROTESQUE`, then add `PAINTERLY_2D`, `PRE_RENDERED_2_5D`, `GAME_VFX`, or `TACTICAL_UI_HUD` as needed
 - UI-heavy games: `TACTICAL_UI_HUD` plus `VECTOR_UI`
 - TCG, CCG, deck-builder, and card-battler games: start with one of `WARM_TAVERN_FANTASY`, `ARCANE_ARENA_CLARITY`, `MYTHIC_GODFORGE`, `HEROIC_FACTION_FANTASY`, or `SCIENCE_FANTASY`, then add `TACTICAL_UI_HUD`, `VECTOR_UI`, `PAINTERLY_2D`, or `GAME_VFX` as needed
 - Animation-heavy characters: `CUTOUT_RIGGED`
