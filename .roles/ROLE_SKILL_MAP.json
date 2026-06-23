@@ -203,7 +203,7 @@
       "commands/validate-art-sanity-report.sh"
     ]
   },
-  "arts/tcg-art-director": {
+  "arts/art-director": {
     "skills": [
       "tcg-art-direction",
       "iterate-art-to-sanity",
@@ -215,7 +215,7 @@
       "commands/validate-art-sanity-report.sh"
     ]
   },
-  "arts/tcg-card-illustrator": {
+  "arts/card-illustrator": {
     "skills": [
       "tcg-art-direction",
       "iterate-art-to-sanity",
@@ -227,7 +227,7 @@
       "commands/validate-art-sanity-report.sh"
     ]
   },
-  "arts/tcg-board-ui-artist": {
+  "arts/board-ui-artist": {
     "skills": [
       "tcg-art-direction",
       "enforce-art-language-safety"
@@ -237,7 +237,7 @@
       "commands/validate-svg-assets.sh"
     ]
   },
-  "arts/tcg-token-vfx-artist": {
+  "arts/token-vfx-artist": {
     "skills": [
       "tcg-art-direction",
       "iterate-art-to-sanity",
