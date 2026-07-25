@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manage Task Issues"
+  short_description: "Help with Manage Task Issues tasks"
+  default_prompt: "Use $manage-task-issues to complete this OpenCaw workflow with explicit evidence and safety checks."

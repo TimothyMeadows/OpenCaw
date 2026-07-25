@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Hybrid Game Assets"
+  short_description: "Choose traceable runtime-ready game assets"
+  default_prompt: "Use $plan-hybrid-game-assets to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,4 +1,4 @@
 interface:
   display_name: "Prepare Game Art Handoff"
   short_description: "Prepare game art assets for engine implementation handoff."
-  default_prompt: "Create a production handoff for these game art assets with metadata, runtime assumptions, and validation checks."
+  default_prompt: "Use $prepare-game-art-handoff to create an asset handoff with metadata and validation evidence."

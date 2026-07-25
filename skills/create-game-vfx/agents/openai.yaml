@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Game VFX"
+  short_description: "Design readable performant game effects"
+  default_prompt: "Use $create-game-vfx to complete this OpenCaw workflow with explicit evidence and safety checks."

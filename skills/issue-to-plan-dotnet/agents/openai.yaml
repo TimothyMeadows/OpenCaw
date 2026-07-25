@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue to Plan Dotnet"
+  short_description: "Help with Issue to Plan Dotnet tasks"
+  default_prompt: "Use $issue-to-plan-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -401,9 +401,11 @@ OpenCaw includes default bindings between common engineering roles, reusable ski
 See:
 
 ```text
-.roles/ROLE_SKILL_MAP.md
 .roles/ROLE_SKILL_MAP.json
+.roles/ROLE_SKILL_MAP.md
 ```
+
+The JSON file is canonical. It contains one explicit domain-qualified mapping for every role. The Markdown file is generated deterministically with `./commands/generate-role-skill-map.sh` and validated for drift.
 
 These mappings allow role casting to do more than change tone or perspective.
 
@@ -413,7 +415,7 @@ When a role is activated, OpenCaw should:
 - prefer commands associated with that role
 - apply shared skills such as planning, debugging, review, refactoring, and verification
 - bias reasoning toward the role's domain expertise
-- resolve bindings by checking `<domain>/<role>` first, then fallback to `<role>` for backward compatibility
+- resolve bindings through the role's domain-qualified identifier
 
 Examples:
 
@@ -423,6 +425,8 @@ Examples:
 - `security-engineer` → threat modeling, security audits, dependency vulnerability review
 - `sre` → incident analysis, resilience design, performance review
 - `art-director` → general game art bible, visual language, production constraints, and routing to specialist art skills when a specific game format is requested
+- `web-experience-designer` → original web direction, hierarchy, accessible motion, references, and implementation evidence
+- `gameplay-engineer` → deterministic runtime systems, production tools, optimization, playtesting, and release evidence
 
 Multi-role sessions should merge bindings in the same order as the requested roles.
 
@@ -630,11 +634,30 @@ skills/create-task-file/
 skills/test-dotnet/
 ```
 
+The catalog includes governance and evidence, visual research and production, web experience, gameplay, architecture, delivery, data, QA, and art-production workflows. See `skills/INDEX.md` for the complete catalog.
+
+Every skill includes matching interface metadata at:
+
+```text
+skills/<skill-name>/agents/openai.yaml
+```
+
+Its default prompt must reference `$<skill-name>` so selection and invocation remain aligned.
+
 Skills should:
 
 - Define clear intent
 - Provide deterministic instructions
 - Avoid hidden behavior
+
+Web experience style contracts are available under `.styles/`:
+
+- `WEB_LIGHT_PAPER`
+- `WEB_DARK_GLASS`
+- `WEB_TECHNICAL_GRID`
+- `WEB_EDITORIAL`
+- `WEB_SKEUOMORPHIC`
+- `WEB_ATMOSPHERIC`
 
 ---
 
@@ -652,6 +675,9 @@ commands/dotnet-build.sh
 commands/dotnet-test.sh
 commands/security-scan.sh
 commands/clean-context.sh
+commands/audit-agent-source.sh
+commands/playwright-capture-page.sh
+commands/validate-role-skill-map.sh
 ```
 
 Commands should remain:
@@ -688,6 +714,8 @@ Available commands:
 commands/validate-roles.sh
 commands/validate-skills.sh
 commands/validate-commands.sh
+commands/validate-skill-safety.sh
+commands/validate-role-skill-map.sh
 commands/validate-opencaw.sh
 ```
 
@@ -703,6 +731,8 @@ Or run individual checks:
 ./commands/validate-roles.sh
 ./commands/validate-skills.sh
 ./commands/validate-commands.sh
+./commands/validate-skill-safety.sh
+./commands/validate-role-skill-map.sh
 ```
 
 These validators check:
@@ -713,6 +743,10 @@ These validators check:
 - naming conventions
 - required metadata and sections
 - executable shell command requirements
+- one matching `agents/openai.yaml` interface per skill
+- executable, symlink, resource-boundary, personal-path, credential, account-mutation, and publishing safety rules for skills
+- complete domain-qualified role mappings with valid skill and command references
+- deterministic agreement between canonical role-map JSON and generated Markdown
 
 ---
 
@@ -877,6 +911,17 @@ run command dotnet-build
 | Command | Purpose |
 |--------|--------|
 | `validate-opencaw.sh` | Validate entire OpenCaw setup |
+| `validate-skill-safety.sh` | Reject unsafe skill structure, metadata, links, credentials, paths, and hidden external mutations |
+| `generate-role-skill-map.sh` | Generate deterministic Markdown from the canonical role capability JSON |
+| `validate-role-skill-map.sh` | Validate complete domain-qualified role mappings and generated Markdown agreement |
+| `audit-agent-source.sh` | Statically audit untrusted agent-facing source without executing it |
+| `build-originality-evidence.sh` | Build local hash and text-similarity evidence without making legal conclusions |
+| `playwright-capture-page.sh` | Capture confined, deterministic browser-page evidence with host-installed Playwright |
+| `render-browser-demo.sh` | Render validated local frame manifests into a browser-demo artifact |
+| `web-performance-report.sh` | Convert measured metrics and host budgets into a Markdown result |
+| `print-web-experience-brief.sh` | Print an implementation-ready web experience brief |
+| `print-gameplay-system-brief.sh` | Print a gameplay-system contract and verification brief |
+| `validate-gameplay-review.sh` | Validate required gameplay review evidence and recommendation sections |
 | `dotnet-restore.sh` | Restore .NET dependencies |
 | `dotnet-build.sh` | Build .NET project |
 | `dotnet-test.sh` | Run tests |

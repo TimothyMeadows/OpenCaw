@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright E2e Tests"
+  short_description: "Help with Playwright E2e Tests tasks"
+  default_prompt: "Use $playwright-e2e-tests to complete this OpenCaw workflow with explicit evidence and safety checks."

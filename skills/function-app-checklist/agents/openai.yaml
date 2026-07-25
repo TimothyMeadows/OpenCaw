@@ -1,0 +1,4 @@
+interface:
+  display_name: "Function App Checklist"
+  short_description: "Help with Function App Checklist tasks"
+  default_prompt: "Use $function-app-checklist to complete this OpenCaw workflow with explicit evidence and safety checks."

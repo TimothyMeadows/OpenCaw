@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prototype from Reference Pack"
+  short_description: "Create original prototypes from research"
+  default_prompt: "Use $prototype-from-reference-pack to complete this OpenCaw workflow with explicit evidence and safety checks."

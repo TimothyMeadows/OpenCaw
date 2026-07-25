@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build WebGL Experiences"
+  short_description: "Design purposeful resilient WebGL features"
+  default_prompt: "Use $build-webgl-experiences to complete this OpenCaw workflow with explicit evidence and safety checks."

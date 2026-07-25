@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Action Gameplay"
+  short_description: "Specify fair readable action gameplay"
+  default_prompt: "Use $design-action-gameplay to complete this OpenCaw workflow with explicit evidence and safety checks."

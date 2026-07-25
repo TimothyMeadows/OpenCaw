@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apim Change Review"
+  short_description: "Help with Apim Change Review tasks"
+  default_prompt: "Use $apim-change-review to complete this OpenCaw workflow with explicit evidence and safety checks."

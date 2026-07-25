@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify and Explain"
+  short_description: "Verify claims and explain the evidence clearly"
+  default_prompt: "Use $verify-and-explain to complete this OpenCaw workflow with explicit evidence and safety checks."

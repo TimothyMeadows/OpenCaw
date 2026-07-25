@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clean Context"
+  short_description: "Help with Clean Context tasks"
+  default_prompt: "Use $clean-context to complete this OpenCaw workflow with explicit evidence and safety checks."

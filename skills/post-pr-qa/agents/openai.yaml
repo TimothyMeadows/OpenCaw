@@ -1,0 +1,4 @@
+interface:
+  display_name: "Post PR Qa"
+  short_description: "Help with Post PR Qa tasks"
+  default_prompt: "Use $post-pr-qa to complete this OpenCaw workflow with explicit evidence and safety checks."

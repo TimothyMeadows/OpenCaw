@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Host Ai Scaffold"
+  short_description: "Help with Create Host Ai Scaffold tasks"
+  default_prompt: "Use $create-host-ai-scaffold to complete this OpenCaw workflow with explicit evidence and safety checks."

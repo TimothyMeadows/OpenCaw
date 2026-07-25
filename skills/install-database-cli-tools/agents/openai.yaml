@@ -1,0 +1,4 @@
+interface:
+  display_name: "Install Database CLI Tools"
+  short_description: "Help with Install Database CLI Tools tasks"
+  default_prompt: "Use $install-database-cli-tools to complete this OpenCaw workflow with explicit evidence and safety checks."

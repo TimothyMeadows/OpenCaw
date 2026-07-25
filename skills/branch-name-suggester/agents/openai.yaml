@@ -1,0 +1,4 @@
+interface:
+  display_name: "Branch Name Suggester"
+  short_description: "Help with Branch Name Suggester tasks"
+  default_prompt: "Use $branch-name-suggester to complete this OpenCaw workflow with explicit evidence and safety checks."

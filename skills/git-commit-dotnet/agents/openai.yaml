@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit Dotnet"
+  short_description: "Help with Git Commit Dotnet tasks"
+  default_prompt: "Use $git-commit-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

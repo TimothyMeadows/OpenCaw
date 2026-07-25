@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright Browser Discovery"
+  short_description: "Help with Playwright Browser Discovery tasks"
+  default_prompt: "Use $playwright-browser-discovery to complete this OpenCaw workflow with explicit evidence and safety checks."

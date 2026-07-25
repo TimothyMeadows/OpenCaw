@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Interactive Web Effects"
+  short_description: "Build bounded accessible interaction effects"
+  default_prompt: "Use $build-interactive-web-effects to complete this OpenCaw workflow with explicit evidence and safety checks."
