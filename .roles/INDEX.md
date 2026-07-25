@@ -20,6 +20,7 @@ Current role catalog location:
 ### Frontend & UX
 - `frontend-developer`
 - `game-designer`
+- `gameplay-engineer`
 - `mobile-app-builder`
 
 ### Arts & Visual Design
@@ -39,6 +40,7 @@ Current role catalog location:
 - `pre-rendered-2-5d-artist`
 - `tile-set-artist`
 - `token-vfx-artist`
+- `web-experience-designer`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -100,12 +102,14 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `arts/pre-rendered-2-5d-artist`: `pre-rendered-2-5d-artist`, `prerendered-2-5d-artist`, `hd-2d-artist`, `rendered-sprite-artist`, `orthographic-render-artist`, `3d-to-2d-artist`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `arts/token-vfx-artist`: `token-vfx-artist`, `token-vfx`, `token-artist`, `minion-artist`, `card-vfx`
+- `arts/web-experience-designer`: `web-experience-designer`, `web-designer`, `experience-designer`, `interactive-web-designer`
 - `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`
 - `computer-science/embedded-firmware-engineer`: `embedded firmware engineer`, `embedded-firmware-engineer`, `embeddedfirmwareengineer`
 - `computer-science/frontend-developer`: `frontend`, `frontend developer`, `frontend-developer`, `frontenddeveloper`, `ui`, `web`
 - `computer-science/game-designer`: `game-designer`, `game-design`, `gameplay-designer`, `systems-designer`, `encounter-designer`
+- `computer-science/gameplay-engineer`: `gameplay-engineer`, `gameplay-programmer`, `game-engineer`, `runtime-gameplay-engineer`
 - `computer-science/fullstack-engineer`: `full stack`, `full-stack`, `fullstack`, `fullstack engineer`, `fullstack-engineer`, `fullstackengineer`
 - `computer-science/git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `computer-science/incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`

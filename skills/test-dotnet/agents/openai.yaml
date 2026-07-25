@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Dotnet"
+  short_description: "Help with Test Dotnet tasks"
+  default_prompt: "Use $test-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

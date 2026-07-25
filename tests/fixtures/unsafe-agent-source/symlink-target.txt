@@ -1,0 +1,1 @@
+This inert file is used as a symbolic-link target by the test harness.

@@ -5,6 +5,7 @@ set -euo pipefail
 ./commands/validate-skills.sh
 ./commands/validate-commands.sh
 ./commands/validate-styles.sh
+./commands/validate-role-skill-map.sh
 ./commands/validate-role-language-alignment.sh
 ./commands/validate-cloud-preferences.sh
 

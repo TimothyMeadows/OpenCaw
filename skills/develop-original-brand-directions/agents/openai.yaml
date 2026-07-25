@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Original Brand Directions"
+  short_description: "Create distinct reference-aware brand systems"
+  default_prompt: "Use $develop-original-brand-directions to complete this OpenCaw workflow with explicit evidence and safety checks."

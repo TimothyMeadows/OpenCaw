@@ -1,0 +1,9 @@
+{
+  "width": 160,
+  "height": 90,
+  "fps": 12,
+  "frames": [
+    { "path": "frame-a.ppm", "duration": 0.5 },
+    { "path": "frame-b.ppm", "duration": 0.5 }
+  ]
+}

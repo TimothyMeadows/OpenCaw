@@ -30,6 +30,12 @@ Available OpenCaw art style templates:
 - TILESET_ENVIRONMENT
 - VECTOR_UI
 - WARM_TAVERN_FANTASY
+- WEB_ATMOSPHERIC
+- WEB_DARK_GLASS
+- WEB_EDITORIAL
+- WEB_LIGHT_PAPER
+- WEB_SKEUOMORPHIC
+- WEB_TECHNICAL_GRID
 
 Use one or more of these when generating `../STYLE.md` for a host repository.
 
@@ -44,6 +50,11 @@ Use one or more of these when generating `../STYLE.md` for a host repository.
 - Animation-heavy characters: `CUTOUT_RIGGED`
 - Sprite-rendered 3D pipelines: `PRE_RENDERED_2_5D` or `HD_2D`
 - Effects-heavy combat or magic: `GAME_VFX`
+- Content-led web products and documentation: `WEB_LIGHT_PAPER` or `WEB_EDITORIAL`
+- Dense technical products and operational interfaces: `WEB_TECHNICAL_GRID`
+- Layered dark interfaces: `WEB_DARK_GLASS`
+- Immersive campaign or showcase pages: `WEB_ATMOSPHERIC`
+- Interfaces that benefit from restrained physical affordances: `WEB_SKEUOMORPHIC`
 
 ## Research Basis
 

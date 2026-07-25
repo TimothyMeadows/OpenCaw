@@ -1,0 +1,4 @@
+interface:
+  display_name: "Optimize Web Games"
+  short_description: "Measure and improve web game performance"
+  default_prompt: "Use $optimize-web-games to complete this OpenCaw workflow with explicit evidence and safety checks."

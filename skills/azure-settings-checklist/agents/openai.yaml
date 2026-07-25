@@ -1,0 +1,4 @@
+interface:
+  display_name: "Azure Settings Checklist"
+  short_description: "Help with Azure Settings Checklist tasks"
+  default_prompt: "Use $azure-settings-checklist to complete this OpenCaw workflow with explicit evidence and safety checks."

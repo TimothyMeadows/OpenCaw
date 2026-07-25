@@ -1,0 +1,4 @@
+interface:
+  display_name: "Format Dotnet"
+  short_description: "Help with Format Dotnet tasks"
+  default_prompt: "Use $format-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

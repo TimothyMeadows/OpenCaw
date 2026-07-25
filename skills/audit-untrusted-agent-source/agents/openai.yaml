@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Untrusted Agent Source"
+  short_description: "Scan agent content without executing it"
+  default_prompt: "Use $audit-untrusted-agent-source to complete this OpenCaw workflow with explicit evidence and safety checks."

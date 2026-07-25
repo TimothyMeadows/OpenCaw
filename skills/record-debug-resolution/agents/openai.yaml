@@ -1,0 +1,4 @@
+interface:
+  display_name: "Record Debug Resolution"
+  short_description: "Help with Record Debug Resolution tasks"
+  default_prompt: "Use $record-debug-resolution to complete this OpenCaw workflow with explicit evidence and safety checks."

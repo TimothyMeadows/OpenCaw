@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright Reporting"
+  short_description: "Help with Playwright Reporting tasks"
+  default_prompt: "Use $playwright-reporting to complete this OpenCaw workflow with explicit evidence and safety checks."

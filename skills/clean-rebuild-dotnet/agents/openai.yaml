@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clean Rebuild Dotnet"
+  short_description: "Help with Clean Rebuild Dotnet tasks"
+  default_prompt: "Use $clean-rebuild-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

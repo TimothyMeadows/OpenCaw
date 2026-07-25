@@ -1,461 +1,182 @@
 {
-  "arts/css-vector-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/print-css-art-token-template.sh",
-      "commands/validate-svg-assets.sh"
-    ]
-  },
-  "arts/cutout-rig-animator": {
-    "skills": [
-      "maintain-art-style-contract",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/flat-minimalist-game-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/game-vfx-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/generative-art-designer": {
-    "skills": [
-      "maintain-art-style-contract",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety",
-      "tcg-art-direction"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/illustrative-2d-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/isometric-2-5d-art-director": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-tileset-sheet-template.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/isometric-2-5d-environment-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/print-tileset-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/parallax-background-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/pixel-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/pre-rendered-2-5d-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/print-tileset-sheet-template.sh",
-      "commands/print-directional-animation-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/tile-set-artist": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-game-art-sheets",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/print-tileset-sheet-template.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
+  "__shared__": {
+    "skills": ["create-task-file", "manage-task-issues", "clean-context", "pr-readiness-gate", "link-pr-to-task-issue", "post-pr-qa", "record-correction-pattern", "record-debug-resolution", "verify-and-explain"],
+    "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh"]
   },
   "arts/art-director": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
-  },
-  "arts/card-illustrator": {
-    "skills": [
-      "tcg-art-direction",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/print-tcg-art-style-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
+    "skills": ["maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/build-originality-evidence.sh", "commands/print-web-experience-brief.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/board-ui-artist": {
-    "skills": [
-      "tcg-art-direction",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/print-tcg-art-style-template.sh",
-      "commands/validate-svg-assets.sh"
-    ]
+    "skills": ["tcg-art-direction", "design-ui-from-constraints", "source-licensed-visual-assets", "enforce-art-language-safety"],
+    "commands": ["commands/print-tcg-art-style-template.sh", "commands/validate-svg-assets.sh", "commands/build-originality-evidence.sh"]
+  },
+  "arts/card-illustrator": {
+    "skills": ["tcg-art-direction", "develop-original-brand-directions", "source-licensed-visual-assets", "audit-reference-originality", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/print-tcg-art-style-template.sh", "commands/build-originality-evidence.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
+  "arts/css-vector-artist": {
+    "skills": ["maintain-art-style-contract", "design-ui-from-constraints", "prepare-game-art-handoff", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-css-art-token-template.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-svg-assets.sh"]
+  },
+  "arts/cutout-rig-animator": {
+    "skills": ["maintain-art-style-contract", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-directional-animation-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/flat-minimalist-game-artist": {
+    "skills": ["maintain-art-style-contract", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
+  "arts/game-vfx-artist": {
+    "skills": ["create-game-vfx", "plan-hybrid-game-assets", "maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
+  "arts/generative-art-designer": {
+    "skills": ["develop-original-brand-directions", "source-licensed-visual-assets", "audit-reference-originality", "maintain-art-style-contract", "create-game-art-sheets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/build-originality-evidence.sh", "commands/validate-style-contract.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
+  "arts/illustrative-2d-artist": {
+    "skills": ["maintain-art-style-contract", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "source-licensed-visual-assets", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/isometric-2-5d-art-director": {
+    "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-tileset-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/isometric-2-5d-environment-artist": {
+    "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/print-tileset-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/parallax-background-artist": {
+    "skills": ["maintain-art-style-contract", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
+  "arts/pixel-artist": {
+    "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-directional-animation-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/pre-rendered-2-5d-artist": {
+    "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-tileset-sheet-template.sh", "commands/print-directional-animation-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
+  },
+  "arts/tile-set-artist": {
+    "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/print-tileset-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
   },
   "arts/token-vfx-artist": {
-    "skills": [
-      "tcg-art-direction",
-      "iterate-art-to-sanity",
-      "enforce-art-language-safety"
-    ],
-    "commands": [
-      "commands/print-tcg-art-style-template.sh",
-      "commands/art-sanity-checklist.sh",
-      "commands/validate-art-sanity-report.sh"
-    ]
+    "skills": ["tcg-art-direction", "create-game-vfx", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/print-tcg-art-style-template.sh", "commands/print-gameplay-system-brief.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
-  "code-migrator": {
-    "skills": [
-      "dependency-audit-dotnet",
-      "upgrade-dotnet-runtime",
-      "test-dotnet",
-      "format-dotnet",
-      "clean-rebuild-dotnet"
-    ],
-    "commands": [
-      "commands/dotnet-list-outdated-packages.sh",
-      "commands/dotnet-upgrade-assistant.sh",
-      "commands/dotnet-restore.sh",
-      "commands/dotnet-build.sh",
-      "commands/dotnet-test.sh",
-      "commands/dotnet-format.sh",
-      "commands/dotnet-clean-rebuild.sh"
-    ]
+  "arts/web-experience-designer": {
+    "skills": ["design-web-experiences", "design-conversion-pages", "design-ui-from-constraints", "develop-original-brand-directions", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-ui-reference-pack", "extract-interaction-patterns", "prototype-from-reference-pack", "source-licensed-visual-assets", "audit-reference-originality"],
+    "commands": ["commands/print-web-experience-brief.sh", "commands/validate-style-contract.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/build-originality-evidence.sh"]
   },
-  "qa-engineer": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "prepare-game-art-handoff",
-      "playwright-e2e-tests",
-      "playwright-browser-discovery",
-      "playwright-test-refinement",
-      "playwright-reporting",
-      "post-pr-qa",
-      "comment-issue-test-results",
-      "test-dotnet"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/playwright-install.sh",
-      "commands/playwright-test.sh",
-      "commands/playwright-show-report.sh",
-      "commands/playwright-report-summary.sh",
-      "commands/playwright-artifact-index.sh",
-      "commands/playwright-discovery-report.sh",
-      "commands/playwright-evidence-report.sh",
-      "commands/dotnet-test.sh",
-      "commands/comment-pr-qa-results.sh",
-      "commands/comment-issue-test-results.sh"
-    ]
+  "computer-science/ai-data-remediation-engineer": {
+    "skills": ["audit-untrusted-agent-source", "adapt-external-agent-skills", "verify-and-explain", "repo-map-dotnet"],
+    "commands": ["commands/audit-agent-source.sh", "commands/validate-skill-safety.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh"]
   },
-  "computer-science/project-manager": {
-    "skills": [
-      "create-task-file",
-      "goal-flow",
-      "manage-task-issues",
-      "orchestrate-subagents",
-      "pr-readiness-gate",
-      "post-pr-qa",
-      "clean-context"
-    ],
-    "commands": [
-      "commands/create-goal-file.sh",
-      "commands/create-goal-completion-report.sh",
-      "commands/create-task-file.sh",
-      "commands/create-task-issue.sh",
-      "commands/create-subagent-plan.sh",
-      "commands/validate-subagent-plan.sh",
-      "commands/record-subagent-result.sh",
-      "commands/import-task-from-issue.sh",
-      "commands/sync-task-issues.sh",
-      "commands/update-todo-checklist.sh",
-      "commands/pr-readiness-check.sh",
-      "commands/comment-pr-qa-results.sh"
-    ]
+  "computer-science/ai-engineer": {
+    "skills": ["audit-untrusted-agent-source", "adapt-external-agent-skills", "verify-and-explain", "dependency-audit-dotnet"],
+    "commands": ["commands/audit-agent-source.sh", "commands/validate-skill-safety.sh", "commands/dependency-check.sh"]
   },
-  "senior-developer": {
-    "skills": [
-      "solution-restore",
-      "solution-build",
-      "test-dotnet",
-      "format-dotnet"
-    ],
-    "commands": [
-      "commands/dotnet-restore.sh",
-      "commands/dotnet-build.sh",
-      "commands/dotnet-test.sh",
-      "commands/dotnet-format.sh"
-    ]
+  "computer-science/autonomous-optimization-architect": {
+    "skills": ["generate-architecture", "verify-and-explain", "profile-application-performance", "optimize-web-games"],
+    "commands": ["commands/generate-architecture.sh", "commands/web-performance-report.sh", "commands/validate-opencaw.sh"]
   },
-  "fullstack-engineer": {
-    "skills": [
-      "generate-architecture",
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff",
-      "solution-build",
-      "test-dotnet"
-    ],
-    "commands": [
-      "commands/generate-architecture.sh",
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/dotnet-build.sh",
-      "commands/dotnet-test.sh"
-    ]
+  "computer-science/backend-architect": {
+    "skills": ["generate-architecture", "apim-change-review", "verify-and-explain", "solution-build", "test-dotnet"],
+    "commands": ["commands/generate-architecture.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh"]
+  },
+  "computer-science/code-migrator": {
+    "skills": ["dependency-audit-dotnet", "upgrade-dotnet-runtime", "test-dotnet", "format-dotnet", "clean-rebuild-dotnet", "verify-and-explain"],
+    "commands": ["commands/dotnet-list-outdated-packages.sh", "commands/dotnet-upgrade-assistant.sh", "commands/dotnet-restore.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh", "commands/dotnet-format.sh", "commands/dotnet-clean-rebuild.sh"]
+  },
+  "computer-science/code-reviewer": {
+    "skills": ["verify-and-explain", "audit-untrusted-agent-source", "audit-reference-originality", "dependency-audit-dotnet"],
+    "commands": ["commands/audit-agent-source.sh", "commands/build-originality-evidence.sh", "commands/dependency-check.sh", "commands/validate-opencaw.sh"]
+  },
+  "computer-science/data-engineer": {
+    "skills": ["install-database-cli-tools", "database-cli-query", "generate-architecture", "verify-and-explain"],
+    "commands": ["commands/install-database-cli-tools.sh", "commands/database-cli-query.sh", "commands/generate-architecture.sh"]
+  },
+  "computer-science/database-optimizer": {
+    "skills": ["install-database-cli-tools", "database-cli-query", "verify-and-explain", "profile-application-performance"],
+    "commands": ["commands/install-database-cli-tools.sh", "commands/database-cli-query.sh", "commands/web-performance-report.sh"]
+  },
+  "computer-science/devops-automator": {
+    "skills": ["generate-architecture", "create-host-ai-scaffold", "audit-untrusted-agent-source", "verify-and-explain"],
+    "commands": ["commands/generate-architecture.sh", "commands/create-host-ai-scaffold.sh", "commands/audit-agent-source.sh", "commands/validate-opencaw.sh"]
+  },
+  "computer-science/embedded-firmware-engineer": {
+    "skills": ["generate-architecture", "verify-and-explain"],
+    "commands": ["commands/generate-architecture.sh", "commands/validate-opencaw.sh"]
   },
   "computer-science/frontend-developer": {
-    "skills": [
-      "maintain-art-style-contract",
-      "prepare-game-art-handoff"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-game-art-handoff-template.sh",
-      "commands/inspect-animation-sheet-folder.sh",
-      "commands/validate-svg-assets.sh"
-    ]
+    "skills": ["design-web-experiences", "design-ui-from-constraints", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff"],
+    "commands": ["commands/print-web-experience-brief.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-style-contract.sh", "commands/validate-svg-assets.sh"]
+  },
+  "computer-science/fullstack-engineer": {
+    "skills": ["generate-architecture", "design-web-experiences", "capture-full-page-evidence", "profile-application-performance", "solution-build", "test-dotnet", "verify-and-explain"],
+    "commands": ["commands/generate-architecture.sh", "commands/playwright-capture-page.sh", "commands/web-performance-report.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh"]
   },
   "computer-science/game-designer": {
-    "skills": [
-      "maintain-art-style-contract",
-      "review-isometric-production",
-      "create-task-file",
-      "manage-task-issues"
-    ],
-    "commands": [
-      "commands/validate-style-contract.sh",
-      "commands/print-isometric-production-checklist.sh",
-      "commands/create-task-file.sh",
-      "commands/update-todo-checklist.sh"
-    ]
+    "skills": ["author-game-worlds", "design-action-gameplay", "test-playable-games", "maintain-art-style-contract", "review-isometric-production"],
+    "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh"]
   },
-  "devops-automator": {
-    "skills": [
-      "generate-architecture",
-      "create-host-ai-scaffold"
-    ],
-    "commands": [
-      "commands/generate-architecture.sh",
-      "commands/create-host-ai-scaffold.sh"
-    ]
+  "computer-science/gameplay-engineer": {
+    "skills": ["build-gameplay-runtime", "build-game-production-tools", "design-action-gameplay", "plan-hybrid-game-assets", "create-game-vfx", "optimize-web-games", "test-playable-games", "ship-web-games", "verify-and-explain"],
+    "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh"]
   },
-  "data-engineer": {
-    "skills": [
-      "install-database-cli-tools",
-      "database-cli-query",
-      "generate-architecture"
-    ],
-    "commands": [
-      "commands/install-database-cli-tools.sh",
-      "commands/database-cli-query.sh",
-      "commands/generate-architecture.sh"
-    ]
+  "computer-science/git-workflow-master": {
+    "skills": ["branch-name-suggester", "git-commit-dotnet", "link-pr-to-task-issue", "pr-readiness-gate", "verify-and-explain"],
+    "commands": ["commands/git-commit.sh", "commands/link-pr-to-task-issue.sh", "commands/pr-readiness-check.sh"]
   },
-  "database-optimizer": {
-    "skills": [
-      "install-database-cli-tools",
-      "database-cli-query"
-    ],
-    "commands": [
-      "commands/install-database-cli-tools.sh",
-      "commands/database-cli-query.sh"
-    ]
+  "computer-science/incident-response-commander": {
+    "skills": ["record-debug-resolution", "verify-and-explain", "audit-untrusted-agent-source", "manage-task-issues"],
+    "commands": ["commands/audit-agent-source.sh", "commands/security-scan.sh", "commands/create-task-issue.sh", "commands/append-debug.sh"]
   },
-  "security-engineer": {
-    "skills": [
-      "apim-change-review"
-    ],
-    "commands": [
-      "commands/veracode-scan.sh",
-      "commands/snyk-scan.sh",
-      "commands/stackhawk-scan.sh",
-      "commands/security-scan.sh",
-      "commands/dependency-check.sh"
-    ]
+  "computer-science/mobile-app-builder": {
+    "skills": ["generate-architecture", "design-ui-from-constraints", "build-accessible-motion-systems", "profile-application-performance", "verify-and-explain"],
+    "commands": ["commands/generate-architecture.sh", "commands/print-web-experience-brief.sh", "commands/web-performance-report.sh"]
   },
-  "threat-detection-engineer": {
-    "skills": [
-      "apim-change-review"
-    ],
-    "commands": [
-      "commands/veracode-scan.sh",
-      "commands/snyk-scan.sh",
-      "commands/stackhawk-scan.sh",
-      "commands/security-scan.sh"
-    ]
+  "computer-science/project-manager": {
+    "skills": ["create-task-file", "goal-flow", "manage-task-issues", "orchestrate-subagents", "pr-readiness-gate", "post-pr-qa", "clean-context", "verify-and-explain"],
+    "commands": ["commands/create-goal-file.sh", "commands/create-goal-completion-report.sh", "commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/create-subagent-plan.sh", "commands/validate-subagent-plan.sh", "commands/record-subagent-result.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/update-todo-checklist.sh", "commands/pr-readiness-check.sh", "commands/comment-pr-qa-results.sh"]
   },
-  "__shared__": {
-    "skills": [
-      "create-task-file",
-      "manage-task-issues",
-      "clean-context",
-      "pr-readiness-gate",
-      "link-pr-to-task-issue",
-      "post-pr-qa",
-      "record-correction-pattern",
-      "record-debug-resolution"
-    ],
-    "commands": [
-      "commands/create-task-file.sh",
-      "commands/create-task-issue.sh",
-      "commands/import-task-from-issue.sh",
-      "commands/sync-task-issues.sh",
-      "commands/pr-readiness-check.sh",
-      "commands/link-pr-to-task-issue.sh",
-      "commands/comment-pr-qa-results.sh",
-      "commands/update-todo-checklist.sh"
-    ]
+  "computer-science/qa-engineer": {
+    "skills": ["verify-and-explain", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "test-playable-games", "optimize-web-games", "playwright-e2e-tests", "playwright-browser-discovery", "playwright-test-refinement", "playwright-reporting", "post-pr-qa", "comment-issue-test-results", "test-dotnet"],
+    "commands": ["commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-gameplay-review.sh", "commands/playwright-test.sh", "commands/playwright-report-summary.sh", "commands/playwright-artifact-index.sh", "commands/playwright-discovery-report.sh", "commands/playwright-evidence-report.sh", "commands/dotnet-test.sh", "commands/comment-pr-qa-results.sh", "commands/comment-issue-test-results.sh"]
+  },
+  "computer-science/rapid-prototyper": {
+    "skills": ["prototype-from-reference-pack", "design-ui-from-constraints", "design-web-experiences", "build-gameplay-runtime", "verify-and-explain"],
+    "commands": ["commands/print-web-experience-brief.sh", "commands/print-gameplay-system-brief.sh", "commands/playwright-capture-page.sh"]
+  },
+  "computer-science/security-engineer": {
+    "skills": ["audit-untrusted-agent-source", "adapt-external-agent-skills", "audit-reference-originality", "verify-and-explain", "apim-change-review"],
+    "commands": ["commands/audit-agent-source.sh", "commands/validate-skill-safety.sh", "commands/build-originality-evidence.sh", "commands/veracode-scan.sh", "commands/snyk-scan.sh", "commands/stackhawk-scan.sh", "commands/security-scan.sh", "commands/dependency-check.sh"]
+  },
+  "computer-science/senior-developer": {
+    "skills": ["solution-restore", "solution-build", "test-dotnet", "format-dotnet", "verify-and-explain", "audit-untrusted-agent-source"],
+    "commands": ["commands/dotnet-restore.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh", "commands/dotnet-format.sh", "commands/audit-agent-source.sh"]
+  },
+  "computer-science/software-architect": {
+    "skills": ["generate-architecture", "verify-and-explain", "audit-untrusted-agent-source", "profile-application-performance"],
+    "commands": ["commands/generate-architecture.sh", "commands/audit-agent-source.sh", "commands/web-performance-report.sh", "commands/validate-opencaw.sh"]
+  },
+  "computer-science/solidity-smart-contract-engineer": {
+    "skills": ["audit-untrusted-agent-source", "verify-and-explain", "dependency-audit-dotnet"],
+    "commands": ["commands/audit-agent-source.sh", "commands/security-scan.sh", "commands/dependency-check.sh"]
+  },
+  "computer-science/sre": {
+    "skills": ["verify-and-explain", "profile-application-performance", "record-debug-resolution", "audit-untrusted-agent-source"],
+    "commands": ["commands/web-performance-report.sh", "commands/security-scan.sh", "commands/audit-agent-source.sh", "commands/append-debug.sh"]
+  },
+  "computer-science/technical-writer": {
+    "skills": ["verify-and-explain", "derive-visual-spec-from-video", "extract-interaction-patterns", "capture-ui-reference-pack", "audit-reference-originality"],
+    "commands": ["commands/print-web-experience-brief.sh", "commands/print-gameplay-system-brief.sh", "commands/build-originality-evidence.sh"]
+  },
+  "computer-science/threat-detection-engineer": {
+    "skills": ["audit-untrusted-agent-source", "verify-and-explain", "apim-change-review"],
+    "commands": ["commands/audit-agent-source.sh", "commands/veracode-scan.sh", "commands/snyk-scan.sh", "commands/stackhawk-scan.sh", "commands/security-scan.sh"]
   }
 }

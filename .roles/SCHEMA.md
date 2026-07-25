@@ -134,6 +134,9 @@ A role is valid if:
 - required sections are present
 - metadata block exists
 - name matches folder
+- `.roles/ROLE_SKILL_MAP.json` contains an explicit domain-qualified mapping for the role
+- every mapped skill and command exists
+- generated `.roles/ROLE_SKILL_MAP.md` matches the canonical JSON representation
 
 ---
 

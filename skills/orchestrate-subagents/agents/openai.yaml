@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestrate Subagents"
+  short_description: "Help with Orchestrate Subagents tasks"
+  default_prompt: "Use $orchestrate-subagents to complete this OpenCaw workflow with explicit evidence and safety checks."

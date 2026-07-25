@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capture Full-Page Evidence"
+  short_description: "Capture reliable complete-page browser evidence"
+  default_prompt: "Use $capture-full-page-evidence to complete this OpenCaw workflow with explicit evidence and safety checks."

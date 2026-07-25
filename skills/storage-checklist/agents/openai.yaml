@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storage Checklist"
+  short_description: "Help with Storage Checklist tasks"
+  default_prompt: "Use $storage-checklist to complete this OpenCaw workflow with explicit evidence and safety checks."

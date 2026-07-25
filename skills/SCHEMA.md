@@ -8,11 +8,14 @@ Skills represent **reusable reasoning patterns**, not tools or commands.
 
 # Required Structure
 
-Each skill must exist at:
+Each skill must include:
 
 ```
 skills/<skill-name>/SKILL.md
+skills/<skill-name>/agents/openai.yaml
 ```
+
+`agents/openai.yaml` must define `display_name`, `short_description`, and a `default_prompt` that explicitly references `$<skill-name>`.
 
 ---
 
@@ -111,6 +114,10 @@ A skill is valid if:
 - metadata block exists
 - name matches folder
 - contains "When to use"
+- `agents/openai.yaml` exists and identifies the same skill in its default prompt
+- all relative Markdown resource links resolve within the skill folder
+- the skill folder contains no executable helpers, symbolic links, embedded credentials, or personal absolute paths
+- the skill does not conceal account mutations or automatic external publishing
 
 ---
 
@@ -118,10 +125,12 @@ A skill is valid if:
 
 Do NOT:
 
-- embed CLI commands directly
+- embed executable helpers inside the skill directory
 - include repo-specific logic
 - duplicate other skills
 - make skills too broad or too narrow
+- reference resources outside the skill directory
+- embed credentials, personal paths, account operations, automatic publishing, or an unapproved vendor requirement
 
 ---
 

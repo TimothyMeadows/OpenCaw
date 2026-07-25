@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Task File"
+  short_description: "Help with Create Task File tasks"
+  default_prompt: "Use $create-task-file to complete this OpenCaw workflow with explicit evidence and safety checks."

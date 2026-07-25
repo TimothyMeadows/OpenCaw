@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Architecture"
+  short_description: "Help with Generate Architecture tasks"
+  default_prompt: "Use $generate-architecture to complete this OpenCaw workflow with explicit evidence and safety checks."

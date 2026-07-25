@@ -1,0 +1,4 @@
+interface:
+  display_name: "Database CLI Query"
+  short_description: "Help with Database CLI Query tasks"
+  default_prompt: "Use $database-cli-query to complete this OpenCaw workflow with explicit evidence and safety checks."

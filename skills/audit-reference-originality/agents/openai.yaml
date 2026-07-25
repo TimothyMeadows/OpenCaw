@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Reference Originality"
+  short_description: "Assess reference similarity with evidence"
+  default_prompt: "Use $audit-reference-originality to complete this OpenCaw workflow with explicit evidence and safety checks."
