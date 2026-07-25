@@ -15,8 +15,10 @@ if [[ ! -f "$schema_file" ]]; then
 fi
 
 status=0
+skill_count=0
 
 while IFS= read -r -d '' skill_md; do
+  skill_count=$((skill_count + 1))
   skill_dir="$(basename "$(dirname "$skill_md")")"
 
   if [[ ! "$skill_dir" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
@@ -51,6 +53,15 @@ while IFS= read -r -d '' skill_md; do
   fi
 
 done < <(find "$skills_dir" -mindepth 2 -maxdepth 2 -name SKILL.md -print0)
+
+if [[ $skill_count -eq 0 ]]; then
+  echo "No skills found below $skills_dir" >&2
+  status=1
+fi
+
+if ! ./commands/validate-skill-safety.sh "$skills_dir"; then
+  status=1
+fi
 
 if [[ $status -eq 0 ]]; then
   echo "Skills validation passed."

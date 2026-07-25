@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solution Build"
+  short_description: "Help with Solution Build tasks"
+  default_prompt: "Use $solution-build to complete this OpenCaw workflow with explicit evidence and safety checks."

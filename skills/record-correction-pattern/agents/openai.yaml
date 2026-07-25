@@ -1,0 +1,4 @@
+interface:
+  display_name: "Record Correction Pattern"
+  short_description: "Help with Record Correction Pattern tasks"
+  default_prompt: "Use $record-correction-pattern to complete this OpenCaw workflow with explicit evidence and safety checks."

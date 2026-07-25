@@ -1,0 +1,4 @@
+interface:
+  display_name: "Memory Candidate Review"
+  short_description: "Help with Memory Candidate Review tasks"
+  default_prompt: "Use $memory-candidate-review to complete this OpenCaw workflow with explicit evidence and safety checks."

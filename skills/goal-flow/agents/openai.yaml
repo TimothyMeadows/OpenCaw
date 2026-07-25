@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal Flow"
+  short_description: "Help with Goal Flow tasks"
+  default_prompt: "Use $goal-flow to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extract Interaction Patterns"
+  short_description: "Describe reusable UI interaction behavior"
+  default_prompt: "Use $extract-interaction-patterns to complete this OpenCaw workflow with explicit evidence and safety checks."

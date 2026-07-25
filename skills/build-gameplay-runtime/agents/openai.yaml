@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Gameplay Runtime"
+  short_description: "Implement deterministic gameplay systems"
+  default_prompt: "Use $build-gameplay-runtime to complete this OpenCaw workflow with explicit evidence and safety checks."

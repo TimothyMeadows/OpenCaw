@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design UI from Constraints"
+  short_description: "Turn product constraints into UI direction"
+  default_prompt: "Use $design-ui-from-constraints to complete this OpenCaw workflow with explicit evidence and safety checks."

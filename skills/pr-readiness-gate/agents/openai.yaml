@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Readiness Gate"
+  short_description: "Help with PR Readiness Gate tasks"
+  default_prompt: "Use $pr-readiness-gate to complete this OpenCaw workflow with explicit evidence and safety checks."

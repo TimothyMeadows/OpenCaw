@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adapt External Agent Skills"
+  short_description: "Redesign external capabilities for OpenCaw"
+  default_prompt: "Use $adapt-external-agent-skills to complete this OpenCaw workflow with explicit evidence and safety checks."

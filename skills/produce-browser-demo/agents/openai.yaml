@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce Browser Demo"
+  short_description: "Create verified demos from browser captures"
+  default_prompt: "Use $produce-browser-demo to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -14,6 +14,10 @@ Curated reusable skills included in OpenCaw.
 - `link-pr-to-task-issue` - Ensure PR bodies include issue-closing linkage.
 - `post-pr-qa` - Run post-PR QA and post PR comments with pass/fail evidence and inline screenshot links.
 - `comment-issue-test-results` - Post QA/Playwright outcomes and artifacts to linked issue threads.
+- `audit-untrusted-agent-source` - Statically inspect agent-facing source for unsafe instructions, executables, credentials, path escapes, and hidden side effects.
+- `adapt-external-agent-skills` - Reimplement approved capability intent as an independently authored OpenCaw skill.
+- `verify-and-explain` - Produce evidence-backed conclusions with explicit scope, limitations, and reproduction steps.
+- `audit-reference-originality` - Compare local subject and reference material for mechanical similarity evidence without making legal conclusions.
 
 ## Memory And Context
 
@@ -58,6 +62,40 @@ Curated reusable skills included in OpenCaw.
 - `playwright-browser-discovery` - Discover live UI selectors, fields, and conditional behavior before authoring tests.
 - `playwright-test-refinement` - Diagnose, rerun, and stabilize Playwright tests.
 - `playwright-reporting` - Generate non-interactive Playwright evidence reports from JSON results and artifacts.
+
+## Visual Research And Production
+
+- `capture-ui-reference-pack` - Capture authorized interface evidence with provenance, state, viewport, and observation notes.
+- `derive-visual-spec-from-video` - Convert authorized video evidence into implementable visual and temporal constraints.
+- `extract-interaction-patterns` - Describe reusable interaction state machines without reproducing distinctive expression.
+- `develop-original-brand-directions` - Develop multiple original visual directions from product constraints.
+- `prototype-from-reference-pack` - Build a bounded original prototype from documented observations and host requirements.
+- `capture-full-page-evidence` - Produce repeatable full-page browser evidence with explicit viewport and motion settings.
+- `produce-browser-demo` - Assemble reviewed local frames into a deterministic browser-demo artifact.
+- `profile-application-performance` - Measure representative application performance against host-defined budgets.
+- `source-licensed-visual-assets` - Evaluate asset candidates using provenance, license, fit, and production risk.
+- `design-ui-from-constraints` - Derive interface hierarchy, states, tokens, and acceptance criteria from explicit constraints.
+
+## Web Experience
+
+- `design-web-experiences` - Design original responsive web systems with accessible enhancement paths.
+- `design-conversion-pages` - Design clear conversion journeys without coercive patterns or hidden mutations.
+- `build-accessible-motion-systems` - Define motion semantics, comfort controls, and equivalent reduced-motion states.
+- `build-interactive-web-effects` - Add bounded effects that support comprehension and degrade safely.
+- `build-webgl-experiences` - Build progressively enhanced 3D browser scenes with fallback and resource budgets.
+- `optimize-web-motion` - Diagnose and reduce animation cost using measured evidence.
+
+## Game Development
+
+- `author-game-worlds` - Define coherent playable worlds, rules, regions, encounters, and content constraints.
+- `design-action-gameplay` - Specify responsive actions, counterplay, timing, feedback, and tuning hypotheses.
+- `build-gameplay-runtime` - Implement deterministic gameplay state and presentation boundaries.
+- `build-game-production-tools` - Create reversible, validated content tools with preview and rollback paths.
+- `plan-hybrid-game-assets` - Plan coherent asset pipelines across runtime-native, rendered, and generated media.
+- `create-game-vfx` - Design readable effect families with timing, accessibility, and runtime budgets.
+- `optimize-web-games` - Profile and improve browser-game frame time, memory, loading, and asset churn.
+- `test-playable-games` - Run structured functional, experiential, accessibility, and performance playtests.
+- `ship-web-games` - Assemble evidence and release gates for a web game without automatic publication.
 
 ## Art Production
 

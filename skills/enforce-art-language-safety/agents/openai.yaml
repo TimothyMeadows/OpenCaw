@@ -1,0 +1,4 @@
+interface:
+  display_name: "Enforce Art Language Safety"
+  short_description: "Help with Enforce Art Language Safety tasks"
+  default_prompt: "Use $enforce-art-language-safety to complete this OpenCaw workflow with explicit evidence and safety checks."

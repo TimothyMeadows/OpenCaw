@@ -1,0 +1,4 @@
+interface:
+  display_name: "Upgrade Dotnet Runtime"
+  short_description: "Help with Upgrade Dotnet Runtime tasks"
+  default_prompt: "Use $upgrade-dotnet-runtime to complete this OpenCaw workflow with explicit evidence and safety checks."

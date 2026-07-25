@@ -1,0 +1,4 @@
+interface:
+  display_name: "Profile Application Performance"
+  short_description: "Plan evidence-driven application profiling"
+  default_prompt: "Use $profile-application-performance to complete this OpenCaw workflow with explicit evidence and safety checks."

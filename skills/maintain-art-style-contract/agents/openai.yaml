@@ -1,4 +1,4 @@
 interface:
   display_name: "Maintain Art Style Contract"
   short_description: "Maintain and validate project STYLE.md art contracts."
-  default_prompt: "Use the active STYLE.md and OpenCaw .styles templates to align art work."
+  default_prompt: "Use $maintain-art-style-contract to align visual work with the active OpenCaw style contract."

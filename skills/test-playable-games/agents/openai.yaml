@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Playable Games"
+  short_description: "Verify game feel systems and release quality"
+  default_prompt: "Use $test-playable-games to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capture UI Reference Pack"
+  short_description: "Package source-backed UI research evidence"
+  default_prompt: "Use $capture-ui-reference-pack to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenCaw Capture Fixture</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #f5f1e8; color: #20242a; }
+    header { min-height: 420px; display: grid; place-items: center; background: #dbeafe; }
+    main { min-height: 1900px; padding: 2rem; background: linear-gradient(#f5f1e8, #d1fae5); }
+    canvas { display: block; width: 320px; height: 180px; border: 4px solid #20242a; }
+    .motion-indicator::before { content: "motion-preference: standard"; color: #7c2d12; }
+    .moving { width: 80px; height: 24px; background: #7c3aed; animation: drift 1s infinite alternate linear; }
+    @keyframes drift { to { transform: translateX(160px); } }
+    @media (prefers-reduced-motion: reduce) {
+      .motion-indicator::before { content: "motion-preference: reduced"; color: #166534; }
+      .moving { animation: none; transform: translateX(40px); }
+    }
+    footer { min-height: 360px; display: grid; place-items: center; background: #1f2937; color: white; }
+  </style>
+</head>
+<body>
+  <header><h1>Full-page capture fixture</h1></header>
+  <main>
+    <p class="motion-indicator" aria-label="Motion preference indicator"></p>
+    <div class="moving" aria-hidden="true"></div>
+    <h2>Canvas evidence</h2>
+    <canvas id="evidence-canvas" width="320" height="180" aria-label="Rendered canvas fixture"></canvas>
+  </main>
+  <footer id="page-end">End-of-page evidence</footer>
+  <script>
+    const canvas = document.querySelector('#evidence-canvas');
+    const context = canvas.getContext('2d');
+    context.fillStyle = '#0f766e';
+    context.fillRect(0, 0, 320, 180);
+    context.fillStyle = '#fef3c7';
+    context.beginPath();
+    context.arc(160, 90, 54, 0, Math.PI * 2);
+    context.fill();
+  </script>
+</body>
+</html>
