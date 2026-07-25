@@ -1,0 +1,4 @@
+interface:
+  display_name: "Iterate Art to Sanity"
+  short_description: "Help with Iterate Art to Sanity tasks"
+  default_prompt: "Use $iterate-art-to-sanity to complete this OpenCaw workflow with explicit evidence and safety checks."

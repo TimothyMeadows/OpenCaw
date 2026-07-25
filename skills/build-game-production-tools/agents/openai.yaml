@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Game Production Tools"
+  short_description: "Create reversible game content tooling"
+  default_prompt: "Use $build-game-production-tools to complete this OpenCaw workflow with explicit evidence and safety checks."

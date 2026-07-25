@@ -1,0 +1,4 @@
+interface:
+  display_name: "Link PR to Task Issue"
+  short_description: "Help with Link PR to Task Issue tasks"
+  default_prompt: "Use $link-pr-to-task-issue to complete this OpenCaw workflow with explicit evidence and safety checks."

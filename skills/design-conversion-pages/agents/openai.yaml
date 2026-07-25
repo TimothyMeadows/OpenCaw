@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Conversion Pages"
+  short_description: "Design clear ethical conversion journeys"
+  default_prompt: "Use $design-conversion-pages to complete this OpenCaw workflow with explicit evidence and safety checks."

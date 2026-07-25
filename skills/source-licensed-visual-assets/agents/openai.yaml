@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source Licensed Visual Assets"
+  short_description: "Select visual assets with clear provenance"
+  default_prompt: "Use $source-licensed-visual-assets to complete this OpenCaw workflow with explicit evidence and safety checks."

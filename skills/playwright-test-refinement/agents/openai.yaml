@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright Test Refinement"
+  short_description: "Help with Playwright Test Refinement tasks"
+  default_prompt: "Use $playwright-test-refinement to complete this OpenCaw workflow with explicit evidence and safety checks."

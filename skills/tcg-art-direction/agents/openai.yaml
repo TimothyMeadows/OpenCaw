@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tcg Art Direction"
+  short_description: "Help with Tcg Art Direction tasks"
+  default_prompt: "Use $tcg-art-direction to complete this OpenCaw workflow with explicit evidence and safety checks."

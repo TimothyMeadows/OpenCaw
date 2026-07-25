@@ -1,0 +1,4 @@
+interface:
+  display_name: "Servicebus Checklist"
+  short_description: "Help with Servicebus Checklist tasks"
+  default_prompt: "Use $servicebus-checklist to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solution Restore"
+  short_description: "Help with Solution Restore tasks"
+  default_prompt: "Use $solution-restore to complete this OpenCaw workflow with explicit evidence and safety checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Web Experiences"
+  short_description: "Direct original accessible web experiences"
+  default_prompt: "Use $design-web-experiences to complete this OpenCaw workflow with explicit evidence and safety checks."

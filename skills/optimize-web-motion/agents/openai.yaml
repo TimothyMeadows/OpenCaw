@@ -1,0 +1,4 @@
+interface:
+  display_name: "Optimize Web Motion"
+  short_description: "Measure and reduce browser motion cost"
+  default_prompt: "Use $optimize-web-motion to complete this OpenCaw workflow with explicit evidence and safety checks."

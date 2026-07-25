@@ -1,0 +1,4 @@
+interface:
+  display_name: "Author Game Worlds"
+  short_description: "Design readable testable game spaces"
+  default_prompt: "Use $author-game-worlds to complete this OpenCaw workflow with explicit evidence and safety checks."

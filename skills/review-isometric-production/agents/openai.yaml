@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Isometric Production"
   short_description: "Review isometric projection, anchors, sorting, and readability."
-  default_prompt: "Review this isometric game art for projection, anchors, depth sorting, and gameplay readability."
+  default_prompt: "Use $review-isometric-production to review projection, anchors, depth sorting, and gameplay readability."

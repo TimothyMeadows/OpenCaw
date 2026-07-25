@@ -1,0 +1,4 @@
+interface:
+  display_name: "Comment Issue Test Results"
+  short_description: "Help with Comment Issue Test Results tasks"
+  default_prompt: "Use $comment-issue-test-results to complete this OpenCaw workflow with explicit evidence and safety checks."

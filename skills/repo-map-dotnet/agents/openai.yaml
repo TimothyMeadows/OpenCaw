@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Map Dotnet"
+  short_description: "Help with Repo Map Dotnet tasks"
+  default_prompt: "Use $repo-map-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

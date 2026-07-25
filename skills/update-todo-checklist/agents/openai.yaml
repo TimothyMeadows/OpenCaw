@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Todo Checklist"
+  short_description: "Help with Update Todo Checklist tasks"
+  default_prompt: "Use $update-todo-checklist to complete this OpenCaw workflow with explicit evidence and safety checks."

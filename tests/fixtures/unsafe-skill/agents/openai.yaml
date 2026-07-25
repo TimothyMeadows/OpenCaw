@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unsafe Skill Fixture"
+  short_description: "Intentionally malformed safety fixture"
+  default_prompt: "Use $different-skill to exercise the validator."

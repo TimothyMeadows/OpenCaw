@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dependency Audit Dotnet"
+  short_description: "Help with Dependency Audit Dotnet tasks"
+  default_prompt: "Use $dependency-audit-dotnet to complete this OpenCaw workflow with explicit evidence and safety checks."

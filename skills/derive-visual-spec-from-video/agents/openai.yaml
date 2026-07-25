@@ -1,0 +1,4 @@
+interface:
+  display_name: "Derive Visual Spec from Video"
+  short_description: "Turn motion references into visual specs"
+  default_prompt: "Use $derive-visual-spec-from-video to complete this OpenCaw workflow with explicit evidence and safety checks."
