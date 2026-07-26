@@ -8,6 +8,7 @@ set -euo pipefail
 ./commands/validate-role-skill-map.sh
 ./commands/validate-role-language-alignment.sh
 ./commands/validate-cloud-preferences.sh
+./commands/validate-media-templates.sh
 ./tests/test-memory-system.sh
 ./tests/test-windows-bash-bootstrap.sh
 

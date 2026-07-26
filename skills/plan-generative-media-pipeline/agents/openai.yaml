@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Generative Media Pipeline"
+  short_description: "Plan traceable cloud and local media generation"
+  default_prompt: "Use $plan-generative-media-pipeline to plan a reproducible, reviewed generative media workflow."

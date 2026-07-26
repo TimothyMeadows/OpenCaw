@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "packs": {
+    "flux-schnell-fp8": {
+      "modality": "image",
+      "minimumVramBytes": 12884901888,
+      "licenses": [
+        {
+          "id": "apache-2.0",
+          "name": "Apache License 2.0",
+          "url": "https://huggingface.co/Comfy-Org/flux1-schnell/blob/main/LICENSE"
+        }
+      ],
+      "files": [
+        {
+          "source": "https://huggingface.co/Comfy-Org/flux1-schnell/resolve/7d679837b018bfeb28eca55734b335efcd0e7100/flux1-schnell-fp8.safetensors",
+          "revision": "7d679837b018bfeb28eca55734b335efcd0e7100",
+          "sizeBytes": 17236328572,
+          "sha256": "ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72",
+          "destination": "models/checkpoints/flux1-schnell-fp8.safetensors",
+          "gated": false
+        }
+      ],
+      "workflow": {
+        "source": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/c56b99f1d41bb45da9ffc23521390c618f7aedda/templates/flux_schnell.json",
+        "revision": "c56b99f1d41bb45da9ffc23521390c618f7aedda",
+        "sizeBytes": 7910,
+        "sha256": "912fe178607a2c0e1ff12688703d22b34866949c9669ecc2739d19971e916b96",
+        "destination": "workflows/opencaw/flux_schnell.json",
+        "coreNodesOnly": true
+      }
+    },
+    "stable-audio-open": {
+      "modality": "audio",
+      "minimumVramBytes": 12884901888,
+      "licenses": [
+        {
+          "id": "stability-community-license",
+          "name": "Stability AI Community License",
+          "url": "https://huggingface.co/StabilityAI/stable-audio-open-1.0/blob/main/LICENSE"
+        },
+        {
+          "id": "apache-2.0",
+          "name": "Apache License 2.0",
+          "url": "https://huggingface.co/ComfyUI-Wiki/t5-base/blob/6cd5e6887a033dee7a1bad4e5ea9ed43d83681f4/LICENSE"
+        }
+      ],
+      "files": [
+        {
+          "source": "https://huggingface.co/StabilityAI/stable-audio-open-1.0/resolve/f21265c1e2710b3bd2386596943f0007f55f802e/stable-audio-open-1.0.safetensors",
+          "revision": "f21265c1e2710b3bd2386596943f0007f55f802e",
+          "sizeBytes": 4853889016,
+          "sha256": "7b20458a071231aaf32613b6fbc7945f28f34dbba4f295bb49bad56f5f66b57e",
+          "destination": "models/checkpoints/stable-audio-open-1.0.safetensors",
+          "gated": true
+        },
+        {
+          "source": "https://huggingface.co/ComfyUI-Wiki/t5-base/resolve/6cd5e6887a033dee7a1bad4e5ea9ed43d83681f4/t5-base.safetensors",
+          "revision": "6cd5e6887a033dee7a1bad4e5ea9ed43d83681f4",
+          "sizeBytes": 891646390,
+          "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+          "destination": "models/text_encoders/t5-base.safetensors",
+          "gated": false
+        }
+      ],
+      "workflow": {
+        "source": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/c56b99f1d41bb45da9ffc23521390c618f7aedda/templates/audio_stable_audio_example.json",
+        "revision": "c56b99f1d41bb45da9ffc23521390c618f7aedda",
+        "sizeBytes": 8794,
+        "sha256": "2c4b9a603d635a3ab5996ca2ee70f7700627ac43cff9dcfafb0d2694b9e6514b",
+        "destination": "workflows/opencaw/audio_stable_audio_example.json",
+        "coreNodesOnly": true
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use ComfyUI Local Generation"
+  short_description: "Run pinned local media workflows safely"
+  default_prompt: "Use $use-comfyui-local-generation to inspect, provision, and run an approved local ComfyUI workflow."

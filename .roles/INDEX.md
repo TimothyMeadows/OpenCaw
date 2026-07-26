@@ -35,9 +35,11 @@ Current role catalog location:
 - `illustrative-2d-artist`
 - `isometric-2-5d-art-director`
 - `isometric-2-5d-environment-artist`
+- `papercraft-art-director`
 - `parallax-background-artist`
 - `pixel-artist`
 - `pre-rendered-2-5d-artist`
+- `sound-designer`
 - `tile-set-artist`
 - `token-vfx-artist`
 - `web-experience-designer`
@@ -68,6 +70,7 @@ Current role catalog location:
 - `ai-engineer`
 - `code-reviewer`
 - `embedded-firmware-engineer`
+- `generative-media-pipeline-engineer`
 - `git-workflow-master`
 - `incident-response-commander`
 - `senior-developer`
@@ -98,8 +101,10 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `arts/isometric-2-5d-art-director`: `isometric-2-5d-art-director`, `isometric-art-director`, `iso-art-director`, `isometric-game-art`, `isometric-style-director`, `isometric`
 - `arts/isometric-2-5d-environment-artist`: `isometric-2-5d-environment-artist`, `isometric-environment-artist`, `iso-environment-artist`, `isometric-world-artist`, `isometric-prop-artist`, `isometric-tiles-artist`
 - `arts/parallax-background-artist`: `parallax-background-artist`, `parallax-artist`, `background-layer-artist`, `scrolling-background-artist`, `atmospheric-background-artist`
+- `arts/papercraft-art-director`: `papercraft-art`, `paper-art-director`, `cut-paper-art-director`
 - `arts/pixel-artist`: `pixel-artist`, `pixel-art`, `sprite-artist`, `sprite-sheet-artist`, `raster-game-artist`
 - `arts/pre-rendered-2-5d-artist`: `pre-rendered-2-5d-artist`, `prerendered-2-5d-artist`, `hd-2d-artist`, `rendered-sprite-artist`, `orthographic-render-artist`, `3d-to-2d-artist`
+- `arts/sound-designer`: `audio-designer`, `game-audio-designer`, `sound-art-director`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `arts/token-vfx-artist`: `token-vfx-artist`, `token-vfx`, `token-artist`, `minion-artist`, `card-vfx`
 - `arts/web-experience-designer`: `web-experience-designer`, `web-designer`, `experience-designer`, `interactive-web-designer`
@@ -112,6 +117,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/gameplay-engineer`: `gameplay-engineer`, `gameplay-programmer`, `game-engineer`, `runtime-gameplay-engineer`
 - `computer-science/fullstack-engineer`: `full stack`, `full-stack`, `fullstack`, `fullstack engineer`, `fullstack-engineer`, `fullstackengineer`
 - `computer-science/git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
+- `computer-science/generative-media-pipeline-engineer`: `media-pipeline-engineer`, `generative-pipeline-engineer`, `ai-media-pipeline-engineer`
 - `computer-science/incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
 - `computer-science/mobile-app-builder`: `mobile app builder`, `mobile-app-builder`, `mobileappbuilder`
 - `computer-science/project-manager`: `agent-coordinator`, `delivery-lead`, `delivery-manager`, `multi-agent-coordinator`, `pm`, `project manager`, `project-manager`, `projectmanager`

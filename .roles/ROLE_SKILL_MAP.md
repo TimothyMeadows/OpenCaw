@@ -49,6 +49,9 @@ Skills:
 - `design-ui-from-constraints`
 - `source-licensed-visual-assets`
 - `audit-reference-originality`
+- `plan-generative-media-pipeline`
+- `use-comfyui-local-generation`
+- `validate-generated-media`
 - `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
@@ -56,6 +59,11 @@ Skills:
 Commands:
 
 - `commands/validate-style-contract.sh`
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
 - `commands/build-originality-evidence.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/print-game-art-handoff-template.sh`
@@ -178,6 +186,9 @@ Skills:
 - `source-licensed-visual-assets`
 - `audit-reference-originality`
 - `maintain-art-style-contract`
+- `plan-generative-media-pipeline`
+- `use-comfyui-local-generation`
+- `validate-generated-media`
 - `create-game-art-sheets`
 - `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
@@ -187,6 +198,11 @@ Commands:
 
 - `commands/build-originality-evidence.sh`
 - `commands/validate-style-contract.sh`
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
@@ -251,6 +267,30 @@ Commands:
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 
+### arts/papercraft-art-director
+
+Skills:
+
+- `maintain-art-style-contract`
+- `plan-generative-media-pipeline`
+- `use-comfyui-local-generation`
+- `validate-generated-media`
+- `plan-hybrid-game-assets`
+- `prepare-game-art-handoff`
+- `iterate-art-to-sanity`
+- `enforce-art-language-safety`
+
+Commands:
+
+- `commands/validate-style-contract.sh`
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
+- `commands/print-game-art-handoff-template.sh`
+- `commands/art-sanity-checklist.sh`
+
 ### arts/parallax-background-artist
 
 Skills:
@@ -308,6 +348,23 @@ Commands:
 - `commands/print-directional-animation-sheet-template.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
+
+### arts/sound-designer
+
+Skills:
+
+- `plan-generative-media-pipeline`
+- `produce-generative-audio`
+- `validate-generated-media`
+- `plan-hybrid-game-assets`
+
+Commands:
+
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
 
 ### arts/tile-set-artist
 
@@ -395,12 +452,23 @@ Skills:
 - `audit-untrusted-agent-source`
 - `adapt-external-agent-skills`
 - `verify-and-explain`
+- `plan-generative-media-pipeline`
+- `use-comfyui-local-generation`
+- `produce-generative-audio`
+- `validate-generated-media`
 - `dependency-audit-dotnet`
 
 Commands:
 
 - `commands/audit-agent-source.sh`
 - `commands/validate-skill-safety.sh`
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/install-comfyui-local.sh`
+- `commands/install-comfyui-models.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
 - `commands/dependency-check.sh`
 
 ### computer-science/autonomous-optimization-architect
@@ -612,6 +680,28 @@ Commands:
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
 - `commands/web-performance-report.sh`
+
+### computer-science/generative-media-pipeline-engineer
+
+Skills:
+
+- `plan-generative-media-pipeline`
+- `use-comfyui-local-generation`
+- `produce-generative-audio`
+- `validate-generated-media`
+- `audit-untrusted-agent-source`
+- `verify-and-explain`
+
+Commands:
+
+- `commands/generate-media-contract.sh`
+- `commands/validate-media-contract.sh`
+- `commands/install-comfyui-local.sh`
+- `commands/install-comfyui-models.sh`
+- `commands/inspect-local-media-host.sh`
+- `commands/run-comfyui-workflow.sh`
+- `commands/validate-media-generation-manifest.sh`
+- `commands/validate-media-templates.sh`
 
 ### computer-science/git-workflow-master
 

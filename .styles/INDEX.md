@@ -17,12 +17,15 @@ Available OpenCaw art style templates:
 - HD_2D
 - HEROIC_FACTION_FANTASY
 - ISOMETRIC_2_5D
+- LAYERED_PAPERCRAFT
 - LOW_POLY_2_5D
 - MONOCHROME_LIMITED_PALETTE
 - MYTHIC_GODFORGE
 - PAINTERLY_2D
+- PAPER_DIORAMA
 - PARALLAX_BACKGROUND
 - PIXEL_ART
+- POPUP_STORYBOOK
 - PRE_RENDERED_2_5D
 - RUINED_MEDIEVAL_REALISM
 - SCIENCE_FANTASY
@@ -48,6 +51,9 @@ Use one or more of these when generating `../STYLE.md` for a host repository.
 - UI-heavy games: `TACTICAL_UI_HUD` plus `VECTOR_UI`
 - TCG, CCG, deck-builder, and card-battler games: start with one of `WARM_TAVERN_FANTASY`, `ARCANE_ARENA_CLARITY`, `MYTHIC_GODFORGE`, `HEROIC_FACTION_FANTASY`, or `SCIENCE_FANTASY`, then add `TACTICAL_UI_HUD`, `VECTOR_UI`, `PAINTERLY_2D`, or `GAME_VFX` as needed
 - Animation-heavy characters: `CUTOUT_RIGGED`
+- Tactile cut-paper assets and interfaces: `LAYERED_PAPERCRAFT`
+- Layered shadow-box scenes: `PAPER_DIORAMA` plus `LAYERED_PAPERCRAFT`
+- Responsive bound-page experiences: `POPUP_STORYBOOK` plus `LAYERED_PAPERCRAFT`
 - Sprite-rendered 3D pipelines: `PRE_RENDERED_2_5D` or `HD_2D`
 - Effects-heavy combat or magic: `GAME_VFX`
 - Content-led web products and documentation: `WEB_LIGHT_PAPER` or `WEB_EDITORIAL`
