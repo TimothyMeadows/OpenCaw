@@ -1,1 +1,3 @@
 # Debug History
+- Generative-media validation failed on correct Markdown headings and style-index entries under WSL because Git-managed files contained CRLF and exact-line grep treated the trailing CR as content. Normalize CR before exact comparisons; commands/validate-media-templates.sh now normalizes the first heading and tests/test-generative-media.sh uses a CR-normalizing exact-line helper. Verified by the full generative-media and OpenCaw suites.
+- commands/append-debug.sh failed before writing because Bash printf parsed the leading hyphen in its format string as an option. Use printf -- when a format string begins with '-'. Verified by successfully appending the generative-media CRLF resolution afterward.

@@ -13,4 +13,4 @@ if [[ -z "$entry" ]]; then
   exit 1
 fi
 
-printf "- %s\n" "$entry" >> "$target"
+printf -- "- %s\n" "$entry" >> "$target"

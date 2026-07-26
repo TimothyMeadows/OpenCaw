@@ -9,6 +9,7 @@ cleanup() { case "$runtime_dir" in "$repo_root"/tests/.media-runtime-*) rm -rf -
 trap cleanup EXIT
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
+contains_exact_line() { tr -d '\r' < "$2" | grep -Fqx -- "$1"; }
 expect_failure() {
   local log="$1"; shift
   set +e; "$@" >"$log" 2>&1; local status=$?; set -e
@@ -18,7 +19,11 @@ expect_failure() {
 echo "[1/8] validating styles, roles, skills, and bindings"
 for style in LAYERED_PAPERCRAFT PAPER_DIORAMA POPUP_STORYBOOK; do
   [[ -f ".styles/$style.md" ]] || fail "missing style $style"
-  grep -Fqx -- "- $style" .styles/INDEX.md || fail "$style is not indexed"
+  contains_exact_line "- $style" .styles/INDEX.md || fail "$style is not indexed"
+done
+for asset in COMFYUI_LOCAL.md toolchain.json model-packs.json; do
+  [[ -f ".styles/.gpu/$asset" ]] || fail "missing local GPU asset: $asset"
+  [[ ! -e ".media/$asset" ]] || fail "local GPU asset remains under .media: $asset"
 done
 for role in arts/papercraft-art-director arts/sound-designer computer-science/generative-media-pipeline-engineer; do
   [[ -f ".roles/$role/ROLE.md" ]] || fail "missing role $role"
@@ -30,7 +35,7 @@ bash commands/resolve-role.sh media-pipeline-engineer >/dev/null
 for skill in plan-generative-media-pipeline use-comfyui-local-generation produce-generative-audio validate-generated-media; do
   [[ -f "skills/$skill/SKILL.md" ]] || fail "missing skill $skill"
   grep -Fq "\$$skill" "skills/$skill/agents/openai.yaml" || fail "$skill metadata lacks its invocation"
-  for section in "When to use" "Workflow" "Output" "Guardrails"; do grep -Eq "^## $section\r?$" "skills/$skill/SKILL.md" || fail "$skill is missing $section"; done
+  for section in "When to use" "Workflow" "Output" "Guardrails"; do contains_exact_line "## $section" "skills/$skill/SKILL.md" || fail "$skill is missing $section"; done
 done
 bash commands/validate-role-skill-map.sh
 
@@ -40,6 +45,9 @@ bash commands/validate-media-contract.sh "$runtime_dir/cloud/MEDIA.md"
 ! grep -q '^- COMFYUI_LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
 bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD_SESSION COMFYUI_LOCAL
 bash commands/validate-media-contract.sh "$runtime_dir/hybrid/MEDIA.md"
+grep -Fq '.media/CLOUD_SESSION.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud template path"
+grep -Fq '.styles/.gpu/COMFYUI_LOCAL.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local GPU template path"
+! grep -Fq '.media/COMFYUI_LOCAL.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained the stale local template path"
 grep -Eiq 'ask the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted user choice"
 grep -Eiq 'never switch or fall back.*silently' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted fallback boundary"
 expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" COMFYUI_LOCAL CLOUD_SESSION

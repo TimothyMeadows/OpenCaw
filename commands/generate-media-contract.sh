@@ -32,13 +32,22 @@ host_root="$(cd "$opencaw_root/.." && pwd)"
 mount_dir_name="$(basename "$opencaw_root")"
 target="${output:-$host_root/MEDIA.md}"
 
+backend_template_relative_path() {
+  case "$1" in
+    CLOUD_SESSION) printf '%s\n' ".media/CLOUD_SESSION.md" ;;
+    COMFYUI_LOCAL) printf '%s\n' ".styles/.gpu/COMFYUI_LOCAL.md" ;;
+    *) return 1 ;;
+  esac
+}
+
 selected=()
 for raw in "${backends[@]}"; do
   normalized="${raw//-/_}"
   normalized="${normalized// /_}"
   name="${normalized^^}"
   case "$name" in CLOUD_SESSION|COMFYUI_LOCAL) ;; *) echo "Unknown media backend: $raw" >&2; exit 1 ;; esac
-  [[ -f "$opencaw_root/.media/$name.md" ]] || { echo "Missing media template: $name" >&2; exit 1; }
+  template_relative_path="$(backend_template_relative_path "$name")"
+  [[ -f "$opencaw_root/$template_relative_path" ]] || { echo "Missing media template: $name ($template_relative_path)" >&2; exit 1; }
   for existing in "${selected[@]:-}"; do [[ "$existing" != "$name" ]] || { echo "Duplicate media backend: $name" >&2; exit 1; }; done
   selected+=("$name")
 done
@@ -89,14 +98,18 @@ mkdir -p "$(dirname "$target")"
   if [[ "$mode" == "link" ]]; then
     echo "## Read Backend Instructions"
     echo
-    for name in "${selected[@]}"; do echo "Read \`./${mount_dir_name}/.media/${name}.md\` instructions"; done
+    for name in "${selected[@]}"; do
+      template_relative_path="$(backend_template_relative_path "$name")"
+      echo "Read \`./${mount_dir_name}/${template_relative_path}\` instructions"
+    done
   else
     echo "## Inlined Backend Instructions"
     echo
     for name in "${selected[@]}"; do
+      template_relative_path="$(backend_template_relative_path "$name")"
       echo "<!-- BEGIN MEDIA TEMPLATE: $name -->"
       echo
-      cat "$opencaw_root/.media/$name.md"
+      cat "$opencaw_root/$template_relative_path"
       echo
       echo "<!-- END MEDIA TEMPLATE: $name -->"
       echo

@@ -18,6 +18,14 @@ host_root="$(cd "$opencaw_root/.." && pwd)"
 media_file="${1:-$host_root/MEDIA.md}"
 [[ -f "$media_file" ]] || { echo "Missing MEDIA.md: $media_file" >&2; exit 1; }
 
+backend_template_path() {
+  case "$1" in
+    CLOUD_SESSION) printf '%s\n' "$opencaw_root/.media/CLOUD_SESSION.md" ;;
+    COMFYUI_LOCAL) printf '%s\n' "$opencaw_root/.styles/.gpu/COMFYUI_LOCAL.md" ;;
+    *) return 1 ;;
+  esac
+}
+
 status=0
 for heading in "# MEDIA.md" "## Backend Selection" "## Capability Matrix" "## Destinations And Budgets" "## Rights, Consent, And Provenance" "## Review And Promotion"; do
   grep -Fqx "$heading" "$media_file" || { echo "MEDIA.md is missing: $heading" >&2; status=1; }
@@ -35,7 +43,8 @@ if [[ ${#selected[@]} -ge 1 && "${selected[0]}" != "CLOUD_SESSION" ]]; then
 fi
 for backend in "${selected[@]:-}"; do
   case "$backend" in CLOUD_SESSION|COMFYUI_LOCAL) ;; *) echo "Unknown backend in MEDIA.md: $backend" >&2; status=1; continue ;; esac
-  [[ -f "$opencaw_root/.media/$backend.md" ]] || { echo "Missing backend template: $backend" >&2; status=1; }
+  template_path="$(backend_template_path "$backend")"
+  [[ -f "$template_path" ]] || { echo "Missing backend template: $backend ($template_path)" >&2; status=1; }
 done
 
 if printf '%s\n' "${selected[@]:-}" | grep -qx 'COMFYUI_LOCAL'; then

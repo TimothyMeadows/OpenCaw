@@ -15,7 +15,7 @@ Run reviewed image and audio workflows locally through the official `comfy-cli` 
 
 - Install only after explicit `--execute`; keep dry-run as the default.
 - Require every model-pack license identifier before downloading and use environment-provided Hugging Face credentials for gated sources.
-- Pin ComfyUI, `comfy-cli`, model revisions, workflow revisions, sizes, and checksums through `.media` manifests.
+- Pin ComfyUI, `comfy-cli`, model revisions, workflow revisions, sizes, and checksums through `.styles/.gpu` manifests.
 - Bind the server to loopback, disable online API nodes, and do not install unreviewed custom nodes.
 - Submit workflows through structured `comfy --json` output and confine downloaded results to a staging directory.
 - Hash staged outputs and write a run receipt. Promotion is a separate human-reviewed action.
