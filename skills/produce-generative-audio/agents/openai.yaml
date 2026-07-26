@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce Generative Audio"
+  short_description: "Create reviewed runtime-ready audio candidates"
+  default_prompt: "Use $produce-generative-audio to create and review traceable music, sound-effect, or voice candidates."

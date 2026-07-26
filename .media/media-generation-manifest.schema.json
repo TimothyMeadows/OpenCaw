@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/media-generation-manifest-v1.json",
+  "title": "OpenCaw Media Generation Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "runId", "createdAt", "backend", "modality", "model", "workflow", "generation", "inputs", "outputs", "runtime", "review"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "backend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "provider", "capability", "toolVersion"],
+      "properties": {
+        "kind": { "enum": ["cloud-session", "local"] },
+        "provider": { "type": "string", "minLength": 1 },
+        "capability": { "type": "string", "minLength": 1 },
+        "toolVersion": { "$ref": "#/$defs/valueOrUnavailable" }
+      }
+    },
+    "modality": { "enum": ["image", "music", "sfx", "voice"] },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "revision", "digest", "license"],
+      "properties": {
+        "name": { "$ref": "#/$defs/valueOrUnavailable" },
+        "revision": { "$ref": "#/$defs/valueOrUnavailable" },
+        "digest": { "$ref": "#/$defs/valueOrUnavailable" },
+        "license": { "$ref": "#/$defs/valueOrUnavailable" }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "revision", "digest"],
+      "properties": {
+        "name": { "$ref": "#/$defs/valueOrUnavailable" },
+        "revision": { "$ref": "#/$defs/valueOrUnavailable" },
+        "digest": { "$ref": "#/$defs/valueOrUnavailable" }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt", "negativePrompt", "parameters", "seed"],
+      "properties": {
+        "prompt": { "type": "string", "minLength": 1 },
+        "negativePrompt": { "$ref": "#/$defs/valueOrUnavailable" },
+        "parameters": { "oneOf": [{ "type": "object" }, { "$ref": "#/$defs/unavailable" }] },
+        "seed": { "oneOf": [{ "type": "integer" }, { "$ref": "#/$defs/unavailable" }] }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "source", "rights", "consent"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "minLength": 1 },
+          "rights": { "type": "string", "minLength": 1 },
+          "consent": { "enum": ["not-applicable", "confirmed", "not-confirmed"] }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stagedPath", "sha256", "status", "runtimeTarget"],
+        "properties": {
+          "stagedPath": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "status": { "enum": ["staged", "accepted", "rejected", "promoted"] },
+          "runtimeTarget": { "$ref": "#/$defs/valueOrUnavailable" },
+          "rejectionReason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["destination", "budgets"],
+      "properties": {
+        "destination": { "$ref": "#/$defs/valueOrUnavailable" },
+        "budgets": { "type": "object", "minProperties": 1 }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewer", "reviewedAt", "notes"],
+      "properties": {
+        "status": { "enum": ["pending", "accepted", "rejected"] },
+        "reviewer": { "$ref": "#/$defs/valueOrUnavailable" },
+        "reviewedAt": { "$ref": "#/$defs/valueOrUnavailable" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "unavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unavailable", "reason"],
+      "properties": {
+        "unavailable": { "const": true },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "valueOrUnavailable": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    }
+  }
+}

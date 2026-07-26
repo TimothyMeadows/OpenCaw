@@ -92,6 +92,10 @@ Curated reusable skills included in OpenCaw.
 - `build-gameplay-runtime` - Implement deterministic gameplay state and presentation boundaries.
 - `build-game-production-tools` - Create reversible, validated content tools with preview and rollback paths.
 - `plan-hybrid-game-assets` - Plan coherent asset pipelines across runtime-native, rendered, and generated media.
+- `plan-generative-media-pipeline` - Plan reproducible cloud/session and local media generation with explicit selection and promotion gates.
+- `use-comfyui-local-generation` - Provision and run pinned local image and audio workflows through official ComfyUI tooling.
+- `produce-generative-audio` - Produce reviewed music, sound-effect, ambience, and voice candidates.
+- `validate-generated-media` - Validate manifests, hashes, exact coverage, budgets, provenance, and review status before promotion.
 - `create-game-vfx` - Design readable effect families with timing, accessibility, and runtime budgets.
 - `optimize-web-games` - Profile and improve browser-game frame time, memory, loading, and asset churn.
 - `test-playable-games` - Run structured functional, experiential, accessibility, and performance playtests.
