@@ -1,0 +1,5 @@
+# OpenCaw runtime context artifacts
+.ai/archive/
+.ai/migrations/
+.ai/reports/
+.ai/CONTEXT_SUMMARY.md

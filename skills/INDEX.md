@@ -22,11 +22,11 @@ Curated reusable skills included in OpenCaw.
 ## Memory And Context
 
 - `clean-context` - Compact context artifacts and refresh high-signal summaries.
-- `memory-candidate-review` - Evaluate whether discoveries should be promoted to durable memory.
-- `promote-memory-fragment` - Promote validated fragments into durable memory files.
+- `maintain-memory` - Proactively retrieve, validate, record, replace, migrate, and purge scoped Memory v2 entries.
+- `maintain-repository-map` - Keep the tagged semantic repository map current using a Git-visible project-path fingerprint.
 - `record-correction-pattern` - Capture user corrections as memory + preventive rules.
 - `record-debug-resolution` - Capture reusable bug diagnosis/resolution notes.
-- `repo-map-dotnet` - Build or refine a repo map focused on .NET solution structure.
+- `repo-map-dotnet` - Add .NET-specific structure to the canonical semantic repository map.
 
 ## .NET Delivery
 

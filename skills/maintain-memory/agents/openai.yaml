@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maintain Memory"
+  short_description: "Capture and retrieve durable OpenCaw memory"
+  default_prompt: "Use $maintain-memory to retrieve relevant context and record verified durable learnings safely."

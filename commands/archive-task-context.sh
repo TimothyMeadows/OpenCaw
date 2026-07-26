@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+
 task_ref="${1:-}"
 
 if [[ -z "$task_ref" ]]; then
-  echo 'Usage: ./commands/archive-task-context.sh "<task-name|../.ai/tasks/<task-name>/TASK.md>"' >&2
+  echo 'Usage: ./commands/archive-task-context.sh "<task-name|.ai/tasks/<task-name>/TASK.md>"' >&2
   exit 1
 fi
 
@@ -13,10 +17,10 @@ if [[ "$task_ref" == */TASK.md ]]; then
 elif [[ "$task_ref" == *.md ]]; then
   task_file="$task_ref"
 else
-  task_file="../.ai/tasks/$task_ref/TASK.md"
+  task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_ref/TASK.md"
 fi
 
-if [[ "$task_file" != ../.ai/tasks/*/TASK.md && "$task_file" != ./.ai/tasks/*/TASK.md && "$task_file" != .ai/tasks/*/TASK.md && "$task_file" != */.ai/tasks/*/TASK.md ]]; then
+if [[ "$task_file" != "$OPENCAW_PROJECT_AI_DIR"/tasks/*/TASK.md && "$task_file" != */.ai/tasks/*/TASK.md ]]; then
   echo "Task file must be under .ai/tasks: $task_file" >&2
   exit 1
 fi
@@ -35,7 +39,7 @@ if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
   exit 0
 fi
 
-archive_dir="../.ai/archive/tasks"
+archive_dir="$OPENCAW_PROJECT_AI_DIR/archive/tasks"
 mkdir -p "$archive_dir"
 
 timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"

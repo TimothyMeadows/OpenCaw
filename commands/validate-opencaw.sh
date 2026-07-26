@@ -8,5 +8,6 @@ set -euo pipefail
 ./commands/validate-role-skill-map.sh
 ./commands/validate-role-language-alignment.sh
 ./commands/validate-cloud-preferences.sh
+./tests/test-memory-system.sh
 
 echo "OpenCaw validation passed."

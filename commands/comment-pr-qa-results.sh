@@ -53,8 +53,10 @@ is_image_ref() {
 }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 summary_text="$(cat "$summary_file")"
 
 repo_root="$host_root"

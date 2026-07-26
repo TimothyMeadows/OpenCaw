@@ -15,13 +15,14 @@ Use when active context has grown noisy and you need to keep only high-signal ar
 
 ## Output
 - task files compacted
-- memory entries merged
+- system and tagged project memory entries merged
+- repository-map entries merged
 - duplicate rules removed
 - debug notes compressed
-- recommended context summary refreshed
+- tag inventory and context summary refreshed
 
 ## Safety rules
 - Never delete durable knowledge without archiving first.
 - Prefer summarization over destruction.
-- Keep `../.ai/MEMORY.md` short and high-value.
-- Preserve traceability via `../.ai/archive/tasks/` snapshots and `../.ai/reports/` report files.
+- Keep system memory flat and project memory tagged, concise, and high-value.
+- Preserve traceability through the resolved project archive and report directories.
