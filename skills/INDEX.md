@@ -4,7 +4,7 @@ Curated reusable skills included in OpenCaw.
 
 ## Task And Governance
 
-- `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding and OpenCaw bootstrap wiring are in place.
+- `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding, Windows Bash guidance when applicable, and OpenCaw bootstrap wiring are in place.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
 - `goal-flow` - Manage explicitly requested automated goals across task completion, automatic PR creation, post-PR QA, branch chaining, and final human approval reporting.
 - `manage-task-issues` - Maintain one GitHub issue per task and keep only open issue URLs in tracking.
@@ -22,11 +22,11 @@ Curated reusable skills included in OpenCaw.
 ## Memory And Context
 
 - `clean-context` - Compact context artifacts and refresh high-signal summaries.
-- `memory-candidate-review` - Evaluate whether discoveries should be promoted to durable memory.
-- `promote-memory-fragment` - Promote validated fragments into durable memory files.
+- `maintain-memory` - Proactively retrieve, validate, record, replace, migrate, and purge scoped Memory v2 entries.
+- `maintain-repository-map` - Keep the tagged semantic repository map current using a Git-visible project-path fingerprint.
 - `record-correction-pattern` - Capture user corrections as memory + preventive rules.
 - `record-debug-resolution` - Capture reusable bug diagnosis/resolution notes.
-- `repo-map-dotnet` - Build or refine a repo map focused on .NET solution structure.
+- `repo-map-dotnet` - Add .NET-specific structure to the canonical semantic repository map.
 
 ## .NET Delivery
 

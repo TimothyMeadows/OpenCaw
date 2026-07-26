@@ -8,17 +8,23 @@ Commands represent **deterministic execution steps**, typically shell scripts.
 
 # Required Structure
 
-Commands must exist at:
+Portable commands normally exist at:
 
 ```
 commands/<command-name>.sh
+```
+
+Windows bootstrap commands that must run before Bash is available may use:
+
+```
+commands/<command-name>.ps1
 ```
 
 ---
 
 # Command Format
 
-All commands must:
+All Bash commands must:
 
 - be executable
 - use bash
@@ -30,6 +36,14 @@ Required header:
 #!/usr/bin/env bash
 set -euo pipefail
 ```
+
+PowerShell bootstrap commands must:
+
+- use lowercase kebab-case filenames
+- enable `Set-StrictMode`
+- fail loudly with `$ErrorActionPreference = 'Stop'`
+- avoid installing software unless the user explicitly requests installation
+- no-op with actionable output outside Windows
 
 ---
 
@@ -77,12 +91,14 @@ Commands should:
 
 # Validation Rules
 
-A command is valid if:
+A Bash command is valid if:
 
 - file is executable
 - contains bash header
 - uses strict mode
 - follows naming conventions
+
+A PowerShell bootstrap command is valid if it follows the PowerShell safety and naming rules above.
 
 ---
 

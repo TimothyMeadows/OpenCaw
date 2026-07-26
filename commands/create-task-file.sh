@@ -8,6 +8,8 @@ EOF
 }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
 task_name=""
 title=""
 create_issue=1
@@ -45,8 +47,8 @@ if [[ -z "$title" ]]; then
   title="$task_name"
 fi
 
-mkdir -p "../.ai/tasks/$task_name"
-target="../.ai/tasks/$task_name/TASK.md"
+mkdir -p "$OPENCAW_PROJECT_AI_DIR/tasks/$task_name"
+target="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"
 created=0
 
 if [[ ! -f "$target" ]]; then

@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+
 usage() {
   cat <<'EOF'
 Usage: ./commands/create-goal-file.sh "<goal_name>" ["Goal Title"] [--dry-run]
 
-Creates ../.ai/goals/<goal_name>/GOAL.md when it does not already exist.
+Creates <project-root>/.ai/goals/<goal_name>/GOAL.md when it does not already exist.
 Use --dry-run to print the goal scaffold without writing files.
 EOF
 }
@@ -52,7 +56,7 @@ if [[ -z "$title" ]]; then
   title="$goal_name"
 fi
 
-goal_dir="../.ai/goals/$goal_name"
+goal_dir="$OPENCAW_PROJECT_AI_DIR/goals/$goal_name"
 target="$goal_dir/GOAL.md"
 
 write_goal() {
@@ -74,7 +78,7 @@ write_goal() {
 ## Constraints
 
 ## Task Queue
-1. [ ] TODO task name (\`../.ai/tasks/<task-name>/TASK.md\`)
+1. [ ] TODO task name (\`.ai/tasks/<task-name>/TASK.md\`)
 
 ## Current Task
 

@@ -1,7 +1,7 @@
 {
   "__shared__": {
-    "skills": ["create-task-file", "manage-task-issues", "clean-context", "pr-readiness-gate", "link-pr-to-task-issue", "post-pr-qa", "record-correction-pattern", "record-debug-resolution", "verify-and-explain"],
-    "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh"]
+    "skills": ["create-task-file", "manage-task-issues", "maintain-memory", "maintain-repository-map", "clean-context", "pr-readiness-gate", "link-pr-to-task-issue", "post-pr-qa", "record-correction-pattern", "record-debug-resolution", "verify-and-explain"],
+    "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/resolve-opencaw-paths.sh", "commands/install-windows-bash.ps1", "commands/query-project-context.sh", "commands/append-project-memory.sh", "commands/append-system-memory.sh", "commands/repo-map-status.sh", "commands/validate-memory.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh"]
   },
   "arts/art-director": {
     "skills": ["maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],

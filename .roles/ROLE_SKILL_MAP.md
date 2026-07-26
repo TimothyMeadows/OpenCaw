@@ -10,6 +10,8 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 
 - `create-task-file`
 - `manage-task-issues`
+- `maintain-memory`
+- `maintain-repository-map`
 - `clean-context`
 - `pr-readiness-gate`
 - `link-pr-to-task-issue`
@@ -24,6 +26,13 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 - `commands/create-task-issue.sh`
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
+- `commands/resolve-opencaw-paths.sh`
+- `commands/install-windows-bash.ps1`
+- `commands/query-project-context.sh`
+- `commands/append-project-memory.sh`
+- `commands/append-system-memory.sh`
+- `commands/repo-map-status.sh`
+- `commands/validate-memory.sh`
 - `commands/pr-readiness-check.sh`
 - `commands/link-pr-to-task-issue.sh`
 - `commands/comment-pr-qa-results.sh`

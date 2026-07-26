@@ -72,6 +72,34 @@ After forking, use **your fork URL** in all installation commands instead of the
 
 OpenCaw can be installed in an existing repository in two primary ways.
 
+## Windows Bash prerequisite
+
+OpenCaw commands use Bash. Linux and macOS already provide the expected shell and do not need this Windows bootstrap.
+
+On Windows, Git Bash is recommended because it runs natively against Windows paths and normally starts faster than crossing the WSL filesystem boundary. After OpenCaw exists at `.codex` (replace the mount name for `.cursor` or `.claude`), inspect the available provider from PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1"
+```
+
+Install Git Bash explicitly when it is missing:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -Install
+```
+
+Or install WSL when Linux compatibility is preferred:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider WSL -Install
+```
+
+Installation is never automatic. Preview installation or scaffold execution with `-WhatIf`. Once a provider is available, run the canonical scaffold through it:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
+```
+
 ## Option 1 — Git Submodule (Recommended)
 
 Submodules allow the instruction system to be updated centrally while individual projects control the version they use.
@@ -794,22 +822,19 @@ Rules:
 
 # AI Memory System
 
-AI learning artifacts are stored outside the tool directory to prevent pollution of the shared instruction system.
+OpenCaw Memory v2 keeps system-like constraints and selectively loaded project knowledge together under the resolved repository's `.ai` directory:
 
-Example:
-
+```text
+<project-root>/.ai/SYSTEM_MEMORY.md
+<project-root>/.ai/MEMORY.md
+<project-root>/.ai/REPO_MAP.md
+<project-root>/.ai/RULES.md
+<project-root>/.ai/DEBUG.md
 ```
-.ai/
-.ai/MEMORY.md
-.ai/RULES.md
-.ai/DEBUG.md
-```
 
-These files allow agents to:
+`SYSTEM_MEMORY.md` is a repository-local, flat, always-loaded list for protected safety rules, safe machine capabilities, and repository-wide constraints. Project memory uses namespaced tags such as `[kind:workflow] [area:auth] [tech:dotnet]` and is queried by relevance before raw repository searches. The semantic repository map uses the same tags and a fingerprint of Git-visible project paths to detect structural drift.
 
-- record lessons learned
-- prevent repeated mistakes
-- store debugging knowledge
+Agents proactively record verified durable facts without waiting for a user prompt. Commands reject untagged project entries, credential-shaped values, personal paths, and unsafe system-memory content. Purges and migrations archive source data first.
 
 ---
 
@@ -864,6 +889,8 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `goal-flow` | Manage explicit automated goals across task PRs, post-PR QA, branch chaining, and final approval reporting |
 | `manage-task-issues` | Sync and prune open issue tracking |
 | `orchestrate-subagents` | Plan and coordinate parallel sub-agent lanes with OpenCaw roles |
+| `maintain-memory` | Retrieve relevant context and proactively preserve verified durable learnings |
+| `maintain-repository-map` | Keep the semantic repository index current and freshness-checked |
 | `clean-context` | Compact context after substantial work |
 | `pr-readiness-gate` | Require human confirmation before push or PR creation |
 | `post-pr-qa` | Run QA after PR availability and post PR evidence comments |
@@ -964,6 +991,15 @@ run command dotnet-build
 | `comment-pr-qa-results.sh` | Post QA evidence to a PR comment with inline screenshot URL support |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
 | `clean-context.sh` | Compress context and refresh high-signal summaries |
+| `resolve-opencaw-paths.sh` | Resolve safe project-local `.ai` memory paths |
+| `install-windows-bash.ps1` | Discover or explicitly install Git Bash/WSL and run the OpenCaw scaffold on Windows |
+| `append-system-memory.sh` | Add a validated repository-local system-memory entry |
+| `append-project-memory.sh` | Add or replace a validated tagged project-memory entry |
+| `query-project-context.sh` | List tags or retrieve ranked relevant memory and repository-map entries |
+| `purge-project-memory.sh` | Preview or archive-and-purge entries by exact tag |
+| `migrate-memory-v2.sh` | Prepare and apply a complete AI-classified legacy-memory migration |
+| `repo-map-status.sh` | Check or stamp semantic repository-map freshness |
+| `validate-memory.sh` | Validate system memory, tagged project memory, and repository map |
 | `security-scan.sh` | Run security checks |
 | `install-database-cli-tools.sh` | Print or execute database CLI install commands |
 | `database-cli-query.sh` | Execute engine-specific database query/connect commands |
