@@ -130,7 +130,12 @@ $summary_text
 $inline_or_artifact_block
 EOF
 
-"$GH_BIN" pr comment "$pr_ref" --body-file "$comment_file" >/dev/null
+gh_comment_file="$comment_file"
+if [[ "${GH_BIN,,}" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  gh_comment_file="$(wslpath -w "$comment_file")"
+fi
+
+"$GH_BIN" pr comment "$pr_ref" --body-file "$gh_comment_file" >/dev/null
 
 popd >/dev/null
 
