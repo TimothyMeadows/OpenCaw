@@ -160,6 +160,32 @@ grep -q '## Tag Catalog' "$project/.ai/CONTEXT_SUMMARY.md" || fail 'summary omit
 ! grep -q 'Billing fixture fact' "$project/.ai/CONTEXT_SUMMARY.md" || fail 'summary copied arbitrary memory content'
 
 echo '[9/9] checking command syntax and repository validation hooks'
+fake_gh_dir="$temp_root/fake-gh"
+fake_gh_log="$temp_root/fake-gh.log"
+fake_qa_summary="$temp_root/fake-qa-summary.md"
+mkdir -p "$fake_gh_dir"
+cat > "$fake_gh_dir/gh.exe" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-} ${2:-}" == 'pr view' ]]; then
+  echo 'https://github.com/example/project/pull/73'
+  exit 0
+fi
+if [[ "${1:-} ${2:-}" == 'pr comment' ]]; then
+  while [[ $# -gt 0 ]]; do
+    if [[ "$1" == '--body-file' ]]; then
+      printf '%s\n' "${2:-}" > "$OPENCAW_TEST_GH_LOG"
+      exit 0
+    fi
+    shift
+  done
+fi
+exit 1
+EOF
+chmod +x "$fake_gh_dir/gh.exe"
+printf '# QA\n\nPASS\n' > "$fake_qa_summary"
+PATH="$fake_gh_dir:/usr/bin:/bin" OPENCAW_TEST_GH_LOG="$fake_gh_log" run_for "$project" bash commands/comment-pr-qa-results.sh 73 "$fake_qa_summary" >/dev/null
+grep -Eq '^([A-Za-z]:\\|\\\\)' "$fake_gh_log" || fail 'Windows gh.exe did not receive a translated body-file path'
 bash -n commands/lib/memory-common.sh commands/*memory*.sh commands/query-project-context.sh commands/repo-map-status.sh commands/resolve-opencaw-paths.sh
 bash commands/validate-commands.sh >/dev/null
 bash commands/validate-skills.sh >/dev/null
