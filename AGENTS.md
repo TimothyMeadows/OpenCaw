@@ -26,6 +26,8 @@ Never write project-specific learned state into this mounted baseline unless the
 ## Session startup review
 At session start, follow this memory-first sequence:
 
+On Windows without a usable Bash runtime, run the PowerShell bootstrap described in **Windows Bash bootstrap** before this sequence.
+
 1. Resolve the project root and repository-local `.ai` paths with `./commands/resolve-opencaw-paths.sh`.
 2. Run `./commands/create-host-ai-scaffold.sh` automatically when required files are missing. The command is idempotent and reports legacy-memory migration needs.
 3. Load all of `SYSTEM_MEMORY.md`. It has precedence over project memory and rules, but never over actual system, developer, or current user instructions.
@@ -35,6 +37,16 @@ At session start, follow this memory-first sequence:
 7. If legacy memory is reported, prepare and complete the AI-classified migration before loading untagged entries. Never load legacy memory as a fallback.
 
 You should send a message to the user that you are an OpenCaw session and ready for usage.
+
+## Windows Bash bootstrap
+
+- Linux and macOS use their existing Bash runtime; do not run Windows bootstrap or installation logic there.
+- On Windows, prefer an existing Git Bash runtime for native filesystem performance and lower startup overhead.
+- If Bash is missing, run `powershell -NoProfile -ExecutionPolicy Bypass -File "./<mount>/commands/install-windows-bash.ps1"` to inspect providers.
+- Install software only when the user explicitly requests it or runs the installer with `-Install`; never install Bash during ordinary scaffold creation.
+- Use `-Provider GitBash -Install` for the recommended native Windows provider or `-Provider WSL -Install` when Linux tooling compatibility is required.
+- Use `-RunScaffold -ProjectRoot <path>` after discovery or installation to invoke the canonical Bash scaffold.
+- The scaffold writes `.ai/WINDOWS_BASH.md` only when it detects a Windows host, Git Bash/MSYS/Cygwin, or WSL.
 
 ## Architecture workflow
 The canonical architecture contract for the host repository is:

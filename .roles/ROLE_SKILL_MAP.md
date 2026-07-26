@@ -27,6 +27,7 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
 - `commands/resolve-opencaw-paths.sh`
+- `commands/install-windows-bash.ps1`
 - `commands/query-project-context.sh`
 - `commands/append-project-memory.sh`
 - `commands/append-system-memory.sh`

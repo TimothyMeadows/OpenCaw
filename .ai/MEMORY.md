@@ -4,3 +4,4 @@
 - [kind:gotcha] [env:wsl] [env:windows] [topic:path-translation] OpenCaw validation can run under WSL while Node.js, Git, Playwright, and FFmpeg resolve as Windows executables; translate paths only at the runtime boundary and preserve already-native Windows paths.
 - [kind:architecture] [area:memory] [tech:bash] Memory v2 keeps all memory artifacts under `<project-root>/.ai/`: always-loaded constraints in `SYSTEM_MEMORY.md`, tagged facts in `MEMORY.md`, and semantic structure in `REPO_MAP.md`.
 - [kind:convention] [area:commands] [topic:path-boundaries] Commands that write project artifacts resolve the active project through `commands/lib/memory-common.sh` and fail closed when the repository boundary is ambiguous.
+- [kind:workflow] [env:windows] [tech:powershell] Use `commands/install-windows-bash.ps1` to prefer existing native Git Bash, explicitly install Git Bash or WSL, and invoke the Bash scaffold; Linux and macOS do not use this bootstrap.
