@@ -92,9 +92,15 @@ expect_failure "$temp_root/secret.log" run_for "$project" bash commands/append-s
 expect_failure "$temp_root/project-secret.log" run_for "$project" bash commands/append-project-memory.sh --tags 'kind:environment,topic:security' --entry 'access_token=do-not-store-this-value'
 expect_failure "$temp_root/personal-path.log" run_for "$project" bash commands/append-system-memory.sh --entry 'Use C:\Users\someone\private\tool.exe.'
 run_for "$project" bash commands/append-system-memory.sh --entry 'Bash and Git are available to OpenCaw commands.' >/dev/null
+awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$project/.ai/MEMORY.md" > "$project/.ai/MEMORY.md.tmp"
+mv "$project/.ai/MEMORY.md.tmp" "$project/.ai/MEMORY.md"
 run_for "$project" bash commands/append-project-memory.sh --tags 'kind:workflow,area:auth,tech:dotnet' --entry 'Run the authentication smoke tests first.' --replace 'Run focused authentication tests before the full suite.' >/dev/null
+run_for "$project" bash commands/append-rules.sh 'Fixture preventive rule.' >/dev/null
+run_for "$project" bash commands/append-debug.sh 'Fixture debug resolution.' >/dev/null
 ! grep -q 'Run focused authentication tests' "$project/.ai/MEMORY.md" || fail 'replaced fact remained active'
 grep -q 'Run the authentication smoke tests first' "$project/.ai/MEMORY.md" || fail 'replacement fact was not stored'
+grep -q 'Fixture preventive rule' "$project/.ai/RULES.md" || fail 'rule append failed for a leading-hyphen format'
+grep -q 'Fixture debug resolution' "$project/.ai/DEBUG.md" || fail 'debug append failed for a leading-hyphen format'
 find "$project/.ai/archive/memory" -name 'MEMORY-replace-*.md' | grep -q . || fail 'replacement was not archived'
 
 echo '[4/9] retrieving ranked relevant context'
@@ -122,11 +128,16 @@ find "$project/.ai/archive/memory" -name 'MEMORY-purge-area-legacy-*.md' | grep 
 echo '[6/9] detecting semantic repository-map staleness'
 run_for "$project" bash commands/repo-map-status.sh --stamp >/dev/null
 grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'stamped map was not current'
+awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$project/.ai/REPO_MAP.md" > "$project/.ai/REPO_MAP.md.tmp"
+mv "$project/.ai/REPO_MAP.md.tmp" "$project/.ai/REPO_MAP.md"
+grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'CRLF repository-map marker was not recognized'
 printf 'content-only change\n' >> "$project/app.txt"
 grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'content-only edit made map stale'
 printf 'new tracked path\n' > "$project/new-component.txt"
 git -C "$project" add new-component.txt
 grep -q 'REPO_MAP_STATUS=STALE' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'tracked path addition did not make map stale'
+run_for "$project" bash commands/repo-map-status.sh --stamp >/dev/null
+grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'CRLF repository map could not be restamped'
 
 echo '[7/9] applying complete AI-classified migration'
 migration_project="$(new_project migration-project)"
@@ -158,6 +169,10 @@ run_for "$migration_project" bash commands/validate-memory.sh >/dev/null
 run_for "$project" bash commands/summarize-memory.sh >/dev/null
 grep -q '## Tag Catalog' "$project/.ai/CONTEXT_SUMMARY.md" || fail 'summary omitted tag inventory'
 ! grep -q 'Billing fixture fact' "$project/.ai/CONTEXT_SUMMARY.md" || fail 'summary copied arbitrary memory content'
+printf '\n1. [x] Boundary task (`.ai/tasks/boundary-task/TASK.md`)\n' >> "$project/.ai/tasks/TODO.md"
+printf '# Boundary task\r\n\r\n## Status\r\nArchived on 20260725T000000Z.\r\n' > "$project/.ai/tasks/boundary-task/TASK.md"
+cleanup_preview="$(run_for "$project" bash commands/clean-context.sh --dry-run)"
+grep -q '^TASK_FILES_COMPACTED=0$' <<< "$cleanup_preview" || fail 'clean-context did not recognize an archived CRLF task'
 
 echo '[9/9] checking command syntax and repository validation hooks'
 fake_gh_dir="$temp_root/fake-gh"

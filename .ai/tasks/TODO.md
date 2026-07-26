@@ -5,3 +5,4 @@
 3. [x] Add Windows Bash bootstrap and scaffold guidance (`.ai/tasks/windows-bash-bootstrap/TASK.md`)
 4. [x] Move local GPU assets into `.styles/.gpu` (`.ai/tasks/media-local-gpu-assets/TASK.md`)
 5. [x] Remove obsolete `demo/` assets from Git history (`.ai/tasks/remove-demo-history/TASK.md`)
+6. [x] Remove the legacy `.media/` directory (`.ai/tasks/remove-media-directory/TASK.md`)

@@ -44,7 +44,7 @@ output_dir="$(realpath -m "$output_dir")"
 workspace="$(realpath -m "$workspace")"
 if [[ -n "${OPENCAW_TEST_COMFY_SCRIPT:-}" ]]; then
   case "$output_dir" in
-    "$opencaw_root"/tests/.media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Fake comfy execution requires OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
+    "$opencaw_root"/tests/.gpu-media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Fake comfy execution requires OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
     *) echo "Fake comfy execution is confined to OpenCaw test runtimes." >&2; exit 1 ;;
   esac
 fi

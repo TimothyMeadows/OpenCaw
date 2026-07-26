@@ -14,6 +14,7 @@ validate_flat_system_file() {
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     line_number=$((line_number + 1))
+    line="${line%$'\r'}"
     [[ $line_number -eq 1 && "$line" == '# System Memory' ]] && continue
     [[ -z "$line" ]] && continue
     if [[ "$line" != '- '* ]]; then
@@ -29,7 +30,7 @@ validate_flat_system_file() {
   done < "$OPENCAW_SYSTEM_MEMORY_FILE"
 
   while IFS= read -r line; do
-    if ! grep -Fqx -- "$line" "$OPENCAW_SYSTEM_MEMORY_FILE"; then
+    if ! awk -v expected="$line" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$OPENCAW_SYSTEM_MEMORY_FILE"; then
       echo "Missing protected system-memory entry: $line" >&2
       status=1
     fi
@@ -44,6 +45,7 @@ validate_tagged_file() {
   [[ -f "$file" ]] || { echo "Missing $label: $file" >&2; status=1; return; }
   while IFS= read -r line || [[ -n "$line" ]]; do
     line_number=$((line_number + 1))
+    line="${line%$'\r'}"
     [[ -z "$line" || "$line" == '# '* || "$line" == '<!-- '* ]] && continue
     if ! opencaw_validate_tagged_line "$line"; then
       echo "Invalid $label line $line_number." >&2
@@ -54,6 +56,7 @@ validate_tagged_file() {
   duplicate_count="$(awk '
     /^-[[:space:]]+\[/ {
       normalized = tolower($0)
+      sub(/\r$/, "", normalized)
       gsub(/[[:space:]]+/, " ", normalized)
       count[normalized]++
     }
