@@ -106,11 +106,7 @@ The optional generative media contract for the host repository is:
 
 - `../MEDIA.md`
 
-Provider-neutral backend templates and schemas live in:
-
-- `./.media/`
-
-The local GPU backend template and pinned local manifests live in:
+Generative-media backend templates, schemas, and pinned local manifests live in:
 
 - `./.styles/.gpu/`
 

@@ -3,13 +3,15 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
-runtime_dir="$(mktemp -d "$repo_root/tests/.media-runtime-XXXXXX")"
+runtime_dir="$(mktemp -d "$repo_root/tests/.gpu-media-runtime-XXXXXX")"
 export OPENCAW_TEST_MODE=1
-cleanup() { case "$runtime_dir" in "$repo_root"/tests/.media-runtime-*) rm -rf -- "$runtime_dir" ;; esac; }
+cleanup() { case "$runtime_dir" in "$repo_root"/tests/.gpu-media-runtime-*) rm -rf -- "$runtime_dir" ;; esac; }
 trap cleanup EXIT
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
-contains_exact_line() { tr -d '\r' < "$2" | grep -Fqx -- "$1"; }
+contains_exact_line() {
+  awk -v expected="$1" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$2"
+}
 expect_failure() {
   local log="$1"; shift
   set +e; "$@" >"$log" 2>&1; local status=$?; set -e
@@ -21,10 +23,10 @@ for style in LAYERED_PAPERCRAFT PAPER_DIORAMA POPUP_STORYBOOK; do
   [[ -f ".styles/$style.md" ]] || fail "missing style $style"
   contains_exact_line "- $style" .styles/INDEX.md || fail "$style is not indexed"
 done
-for asset in COMFYUI_LOCAL.md toolchain.json model-packs.json; do
-  [[ -f ".styles/.gpu/$asset" ]] || fail "missing local GPU asset: $asset"
-  [[ ! -e ".media/$asset" ]] || fail "local GPU asset remains under .media: $asset"
+for asset in INDEX.md CLOUD_SESSION.md COMFYUI_LOCAL.md media-generation-manifest.schema.json toolchain.json model-packs.json; do
+  [[ -f ".styles/.gpu/$asset" ]] || fail "missing generative-media asset: $asset"
 done
+[[ ! -e ".media" ]] || fail "legacy .media directory still exists"
 for role in arts/papercraft-art-director arts/sound-designer computer-science/generative-media-pipeline-engineer; do
   [[ -f ".roles/$role/ROLE.md" ]] || fail "missing role $role"
   bash commands/resolve-role.sh "${role#*/}" >/dev/null
@@ -45,9 +47,9 @@ bash commands/validate-media-contract.sh "$runtime_dir/cloud/MEDIA.md"
 ! grep -q '^- COMFYUI_LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
 bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD_SESSION COMFYUI_LOCAL
 bash commands/validate-media-contract.sh "$runtime_dir/hybrid/MEDIA.md"
-grep -Fq '.media/CLOUD_SESSION.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud template path"
+grep -Fq '.styles/.gpu/CLOUD_SESSION.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud template path"
 grep -Fq '.styles/.gpu/COMFYUI_LOCAL.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local GPU template path"
-! grep -Fq '.media/COMFYUI_LOCAL.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained the stale local template path"
+! grep -Fq '.media/' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained a stale .media path"
 grep -Eiq 'ask the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted user choice"
 grep -Eiq 'never switch or fall back.*silently' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted fallback boundary"
 expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" COMFYUI_LOCAL CLOUD_SESSION

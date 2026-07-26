@@ -693,7 +693,7 @@ Papercraft style contracts are also composable:
 - `PAPER_DIORAMA`
 - `POPUP_STORYBOOK`
 
-Repositories that configure generative image or audio production may add an optional `MEDIA.md`. OpenCaw composes it from provider-neutral session/cloud guidance in `.media/` and the pinned `COMFYUI_LOCAL` adapter in `.styles/.gpu/`; `STYLE.md` remains the visual authority. Backend selection is explicit, outputs stay staged until human review, and generation manifests preserve provenance and reproducibility evidence.
+Repositories that configure generative image or audio production may add an optional `MEDIA.md`. OpenCaw composes it from the session/cloud and pinned local backend assets in `.styles/.gpu/`; `STYLE.md` remains the visual authority. Backend selection is explicit, outputs stay staged until human review, and generation manifests preserve provenance and reproducibility evidence.
 
 ---
 

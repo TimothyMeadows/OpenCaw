@@ -42,11 +42,14 @@ Available OpenCaw art style templates:
 
 Use one or more of these when generating `../STYLE.md` for a host repository.
 
-## Local GPU Generation Support
+## Generative Media Support
 
-Local GPU generation assets are stored under `.styles/.gpu/` but are not selectable art-style templates:
+All generative-media assets are stored under `.styles/.gpu/` but are not selectable art-style templates:
 
+- `.styles/.gpu/INDEX.md` indexes the complete media asset set.
+- `.styles/.gpu/CLOUD_SESSION.md` defines the session-provided cloud backend.
 - `.styles/.gpu/COMFYUI_LOCAL.md` defines the loopback-only ComfyUI backend.
+- `.styles/.gpu/media-generation-manifest.schema.json` defines generation provenance and review records.
 - `.styles/.gpu/toolchain.json` pins the supported local toolchain.
 - `.styles/.gpu/model-packs.json` defines reviewed model and workflow packs.
 

@@ -37,12 +37,12 @@ if [[ ! -f "$OPENCAW_REPO_MAP_FILE" ]]; then
 fi
 
 entry_count="$(grep -Ec '^-[[:space:]]+\[' "$OPENCAW_REPO_MAP_FILE" || true)"
-stored_fingerprint="$(sed -nE 's/^<!-- OPENCAW_REPO_MAP_FINGERPRINT: ([^ ]+) -->$/\1/p' "$OPENCAW_REPO_MAP_FILE" | head -n1)"
+stored_fingerprint="$(sed -nE 's/\r$//; s/^<!-- OPENCAW_REPO_MAP_FINGERPRINT: ([^ ]+) -->$/\1/p' "$OPENCAW_REPO_MAP_FILE" | head -n1)"
 
 if [[ "$stamp" == 'true' ]]; then
   [[ "$entry_count" -gt 0 ]] || { echo 'Refusing to stamp an empty semantic repository map.' >&2; exit 1; }
   if grep -q '^<!-- OPENCAW_REPO_MAP_FINGERPRINT:' "$OPENCAW_REPO_MAP_FILE"; then
-    sed -E "s/^<!-- OPENCAW_REPO_MAP_FINGERPRINT: [^ ]+ -->$/<!-- OPENCAW_REPO_MAP_FINGERPRINT: $current_fingerprint -->/" \
+    sed -E "s/\r$//; s/^<!-- OPENCAW_REPO_MAP_FINGERPRINT: [^ ]+ -->$/<!-- OPENCAW_REPO_MAP_FINGERPRINT: $current_fingerprint -->/" \
       "$OPENCAW_REPO_MAP_FILE" > "$OPENCAW_REPO_MAP_FILE.tmp"
   else
     awk -v marker="<!-- OPENCAW_REPO_MAP_FINGERPRINT: $current_fingerprint -->" '

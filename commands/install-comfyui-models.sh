@@ -52,7 +52,7 @@ if [[ "$node_bin" == *.exe && -n "$(command -v wslpath 2>/dev/null || true)" ]];
 if [[ -n "${OPENCAW_TEST_DISK_BYTES:-}${OPENCAW_TEST_GPU_KIND:-}${OPENCAW_TEST_VRAM_BYTES:-}" ]]; then
   workspace_real="$(realpath -m "$workspace")"
   case "$workspace_real" in
-    "$opencaw_root"/tests/.media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Media probe fixtures require OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
+    "$opencaw_root"/tests/.gpu-media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Media probe fixtures require OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
     *) echo "Media probe fixtures are confined to OpenCaw test runtimes." >&2; exit 1 ;;
   esac
 fi

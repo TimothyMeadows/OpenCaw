@@ -34,7 +34,7 @@ target="${output:-$host_root/MEDIA.md}"
 
 backend_template_relative_path() {
   case "$1" in
-    CLOUD_SESSION) printf '%s\n' ".media/CLOUD_SESSION.md" ;;
+    CLOUD_SESSION) printf '%s\n' ".styles/.gpu/CLOUD_SESSION.md" ;;
     COMFYUI_LOCAL) printf '%s\n' ".styles/.gpu/COMFYUI_LOCAL.md" ;;
     *) return 1 ;;
   esac

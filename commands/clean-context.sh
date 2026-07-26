@@ -48,7 +48,7 @@ if [[ -f "$todo_file" ]]; then
       task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"
 
       if [[ -f "$task_file" ]]; then
-        if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
+        if awk '{ sub(/\r$/, ""); if ($0 ~ /^Archived on [0-9]{8}T[0-9]{6}Z\.$/) found=1 } END { exit !found }' "$task_file"; then
           continue
         fi
 

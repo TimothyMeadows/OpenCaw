@@ -54,6 +54,7 @@ if [[ -n "$replace" ]]; then
     function lower(value) { return tolower(value) }
     {
       line = $0
+      sub(/\r$/, "", line)
       if (line !~ /^-[[:space:]]+\[/) next
       sub(/^-[[:space:]]+/, "", line)
       while (line ~ /^\[[^]]+\][[:space:]]+/) sub(/^\[[^]]+\][[:space:]]+/, "", line)
@@ -72,6 +73,7 @@ if [[ -n "$replace" ]]; then
     {
       original = $0
       line = $0
+      sub(/\r$/, "", line)
       if (line ~ /^-[[:space:]]+\[/) {
         sub(/^-[[:space:]]+/, "", line)
         while (line ~ /^\[[^]]+\][[:space:]]+/) sub(/^\[[^]]+\][[:space:]]+/, "", line)

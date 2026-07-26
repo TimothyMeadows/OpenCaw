@@ -20,7 +20,7 @@ media_file="${1:-$host_root/MEDIA.md}"
 
 backend_template_path() {
   case "$1" in
-    CLOUD_SESSION) printf '%s\n' "$opencaw_root/.media/CLOUD_SESSION.md" ;;
+    CLOUD_SESSION) printf '%s\n' "$opencaw_root/.styles/.gpu/CLOUD_SESSION.md" ;;
     COMFYUI_LOCAL) printf '%s\n' "$opencaw_root/.styles/.gpu/COMFYUI_LOCAL.md" ;;
     *) return 1 ;;
   esac

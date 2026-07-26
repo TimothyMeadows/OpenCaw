@@ -133,7 +133,7 @@ if [[ -n "${OPENCAW_TEST_MISSING_FFMPEG:-}" ]]; then
     exit 1
   fi
   case "$workspace_real" in
-    "$tests_real"/.media-runtime-*) force_missing_ffmpeg=1 ;;
+    "$tests_real"/.gpu-media-runtime-*) force_missing_ffmpeg=1 ;;
     *) echo "OPENCAW_TEST_MISSING_FFMPEG requires an isolated OpenCaw test workspace." >&2; exit 1 ;;
   esac
 fi
