@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "resolvedAt": "2026-07-25",
+  "python": {
+    "preferred": "3.13",
+    "minimum": "3.10",
+    "maximumExclusive": "3.14",
+    "isolation": "venv"
+  },
+  "comfyCli": {
+    "package": "comfy-cli",
+    "version": "1.12.0"
+  },
+  "comfyUI": {
+    "repository": "https://github.com/Comfy-Org/ComfyUI",
+    "version": "0.28.0",
+    "tag": "v0.28.0"
+  },
+  "ffmpeg": {
+    "minimum": "6.1",
+    "versionPolicy": "operating-system-package-lock"
+  },
+  "launch": {
+    "listen": "127.0.0.1",
+    "disableApiNodes": true,
+    "customNodes": "none"
+  }
+}

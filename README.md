@@ -659,6 +659,14 @@ Web experience style contracts are available under `.styles/`:
 - `WEB_SKEUOMORPHIC`
 - `WEB_ATMOSPHERIC`
 
+Papercraft style contracts are also composable:
+
+- `LAYERED_PAPERCRAFT`
+- `PAPER_DIORAMA`
+- `POPUP_STORYBOOK`
+
+Repositories that configure generative image or audio production may add an optional `MEDIA.md`. OpenCaw composes it from provider-neutral session/cloud guidance and the pinned `COMFYUI_LOCAL` adapter in `.media/`; `STYLE.md` remains the visual authority. Backend selection is explicit, outputs stay staged until human review, and generation manifests preserve provenance and reproducibility evidence.
+
 ---
 
 # Commands
@@ -678,6 +686,9 @@ commands/clean-context.sh
 commands/audit-agent-source.sh
 commands/playwright-capture-page.sh
 commands/validate-role-skill-map.sh
+commands/generate-media-contract.sh
+commands/inspect-local-media-host.sh
+commands/run-comfyui-workflow.sh
 ```
 
 Commands should remain:
@@ -706,7 +717,7 @@ Host repositories still own real tests, credentials, app-specific artifacts, and
 
 # Validation
 
-OpenCaw includes built-in validation commands for its role, skill, and command schemas.
+OpenCaw includes built-in validation commands for its role, skill, command, style, and generative-media schemas.
 
 Available commands:
 
@@ -716,6 +727,7 @@ commands/validate-skills.sh
 commands/validate-commands.sh
 commands/validate-skill-safety.sh
 commands/validate-role-skill-map.sh
+commands/validate-media-templates.sh
 commands/validate-opencaw.sh
 ```
 
@@ -733,6 +745,7 @@ Or run individual checks:
 ./commands/validate-commands.sh
 ./commands/validate-skill-safety.sh
 ./commands/validate-role-skill-map.sh
+./commands/validate-media-templates.sh
 ```
 
 These validators check:
@@ -747,6 +760,7 @@ These validators check:
 - executable, symlink, resource-boundary, personal-path, credential, account-mutation, and publishing safety rules for skills
 - complete domain-qualified role mappings with valid skill and command references
 - deterministic agreement between canonical role-map JSON and generated Markdown
+- pinned generative-media toolchain, model-pack, workflow, checksum, and manifest metadata
 
 ---
 
@@ -862,6 +876,10 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `install-database-cli-tools` | Install or preview database CLI tooling setup |
 | `database-cli-query` | Run database connect/query workflows by engine |
 | `tcg-art-direction` | Plan original TCG/CCG card frames, board styling, tokens, VFX, and IP-safe card-game art direction |
+| `plan-generative-media-pipeline` | Select and govern reproducible cloud/session or local image and audio generation |
+| `use-comfyui-local-generation` | Provision and run pinned loopback-only ComfyUI workflows into staging |
+| `produce-generative-audio` | Produce reviewed music, sound-effect, ambience, and voice candidates |
+| `validate-generated-media` | Verify manifests, hashes, exact coverage, budgets, provenance, and review status |
 
 ### Role-Driven Skills
 
@@ -950,6 +968,13 @@ run command dotnet-build
 | `install-database-cli-tools.sh` | Print or execute database CLI install commands |
 | `database-cli-query.sh` | Execute engine-specific database query/connect commands |
 | `print-tcg-art-style-template.sh` | Print a reusable TCG art style brief for cards, boards, tokens, graveyards, and VFX |
+| `generate-media-contract.sh` | Generate an optional provider-neutral host `MEDIA.md` contract |
+| `validate-media-contract.sh` | Validate backend selection, capability, provenance, and promotion policy |
+| `install-comfyui-local.sh` | Dry-run or install the pinned isolated ComfyUI toolchain |
+| `install-comfyui-models.sh` | Preview or install licensed, revision-pinned starter model packs |
+| `inspect-local-media-host.sh` | Inspect local GPU, tools, model packs, and per-modality viability |
+| `run-comfyui-workflow.sh` | Run a local workflow into staging and write a hashed receipt |
+| `validate-media-generation-manifest.sh` | Validate generated-media reproducibility, rights, hashes, budgets, and review |
 
 ---
 

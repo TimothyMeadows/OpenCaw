@@ -1,0 +1,4 @@
+interface:
+  display_name: "Validate Generated Media"
+  short_description: "Verify generated media before promotion"
+  default_prompt: "Use $validate-generated-media to validate staged media, manifests, budgets, provenance, and review status."
