@@ -1,6 +1,6 @@
 ---
 name: create-host-ai-scaffold
-description: Create the repository-local Memory v2 scaffold, seed protected system memory under the project `.ai` directory, and ensure host AGENTS bootstrap points to OpenCaw when missing. Use at first startup or when required memory, map, task, or bootstrap artifacts are absent.
+description: Create the repository-local Memory v2 scaffold, seed protected system memory, add Windows Bash guidance when applicable, and ensure host AGENTS bootstrap points to OpenCaw when missing. Use at first startup or when required memory, map, task, or bootstrap artifacts are absent.
 ---
 
 ## When to use
@@ -12,6 +12,10 @@ Use when the host repo does not yet have the expected `.ai` structure or when Op
 - Host root `AGENTS.md` includes a managed OpenCaw bootstrap block.
 - Existing host `AGENTS.md` content is preserved; bootstrap block is appended only if missing.
 - Legacy untagged memory is reported for AI-classified migration and is never silently rewritten.
+- Windows hosts receive `.ai/WINDOWS_BASH.md` with safe Git Bash and WSL setup commands; Linux and macOS do not need the Windows bootstrap.
+- Scaffold creation never installs Bash automatically.
 
-## Command
-../commands/create-host-ai-scaffold.sh
+## Commands
+
+- `../commands/create-host-ai-scaffold.sh`
+- Windows before Bash is available: `../commands/install-windows-bash.ps1`
