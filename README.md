@@ -5,17 +5,17 @@
 
 https://github.com/user-attachments/assets/eb32b378-7269-4aa7-90d4-cbc0cba535f9
 
-OpenCaw is an **open source framework library for AI-assisted development** that standardizes instructions, skills, commands, and architecture guidance for tools such as **Cursor, Codex, and Claude**.
+OpenCaw helps you work with an AI coding agent the way you would work with a thoughtful teammate: describe what you want in ordinary language, refine the plan together, and let the agent handle the repository-specific machinery.
 
-It provides a structured system that allows teams to:
+You do **not** need to memorize role names, invoke skills, or know command syntax before you can use it. Those controls are available when you want extra precision, but the normal interface is simply a conversation.
 
-- Standardize AI agent behavior across repositories
-- Reuse architecture frameworks and coding standards
-- Define reusable commands and skills
-- Offload memory and learning fragments into project-local storage
-- Maintain consistent enterprise-ready development workflows
+```text
+Help me plan a safe migration from our legacy checkout flow. Do not change code yet. Inspect the repository, identify the risky boundaries, and propose reviewable phases with tests and rollback points.
+```
 
-OpenCaw is designed so it can be installed into an existing repository as a **submodule or cloned tool directory** (such as `.codex`, `.cursor`, or `.claude`) while keeping project-specific artifacts separate from the shared instruction system.
+That is a complete OpenCaw request.
+
+Behind the conversation, OpenCaw provides a shared system for planning, architecture, implementation, task tracking, repository memory, verification, and delivery across tools such as **Cursor, Codex, and Claude**. It can be mounted as `.codex`, `.cursor`, or `.claude` while keeping project-specific context inside the host repository.
 
 ![](OpenCawFlow.png)
 
@@ -23,254 +23,955 @@ OpenCaw is designed so it can be installed into an existing repository as a **su
 
 # Table of Contents
 
+- [Start with a Normal Request](#start-with-a-normal-request)
+  - [No Magic Words](#no-magic-words)
+  - [Planning Is a Conversation](#planning-is-a-conversation)
+  - [A Realistic Planning Flow](#a-realistic-planning-flow)
+  - [What OpenCaw Does Behind the Scenes](#what-opencaw-does-behind-the-scenes)
+  - [Natural-Language Examples](#natural-language-examples)
+  - [When Explicit Controls Help](#when-explicit-controls-help)
 - [Install](#install)
-- [Examples](#examples)
+  - [Fork OpenCaw First](#fork-opencaw-first)
+  - [Choose a Mount Name](#choose-a-mount-name)
+  - [Windows Bash Prerequisite](#windows-bash-prerequisite)
+  - [Option 1 — Git Submodule](#option-1--git-submodule)
+  - [Option 2 — Clone](#option-2--clone)
+  - [Start the First Session](#start-the-first-session)
+- [Technical Reference](#technical-reference)
+  - [Runtime Model](#runtime-model)
+  - [Session Startup and Context Resolution](#session-startup-and-context-resolution)
+  - [Repository Layering](#repository-layering)
+  - [Architecture, Style, and Media Contracts](#architecture-style-and-media-contracts)
+  - [Roles](#roles)
+  - [Role, Skill, and Command Bindings](#role-skill-and-command-bindings)
+  - [Skills](#skills)
+  - [Commands](#commands)
+  - [Sub-Agent Orchestration](#sub-agent-orchestration)
+  - [Goal Flow](#goal-flow)
+  - [Task, Issue, and PR Delivery](#task-issue-and-pr-delivery)
+  - [Memory v2](#memory-v2)
+  - [Generative Media](#generative-media)
+  - [Validation](#validation)
+  - [Repository Layout](#repository-layout)
 - [Contributing](#contributing)
-- [Architecture Frameworks](#architecture-frameworks)
-- [Roles](#roles)
-- [Role-Skill Bindings](#role-skill-bindings)
-- [Sub-Agent Orchestration](#sub-agent-orchestration)
-- [Goals](#goals)
-- [Skills](#skills)
-- [Commands](#commands)
-- [Skills & Commands Guide](#skills--commands-guide)
-- [Validation](#validation)
-- [Task Management](#task-management)
-- [AI Memory System](#ai-memory-system)
 - [License](#license)
+
+---
+
+# Start with a Normal Request
+
+OpenCaw is not a command language wrapped around an AI. It is a repository-aware operating system for the conversation you were already going to have.
+
+Start with the outcome:
+
+```text
+The settings screen has become hard to maintain. Help me understand why, propose a cleaner structure, and then make the smallest safe refactor with tests.
+```
+
+You can add constraints naturally:
+
+```text
+Keep the public API stable. Do not add dependencies. Show me the plan before editing, and stop for approval before opening a PR.
+```
+
+You can correct direction naturally too:
+
+```text
+That plan is too broad. Keep the database untouched and split the UI cleanup from the API work.
+```
+
+OpenCaw uses the baseline instructions, project contracts, repository structure, task state, and relevant memory to turn that conversation into governed work. You can stay at this level for the whole task.
+
+## No Magic Words
+
+Role and skill names are **optional controls**, not required incantations.
+
+| You can simply say | OpenCaw can interpret it as |
+| --- | --- |
+| “Before coding, help me work out the safest approach.” | Inspect context, identify decisions, and produce a plan. |
+| “Find the root cause and prove the fix.” | Diagnose, implement a focused correction, and run verification. |
+| “Review this like a security-minded senior engineer.” | Apply a security review lens without requiring a role name. |
+| “This is large; split only the parts that can safely run in parallel.” | Plan bounded sub-agent lanes when parallelism is useful and available. |
+| “Take this from idea through a reviewed PR, but ask before publishing.” | Track the task, implement, validate, then stop at the PR readiness gate. |
+| “Remember this repository rule for next time.” | Validate and store durable project knowledge under `.ai/`. |
+
+These prompts are examples, not fixed syntax. Equivalent natural wording works.
+
+You may still say `use role security-engineer`, invoke a named skill, or request a command when you know exactly which control you want. OpenCaw does not require that level of specificity to plan or complete ordinary work.
+
+## Planning Is a Conversation
+
+Planning is where natural-language use is often most powerful.
+
+You can begin with uncertainty:
+
+```text
+I know the reporting module needs to be modernized, but I am not sure where to start. Inspect it and help me turn the problem into a safe sequence of decisions and changes. Do not implement anything yet.
+```
+
+OpenCaw can then:
+
+1. Resolve the repository boundary and load the relevant project context.
+2. Inspect the current architecture, active tasks, tests, and likely change surface.
+3. Separate facts from assumptions and identify decisions only you can make.
+4. Draft an ordered plan with dependencies, risks, verification, and rollback points.
+5. Let you revise the plan in plain language.
+6. Record the agreed task structure before implementation.
+7. Keep the plan current when discoveries change the direction.
+
+Useful planning phrases include:
+
+```text
+Plan this with me before touching code.
+```
+
+```text
+Give me three options and recommend one, including migration and rollback costs.
+```
+
+```text
+Turn this idea into small PR-sized tasks and call out what can run in parallel.
+```
+
+```text
+Assume zero downtime and no schema breaking changes. What does that change in the plan?
+```
+
+```text
+We learned the API is shared by mobile. Stop and re-plan around backward compatibility.
+```
+
+You are not locked into the first plan. OpenCaw treats corrections, new evidence, and changed constraints as reasons to update the plan rather than push through stale assumptions.
+
+## A Realistic Planning Flow
+
+Here is a complete interaction without role or skill syntax:
+
+```text
+You:
+Our authentication code is spread across the API and web app. I want a simpler design, but I cannot break mobile clients. First inspect the repository and give me a phased plan. Do not edit yet.
+
+OpenCaw:
+Inspects the architecture, authentication boundaries, active issues, tests, and relevant repository memory. Returns a plan with assumptions, compatibility risks, phases, and verification.
+
+You:
+Keep token formats unchanged in phase one. Separate observability from the refactor, and make the first task small enough for one reviewer.
+
+OpenCaw:
+Updates the plan, narrows phase one, and makes the dependency order explicit.
+
+You:
+Implement phase one. Add focused tests, run the broader validation, and tell me when it is ready for a PR.
+
+OpenCaw:
+Creates or updates task tracking, implements the agreed slice, verifies it, records reusable findings, and stops at the PR readiness gate.
+```
+
+The named machinery is still there—roles, skills, commands, task files, memory, and validation—but it supports the conversation instead of replacing it.
+
+## What OpenCaw Does Behind the Scenes
+
+For a substantial request, the normal flow is:
+
+1. **Resolve the project safely** — find the actual host repository and mounted OpenCaw directory without guessing across workspace boundaries.
+2. **Load high-signal context** — read protected repository memory, project rules, architecture/style contracts, active tasks, and relevant tagged knowledge.
+3. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done.
+4. **Plan at the right depth** — use a lightweight checklist for small work or a detailed dependency-aware plan for cross-cutting work.
+5. **Choose capabilities** — apply baseline behavior and automatically use relevant skills; explicit roles remain optional specialist lenses.
+6. **Track real work** — create or import a task, link its GitHub issue, and keep the active checklist concise.
+7. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
+8. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
+9. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
+10. **Deliver with a human gate** — summarize completed work and validation, ask before publishing a normal PR, then run post-PR QA after it exists.
+
+OpenCaw can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
+
+## Natural-Language Examples
+
+### Understand a repository
+
+```text
+I am new to this codebase. Explain how a request moves from the API entry point to storage, show me the important files, and call out the parts that are risky to change.
+```
+
+### Plan a feature
+
+```text
+Help me plan team invitations. We need expiring links, audit history, and no new infrastructure. Ask me only for decisions that materially change the design, then produce reviewable implementation tasks.
+```
+
+### Build a feature
+
+```text
+Add CSV export to the reporting page. Match the existing architecture, keep the UI accessible, add tests, and verify the download in a browser. Do not publish anything until I approve the PR.
+```
+
+### Diagnose a bug
+
+```text
+Users occasionally see duplicate invoices after retrying checkout. Find concrete evidence for the root cause, fix it without changing the public API, and add a regression test.
+```
+
+### Review without editing
+
+```text
+Review this pull request for correctness, security, and maintainability. Do not change files. Rank findings by severity and point to the exact evidence.
+```
+
+### Work from an issue
+
+```text
+Work on #123. Import the issue into task tracking, implement the smallest complete fix, test it, and prepare the PR readiness summary.
+```
+
+### Plan safe parallel work
+
+```text
+This migration is large. Split independent investigation, implementation, and QA work into safe lanes, avoid overlapping write scopes, then integrate and verify everything from the main lane.
+```
+
+### Create visual or media assets
+
+```text
+Help me define the visual direction for this onboarding flow, produce a reusable style contract, and stage a small set of image concepts for review without promoting them into runtime assets yet.
+```
+
+### Improve the process itself
+
+```text
+We keep rediscovering the same Windows path issue. Verify the pattern, fix the workflow, add a regression check, and remember the durable rule for future tasks.
+```
+
+## When Explicit Controls Help
+
+Natural language is the default. Explicit controls are useful when you want to constrain *how* OpenCaw approaches the work.
+
+| Control | Use it when | Example |
+| --- | --- | --- |
+| Role | You want a named specialist perspective or composition order. | `Use roles backend-architect + security-engineer.` |
+| Skill | You want one exact reusable workflow. | `Use the dependency audit skill before changing packages.` |
+| Command | You want a deterministic repository script. | `Run the full OpenCaw validation command.` |
+| Agent count | You are authorizing parallel agent work and want a capacity ceiling. | `Use up to 3 agents, but only for independent lanes.` |
+| Issue reference | Existing GitHub issue content is the source task. | `Work on #123.` |
+| Goal flow | You explicitly authorize automated task-to-PR progression across multiple tasks. | `Use goal flow for these four tasks; never merge automatically.` |
+
+Explicit role examples:
+
+```text
+Use role security-engineer + sre and review the service for exploit paths and resilience gaps.
+```
+
+```text
+Act as project-manager + fullstack-engineer. Build a safe parallel plan, then implement only after I approve it.
+```
+
+Explicit goal-flow example:
+
+```text
+Goal: modernize the reporting module across these five tasks. Raise each task PR after validation, run post-PR QA, then continue. Never merge PRs automatically.
+```
+
+Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Ordinary natural-language work still pauses for human PR readiness approval.
 
 ---
 
 # Install
 
-## Fork OpenCaw First (Required)
+OpenCaw is designed to be mounted directly inside an existing repository as one of:
 
-Before installing OpenCaw in your project, **you must first fork the repository**.
+```text
+.codex/
+.cursor/
+.claude/
+```
 
-This ensures:
+The mounted directory is the reusable baseline. Project-specific memory, tasks, rules, and generated contracts stay in the host repository.
 
-- you control updates
-- you can modify roles, skills, or commands
-- upstream updates can be merged safely
-- any enterprise security policies are satisfied
+## Fork OpenCaw First
 
-### Fork the repository
+Fork the repository before installing it into production or team projects. A fork gives your team control over updates, custom roles and skills, security policy, and the exact version each repository consumes.
 
-Visit:
+Upstream repository:
 
 https://github.com/TimothyMeadows/OpenCaw
 
-Click **Fork** and create a fork under your GitHub account or organization.
+Example fork:
 
-Example fork location:
-
-```
+```text
 https://github.com/<your-org>/OpenCaw
 ```
 
-After forking, use **your fork URL** in all installation commands instead of the upstream repository.
+Use your fork URL in the installation commands below.
 
-OpenCaw can be installed in an existing repository in two primary ways.
+## Choose a Mount Name
 
-## Windows Bash prerequisite
+Choose the directory recognized by your AI tool:
 
-OpenCaw commands use Bash. Linux and macOS already provide the expected shell and do not need this Windows bootstrap.
+| Tool or convention | Typical mount |
+| --- | --- |
+| Codex | `.codex` |
+| Cursor | `.cursor` |
+| Claude | `.claude` |
 
-On Windows, Git Bash is recommended because it runs natively against Windows paths and normally starts faster than crossing the WSL filesystem boundary. After OpenCaw exists at `.codex` (replace the mount name for `.cursor` or `.claude`), inspect the available provider from PowerShell:
+Examples below use `.codex`. Replace it consistently if you choose another mount.
+
+## Windows Bash Prerequisite
+
+OpenCaw commands use Bash. Linux and macOS normally already provide the expected runtime.
+
+On Windows, Git Bash is recommended for native Windows filesystem performance. After OpenCaw is mounted, inspect available providers from PowerShell:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1"
 ```
 
-Install Git Bash explicitly when it is missing:
+Install Git Bash explicitly when needed:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -Install
 ```
 
-Or install WSL when Linux compatibility is preferred:
+Or explicitly install WSL when Linux tooling compatibility is preferred:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider WSL -Install
 ```
 
-Installation is never automatic. Preview installation or scaffold execution with `-WhatIf`. Once a provider is available, run the canonical scaffold through it:
+OpenCaw never installs Bash implicitly. Use `-WhatIf` to preview installation or scaffold execution.
+
+Run the canonical scaffold through the selected provider:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
 ```
 
-## Option 1 — Git Submodule (Recommended)
+## Option 1 — Git Submodule
 
-Submodules allow the instruction system to be updated centrally while individual projects control the version they use.
-
-Example installation as `.codex` or `.cursor` or `.claude`:
+Recommended for teams that want centralized OpenCaw updates while pinning each host repository to a reviewed revision:
 
 ```bash
 git submodule add https://github.com/<your-org>/OpenCaw .codex
 git submodule update --init --recursive
 ```
 
-or
-
-```bash
-git submodule add https://github.com/<your-org>/OpenCaw .cursor
-```
-
-or
-
-```bash
-git submodule add https://github.com/<your-org>/OpenCaw .claude
-```
-
-Update at anytime:
+Update later when your team is ready:
 
 ```bash
 git submodule update --remote
 ```
 
----
+Equivalent mount examples:
 
-## Option 2 — Clone (Independent Copy)
+```bash
+git submodule add https://github.com/<your-org>/OpenCaw .cursor
+git submodule add https://github.com/<your-org>/OpenCaw .claude
+```
 
-If a repository needs a customized version of OpenCaw, it can be cloned instead.
+## Option 2 — Clone
+
+Use a direct clone when the host repository needs an independent, customized copy:
 
 ```bash
 git clone https://github.com/<your-org>/OpenCaw .codex
 ```
 
-or
+Equivalent mount examples:
 
 ```bash
 git clone https://github.com/<your-org>/OpenCaw .cursor
-```
-
-or
-
-```bash
 git clone https://github.com/<your-org>/OpenCaw .claude
 ```
 
-This allows you to modify instructions without affecting the upstream repository.
+## Start the First Session
 
-# Examples
-
-OpenCaw should auto load in most sessions once the host bootstrap is present in root `AGENTS.md`. If needed, you can still force activation by saying:
+Most compatible agents automatically discover the mounted `AGENTS.md` baseline or the host bootstrap that points to it. If discovery has not happened yet, use a natural request:
 
 ```text
-Read AGENTS.md instructions
+Read the OpenCaw AGENTS.md instructions, initialize the repository-local .ai scaffold, and explain what project context is available before we start.
 ```
 
- These are some examples in how to use OpenCaw after it's been installed, and activated.
+After initialization, begin with the work itself:
 
 ```text
-use role security-engineer + sre and review this repository for vulnerabilities and recommend fixes
+I want to improve the onboarding flow. First help me understand the current implementation and create a safe plan. Do not edit yet.
+```
+
+---
+
+# Technical Reference
+
+The rest of this README describes the machinery behind the conversational experience. You do not need to invoke each layer manually; this section exists for teams that want to inspect, extend, or govern the system.
+
+## Runtime Model
+
+| Layer | Responsibility | User relationship |
+| --- | --- | --- |
+| Natural-language request | Outcome, constraints, corrections, authorization, and definition of done | Primary interface |
+| `AGENTS.md` baseline | Startup, planning, safety, task, memory, verification, and delivery policy | Loaded by the agent |
+| Project contracts | Repository architecture, visual language, media policy, and local rules | Created or consulted when relevant |
+| Roles | Named specialist perspective and priorities | Optional precision control |
+| Skills | Reusable reasoning and workflow instructions | Selected automatically when relevant or explicitly requested |
+| Commands | Deterministic scripts for repeatable execution | Run by the agent or directly by developers |
+| Task and issue state | Ordered work, detailed scope, and GitHub traceability | Maintained during real tasks |
+| Memory and repository map | Durable facts and semantic repository structure | Queried selectively before broad searches |
+| Verification evidence | Tests, logs, browser artifacts, and PR QA comments | Required before completion |
+
+Roles, skills, and commands deepen control, but baseline OpenCaw behavior works without explicitly naming any of them.
+
+## Session Startup and Context Resolution
+
+At session start, OpenCaw follows a memory-first sequence:
+
+1. Resolve the actual project root and mounted baseline with `commands/resolve-opencaw-paths.sh`.
+2. Create the repository-local `.ai` scaffold when required.
+3. Load all of `.ai/SYSTEM_MEMORY.md`.
+4. Review project rules, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, and open issues when present.
+5. Infer relevant memory tags and query ranked context before broad raw searches.
+6. Check the semantic repository-map fingerprint and refresh stale structure when necessary.
+7. Plan and execute the current request using the narrowest safe scope.
+
+The resolver accepts an explicit `OPENCAW_PROJECT_ROOT`, a Git root associated with the host, or the parent of a recognized `.codex`, `.cursor`, or `.claude` mount. It fails closed when the project boundary is ambiguous.
+
+## Repository Layering
+
+OpenCaw separates reusable baseline behavior from host-project state.
+
+### Shared mounted baseline
+
+```text
+<project-root>/.codex/    # or .cursor/ or .claude/
+├── AGENTS.md
+├── .architecture/
+├── .roles/
+├── .styles/
+├── skills/
+├── commands/
+├── assets/
+└── tests/
+```
+
+### Repository-local project state
+
+```text
+<project-root>/
+├── AGENTS.md
+├── ARCHITECTURE.md
+├── STYLE.md
+├── MEDIA.md                 # optional
+└── .ai/
+    ├── SYSTEM_MEMORY.md
+    ├── MEMORY.md
+    ├── REPO_MAP.md
+    ├── RULES.md
+    ├── DEBUG.md
+    ├── CONTEXT_SUMMARY.md
+    ├── tasks/
+    ├── goals/
+    ├── archive/
+    └── reports/
+```
+
+Project-specific learned state belongs under the host repository's `.ai/` directory, never inside the reusable mounted baseline unless the user explicitly asks to modify the baseline itself.
+
+## Architecture, Style, and Media Contracts
+
+OpenCaw uses concise host-level contracts so agents do not have to rediscover foundational decisions during every task.
+
+| Contract | Host file | Template source | Purpose |
+| --- | --- | --- | --- |
+| Architecture | `ARCHITECTURE.md` | `.architecture/` | Technology, boundaries, data, deployment, and engineering conventions |
+| Visual style | `STYLE.md` | `.styles/*.md` | Visual language, UI/art constraints, asset direction, and review criteria |
+| Generative media | `MEDIA.md` | `.styles/.gpu/` | Backend selection, capability, provenance, staging, budgets, and promotion policy |
+
+When a required architecture or style contract is missing, OpenCaw asks which templates apply and supports composing more than one. Default generation uses concise read directives rather than copying entire templates into the host file. Inline generation is opt-in.
+
+### Architecture frameworks
+
+Common templates include:
+
+- `.NET`, .NET Aspire, MAUI, Node.js, Python, Next.js, SPA, React, Angular, and Vue
+- Playwright, SignalR/WebSockets, embedded firmware, and Solidity
+- MSSQL, MySQL, PostgreSQL, SQLite, Cosmos DB, Azure Storage Tables, and Databricks
+- Microservices, event-driven systems, Terraform, Kubernetes, Helm, GitHub Actions, and Azure DevOps
+- Azure-specific infrastructure and application guidance
+
+Templates live in `.architecture/`; language and tool alignment guidance lives in `.architecture/LANGUAGE_SUPPORT.md`.
+
+Generate a host contract with:
+
+```bash
+./commands/generate-architecture.sh "DOTNET" "POSTGRESDB"
+```
+
+### Style contracts
+
+Style templates live in `.styles/` and cover web experiences, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions.
+
+Generate and validate a host style contract with:
+
+```bash
+./commands/generate-style.sh "WEB_LIGHT_PAPER"
+./commands/validate-style-contract.sh
+```
+
+The complete style catalog is indexed in `.styles/INDEX.md`.
+
+## Roles
+
+Roles are optional named perspectives. Use one when you want a specific specialist lens, not because OpenCaw requires a role to work.
+
+Role definitions live at:
+
+```text
+.roles/<domain>/<role-name>/ROLE.md
+```
+
+Current catalogs include computer-science and arts roles. Browse names, domains, and aliases in `.roles/INDEX.md`.
+
+Role references may be:
+
+- an exact name: `backend-architect`
+- an alias: `security`
+- a domain-qualified ID: `computer-science/backend-architect`
+
+Examples:
+
+```text
+Use role backend-architect and review the service boundaries.
 ```
 
 ```text
-use role qa-engineer and generate full test coverage for the current feature including edge cases
+Act as security + sre. Find exploit paths and operational failure modes.
 ```
+
+If an unqualified name or alias is ambiguous across domains, OpenCaw asks for the domain-qualified role. Exact role-name matches take precedence over aliases.
+
+### Multi-role composition
+
+Roles compose in the order requested:
 
 ```text
-use role devops-automator and create a CI/CD pipeline as a github action for gcp with build, test, and deploy stages for this repository
+Use roles frontend-developer + qa-engineer.
 ```
+
+The first role is the primary perspective by default. Later roles add specialist constraints and review lenses. When guidance conflicts, the stricter or safer interpretation wins unless the user sets a different priority.
+
+Deterministic resolution:
+
+```bash
+./commands/resolve-role.sh "security"
+```
+
+## Role, Skill, and Command Bindings
+
+Role casting can influence more than tone. OpenCaw maintains default bindings between roles, reusable skills, and preferred commands:
 
 ```text
-use role fullstack-engineer and build a calculator app with a simple UI, basic arithmetic operations, tests, task tracking, architecture generation if missing, and final verification
+.roles/ROLE_SKILL_MAP.json
+.roles/ROLE_SKILL_MAP.md
 ```
+
+The JSON file is canonical. The Markdown map is generated deterministically and validated for drift.
+
+Examples of role bias:
+
+- `backend-architect` emphasizes service boundaries, architecture review, and dependency decisions.
+- `frontend-developer` emphasizes component structure, accessibility, rendering, and browser evidence.
+- `security-engineer` emphasizes threat modeling, vulnerability review, and least privilege.
+- `sre` emphasizes resilience, observability, performance, and incident evidence.
+- `art-director` emphasizes visual language, asset consistency, production constraints, and specialist art routing.
+- `gameplay-engineer` emphasizes deterministic runtime systems, production tools, optimization, and playtesting.
+
+Generate and validate the binding map with:
+
+```bash
+./commands/generate-role-skill-map.sh
+./commands/validate-role-skill-map.sh
+```
+
+## Skills
+
+Skills are focused, reusable workflows stored at:
 
 ```text
-use role art-director and create a reusable art bible for this game, including visual language, asset categories, style constraints, specialist skill routing, and validation checks
+skills/<skill-name>/SKILL.md
 ```
+
+Each skill includes matching interface metadata at `skills/<skill-name>/agents/openai.yaml`. Skills define when a workflow applies, what steps to follow, what output to produce, and what safety boundaries to preserve.
+
+The agent selects a skill automatically when the request clearly matches its purpose. Explicit invocation remains available:
 
 ```text
-use 4 agents with project-manager + fullstack-engineer + qa-engineer to split the checkout refactor into safe parallel lanes, then integrate and verify the result
+Use the clean-context skill after this work is fully verified.
 ```
+
+or, where the host interface supports named skill syntax:
 
 ```text
-goal: modernize the reporting module across these five tasks. Automatically raise each task PR after validation, run post-PR QA, then continue to the next task. Do not merge PRs automatically.
+$clean-context
 ```
+
+### Common skills
+
+| Area | Examples | Purpose |
+| --- | --- | --- |
+| Planning and governance | `create-task-file`, `manage-task-issues`, `pr-readiness-gate`, `post-pr-qa` | Track work, preserve authorization boundaries, and publish evidence |
+| Context | `maintain-memory`, `maintain-repository-map`, `clean-context` | Retrieve and preserve durable high-signal project knowledge |
+| Parallel work | `orchestrate-subagents` | Create safe role-resolved lanes and integrate their evidence |
+| Goal delivery | `goal-flow` | Manage explicit multi-task PR and post-PR-QA automation |
+| Build and test | `solution-build`, `test-dotnet` | Restore, build, test, and report repository results |
+| Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
+| Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
+| Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate reproducible media |
+| Art and experience | `tcg-art-direction` and specialist web/game/art skills | Produce original, implementation-ready direction and evidence |
+
+See `skills/INDEX.md` for the complete catalog.
+
+## Commands
+
+Commands are deterministic scripts used underneath conversational workflows or directly by developers:
 
 ```text
-work on #123 and implement the fix with tests and verification evidence
+commands/*.sh
+commands/*.ps1
 ```
 
-## What happens?
+You can ask naturally:
 
-OpenCaw deterministically resolves your prompt into:
+```text
+Run the full OpenCaw validation and summarize any failures.
+```
 
-1. **Roles activated** -> sets perspective and priorities
-2. **Skills selected** -> plans and reasons about the work
-3. **Tasks + issues created/updated** -> `.ai/tasks/TODO.md` + `.ai/tasks/<task>/TASK.md` + `.ai/tasks/OPEN_ISSUES.md`
-4. **Sub-agent lanes planned when useful** -> `.ai/tasks/<task>/SUBAGENTS.md` captures parallel lanes, roles, ownership, and verification
-5. **Goal flow selected when explicit** -> `.ai/goals/<goal>/GOAL.md` governs automatic task-to-PR-to-QA progression
-6. **Architecture ensured** -> generates `ARCHITECTURE.md` if missing
-7. **Commands executed** -> builds, tests, scans, or deploys
-8. **Verification performed** -> tests/logs prove correctness
-9. **Memory updated** -> `.ai/` captures reusable lessons
+Or run the command directly:
 
-To be more specific it will:
+```bash
+./commands/validate-opencaw.sh
+```
 
-1. activate the `fullstack-engineer` role
-2. check whether `ARCHITECTURE.md` exists
-3. if missing, ask which architecture templates apply
-4. generate `ARCHITECTURE.md`
-5. update `.ai/tasks/TODO.md` with an ordered checklist
-6. create or import a task file such as:
-   - `.ai/tasks/create-calculator-app/TASK.md`
-7. create/link a matching GitHub issue, or import an existing one from a prompt like `Work on #123`, and add the URL to `.ai/tasks/OPEN_ISSUES.md`
-8. if the prompt requests multiple agents/developers/workers, or the task has safe natural parallelism, create a lane plan such as:
-   - `.ai/tasks/create-calculator-app/SUBAGENTS.md`
-9. validate that each lane has a resolved role, safe ownership boundaries, dependencies, expected output, and verification path
-10. apply appropriate skills such as:
-   - `create-task-file`
-   - `manage-task-issues`
-   - `orchestrate-subagents`
-   - `generate-architecture`
-   - `solution-build`
-   - `test-dotnet`
-11. use appropriate commands based on the stack, such as:
-   - `./commands/dotnet-restore.sh`
-   - `./commands/dotnet-build.sh`
-   - `./commands/dotnet-test.sh`
-   - `./commands/create-subagent-plan.sh` and `./commands/validate-subagent-plan.sh` for parallel lane planning
-   - `./commands/comment-issue-test-results.sh` for task issue QA evidence
-12. implement the application, using sub-agents only for lanes that can run safely in parallel
-13. record sub-agent lane results when a task-backed `SUBAGENTS.md` exists
-14. run validation and verification before completion
-15. create a PR readiness report and ask the user whether they are ready for the branch to be pushed and a PR opened
-16. if explicit goal flow is active, use `./commands/pr-readiness-check.sh --goal` and automatically push/open the task PR without asking for PR readiness confirmation
-17. otherwise, only after user approval, push/open the PR with GitHub tools in priority order: `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
-18. associate the PR with the task issue (`Closes #<issue-number>`)
-19. immediately run post-PR QA once the PR is confirmed available
-20. post QA/Playwright evidence as a GitHub PR comment, including inline screenshot URLs when screenshots are part of the proof
-21. in goal flow, move to the next task only after post-PR QA completes successfully
-22. when a later goal task depends on a previous unmerged task or risks conflicts, branch from the previous task branch or PR head and record the dependency
-23. at goal completion, generate a report with PR links in approval order, branch dependencies, QA evidence, and conflict-risk notes for human approval
-24. notify the user that the PR is ready for review and the agent can move to the next task if any remain
-25. update memory files if durable lessons are discovered
+### Common command groups
 
-This is the intended OpenCaw experience:
+| Group | Commands |
+| --- | --- |
+| Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Architecture and style | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh` |
+| Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
+| Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
+| Goal flow | `create-goal-file.sh`, `create-goal-completion-report.sh` |
+| PR delivery | `pr-readiness-check.sh`, `link-pr-to-task-issue.sh`, `comment-pr-qa-results.sh`, `comment-issue-test-results.sh` |
+| Memory | `append-system-memory.sh`, `append-project-memory.sh`, `query-project-context.sh`, `purge-project-memory.sh`, `migrate-memory-v2.sh`, `clean-context.sh` |
+| Repository map | `repo-map-status.sh` |
+| .NET | `dotnet-restore.sh`, `dotnet-build.sh`, `dotnet-test.sh` |
+| Browser QA | `playwright-install.sh`, `playwright-test.sh`, `playwright-capture-page.sh`, `playwright-report-summary.sh`, `playwright-artifact-index.sh` |
+| Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
+| Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
+| Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
+| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
 
-- The user gives one high-level prompt
-- OpenCaw resolves the role
-- OpenCaw selects the right skills
-- OpenCaw uses the right commands
-- OpenCaw creates task structure and verification flow
-- OpenCaw completes the work in a governed, repeatable way
+Commands should remain deterministic, reviewable, platform-safe, and non-self-installing unless an installation action is explicitly authorized.
 
-The detailed example below shows the same work broken down step by step for users who want to see the full workflow explicitly.
+## Sub-Agent Orchestration
+
+OpenCaw supports parallel work when the user requests multiple agents or when the applicable project policy explicitly permits safe parallel lanes.
+
+Natural request:
+
+```text
+This feature has independent API, UI, and QA work. Split it into safe parallel lanes, keep file ownership separate, then integrate and verify from the main lane.
+```
+
+Count-constrained request:
+
+```text
+Use up to 4 agents. Do not invent work just to fill every slot, and reserve final integration for the main agent.
+```
+
+For substantial task-backed work, the durable lane plan lives at:
+
+```text
+.ai/tasks/<task-name>/SUBAGENTS.md
+```
+
+It records:
+
+- requested and effective capacity
+- lane IDs and resolved OpenCaw roles
+- explorer, worker, or default agent type
+- scope and non-overlapping write sets
+- dependencies and integration order
+- expected outputs and verification
+- completed lane evidence and conflict risks
+
+The main agent remains responsible for orchestration, critical-path blockers, integration, final verification, and user communication.
+
+Helper commands:
+
+```bash
+./commands/create-subagent-plan.sh "<task_name>" "<agent_count>" --dry-run
+./commands/validate-subagent-plan.sh "<task_name>"
+./commands/record-subagent-result.sh "<task_name>" "<lane_id>" "<status>" "<summary_file>"
+```
+
+Parallelism is reduced when lanes would overlap, roles are unresolved, verification is unclear, or coordination would cost more than the work.
+
+## Goal Flow
+
+A goal is an explicitly authorized automated multi-task delivery flow. It is not the ordinary `## Goal` heading inside a task file.
+
+Natural activation:
+
+```text
+Use goal flow for the onboarding modernization. Complete each planned task, raise its PR after validation, run post-PR QA, and stop if any task or QA check fails. Never merge automatically.
+```
+
+Normal task flow:
+
+- work may be planned and implemented autonomously within scope
+- publishing waits for human PR readiness confirmation
+- post-PR QA runs after the PR exists
+
+Goal flow:
+
+- local planning, implementation, and validation remain mandatory
+- each completed task may be pushed and opened as a PR automatically
+- post-PR QA must pass before the next task begins
+- dependent tasks can form an explicit branch chain
+- failures, conflicts, ambiguity, or uncovered product/security decisions stop automation
+- auto-merge, merge approval, and enabling auto-merge remain prohibited
+
+Goal state lives at:
+
+```text
+.ai/goals/<goal-name>/GOAL.md
+```
+
+Create a goal artifact with:
+
+```bash
+./commands/create-goal-file.sh "<goal_name>" "<Goal Title>"
+```
+
+At completion, generate the human approval packet:
+
+```bash
+./commands/create-goal-completion-report.sh "<goal_name>"
+```
+
+The report includes PR links in approval order, branch dependencies, QA evidence, and merge-conflict risk notes.
+
+## Task, Issue, and PR Delivery
+
+Real work is tracked under:
+
+```text
+.ai/tasks/TODO.md
+.ai/tasks/<task-name>/TASK.md
+.ai/tasks/OPEN_ISSUES.md
+```
+
+Rules:
+
+- `TODO.md` is the concise ordered checklist.
+- Each substantial task has a detailed `TASK.md`.
+- Each real task links to a GitHub issue while that issue is open.
+- `OPEN_ISSUES.md` stores only open issue URLs, one per line.
+- Existing issues can be imported from `#123`, `123`, or a full GitHub issue URL.
+- Closed issue URLs are removed from active tracking.
+
+Issue-first request:
+
+```text
+Work on #123. Import it, implement the fix, and keep verification evidence linked to the issue and PR.
+```
+
+Import directly with:
+
+```bash
+./commands/import-task-from-issue.sh "#123"
+```
+
+### Normal PR readiness gate
+
+Completing implementation does not automatically authorize publication. Before a normal push or PR, OpenCaw:
+
+1. summarizes the completed scope
+2. reports validation evidence and remaining risk
+3. creates a durable readiness report
+4. asks the user whether the branch is ready to publish
+
+After explicit approval, it commits intentionally, pushes the branch, opens a linked PR, and starts post-PR QA immediately.
+
+PRs for task-backed work include issue linkage such as `Closes #123`. QA results are posted primarily to the PR, with issue links or mirrored evidence when useful. Screenshots are included inline when they are part of browser or visual proof.
+
+## Memory v2
+
+OpenCaw keeps all memory and context inside the resolved host repository:
+
+```text
+.ai/SYSTEM_MEMORY.md
+.ai/MEMORY.md
+.ai/REPO_MAP.md
+.ai/RULES.md
+.ai/DEBUG.md
+.ai/CONTEXT_SUMMARY.md
+```
+
+### Memory layers
+
+| File | Purpose |
+| --- | --- |
+| `SYSTEM_MEMORY.md` | Small, flat, always-loaded protected constraints and verified safe machine capabilities |
+| `MEMORY.md` | Tagged project knowledge loaded selectively by relevance |
+| `REPO_MAP.md` | Tagged semantic repository structure with a Git-visible path fingerprint |
+| `RULES.md` | Project-specific preventive rules and conventions |
+| `DEBUG.md` | Reusable debugging evidence and verified resolutions |
+| `CONTEXT_SUMMARY.md` | Refreshed high-signal inventory of active state and tags |
+
+Project-memory entries use tags such as:
+
+```text
+- [kind:workflow] [area:auth] [tech:dotnet] Run focused authentication tests before the full suite.
+```
+
+Each entry has exactly one `kind:` tag and at least one relevance tag such as `area:`, `tech:`, `env:`, `topic:`, or `scope:core`.
+
+Useful commands:
+
+```bash
+./commands/query-project-context.sh --list-tags
+./commands/query-project-context.sh --tags "area:auth,tech:dotnet"
+./commands/append-project-memory.sh --tags "kind:workflow,area:auth" --entry "Run the focused authentication tests first."
+./commands/repo-map-status.sh
+./commands/clean-context.sh --dry-run
+```
+
+OpenCaw proactively records only verified, stable, reusable facts. It does not store secrets, identities, personal paths, guesses, raw logs, or transient task chatter. Replacement and purge workflows archive prior knowledge before removing it.
+
+## Generative Media
+
+OpenCaw supports governed image, music, sound-effect, ambience, and voice workflows while keeping `STYLE.md` authoritative for visual language.
+
+All bundled generative-media assets live under:
+
+```text
+.styles/.gpu/
+├── INDEX.md
+├── CLOUD_SESSION.md
+├── COMFYUI_LOCAL.md
+├── media-generation-manifest.schema.json
+├── model-packs.json
+└── toolchain.json
+```
+
+The legacy `.media/` directory is prohibited.
+
+Backend choices:
+
+- `CLOUD_SESSION` uses compatible image or audio capabilities exposed by the active assistant session.
+- `COMFYUI_LOCAL` uses a pinned, loopback-only ComfyUI toolchain with reviewed model/workflow manifests.
+
+Generate a host contract:
+
+```bash
+./commands/generate-media-contract.sh CLOUD_SESSION
+./commands/generate-media-contract.sh CLOUD_SESSION COMFYUI_LOCAL
+```
+
+Media guardrails include:
+
+- explicit backend selection and no silent fallback
+- per-modality capability inspection
+- revision-pinned tool and model sources
+- license, credential, disk, VRAM, and checksum gates
+- non-runtime staging before human review
+- reproducibility and provenance manifests
+- hashed outputs and workflow receipts
+- explicit acceptance, rejection, and promotion state
+
+Local commands:
+
+```bash
+./commands/inspect-local-media-host.sh --json
+./commands/install-comfyui-local.sh --help
+./commands/install-comfyui-models.sh --help
+./commands/run-comfyui-workflow.sh --help
+./commands/validate-media-generation-manifest.sh --help
+```
+
+## Validation
+
+OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Windows bootstrap behavior, and generative-media assets.
+
+Run the complete suite:
+
+```bash
+./commands/validate-opencaw.sh
+```
+
+Common focused validators:
+
+```bash
+./commands/validate-roles.sh
+./commands/validate-skills.sh
+./commands/validate-commands.sh
+./commands/validate-skill-safety.sh
+./commands/validate-role-skill-map.sh
+./commands/validate-styles.sh
+./commands/validate-media-templates.sh
+./commands/validate-readme.sh
+./commands/validate-memory.sh
+```
+
+The integrated suite verifies, among other things:
+
+- role and skill schema compliance
+- matching skill interface metadata
+- unsafe paths, credentials, links, hidden mutations, and publishing behavior
+- complete domain-qualified role mappings
+- agreement between canonical JSON and generated role-map Markdown
+- command syntax and executable requirements
+- style catalog and contract structure
+- pinned media toolchains, model packs, workflows, checksums, and manifests
+- Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
+- Windows provider classification and explicit-install behavior
+
+Verification for host-project work remains proportional to the task: targeted tests first, broader suites when risk warrants them, and browser/log/artifact evidence where behavior cannot be proven by unit tests alone.
+
+## Repository Layout
+
+```text
+OpenCaw/
+├── AGENTS.md                         # shared behavior contract
+├── README.md
+├── ARCHITECTURE.md                   # architecture contract for this repository
+├── STYLE.md                          # visual-style contract for this repository
+├── .architecture/                    # reusable architecture templates
+├── .roles/                           # domain roles, aliases, and capability maps
+├── .styles/                          # style templates
+│   └── .gpu/                         # all generative-media assets
+├── skills/                           # reusable reasoning workflows
+├── commands/                         # deterministic scripts
+├── assets/                           # reusable test/report assets
+├── tests/                            # OpenCaw validation suites and fixtures
+└── .ai/                              # repository-local memory, tasks, goals, and evidence
+```
+
+Bundled Playwright assets include configuration, package-script, report, and CLI-reference templates under `assets/playwright/` and `assets/playwright-cli/`. Host repositories continue to own their actual application tests, credentials, runtime artifacts, and generated reports.
+
+---
 
 # Contributing
 
-Contributions to OpenCaw are welcome.
+Contributions are welcome.
 
-Typical workflow:
+Typical flow:
 
-1. Fork the repository
-2. Create a feature branch
-3. Implement your improvement
-4. Submit a pull request
+1. Fork the repository.
+2. Create a focused branch.
+3. Implement the improvement.
+4. Run the relevant focused checks and `./commands/validate-opencaw.sh`.
+5. Review the diff and readiness evidence.
+6. Push and open a linked pull request after the required human confirmation.
+7. Run post-PR QA and attach the evidence to the PR.
 
 Example:
 
@@ -283,770 +984,22 @@ git checkout -b feature/add-architecture-framework
 After making changes:
 
 ```bash
-git add .
-git commit -m "Add new architecture framework"
+./commands/validate-opencaw.sh
+git add <intended-files>
+git commit -m "feat(architecture): add framework"
 ```
-
-Before pushing or opening a pull request, stop and confirm the branch is ready for human review. After confirmation, prefer `gh` for GitHub PR work, fall back to an available `github` CLI/wrapper, and use GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable. Once the PR is available, run QA and post the result as a GitHub PR comment.
 
 When contributing:
 
-- Keep architecture frameworks **enterprise-ready**
-- Maintain **clear documentation**
-- Follow existing file structure and conventions
-
----
-# Architecture Frameworks
-
-OpenCaw supports multi-architecture repositories.  
-
-Frameworks are located in:
-
-```
-.architecture/
-```
-
-These frameworks allow AI agents to generate a unified `ARCHITECTURE.md` file for a repository by combining multiple architecture standards.
-
-By default, generation is read-reference based so `ARCHITECTURE.md` stays concise and contains directives such as `Read \`./<mount>/.architecture/DOTNET.md\` instructions`. Use inline generation only when full embedded content is explicitly required.
-
-Example supported frameworks include:
-
-- DOTNET
-- DOTNET_ASPIRE
-- NODE
-- MAUI
-- EMBEDDED_FIRMWARE
-- PYTHON
-- PLAYWRIGHT
-- NEXTJS
-- SPA
-- REACT
-- ANGULAR
-- VUE
-- AZURE
-- SIGNALR_WEBSOCKETS
-- MSSQL
-- MYSQL
-- POSTGRESDB
-- SQLITE
-- COSMOSDB
-- AZURE_STORAGE_TABLES
-- DATABRICKS
-- TERRAFORM
-- KUBERNETES
-- HELM
-- MICROSERVICES
-- EVENT_DRIVEN
-- SOLIDITY
-- GITHUB_ACTIONS
-- AZURE_DEVOPS
-
-Language/tool alignment guidance is documented in:
-
-```
-.architecture/LANGUAGE_SUPPORT.md
-```
-
-Agents will ask which architectures apply if `ARCHITECTURE.md` does not exist and generate it automatically.
-
----
-
-# Roles
-
-OpenCaw includes a library of engineering roles in:
-
-```text
-.roles/
-```
-
-Each role is stored as:
-
-```text
-.roles/<domain>/<role-name>/ROLE.md
-```
-
-Current role catalogs:
-
-```text
-.roles/computer-science/<role-name>/ROLE.md
-.roles/arts/<role-name>/ROLE.md
-```
-
-To browse available roles, categories, and aliases, see:
-
-```text
-.roles/INDEX.md
-```
-
-## Role activation
-
-To activate a role, the user can request a matching role name or a common alias.
-
-Role references may be:
-- unqualified role name, for example `backend-architect`
-- alias from `.roles/INDEX.md`, for example `security`
-- domain-qualified role id, for example `computer-science/backend-architect`
-
-Examples:
-
-- `use role backend-architect`
-- `use role security`
-- `act as sre`
-
-Resolution behavior:
-- If an unqualified role name or alias maps to exactly one role across all domains, activate it directly.
-- If an unqualified role name or alias maps to multiple roles across domains, prompt the user to choose a domain-qualified role before continuing.
-- If both an exact role-name match and alias match exist, exact role-name match wins.
-- If no matching role exists, continue with baseline behavior.
-
-Deterministic helper command:
-
-```text
-./commands/resolve-role.sh "<role-name|alias|domain/role-name>"
-```
-
-## Multi-role composition
-
-OpenCaw also supports combining roles in one session.
-
-Examples:
-
-- `use role backend-architect + security-engineer`
-- `use roles frontend-developer + qa-engineer`
-
-When multiple roles are requested:
-- the first role acts as the primary perspective by default
-- later roles add specialist constraints, review lenses, or guidance
-- stricter or safer guidance should win when roles conflict, unless the user says otherwise
-
----
-
-# Role-Skill Bindings
-
-OpenCaw includes default bindings between common engineering roles, reusable skills, and preferred commands.
-
-See:
-
-```text
-.roles/ROLE_SKILL_MAP.json
-.roles/ROLE_SKILL_MAP.md
-```
-
-The JSON file is canonical. It contains one explicit domain-qualified mapping for every role. The Markdown file is generated deterministically with `./commands/generate-role-skill-map.sh` and validated for drift.
-
-These mappings allow role casting to do more than change tone or perspective.
-
-When a role is activated, OpenCaw should:
-
-- prioritize the skills associated with that role
-- prefer commands associated with that role
-- apply shared skills such as planning, debugging, review, refactoring, and verification
-- bias reasoning toward the role's domain expertise
-- resolve bindings through the role's domain-qualified identifier
-
-Examples:
-
-- `backend-architect` → architecture review, service boundaries, dependency audits
-- `frontend-developer` → components, feature modules, rendering, accessibility
-- `fullstack-engineer` → end-to-end feature delivery, API/UI integration, full-flow verification
-- `security-engineer` → threat modeling, security audits, dependency vulnerability review
-- `sre` → incident analysis, resilience design, performance review
-- `art-director` → general game art bible, visual language, production constraints, and routing to specialist art skills when a specific game format is requested
-- `web-experience-designer` → original web direction, hierarchy, accessible motion, references, and implementation evidence
-- `gameplay-engineer` → deterministic runtime systems, production tools, optimization, playtesting, and release evidence
-
-Multi-role sessions should merge bindings in the same order as the requested roles.
-
----
-
-# Sub-Agent Orchestration
-
-OpenCaw supports a portable sub-agent flow for complex tasks that have safe parallel work. The flow is centered on the `computer-science/project-manager` role and the `orchestrate-subagents` skill.
-
-Use sub-agents when:
-
-- the user explicitly requests a number of agents, developers, workers, or parallel lanes
-- the task has independent research, implementation, QA, documentation, or review work
-- each lane can have a clear owner, role, scope, expected output, and verification path
-- implementation lanes can declare non-overlapping write sets
-
-Avoid sub-agents when:
-
-- the next step is a critical-path blocker the main agent needs immediately
-- multiple lanes would edit the same files without an integration strategy
-- the role, scope, output, or verification path is unclear
-- the overhead of coordination is larger than the work itself
-
-## Durable lane artifact
-
-For substantial task-backed work, OpenCaw stores the lane plan in:
-
-```text
-.ai/tasks/<task-name>/SUBAGENTS.md
-```
-
-`SUBAGENTS.md` captures:
-
-- requested and effective capacity
-- lane IDs such as `lane-1`, `lane-2`, and `lane-3`
-- resolved OpenCaw role for each lane
-- agent type: `explorer`, `worker`, or `default`
-- scope and write set
-- dependencies between lanes
-- expected output and verification evidence
-- integration order, conflict risks, and final verification
-- lane results after agents finish
-
-## Planning flow
-
-For complex prompts, the project-manager planning flow is:
-
-1. Identify the requested agent/developer count, if one was provided.
-2. Determine the task's natural parallelism.
-3. Create at most the requested number of active lanes.
-4. Assign each lane a resolved OpenCaw role.
-5. Use `explorer` lanes for read-only investigation and `worker` lanes for implementation.
-6. Require worker lanes to declare disjoint write sets.
-7. Keep the main agent responsible for orchestration, blockers, integration, final verification, and user communication.
-8. Record lane outputs and verification evidence before final handoff.
-
-Helper commands:
-
-```bash
-./commands/create-subagent-plan.sh "<task_name>" ["agent_count"] [--dry-run]
-./commands/validate-subagent-plan.sh "<task_name|path>"
-./commands/record-subagent-result.sh "<task_name>" "<lane_id>" "<status>" "<summary_file>" [--dry-run]
-```
-
-## Best prompts for complex tasks
-
-Good prompts make capacity and ownership expectations explicit:
-
-```text
-use 3 agents with project-manager + backend-architect + qa-engineer to plan and implement #123. Split only safe parallel lanes, keep write sets separate, then integrate and verify.
-```
-
-```text
-use 4 workers for this migration. Have project-manager create the SUBAGENTS.md lane plan first, use specialist roles for each lane, and reserve one lane for QA/review if implementation cannot safely use all four.
-```
-
-```text
-act as project-manager + senior-developer. Break this feature into sub-agent lanes, use explorer agents for investigation, worker agents for non-overlapping patches, and record lane evidence before final verification.
-```
-
-## Best practices
-
-- Ask for a specific agent count only when there is enough work to split cleanly.
-- Prefer fewer high-quality lanes over filling every requested seat.
-- Use specialist roles for specialist lanes, such as `qa-engineer` for verification or `security-engineer` for threat review.
-- Keep each worker lane's write set narrow and explicit.
-- Put cross-cutting or risky changes behind the main agent or a single owner.
-- Validate the lane plan before spawning or assigning work.
-- Integrate lane outputs deliberately, then run the final verification from the main agent.
-
----
-
-# Goals
-
-A **goal** is an explicitly requested automated multi-task delivery flow.
-
-Normal task flow is conservative:
-
-- tasks run one by one unless the project-manager role identifies safe parallel lanes
-- PR creation waits for the human readiness confirmation gate
-- post-PR QA runs after the PR is available
-
-Goal flow is different:
-
-- tasks still require planning, implementation, validation, PR creation, and post-PR QA
-- after each task completes local validation, OpenCaw may automatically raise the task PR
-- post-PR QA still runs immediately after the PR is available
-- the next goal task does not start until post-PR QA completes
-- if a later task depends on earlier unmerged work or is likely to conflict later, OpenCaw should branch from the earlier task branch or PR head and record that chain
-
-Goal flow is the **only** exception to the normal human PR readiness confirmation prompt. It never means auto-merge, merge approval, or auto-merge enablement, and it does not skip QA.
-
-## Activating a goal
-
-Goal flow activates only when the user explicitly requests it, for example:
-
-```text
-goal: finish the onboarding cleanup across the planned tasks, raising each PR automatically after validation and QA before moving on
-```
-
-```text
-use goal flow for this migration plan
-```
-
-Task planning may also mark the mode explicitly:
-
-```text
-Flow: goal
-Goal Flow: enabled
-```
-
-The ordinary `## Goal` section inside a `TASK.md` file does not activate automated goal flow by itself.
-
-## Goal artifact
-
-Goal files live in:
-
-```text
-.ai/goals/<goal-name>/GOAL.md
-```
-
-Create one with:
-
-```bash
-./commands/create-goal-file.sh "<goal_name>" ["Goal Title"] [--dry-run]
-```
-
-Each goal file tracks:
-
-- goal outcome and success criteria
-- ordered task queue
-- current task
-- branch chain for dependent or conflict-prone PRs
-- automation rules
-- PRs raised per task
-- post-PR QA evidence
-- stop conditions and review notes
-- final completion report path and approval order
-
-## Goal flow PR behavior
-
-For each completed goal task:
-
-1. Run local validation.
-2. Generate readiness evidence with `./commands/pr-readiness-check.sh --goal`.
-3. Automatically push/open the PR.
-4. Confirm the PR is available.
-5. Run post-PR QA.
-6. Post QA evidence to the PR.
-7. If the next task depends on this unmerged work or risks conflict, base that next task on this task branch or PR head.
-8. Continue to the next goal task only after post-PR QA completes.
-
-Stop goal automation if validation fails, PR creation fails, post-PR QA fails, a merge conflict blocks progress, role resolution is ambiguous, or a required product/security decision was not already covered by the goal plan.
-
-## Goal completion report
-
-When all goal tasks have completed post-PR QA, generate a completion report:
-
-```bash
-./commands/create-goal-completion-report.sh "<goal_name|goal_dir|goal_file>" [--dry-run]
-```
-
-The report is the human approval packet. It should include:
-
-- PR links in dependency/approval order
-- branch base/head notes for each PR
-- stacked branch dependencies
-- post-PR QA evidence links
-- merge-conflict risk notes
-
-Humans can then approve and merge in order, reducing conflict risk across dependent PRs. Goal flow does not merge the PRs itself.
-
----
-
-# Skills
-
-Skills provide reusable instructions for AI agents to perform structured tasks.
-
-Example skill locations:
-
-```
-skills/
-skills/generate-architecture/
-skills/create-task-file/
-skills/test-dotnet/
-```
-
-The catalog includes governance and evidence, visual research and production, web experience, gameplay, architecture, delivery, data, QA, and art-production workflows. See `skills/INDEX.md` for the complete catalog.
-
-Every skill includes matching interface metadata at:
-
-```text
-skills/<skill-name>/agents/openai.yaml
-```
-
-Its default prompt must reference `$<skill-name>` so selection and invocation remain aligned.
-
-Skills should:
-
-- Define clear intent
-- Provide deterministic instructions
-- Avoid hidden behavior
-
-Web experience style contracts are available under `.styles/`:
-
-- `WEB_LIGHT_PAPER`
-- `WEB_DARK_GLASS`
-- `WEB_TECHNICAL_GRID`
-- `WEB_EDITORIAL`
-- `WEB_SKEUOMORPHIC`
-- `WEB_ATMOSPHERIC`
-
-Papercraft style contracts are also composable:
-
-- `LAYERED_PAPERCRAFT`
-- `PAPER_DIORAMA`
-- `POPUP_STORYBOOK`
-
-Repositories that configure generative image or audio production may add an optional `MEDIA.md`. OpenCaw composes it from the session/cloud and pinned local backend assets in `.styles/.gpu/`; `STYLE.md` remains the visual authority. Backend selection is explicit, outputs stay staged until human review, and generation manifests preserve provenance and reproducibility evidence.
-
----
-
-# Commands
-
-Commands provide reusable CLI workflows for automation tasks.
-
-Examples include:
-
-```
-commands/generate-architecture.sh
-commands/create-task-file.sh
-commands/dotnet-restore.sh
-commands/dotnet-build.sh
-commands/dotnet-test.sh
-commands/security-scan.sh
-commands/clean-context.sh
-commands/audit-agent-source.sh
-commands/playwright-capture-page.sh
-commands/validate-role-skill-map.sh
-commands/generate-media-contract.sh
-commands/inspect-local-media-host.sh
-commands/run-comfyui-workflow.sh
-```
-
-Commands should remain:
-
-- deterministic
-- platform-safe
-- clearly documented
-
-## Bundled Assets
-
-OpenCaw may include reusable assets under:
-
-```text
-assets/
-```
-
-Current testing assets include:
-
-- `assets/playwright/` - Playwright config, package-script, and Azure DevOps starter templates.
-- `assets/playwright/reports/` - Markdown report templates for non-interactive test evidence.
-- `assets/playwright-cli/references/` - Playwright CLI reference notes for discovery workflows.
-
-Host repositories still own real tests, credentials, app-specific artifacts, and generated reports.
-
----
-
-# Validation
-
-OpenCaw includes built-in validation commands for its role, skill, command, style, and generative-media schemas.
-
-Available commands:
-
-```text
-commands/validate-roles.sh
-commands/validate-skills.sh
-commands/validate-commands.sh
-commands/validate-skill-safety.sh
-commands/validate-role-skill-map.sh
-commands/validate-media-templates.sh
-commands/validate-opencaw.sh
-```
-
-Recommended usage:
-
-```bash
-./commands/validate-opencaw.sh
-```
-
-Or run individual checks:
-
-```bash
-./commands/validate-roles.sh
-./commands/validate-skills.sh
-./commands/validate-commands.sh
-./commands/validate-skill-safety.sh
-./commands/validate-role-skill-map.sh
-./commands/validate-media-templates.sh
-```
-
-These validators check:
-
-- `.roles/SCHEMA.md` compliance
-- `skills/SCHEMA.md` compliance
-- `commands/SCHEMA.md` compliance
-- naming conventions
-- required metadata and sections
-- executable shell command requirements
-- one matching `agents/openai.yaml` interface per skill
-- executable, symlink, resource-boundary, personal-path, credential, account-mutation, and publishing safety rules for skills
-- complete domain-qualified role mappings with valid skill and command references
-- deterministic agreement between canonical role-map JSON and generated Markdown
-- pinned generative-media toolchain, model-pack, workflow, checksum, and manifest metadata
-
----
-
-# Task Management
-
-OpenCaw supports structured task tracking using the `.ai/tasks` directory.
-
-```
-.ai/tasks/
-.ai/tasks/TODO.md
-.ai/tasks/<task-name>/TASK.md
-.ai/tasks/OPEN_ISSUES.md
-```
-
-Rules:
-
-- `TODO.md` contains the ordered list of tasks
-- Each task folder contains a detailed `TASK.md`
-- Each substantial task is backed by one GitHub issue
-- Existing GitHub issues can be imported directly with `./commands/import-task-from-issue.sh "<issue-ref>"` where `<issue-ref>` can be `#123`, `123`, or a full issue URL
-- Track only open issue URLs (one per line) in `OPEN_ISSUES.md`
-- Sync and remove closed issue URLs from `.ai/tasks` tracking
-- Agents update progress as tasks are completed
-- Agents ask for human PR readiness approval before pushing or opening a PR
-- PRs for task-backed work should include issue linkage (for example `Closes #123`)
-- GitHub PR operations should prefer `gh`, then an available `github` CLI/wrapper, then GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
-- After a PR is confirmed available, QA should start immediately and post result comments to the PR, including inline screenshot URLs when screenshots are part of the evidence
-- QA/Playwright runs may also post or link result comments to the linked issue for task history
-
----
-
-# AI Memory System
-
-OpenCaw Memory v2 keeps system-like constraints and selectively loaded project knowledge together under the resolved repository's `.ai` directory:
-
-```text
-<project-root>/.ai/SYSTEM_MEMORY.md
-<project-root>/.ai/MEMORY.md
-<project-root>/.ai/REPO_MAP.md
-<project-root>/.ai/RULES.md
-<project-root>/.ai/DEBUG.md
-```
-
-`SYSTEM_MEMORY.md` is a repository-local, flat, always-loaded list for protected safety rules, safe machine capabilities, and repository-wide constraints. Project memory uses namespaced tags such as `[kind:workflow] [area:auth] [tech:dotnet]` and is queried by relevance before raw repository searches. The semantic repository map uses the same tags and a fingerprint of Git-visible project paths to detect structural drift.
-
-Agents proactively record verified durable facts without waiting for a user prompt. Commands reject untagged project entries, credential-shaped values, personal paths, and unsafe system-memory content. Purges and migrations archive source data first.
+- keep changes small enough to review
+- preserve the layering boundary between the shared baseline and host-project `.ai` state
+- keep architecture, role, skill, style, and command schemas valid
+- add regression coverage for workflow fixes
+- avoid hidden dependency installation or external mutations
+- include issue linkage and post-PR QA evidence
 
 ---
 
 # License
 
-OpenCaw is released under the MIT License.
-
-See the `LICENSE` file for full details.
-
-
-
-# Skills & Commands Guide
-
-OpenCaw separates **thinking** from **execution** using:
-
-- **Skills** → reusable reasoning patterns (WHAT to do)
-- **Commands** → deterministic scripts (HOW to do it)
-
----
-
-## Skills
-
-Skills live in:
-
-```
-./skills/<skill-name>/SKILL.md
-```
-
-They are automatically used by the agent when relevant or when a role is active.
-
-### How to use skills
-
-You can explicitly invoke a skill:
-
-```
-use skill create-task-file
-use skill manage-task-issues
-use skill clean-context
-```
-
-Or combine them:
-
-```
-use skill create-task-file + manage-task-issues + test-dotnet
-```
-
-### Common Skills
-
-| Skill | Purpose |
-|------|--------|
-| `create-task-file` | Create a task file and link a matching issue |
-| `goal-flow` | Manage explicit automated goals across task PRs, post-PR QA, branch chaining, and final approval reporting |
-| `manage-task-issues` | Sync and prune open issue tracking |
-| `orchestrate-subagents` | Plan and coordinate parallel sub-agent lanes with OpenCaw roles |
-| `maintain-memory` | Retrieve relevant context and proactively preserve verified durable learnings |
-| `maintain-repository-map` | Keep the semantic repository index current and freshness-checked |
-| `clean-context` | Compact context after substantial work |
-| `pr-readiness-gate` | Require human confirmation before push or PR creation |
-| `post-pr-qa` | Run QA after PR availability and post PR evidence comments |
-| `solution-build` | Build the .NET solution |
-| `test-dotnet` | Run .NET tests for verification |
-| `playwright-e2e-tests` | Design or run Playwright browser verification |
-| `playwright-browser-discovery` | Discover selectors and dynamic browser behavior before test authoring |
-| `playwright-test-refinement` | Diagnose, rerun, and stabilize Playwright tests |
-| `playwright-reporting` | Generate non-interactive Playwright evidence reports |
-| `install-database-cli-tools` | Install or preview database CLI tooling setup |
-| `database-cli-query` | Run database connect/query workflows by engine |
-| `tcg-art-direction` | Plan original TCG/CCG card frames, board styling, tokens, VFX, and IP-safe card-game art direction |
-| `plan-generative-media-pipeline` | Select and govern reproducible cloud/session or local image and audio generation |
-| `use-comfyui-local-generation` | Provision and run pinned loopback-only ComfyUI workflows into staging |
-| `produce-generative-audio` | Produce reviewed music, sound-effect, ambience, and voice candidates |
-| `validate-generated-media` | Verify manifests, hashes, exact coverage, budgets, provenance, and review status |
-
-### Role-Driven Skills
-
-When using roles:
-
-```
-use role backend-architect
-```
-
-Skills are automatically prioritized:
-
-- task tracking
-- verification workflows
-- role-specific command selection
-
----
-
-## Commands
-
-Commands live in:
-
-```
-./commands/*.sh
-```
-
-They are executable scripts used for repeatable workflows.
-
-### How to use commands
-
-Run directly:
-
-```bash
-./commands/validate-opencaw.sh
-```
-
-Or invoke via agent:
-
-```
-run command validate-opencaw
-run command dotnet-build
-```
-
----
-
-## Common Commands
-
-| Command | Purpose |
-|--------|--------|
-| `validate-opencaw.sh` | Validate entire OpenCaw setup |
-| `validate-skill-safety.sh` | Reject unsafe skill structure, metadata, links, credentials, paths, and hidden external mutations |
-| `generate-role-skill-map.sh` | Generate deterministic Markdown from the canonical role capability JSON |
-| `validate-role-skill-map.sh` | Validate complete domain-qualified role mappings and generated Markdown agreement |
-| `audit-agent-source.sh` | Statically audit untrusted agent-facing source without executing it |
-| `build-originality-evidence.sh` | Build local hash and text-similarity evidence without making legal conclusions |
-| `playwright-capture-page.sh` | Capture confined, deterministic browser-page evidence with host-installed Playwright |
-| `render-browser-demo.sh` | Render validated local frame manifests into a browser-demo artifact |
-| `web-performance-report.sh` | Convert measured metrics and host budgets into a Markdown result |
-| `print-web-experience-brief.sh` | Print an implementation-ready web experience brief |
-| `print-gameplay-system-brief.sh` | Print a gameplay-system contract and verification brief |
-| `validate-gameplay-review.sh` | Validate required gameplay review evidence and recommendation sections |
-| `dotnet-restore.sh` | Restore .NET dependencies |
-| `dotnet-build.sh` | Build .NET project |
-| `dotnet-test.sh` | Run tests |
-| `playwright-install.sh` | Install Playwright browsers in a host repository |
-| `playwright-test.sh` | Run Playwright tests with project/grep/headed options |
-| `playwright-show-report.sh` | Generate non-interactive report summaries from Playwright outputs |
-| `playwright-report-summary.sh` | Convert Playwright JSON results into a Markdown run report |
-| `playwright-artifact-index.sh` | Index screenshots, traces, videos, logs, and report artifacts |
-| `playwright-discovery-report.sh` | Summarize `.playwright-cli` discovery snapshots and artifacts |
-| `playwright-evidence-report.sh` | Generate a bundle report linking all Playwright evidence reports |
-| `create-goal-completion-report.sh` | Create the final human approval report for a completed goal |
-| `create-goal-file.sh` | Create a task-backed automated goal file under `.ai/goals` |
-| `create-task-file.sh` | Create a task file and optionally link/create an issue |
-| `create-task-issue.sh` | Create/link a GitHub issue for a task and track its URL |
-| `create-subagent-plan.sh` | Create a task-backed `SUBAGENTS.md` lane plan |
-| `validate-subagent-plan.sh` | Validate sub-agent lane roles, fields, dependencies, and write sets |
-| `record-subagent-result.sh` | Append lane result evidence to `SUBAGENTS.md` |
-| `import-task-from-issue.sh` | Import a task from an existing GitHub issue number/URL and link tracking files |
-| `sync-task-issues.sh` | Remove closed issue URLs from active `.ai/tasks` tracking |
-| `pr-readiness-check.sh` | Create a non-destructive readiness report and required PR approval prompt, or record goal-flow automation with `--goal` |
-| `link-pr-to-task-issue.sh` | Add issue-closing linkage to PR body |
-| `comment-pr-qa-results.sh` | Post QA evidence to a PR comment with inline screenshot URL support |
-| `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
-| `clean-context.sh` | Compress context and refresh high-signal summaries |
-| `resolve-opencaw-paths.sh` | Resolve safe project-local `.ai` memory paths |
-| `install-windows-bash.ps1` | Discover or explicitly install Git Bash/WSL and run the OpenCaw scaffold on Windows |
-| `append-system-memory.sh` | Add a validated repository-local system-memory entry |
-| `append-project-memory.sh` | Add or replace a validated tagged project-memory entry |
-| `query-project-context.sh` | List tags or retrieve ranked relevant memory and repository-map entries |
-| `purge-project-memory.sh` | Preview or archive-and-purge entries by exact tag |
-| `migrate-memory-v2.sh` | Prepare and apply a complete AI-classified legacy-memory migration |
-| `repo-map-status.sh` | Check or stamp semantic repository-map freshness |
-| `validate-memory.sh` | Validate system memory, tagged project memory, and repository map |
-| `security-scan.sh` | Run security checks |
-| `install-database-cli-tools.sh` | Print or execute database CLI install commands |
-| `database-cli-query.sh` | Execute engine-specific database query/connect commands |
-| `print-tcg-art-style-template.sh` | Print a reusable TCG art style brief for cards, boards, tokens, graveyards, and VFX |
-| `generate-media-contract.sh` | Generate an optional provider-neutral host `MEDIA.md` contract |
-| `validate-media-contract.sh` | Validate backend selection, capability, provenance, and promotion policy |
-| `install-comfyui-local.sh` | Dry-run or install the pinned isolated ComfyUI toolchain |
-| `install-comfyui-models.sh` | Preview or install licensed, revision-pinned starter model packs |
-| `inspect-local-media-host.sh` | Inspect local GPU, tools, model packs, and per-modality viability |
-| `run-comfyui-workflow.sh` | Run a local workflow into staging and write a hashed receipt |
-| `validate-media-generation-manifest.sh` | Validate generated-media reproducibility, rights, hashes, budgets, and review |
-
----
-
-## Skill + Command Workflow
-
-Example:
-
-```
-use role code-migrator
-use skill dependency-audit-dotnet
-```
-
-Then:
-
-```bash
-./commands/dotnet-build.sh
-./commands/dotnet-test.sh
-```
-
----
-
-## Best Practices
-
-- Use **skills first** to plan and reason
-- Use **commands second** to execute
-- Combine roles + skills for precision
-- Always verify with commands before completion
-
----
-
-## Mental Model
-
-| Layer | Responsibility |
-|------|--------------|
-| Role | Perspective |
-| Skill | Thinking |
-| Command | Execution |
-
----
+OpenCaw is released under the MIT License. See `LICENSE` for the full terms.

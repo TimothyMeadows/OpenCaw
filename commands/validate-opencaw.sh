@@ -9,6 +9,7 @@ set -euo pipefail
 ./commands/validate-role-language-alignment.sh
 ./commands/validate-cloud-preferences.sh
 ./commands/validate-media-templates.sh
+./commands/validate-readme.sh
 ./tests/test-memory-system.sh
 ./tests/test-windows-bash-bootstrap.sh
 

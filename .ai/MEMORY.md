@@ -10,3 +10,4 @@
 - [kind:architecture] [area:media] Keep all generative-media templates, schemas, indexes, pinned toolchains, and reviewed model packs under .styles/.gpu/; the legacy .media/ directory must not exist.
 - [kind:convention] [topic:corrections] [area:media] When a user requests removal of a configuration directory, inventory and relocate every tracked file and update every live reference; do not preserve a conceptual subset unless explicitly requested.
 - [kind:bug] [area:memory] [tech:bash] When a Bash printf format begins with a hyphen, pass -- before the format; commands/append-debug.sh and commands/append-rules.sh require this for reliable context writes.
+- [kind:convention] [topic:corrections] [area:documentation] When explaining OpenCaw to users, lead with ordinary natural-language collaboration and conversational planning; present named roles, skills, and commands afterward as optional precision controls.

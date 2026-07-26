@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: e5879e13dc91a6db9c5303aee32952eca929d877ff505feaabf18e221c454c6c -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: f6e040c8749612cd6eb10917ea696353e0762ecc8dcea195b4bbd3f081f4f868 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:component] [area:commands] [tech:bash] `commands/` contains deterministic executable workflows; `commands/lib/memory-common.sh` centralizes Memory v2 path, schema, safety, archive, and fingerprint behavior.
