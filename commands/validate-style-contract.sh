@@ -16,8 +16,10 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 styles_dir="$opencaw_root/.styles"
 index_file="$styles_dir/INDEX.md"
 style_file="${1:-$host_root/STYLE.md}"

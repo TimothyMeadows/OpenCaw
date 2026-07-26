@@ -40,6 +40,10 @@ if [[ -z "$goal_ref" ]]; then
   exit 1
 fi
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+
 resolve_goal_file() {
   local ref="$1"
 
@@ -53,8 +57,8 @@ resolve_goal_file() {
     return
   fi
 
-  if [[ -f "../.ai/goals/$ref/GOAL.md" ]]; then
-    printf '%s\n' "../.ai/goals/$ref/GOAL.md"
+  if [[ -f "$OPENCAW_PROJECT_AI_DIR/goals/$ref/GOAL.md" ]]; then
+    printf '%s\n' "$OPENCAW_PROJECT_AI_DIR/goals/$ref/GOAL.md"
     return
   fi
 

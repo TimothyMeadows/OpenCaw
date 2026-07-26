@@ -2,8 +2,11 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-todo_file="../.ai/tasks/TODO.md"
-report_dir="../.ai/reports"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+
+todo_file="$OPENCAW_PROJECT_AI_DIR/tasks/TODO.md"
+report_dir="$OPENCAW_PROJECT_AI_DIR/reports"
 dry_run='false'
 
 usage() {
@@ -42,7 +45,7 @@ if [[ -f "$todo_file" ]]; then
   while IFS= read -r line; do
     if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`(\.\./)?\.ai/tasks/([^/]+)/TASK\.md\` ]]; then
       task_name="${BASH_REMATCH[2]}"
-      task_file="../.ai/tasks/$task_name/TASK.md"
+      task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"
 
       if [[ -f "$task_file" ]]; then
         if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
@@ -54,7 +57,7 @@ if [[ -f "$todo_file" ]]; then
           archived_task_count=$((archived_task_count + 1))
           archived_task_names+="- $task_name\n"
         else
-          archive_output="$("${script_dir}/archive-task-context.sh" "$task_name")"
+          archive_output="$(OPENCAW_PROJECT_ROOT="$OPENCAW_PROJECT_ROOT_RESOLVED" "${script_dir}/archive-task-context.sh" "$task_name")"
           if ! printf '%s\n' "$archive_output" | grep -q '^ALREADY_ARCHIVED=true$'; then
             archived_task_count=$((archived_task_count + 1))
             archived_task_names+="- $task_name\n"
@@ -66,6 +69,8 @@ if [[ -f "$todo_file" ]]; then
 fi
 
 memory_merged=0
+system_memory_merged=0
+repo_map_merged=0
 rules_removed=0
 debug_compressed=0
 summary_file='(dry-run)'
@@ -73,7 +78,9 @@ snapshot_dir='(dry-run)'
 
 if [[ "$dry_run" == 'false' ]]; then
   summarize_output="$("${script_dir}/summarize-memory.sh")"
+  system_memory_merged="$(printf '%s\n' "$summarize_output" | awk -F= '/^SYSTEM_MEMORY_DUPLICATES_MERGED=/{print $2; exit}')"
   memory_merged="$(printf '%s\n' "$summarize_output" | awk -F= '/^MEMORY_DUPLICATES_MERGED=/{print $2; exit}')"
+  repo_map_merged="$(printf '%s\n' "$summarize_output" | awk -F= '/^REPO_MAP_DUPLICATES_MERGED=/{print $2; exit}')"
   rules_removed="$(printf '%s\n' "$summarize_output" | awk -F= '/^RULE_DUPLICATES_REMOVED=/{print $2; exit}')"
   debug_compressed="$(printf '%s\n' "$summarize_output" | awk -F= '/^DEBUG_NOTES_COMPRESSED=/{print $2; exit}')"
   summary_file="$(printf '%s\n' "$summarize_output" | awk -F= '/^SUMMARY_FILE=/{print $2; exit}')"
@@ -95,7 +102,9 @@ Generated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
 ${archived_task_names:-- none}
 
 ## Memory Cleanup
+- System-memory entries merged: $system_memory_merged
 - Memory entries merged: $memory_merged
+- Repository-map entries merged: $repo_map_merged
 - Duplicate rules removed: $rules_removed
 - Debug notes compressed: $debug_compressed
 
@@ -108,7 +117,9 @@ EOF
 fi
 
 echo "TASK_FILES_COMPACTED=$archived_task_count"
+echo "SYSTEM_MEMORY_ENTRIES_MERGED=$system_memory_merged"
 echo "MEMORY_ENTRIES_MERGED=$memory_merged"
+echo "REPO_MAP_ENTRIES_MERGED=$repo_map_merged"
 echo "DUPLICATE_RULES_REMOVED=$rules_removed"
 echo "DEBUG_NOTES_COMPRESSED=$debug_compressed"
 echo "CONTEXT_SUMMARY_REFRESHED=$summary_file"
