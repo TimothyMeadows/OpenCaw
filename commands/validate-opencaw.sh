@@ -9,5 +9,6 @@ set -euo pipefail
 ./commands/validate-role-language-alignment.sh
 ./commands/validate-cloud-preferences.sh
 ./tests/test-memory-system.sh
+./tests/test-windows-bash-bootstrap.sh
 
 echo "OpenCaw validation passed."
