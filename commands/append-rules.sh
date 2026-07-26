@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-target="../.ai/RULES.md"
-mkdir -p "../.ai"
-if [[ ! -f "$target" ]]; then
-  printf "# Rules\n\n" > "$target"
-fi
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_ensure_project_files
+target="$OPENCAW_RULES_FILE"
 
 entry="${1:-}"
 if [[ -z "$entry" ]]; then

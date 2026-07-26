@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maintain Repository Map"
+  short_description: "Keep the semantic repository map current"
+  default_prompt: "Use $maintain-repository-map to inspect map freshness and update the semantic project index."

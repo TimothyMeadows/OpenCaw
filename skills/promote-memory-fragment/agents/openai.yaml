@@ -1,4 +1,0 @@
-interface:
-  display_name: "Promote Memory Fragment"
-  short_description: "Help with Promote Memory Fragment tasks"
-  default_prompt: "Use $promote-memory-fragment to complete this OpenCaw workflow with explicit evidence and safety checks."

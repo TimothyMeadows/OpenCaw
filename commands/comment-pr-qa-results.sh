@@ -53,8 +53,10 @@ is_image_ref() {
 }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 summary_text="$(cat "$summary_file")"
 
 repo_root="$host_root"
@@ -128,7 +130,12 @@ $summary_text
 $inline_or_artifact_block
 EOF
 
-"$GH_BIN" pr comment "$pr_ref" --body-file "$comment_file" >/dev/null
+gh_comment_file="$comment_file"
+if [[ "${GH_BIN,,}" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  gh_comment_file="$(wslpath -w "$comment_file")"
+fi
+
+"$GH_BIN" pr comment "$pr_ref" --body-file "$gh_comment_file" >/dev/null
 
 popd >/dev/null
 

@@ -17,8 +17,10 @@ if [[ -z "$task_name" ]]; then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 host_tasks_dir="$host_root/.ai/tasks"
 task_file="$host_tasks_dir/$task_name/TASK.md"
 task_virtual_path=".ai/tasks/$task_name/TASK.md"

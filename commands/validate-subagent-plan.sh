@@ -16,11 +16,13 @@ if [[ -z "$input" || "$input" == "-h" || "$input" == "--help" ]]; then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
 
 if [[ -f "$input" ]]; then
   plan_path="$input"
 else
-  plan_path="../.ai/tasks/$input/SUBAGENTS.md"
+  plan_path="$OPENCAW_PROJECT_AI_DIR/tasks/$input/SUBAGENTS.md"
 fi
 
 if [[ ! -f "$plan_path" ]]; then
