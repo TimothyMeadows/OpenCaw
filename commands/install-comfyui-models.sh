@@ -44,7 +44,7 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 opencaw_root="$(cd "$script_dir/.." && pwd)"
-manifest="$opencaw_root/.media/model-packs.json"
+manifest="$opencaw_root/.styles/.gpu/model-packs.json"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required to read model packs." >&2; exit 1; }
 manifest_for_node="$manifest"

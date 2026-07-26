@@ -43,7 +43,7 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 [[ -n "$node_bin" ]] || { echo "Node.js is required for structured host inspection." >&2; exit 1; }
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 opencaw_root="$(cd "$script_dir/.." && pwd)"
-packs_manifest="$opencaw_root/.media/model-packs.json"
+packs_manifest="$opencaw_root/.styles/.gpu/model-packs.json"
 
 workspace_for_node="$workspace"
 packs_manifest_for_node="$packs_manifest"

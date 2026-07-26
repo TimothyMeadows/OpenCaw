@@ -45,7 +45,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 opencaw_root="$(cd "$script_dir/.." && pwd)"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required to read the toolchain manifest." >&2; exit 1; }
-toolchain_manifest="$opencaw_root/.media/toolchain.json"
+toolchain_manifest="$opencaw_root/.styles/.gpu/toolchain.json"
 if [[ "$node_bin" == *.exe && -n "$(command -v wslpath 2>/dev/null || true)" ]]; then toolchain_manifest="$(wslpath -w "$toolchain_manifest")"; fi
 cli_version="$("$node_bin" -e "const x=require(process.argv[1]); process.stdout.write(x.comfyCli.version)" "$toolchain_manifest")"
 comfy_version="$("$node_bin" -e "const x=require(process.argv[1]); process.stdout.write(x.comfyUI.version)" "$toolchain_manifest")"

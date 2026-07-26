@@ -42,6 +42,14 @@ Available OpenCaw art style templates:
 
 Use one or more of these when generating `../STYLE.md` for a host repository.
 
+## Local GPU Generation Support
+
+Local GPU generation assets are stored under `.styles/.gpu/` but are not selectable art-style templates:
+
+- `.styles/.gpu/COMFYUI_LOCAL.md` defines the loopback-only ComfyUI backend.
+- `.styles/.gpu/toolchain.json` pins the supported local toolchain.
+- `.styles/.gpu/model-packs.json` defines reviewed model and workflow packs.
+
 ## Recommended Starting Points
 
 - Isometric tactics, town builders, ARPGs, and 2.5D exploration: `ISOMETRIC_2_5D`
