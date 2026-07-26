@@ -36,6 +36,8 @@ On Windows without a usable Bash runtime, run the PowerShell bootstrap described
 6. Run `./commands/repo-map-status.sh`. If the map is missing, empty, or stale, use `maintain-repository-map` before relying on it.
 7. If legacy memory is reported, prepare and complete the AI-classified migration before loading untagged entries. Never load legacy memory as a fallback.
 
+Read `../MEDIA.md` only when the current task configures, generates, validates, or promotes image or audio media. Do not load it for unrelated work.
+
 You should send a message to the user that you are an OpenCaw session and ready for usage.
 
 ## Windows Bash bootstrap
@@ -97,6 +99,38 @@ Style templates live in:
 - Ask the user again which style templates apply unless they already named the replacement style set.
 - Regenerate `../STYLE.md` with the same default read-directive mode unless inline output is explicitly requested.
 - Validate the regenerated contract with `./commands/validate-style-contract.sh`.
+
+## Generative media workflow
+
+The optional generative media contract for the host repository is:
+
+- `../MEDIA.md`
+
+Backend templates and pinned local manifests live in:
+
+- `./.media/`
+
+### When `../MEDIA.md` exists
+
+- Read it only for image, music, sound-effect, voice, or media-pipeline work.
+- Treat it as the authority for backend selection, versions, staging, runtime destinations, budgets, rights, consent, provenance, review, and promotion policy.
+- Continue to treat `../STYLE.md` as the authority for visual language.
+
+### When `../MEDIA.md` is missing
+
+- Do not generate it for unrelated tasks.
+- When the user configures a media pipeline, discover capabilities separately for image, music, sound effects, and voice.
+- Treat a compatible session/cloud capability as the default for each modality.
+- Inspect a compatible local backend when one is available. If both local and session/cloud paths are viable, ask the user to choose before generation.
+- Generate the contract with `./commands/generate-media-contract.sh CLOUD_SESSION [COMFYUI_LOCAL]`, then validate it with `./commands/validate-media-contract.sh`.
+
+### Generation and promotion boundaries
+
+- Never switch or fall back between session/cloud and local backends silently. Report a selected-backend failure and request direction.
+- Keep generated outputs in a non-runtime staging location until human review is recorded.
+- Record versioned generation manifests with explicit unavailable markers when a provider does not disclose a model, workflow, parameter, or seed.
+- Require input rights and applicable identity or voice consent, hash staged outputs, validate runtime budgets, and record acceptance or rejection reasons.
+- Keep promotion separate from generation. Never persist credentials, accept licenses for the user, or promote an unreviewed candidate.
 
 ## Role casting
 
@@ -406,6 +440,7 @@ OpenCaw includes schema validation commands for roles, skills, and commands:
 - `./commands/validate-skills.sh`
 - `./commands/validate-commands.sh`
 - `./commands/validate-styles.sh`
+- `./commands/validate-media-templates.sh`
 - `./commands/validate-opencaw.sh`
 
 Use these when:
