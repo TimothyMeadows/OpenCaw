@@ -43,6 +43,26 @@ while IFS= read -r -d '' cmd; do
 
 done < <(find "$commands_dir" -maxdepth 1 -type f -name "*.sh" -print0)
 
+while IFS= read -r -d '' cmd; do
+  name="$(basename "$cmd")"
+
+  if [[ ! "$name" =~ ^[a-z0-9]+(-[a-z0-9]+)*\.ps1$ ]]; then
+    echo "Invalid PowerShell command name: $name" >&2
+    status=1
+  fi
+
+  if ! grep -Eq '^[[:space:]]*Set-StrictMode([[:space:]]+-Version)?[[:space:]]+' "$cmd"; then
+    echo "Missing PowerShell strict mode in $cmd" >&2
+    status=1
+  fi
+
+  if ! grep -Eq '^\$ErrorActionPreference[[:space:]]*=' "$cmd" \
+    || ! grep -Eq '^\$ErrorActionPreference.*Stop' "$cmd"; then
+    echo "Missing stop-on-error preference in $cmd" >&2
+    status=1
+  fi
+done < <(find "$commands_dir" -maxdepth 1 -type f -name "*.ps1" -print0)
+
 if [[ $status -eq 0 ]]; then
   echo "Commands validation passed."
 fi

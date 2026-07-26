@@ -25,7 +25,7 @@ for (const domain of fs.readdirSync(rolesRoot, { withFileTypes: true }).filter(e
 roles.sort();
 const roleSet = new Set(roles);
 const skillSet = new Set(fs.readdirSync(skillsRoot, { withFileTypes: true }).filter(entry => entry.isDirectory() && fs.existsSync(path.join(skillsRoot, entry.name, 'SKILL.md'))).map(entry => entry.name));
-const commandSet = new Set(fs.readdirSync(commandsRoot, { withFileTypes: true }).filter(entry => entry.isFile() && /^[a-z0-9]+(?:-[a-z0-9]+)*\.sh$/.test(entry.name)).map(entry => `commands/${entry.name}`));
+const commandSet = new Set(fs.readdirSync(commandsRoot, { withFileTypes: true }).filter(entry => entry.isFile() && /^[a-z0-9]+(?:-[a-z0-9]+)*\.(?:sh|ps1)$/.test(entry.name)).map(entry => `commands/${entry.name}`));
 const errors = [];
 
 const expectedKeyOrder = ['__shared__', ...roles];

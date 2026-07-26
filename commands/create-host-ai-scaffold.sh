@@ -3,6 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/platform-common.sh"
 opencaw_resolve_paths
 
 opencaw_root="$OPENCAW_ROOT"
@@ -69,6 +70,63 @@ EOF
 
 ensure_host_agents_bootstrap
 
+ensure_windows_bash_guidance() {
+  local baseline_relative installer_reference guidance_file guidance_content
+
+  opencaw_is_windows_host || return 0
+
+  if [[ "$host_root" == "$opencaw_root" ]]; then
+    installer_reference='./commands/install-windows-bash.ps1'
+  else
+    baseline_relative="${opencaw_root#"$host_root"/}"
+    installer_reference="./$baseline_relative/commands/install-windows-bash.ps1"
+  fi
+
+  guidance_file="$host_ai_dir/WINDOWS_BASH.md"
+  if [[ ! -f "$guidance_file" ]]; then
+    guidance_content="$(cat <<'EOF'
+# Windows Bash Setup
+
+OpenCaw commands use Bash. On Windows, prefer Git Bash for native Windows filesystem performance; use WSL when Linux tool compatibility is more important.
+
+The scaffold never installs software automatically. Run these commands from the repository root in PowerShell.
+
+## Check for an existing provider
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "__OPENCAW_WINDOWS_BASH_INSTALLER__"
+```
+
+## Install native Git Bash (recommended)
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "__OPENCAW_WINDOWS_BASH_INSTALLER__" -Provider GitBash -Install
+```
+
+## Install WSL Bash
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "__OPENCAW_WINDOWS_BASH_INSTALLER__" -Provider WSL -Install
+```
+
+WSL installation can require elevation or a restart.
+
+## Run the OpenCaw scaffold
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "__OPENCAW_WINDOWS_BASH_INSTALLER__" -Provider GitBash -RunScaffold -ProjectRoot .
+```
+
+Linux and macOS should run `./commands/create-host-ai-scaffold.sh` directly; this Windows bootstrap is not needed there.
+EOF
+)"
+    guidance_content="${guidance_content//__OPENCAW_WINDOWS_BASH_INSTALLER__/$installer_reference}"
+    printf '%s\n' "$guidance_content" > "$guidance_file"
+  fi
+
+  echo "WINDOWS_BASH_GUIDANCE=$guidance_file"
+}
+
 mkdir -p \
   "$host_ai_dir/goals" \
   "$host_ai_dir/tasks" \
@@ -82,6 +140,7 @@ mkdir -p \
 
 opencaw_ensure_system_memory
 opencaw_ensure_project_files
+ensure_windows_bash_guidance
 
 mkdir -p "$host_ai_dir/tasks/example-task"
 
