@@ -48,10 +48,12 @@ if [[ "${#templates[@]}" -eq 0 ]]; then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 mount_dir_name="$(basename "$opencaw_root")"
-mount_path_from_host="./${mount_dir_name}"
+if [[ "$opencaw_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
 arch_target="$host_root/ARCHITECTURE.md"
 
 selected=()

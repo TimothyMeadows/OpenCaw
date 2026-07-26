@@ -65,7 +65,7 @@ for skill in "${new_skills[@]}"; do
   file="skills/$skill/SKILL.md"
   [[ -f "$file" ]] || fail "missing $file"
   grep -Eq '^description:.*\bUse\b' "$file" || fail "$skill has no trigger in its description"
-  for section in "When to use" "Workflow" "Output" "Guardrails"; do grep -q "^## $section$" "$file" || fail "$skill is missing $section"; done
+  for section in "When to use" "Workflow" "Output" "Guardrails"; do grep -Eq "^## $section[[:space:]]*$" "$file" || fail "$skill is missing $section"; done
   grep -Fq "\$$skill" "skills/$skill/agents/openai.yaml" || fail "$skill UI metadata does not identify the skill"
 done
 skill_count="$(find skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')"

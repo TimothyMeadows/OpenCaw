@@ -780,22 +780,19 @@ Rules:
 
 # AI Memory System
 
-AI learning artifacts are stored outside the tool directory to prevent pollution of the shared instruction system.
+OpenCaw Memory v2 keeps system-like constraints and selectively loaded project knowledge together under the resolved repository's `.ai` directory:
 
-Example:
-
+```text
+<project-root>/.ai/SYSTEM_MEMORY.md
+<project-root>/.ai/MEMORY.md
+<project-root>/.ai/REPO_MAP.md
+<project-root>/.ai/RULES.md
+<project-root>/.ai/DEBUG.md
 ```
-.ai/
-.ai/MEMORY.md
-.ai/RULES.md
-.ai/DEBUG.md
-```
 
-These files allow agents to:
+`SYSTEM_MEMORY.md` is a repository-local, flat, always-loaded list for protected safety rules, safe machine capabilities, and repository-wide constraints. Project memory uses namespaced tags such as `[kind:workflow] [area:auth] [tech:dotnet]` and is queried by relevance before raw repository searches. The semantic repository map uses the same tags and a fingerprint of Git-visible project paths to detect structural drift.
 
-- record lessons learned
-- prevent repeated mistakes
-- store debugging knowledge
+Agents proactively record verified durable facts without waiting for a user prompt. Commands reject untagged project entries, credential-shaped values, personal paths, and unsafe system-memory content. Purges and migrations archive source data first.
 
 ---
 
@@ -850,6 +847,8 @@ use skill create-task-file + manage-task-issues + test-dotnet
 | `goal-flow` | Manage explicit automated goals across task PRs, post-PR QA, branch chaining, and final approval reporting |
 | `manage-task-issues` | Sync and prune open issue tracking |
 | `orchestrate-subagents` | Plan and coordinate parallel sub-agent lanes with OpenCaw roles |
+| `maintain-memory` | Retrieve relevant context and proactively preserve verified durable learnings |
+| `maintain-repository-map` | Keep the semantic repository index current and freshness-checked |
 | `clean-context` | Compact context after substantial work |
 | `pr-readiness-gate` | Require human confirmation before push or PR creation |
 | `post-pr-qa` | Run QA after PR availability and post PR evidence comments |
@@ -946,6 +945,14 @@ run command dotnet-build
 | `comment-pr-qa-results.sh` | Post QA evidence to a PR comment with inline screenshot URL support |
 | `comment-issue-test-results.sh` | Post QA/Playwright results and screenshot references to issue |
 | `clean-context.sh` | Compress context and refresh high-signal summaries |
+| `resolve-opencaw-paths.sh` | Resolve safe project-local `.ai` memory paths |
+| `append-system-memory.sh` | Add a validated repository-local system-memory entry |
+| `append-project-memory.sh` | Add or replace a validated tagged project-memory entry |
+| `query-project-context.sh` | List tags or retrieve ranked relevant memory and repository-map entries |
+| `purge-project-memory.sh` | Preview or archive-and-purge entries by exact tag |
+| `migrate-memory-v2.sh` | Prepare and apply a complete AI-classified legacy-memory migration |
+| `repo-map-status.sh` | Check or stamp semantic repository-map freshness |
+| `validate-memory.sh` | Validate system memory, tagged project memory, and repository map |
 | `security-scan.sh` | Run security checks |
 | `install-database-cli-tools.sh` | Print or execute database CLI install commands |
 | `database-cli-query.sh` | Execute engine-specific database query/connect commands |

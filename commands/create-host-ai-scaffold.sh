@@ -2,8 +2,11 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+opencaw_resolve_paths
+
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 host_ai_dir="$host_root/.ai"
 host_agents_file="$host_root/AGENTS.md"
 
@@ -15,6 +18,12 @@ ensure_file() {
 
 ensure_host_agents_bootstrap() {
   local mount_dir_name fallback_mount_path
+
+  if [[ "$host_root" == "$opencaw_root" ]]; then
+    echo "Standalone OpenCaw checkout detected; host bootstrap already resolves to $host_agents_file"
+    return
+  fi
+
   mount_dir_name="$(basename "$opencaw_root")"
   fallback_mount_path="./${mount_dir_name}/AGENTS.md"
 
@@ -61,23 +70,18 @@ EOF
 ensure_host_agents_bootstrap
 
 mkdir -p \
-  "$host_ai_dir/FRAGMENTS" \
-  "$host_ai_dir/LEARNINGS" \
   "$host_ai_dir/goals" \
   "$host_ai_dir/tasks" \
   "$host_ai_dir/archive/goals" \
   "$host_ai_dir/archive/tasks" \
   "$host_ai_dir/archive/context-snapshots" \
+  "$host_ai_dir/archive/memory" \
+  "$host_ai_dir/archive/memory-v1" \
+  "$host_ai_dir/migrations" \
   "$host_ai_dir/reports"
 
-ensure_file "$host_ai_dir/MEMORY.md" "# Project Memory"
-ensure_file "$host_ai_dir/RULES.md" "# Rules"
-ensure_file "$host_ai_dir/DEBUG.md" "# Debug History"
-ensure_file "$host_ai_dir/FRAGMENTS/repo-map.md" "# Repository Map"
-ensure_file "$host_ai_dir/FRAGMENTS/conventions.md" "# Conventions"
-ensure_file "$host_ai_dir/FRAGMENTS/gotchas.md" "# Gotchas"
-ensure_file "$host_ai_dir/LEARNINGS/workflows.md" "# Workflows"
-ensure_file "$host_ai_dir/LEARNINGS/bugs.md" "# Bug Patterns"
+opencaw_ensure_system_memory
+opencaw_ensure_project_files
 
 mkdir -p "$host_ai_dir/tasks/example-task"
 
@@ -108,3 +112,16 @@ fi
 
 ## Issue
 EOF
+
+migration_required='false'
+if grep -Eq '^-[[:space:]]+[^[]' "$OPENCAW_PROJECT_MEMORY_FILE" \
+  || [[ -d "$host_ai_dir/FRAGMENTS" ]] \
+  || [[ -d "$host_ai_dir/LEARNINGS" ]]; then
+  migration_required='true'
+fi
+
+echo "OPENCAW_PROJECT_ROOT=$host_root"
+echo "SYSTEM_MEMORY_FILE=$OPENCAW_SYSTEM_MEMORY_FILE"
+echo "PROJECT_MEMORY_FILE=$OPENCAW_PROJECT_MEMORY_FILE"
+echo "REPO_MAP_FILE=$OPENCAW_REPO_MAP_FILE"
+echo "MEMORY_MIGRATION_REQUIRED=$migration_required"
