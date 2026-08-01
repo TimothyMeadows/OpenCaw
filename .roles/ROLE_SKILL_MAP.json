@@ -152,8 +152,8 @@
     "commands": ["commands/generate-architecture.sh", "commands/print-web-experience-brief.sh", "commands/web-performance-report.sh"]
   },
   "computer-science/project-manager": {
-    "skills": ["create-task-file", "goal-flow", "manage-task-issues", "orchestrate-subagents", "pr-readiness-gate", "post-pr-qa", "clean-context", "verify-and-explain"],
-    "commands": ["commands/create-goal-file.sh", "commands/create-goal-completion-report.sh", "commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/create-subagent-plan.sh", "commands/validate-subagent-plan.sh", "commands/record-subagent-result.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/update-todo-checklist.sh", "commands/pr-readiness-check.sh", "commands/comment-pr-qa-results.sh"]
+    "skills": ["create-task-file", "gauntlet-flow", "goal-flow", "manage-task-issues", "orchestrate-subagents", "pr-readiness-gate", "post-pr-qa", "clean-context", "verify-and-explain"],
+    "commands": ["commands/create-gauntlet-file.sh", "commands/validate-gauntlet.sh", "commands/record-gauntlet-round.sh", "commands/create-gauntlet-completion-report.sh", "commands/create-goal-file.sh", "commands/create-goal-completion-report.sh", "commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/create-subagent-plan.sh", "commands/validate-subagent-plan.sh", "commands/record-subagent-result.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/update-todo-checklist.sh", "commands/pr-readiness-check.sh", "commands/comment-pr-qa-results.sh"]
   },
   "computer-science/qa-engineer": {
     "skills": ["verify-and-explain", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "test-playable-games", "optimize-web-games", "playwright-e2e-tests", "playwright-browser-discovery", "playwright-test-refinement", "playwright-reporting", "post-pr-qa", "comment-issue-test-results", "test-dotnet"],

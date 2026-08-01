@@ -756,6 +756,7 @@ Commands:
 Skills:
 
 - `create-task-file`
+- `gauntlet-flow`
 - `goal-flow`
 - `manage-task-issues`
 - `orchestrate-subagents`
@@ -766,6 +767,10 @@ Skills:
 
 Commands:
 
+- `commands/create-gauntlet-file.sh`
+- `commands/validate-gauntlet.sh`
+- `commands/record-gauntlet-round.sh`
+- `commands/create-gauntlet-completion-report.sh`
 - `commands/create-goal-file.sh`
 - `commands/create-goal-completion-report.sh`
 - `commands/create-task-file.sh`

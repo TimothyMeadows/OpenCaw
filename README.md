@@ -17,7 +17,40 @@ That is a complete OpenCaw request.
 
 Behind the conversation, OpenCaw provides a shared system for planning, architecture, implementation, task tracking, repository memory, verification, and delivery across tools such as **Cursor, Codex, and Claude**. It can be mounted as `.codex`, `.cursor`, or `.claude` while keeping project-specific context inside the host repository.
 
-![](OpenCawFlow.png)
+```mermaid
+flowchart TB
+    accTitle: OpenCaw task, goal, and Gauntlet workflows
+    accDescr: A request enters task mode by default, explicit goal mode for an ordered series of task pull requests, or explicit Gauntlet mode for repeated builder and independent critic rounds followed by one pull request.
+
+    Request["Natural-language request"] --> Mode{"Work mode"}
+
+    Mode -->|"Task: default"| Task["Complete one assignment"]
+    Task --> TaskVerify["Verify the result"]
+    TaskVerify --> TaskGate["Human PR readiness approval"]
+    TaskGate --> TaskQA["Open one PR and run post-PR QA"]
+    TaskQA --> HumanMerge["Human review and merge"]
+
+    Mode -->|"Goal: explicit"| GoalTask["Complete next ordered task"]
+    GoalTask --> GoalVerify["Verify the task"]
+    GoalVerify --> GoalPR["Open its PR automatically"]
+    GoalPR --> GoalQA["Run post-PR QA"]
+    GoalQA --> GoalMore{"More tasks?"}
+    GoalMore -->|"Yes"| GoalTask
+    GoalMore -->|"No"| GoalReport["Prepare goal completion report"]
+    GoalReport --> HumanMerge
+
+    Mode -->|"Gauntlet: explicit"| Bar["Approve and freeze an inspectable quality bar"]
+    Bar --> Units["Derive independently judgeable work units"]
+    Units --> Build["Builder improves the real artifact"]
+    Build --> Critic["Fresh critic compares artifact with the bar"]
+    Critic -->|"Fail: record largest gap"| Build
+    Critic -->|"All units pass"| Integration["Fresh integration critic reviews the complete artifact"]
+    Integration -->|"Fail: reopen affected units"| Build
+    Integration -->|"Pass"| GauntletGate["Human PR readiness approval"]
+    GauntletGate --> GauntletQA["Open one final PR and run post-PR QA"]
+    GauntletQA -->|"Pass"| HumanMerge
+    GauntletQA -->|"Fail: reopen same PR"| Build
+```
 
 ---
 
@@ -25,6 +58,7 @@ Behind the conversation, OpenCaw provides a shared system for planning, architec
 
 - [Start with a Normal Request](#start-with-a-normal-request)
   - [No Magic Words](#no-magic-words)
+  - [Choose a Work Mode](#choose-a-work-mode)
   - [Planning Is a Conversation](#planning-is-a-conversation)
   - [A Realistic Planning Flow](#a-realistic-planning-flow)
   - [What OpenCaw Does Behind the Scenes](#what-opencaw-does-behind-the-scenes)
@@ -47,7 +81,7 @@ Behind the conversation, OpenCaw provides a shared system for planning, architec
   - [Skills](#skills)
   - [Commands](#commands)
   - [Sub-Agent Orchestration](#sub-agent-orchestration)
-  - [Goal Flow](#goal-flow)
+  - [Task, Goal, and Gauntlet Modes](#task-goal-and-gauntlet-modes)
   - [Task, Issue, and PR Delivery](#task-issue-and-pr-delivery)
   - [Memory v2](#memory-v2)
   - [Generative Media](#generative-media)
@@ -98,6 +132,36 @@ Role and skill names are **optional controls**, not required incantations.
 These prompts are examples, not fixed syntax. Equivalent natural wording works.
 
 You may still say `use role security-engineer`, invoke a named skill, or request a command when you know exactly which control you want. OpenCaw does not require that level of specificity to plan or complete ordinary work.
+
+## Choose a Work Mode
+
+OpenCaw has three work modes. A normal specific assignment uses task mode; goal and Gauntlet modes begin only when you explicitly request them.
+
+| Mode | Best for | Completion | PR behavior |
+| --- | --- | --- | --- |
+| Task | One specific assignment | The requested result passes its relevant verification | One PR after human readiness approval |
+| Goal | An ordered collection of tasks | Every task is done and its post-PR QA has completed | A PR may open automatically for each task; merging remains human-controlled |
+| Gauntlet | One ambitious, inspectable deliverable that benefits from adversarial iteration | Every active work unit and a fresh integration review pass an approved quality bar | One final PR after human readiness approval |
+
+For ordinary work, describe the assignment directly:
+
+```text
+Fix the duplicate invoice bug, add a regression test, and stop when the branch is ready for my PR approval.
+```
+
+Use goal mode when several tasks should advance automatically through separate PRs:
+
+```text
+Use goal flow for these four migration tasks. Validate and open each task PR, run its post-PR QA, then continue. Never merge automatically.
+```
+
+Use Gauntlet mode when the result should survive repeated independent comparison against a concrete benchmark:
+
+```text
+Use gauntlet mode for this onboarding redesign. First propose an inspectable quality bar for my approval. Use separate builders and fresh critics, and keep one final PR behind my readiness approval.
+```
+
+Gauntlet mode is appropriate only when a critic can inspect the real output—such as running code, rendered pixels, test or performance results, a finished document, or another concrete artifact. It never permits the builder to grade its own work.
 
 ## Planning Is a Conversation
 
@@ -176,13 +240,13 @@ For a substantial request, the normal flow is:
 1. **Resolve the project safely** — find the actual host repository and mounted OpenCaw directory without guessing across workspace boundaries.
 2. **Load high-signal context** — read protected repository memory, project rules, architecture/style contracts, active tasks, and relevant tagged knowledge.
 3. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done.
-4. **Plan at the right depth** — use a lightweight checklist for small work or a detailed dependency-aware plan for cross-cutting work.
+4. **Select and plan the work contract** — use task mode by default or an explicitly requested goal or Gauntlet lifecycle, then plan at the depth its risks and dependencies require.
 5. **Choose capabilities** — apply baseline behavior and automatically use relevant skills; explicit roles remain optional specialist lenses.
 6. **Track real work** — create or import a task, link its GitHub issue, and keep the active checklist concise.
 7. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
 8. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
 9. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
-10. **Deliver with a human gate** — summarize completed work and validation, ask before publishing a normal PR, then run post-PR QA after it exists.
+10. **Deliver by mode** — task and Gauntlet work pause for human PR approval; explicit goal flow may publish each validated task PR automatically; every path preserves post-PR QA and human merge control.
 
 OpenCaw can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
 
@@ -253,7 +317,9 @@ Natural language is the default. Explicit controls are useful when you want to c
 | Command | You want a deterministic repository script. | `Run the full OpenCaw validation command.` |
 | Agent count | You are authorizing parallel agent work and want a capacity ceiling. | `Use up to 3 agents, but only for independent lanes.` |
 | Issue reference | Existing GitHub issue content is the source task. | `Work on #123.` |
+| Task mode | You want to emphasize that one assignment should end at the normal human PR gate. | `Use task mode for this bug fix.` |
 | Goal flow | You explicitly authorize automated task-to-PR progression across multiple tasks. | `Use goal flow for these four tasks; never merge automatically.` |
+| Gauntlet flow | You want one deliverable repeatedly judged by independent critics against an approved bar. | `Use gauntlet mode for this redesign.` |
 
 Explicit role examples:
 
@@ -271,7 +337,13 @@ Explicit goal-flow example:
 Goal: modernize the reporting module across these five tasks. Raise each task PR after validation, run post-PR QA, then continue. Never merge PRs automatically.
 ```
 
-Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Ordinary natural-language work still pauses for human PR readiness approval.
+Explicit Gauntlet example:
+
+```text
+Use gauntlet flow for the reporting experience. Propose a concrete benchmark for my approval, let the lead derive judgeable work units, and use a fresh critic for every round and for final integration.
+```
+
+Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because it changes the execution and evidence model, but it retains the human PR readiness gate. Ordinary natural-language work remains task mode and also pauses for human approval before publication.
 
 ---
 
@@ -412,7 +484,7 @@ The rest of this README describes the machinery behind the conversational experi
 | Roles | Named specialist perspective and priorities | Optional precision control |
 | Skills | Reusable reasoning and workflow instructions | Selected automatically when relevant or explicitly requested |
 | Commands | Deterministic scripts for repeatable execution | Run by the agent or directly by developers |
-| Task and issue state | Ordered work, detailed scope, and GitHub traceability | Maintained during real tasks |
+| Task, goal, and Gauntlet state | Assignment scope, multi-task delivery, adversarial round evidence, and GitHub traceability | Maintained for the selected work mode |
 | Memory and repository map | Durable facts and semantic repository structure | Queried selectively before broad searches |
 | Verification evidence | Tests, logs, browser artifacts, and PR QA comments | Required before completion |
 
@@ -467,7 +539,11 @@ OpenCaw separates reusable baseline behavior from host-project state.
     ├── CONTEXT_SUMMARY.md
     ├── tasks/
     ├── goals/
+    ├── gauntlets/
     ├── archive/
+    │   ├── tasks/
+    │   ├── goals/
+    │   └── gauntlets/
     └── reports/
 ```
 
@@ -619,6 +695,7 @@ $clean-context
 | Context | `maintain-memory`, `maintain-repository-map`, `clean-context` | Retrieve and preserve durable high-signal project knowledge |
 | Parallel work | `orchestrate-subagents` | Create safe role-resolved lanes and integrate their evidence |
 | Goal delivery | `goal-flow` | Manage explicit multi-task PR and post-PR-QA automation |
+| Adversarial delivery | `gauntlet-flow` | Run builder and fresh-critic rounds against an approved quality bar, then require independent integration review |
 | Build and test | `solution-build`, `test-dotnet` | Restore, build, test, and report repository results |
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
 | Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
@@ -657,6 +734,7 @@ Or run the command directly:
 | Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
 | Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
 | Goal flow | `create-goal-file.sh`, `create-goal-completion-report.sh` |
+| Gauntlet flow | `create-gauntlet-file.sh`, `validate-gauntlet.sh`, `record-gauntlet-round.sh`, `create-gauntlet-completion-report.sh` |
 | PR delivery | `pr-readiness-check.sh`, `link-pr-to-task-issue.sh`, `comment-pr-qa-results.sh`, `comment-issue-test-results.sh` |
 | Memory | `append-system-memory.sh`, `append-project-memory.sh`, `query-project-context.sh`, `purge-project-memory.sh`, `migrate-memory-v2.sh`, `clean-context.sh` |
 | Repository map | `repo-map-status.sh` |
@@ -713,50 +791,87 @@ Helper commands:
 
 Parallelism is reduced when lanes would overlap, roles are unresolved, verification is unclear, or coordination would cost more than the work.
 
-## Goal Flow
+## Task, Goal, and Gauntlet Modes
 
-A goal is an explicitly authorized automated multi-task delivery flow. It is not the ordinary `## Goal` heading inside a task file.
+The selected mode controls the unit of work, stopping condition, durable state, and PR authorization boundary. It does not weaken planning, local validation, issue linkage, or post-PR QA.
 
-Natural activation:
+| Mode | Activation | Durable state | Loop | Publication |
+| --- | --- | --- | --- | --- |
+| Task | Default for a specific assignment; may also be named explicitly | `.ai/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
+| Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.ai/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
+| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.ai/gauntlets/<gauntlet-name>/GAUNTLET.md` plus immutable round evidence | Build, independently criticize, and repeat until all units and integration pass | Human approval before one final PR |
 
-```text
-Use goal flow for the onboarding modernization. Complete each planned task, raise its PR after validation, run post-PR QA, and stop if any task or QA check fails. Never merge automatically.
-```
+These are sibling modes. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks, and Gauntlet mode never inherits goal mode's automatic PR exception. If a request explicitly selects both goal and Gauntlet for the same work, OpenCaw asks which mode governs before changing project state.
 
-Normal task flow:
+### Task lifecycle
 
-- work may be planned and implemented autonomously within scope
-- publishing waits for human PR readiness confirmation
-- post-PR QA runs after the PR exists
+Task mode is the normal path for one assignment. OpenCaw creates or imports its task and issue, implements within the agreed scope, proves the result, and stops at the human PR readiness gate. After approval, it opens one linked PR and runs post-PR QA.
 
-Goal flow:
+### Goal lifecycle
 
-- local planning, implementation, and validation remain mandatory
-- each completed task may be pushed and opened as a PR automatically
-- post-PR QA must pass before the next task begins
-- dependent tasks can form an explicit branch chain
-- failures, conflicts, ambiguity, or uncovered product/security decisions stop automation
-- auto-merge, merge approval, and enabling auto-merge remain prohibited
+Goal mode is an explicitly authorized multi-task delivery flow. Each task still receives local planning, implementation, and validation. Its PR may then open automatically, but post-PR QA must finish before the next task begins. Dependent tasks can use a recorded branch chain.
 
-Goal state lives at:
+Failures in validation, PR creation, post-PR QA, role resolution, conflict handling, or an uncovered product or security decision stop goal automation. Goal mode never merges, approves, or enables auto-merge.
 
-```text
-.ai/goals/<goal-name>/GOAL.md
-```
-
-Create a goal artifact with:
+Create and report goal state with:
 
 ```bash
 ./commands/create-goal-file.sh "<goal_name>" "<Goal Title>"
-```
-
-At completion, generate the human approval packet:
-
-```bash
 ./commands/create-goal-completion-report.sh "<goal_name>"
 ```
 
-The report includes PR links in approval order, branch dependencies, QA evidence, and merge-conflict risk notes.
+The completion report orders PRs for approval and records branch dependencies, QA evidence, and conflict risk.
+
+### Gauntlet lifecycle
+
+A Gauntlet has one parent task and GitHub issue, one ambitious deliverable, and a quality bar that a critic can inspect. A useful bar may be a reference artifact, acceptance or recovery test, latency target, security review, or evidence-backed writing rubric. Before building begins, the lead proposes the benchmark when needed and the user approves it. Approval freezes the bar. An approved revision preserves old rounds, records the revision in Unit History, reopens active units, clears integration evidence, resets the current fingerprint to `pending`, and resets PR eligibility to `no`; only evidence produced against the new fingerprint can pass completion.
+
+`GAUNTLET.md` is the live contract and index. It records flow and status, the parent task, objective, approved quality bar, constraints and permissions, work units, current state, round ledger, integration review, delivery state, and review notes.
+
+The lead derives the smallest work units that can be improved and judged independently. Only disjoint units may run in parallel. Splits, merges, and superseded units stay in the ledger so failed work cannot silently disappear.
+
+Each active unit then follows the adversarial loop:
+
+1. A builder changes the real artifact and runs its objective verifier.
+2. A separate critic starts with fresh context containing only the objective, current unit ID and frozen scope, approved bar, relevant constraints, and actual artifact—not the builder's history or justification.
+3. The critic uses blind comparison where feasible; otherwise it directly compares the artifact with the reference and checks objective tests and guardrails.
+4. A passing verdict closes that round. A failing verdict records the largest remaining gap and next strategy; the lead records the changed strategy actually used in Review Notes, keeps it out of the next critic packet, and then starts another round.
+
+The builder and critic IDs must differ, and every round requires a new critic invocation using a native fresh-context subagent or a fresh isolated session. If OpenCaw cannot obtain an isolated critic, it blocks the Gauntlet instead of accepting self-review. Critics inspect the running product, rendered output, test evidence, finished document, or other real artifact—not a builder-written summary.
+
+Every critic report records `Artifact Inspected`, `Bar Comparison`, `Guardrail Results`, `Verdict`, `Largest Remaining Gap`, and `Next Strategy`. Evidence is append-only under:
+
+```text
+.ai/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
+```
+
+There is no automatic round, time, cost, or diminishing-return limit. The loop continues until it passes, the user stops it, or safety, permission, platform policy, or an unrecoverable blocker prevents progress. This does not authorize unapproved paid services or external actions; any user-approved resource boundary remains an explicit permission constraint.
+
+After every active unit's latest round passes, a new integration critic reviews the complete artifact. Record that final review with the reserved item ID `integration`. An integration failure invalidates stale evidence; the bundled recorder conservatively reopens every active unit so no stale pass survives. The Gauntlet passes only after the rebuilt units and a fresh integration review pass.
+
+Gauntlet state uses `planning`, `ready`, `running`, `passed`, `stopped`, or `blocked`; work units use `pending`, `building`, `critic-failed`, `passed`, `blocked`, or `superseded`; round verdicts use `pass`, `fail`, or `blocked`. Passed, user-stopped, and blocked runs each produce a `GAUNTLET_REPORT.md`. Stopped and blocked runs preserve their ledger for an explicit resume, but their reports remain incomplete and cannot become PR-eligible.
+
+Create, validate, record, and report a Gauntlet with:
+
+```bash
+./commands/create-gauntlet-file.sh "<gauntlet-name>" "<Gauntlet Title>" --task "<task-name>" --dry-run
+./commands/validate-gauntlet.sh "<gauntlet-name-or-path>" --phase ready
+./commands/record-gauntlet-round.sh "<gauntlet>" "<item-id>" "<pass|fail|blocked>" "<builder-id>" "<critic-id>" "<native-subagent|fresh-session>" "<critic-report.md>" --dry-run
+./commands/validate-gauntlet.sh "<gauntlet-name-or-path>" --phase complete
+./commands/create-gauntlet-completion-report.sh "<gauntlet>" --status "<complete|stopped|blocked>" --dry-run
+```
+
+Remove `--dry-run` only after reviewing the resolved paths and intended state change. A passed Gauntlet produces `GAUNTLET_REPORT.md`, completes local validation, and runs the normal readiness gate in Gauntlet mode:
+
+```bash
+./commands/pr-readiness-check.sh --gauntlet "<gauntlet-ref>" "<validation-summary-file>"
+```
+
+The validation summary argument is optional, but readiness still waits for human approval before opening one final PR. If post-PR QA fails, OpenCaw reopens the Gauntlet on the same branch and PR, records new builder/critic rounds, and repeats QA. It never merges or enables auto-merge.
+
+### Method sources
+
+OpenCaw's Gauntlet mode adapts Matt Shumer's [Gauntlet Loop method](https://somethingbig.ai/gauntlet-loop), with the public [Claude of Duty repository and process evidence](https://github.com/mshumer/Claude-of-Duty) as a concrete case study. The user-supplied [Prompt Index guide](https://www.thepromptindex.com/ai-loop-engineering-gauntlet-loop-guide.html) provided supplementary framing. OpenCaw adds its own durable state, approval, issue, validation, and PR/QA policies; it does not embed or reproduce the external prompt.
 
 ## Task, Issue, and PR Delivery
 
@@ -899,7 +1014,7 @@ Local commands:
 
 ## Validation
 
-OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Windows bootstrap behavior, and generative-media assets.
+OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and generative-media assets.
 
 Run the complete suite:
 
@@ -919,6 +1034,7 @@ Common focused validators:
 ./commands/validate-media-templates.sh
 ./commands/validate-readme.sh
 ./commands/validate-memory.sh
+./tests/test-gauntlet-flow.sh
 ```
 
 The integrated suite verifies, among other things:
@@ -932,6 +1048,7 @@ The integrated suite verifies, among other things:
 - style catalog and contract structure
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
+- Gauntlet scaffold isolation, lifecycle state, fresh-critic evidence, completion gates, and task/goal/Gauntlet PR-readiness compatibility
 - Windows provider classification and explicit-install behavior
 
 Verification for host-project work remains proportional to the task: targeted tests first, broader suites when risk warrants them, and browser/log/artifact evidence where behavior cannot be proven by unit tests alone.
@@ -952,7 +1069,7 @@ OpenCaw/
 ├── commands/                         # deterministic scripts
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures
-└── .ai/                              # repository-local memory, tasks, goals, and evidence
+└── .ai/                              # repository-local memory, tasks, goals, Gauntlets, and evidence
 ```
 
 Bundled Playwright assets include configuration, package-script, report, and CLI-reference templates under `assets/playwright/` and `assets/playwright-cli/`. Host repositories continue to own their actual application tests, credentials, runtime artifacts, and generated reports.

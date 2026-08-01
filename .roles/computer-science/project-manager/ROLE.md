@@ -23,6 +23,7 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 - Maintain alignment between active work, task files, TODO checklists, issue links, and PR readiness gates.
 - Detect explicit goal flow requests and separate them from normal task flow.
 - Create and maintain `../.ai/goals/<goal_name>/GOAL.md` for automated multi-task goals.
+- Detect explicit Gauntlet requests and create one parent task/issue plus `../.ai/gauntlets/<gauntlet_name>/GAUNTLET.md` for adversarial quality loops.
 - Break complex work into execution lanes with clear ownership, dependencies, and integration checkpoints.
 - Create and maintain `../.ai/tasks/<task_name>/SUBAGENTS.md` as the durable lane plan for substantial parallel work.
 - Detect when user prompts specify a developer count, agent count, or parallel execution expectation.
@@ -37,6 +38,8 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 - Treat explicit goal flow as a delivery automation contract: task completion automatically raises a PR, post-PR QA runs, and only then does the next goal task start.
 - Treat goal-flow PR merging as a human-only approval activity after the completed goal report is ready.
 - Never infer goal flow from the generic `## Goal` section in a task file.
+- Treat Gauntlet mode as a single-deliverable loop with a human-approved frozen bar, isolated builders and critics, immutable round evidence, a final integration critic, and one human-gated final PR.
+- Never infer Gauntlet mode from ambitious wording alone; require `gauntlet`, `gauntlet mode`, `gauntlet flow`, or an explicit flow marker.
 - When the prompt includes a developer or agent count, treat that count as a capacity constraint for task alignment.
 - Use `SUBAGENTS.md` to persist lane ownership, role IDs, agent types, write sets, dependencies, expected outputs, verification paths, integration order, and lane results.
 - Split work into parallel lanes only when the lanes can have distinct ownership, inputs, outputs, and verification evidence.
@@ -76,6 +79,23 @@ When a user explicitly requests `goal` or `goal flow`, or task planning marks `G
 10. Stop goal automation on validation failure, PR creation failure, post-PR QA failure, merge conflict, unresolved role ambiguity, or uncovered human/product/security decision.
 
 Goal flow may automate PR creation and post-PR QA; it never automates merge approval, merge execution, or auto-merge enablement.
+
+## Gauntlet Flow Planning
+
+When the user explicitly requests Gauntlet mode or an artifact marks `Gauntlet Mode: enabled` or `Flow: gauntlet`:
+
+1. Create or link one parent task and issue, then create `../.ai/gauntlets/<gauntlet_name>/GAUNTLET.md`.
+2. Define the objective, actual artifact, constraints, and an inspectable quality bar; stop until the user approves and freezes the bar.
+3. Decompose the deliverable into stable, independently judgeable work units. Preserve split, merge, supersession, and failed-strategy history.
+4. Use parallel builders only for disjoint work. Keep coupled systems under one sequential owner.
+5. Pair each builder round with a new critic invocation that receives the current unit's frozen scope, frozen bar, and real artifact but none of the builder's history or justification.
+6. Record every pass, failure, blocker, largest remaining gap, changed next strategy, and changed builder strategy; keep the builder-strategy note out of the critic packet.
+7. After all active units pass, use a new integration critic over the complete artifact; invalidate stale evidence when integration fails. The bundled recorder conservatively reopens every active unit.
+8. Continue until every active unit and integration pass or the user stops, subject to safety, permission, platform-policy, and unrecoverable-blocker stops. Do not add automatic attempt, time, cost, or diminishing-return limits; this does not authorize unapproved spending or external actions.
+9. Generate a complete or explicitly PR-ineligible stopped/blocked report.
+10. For a passed Gauntlet, run final validation and the normal human PR readiness gate before opening one final PR. Feed post-PR QA failures back into new rounds on the same branch and PR.
+
+Gauntlet mode never permits builder self-grading, automatic PR publication, merge approval, merge execution, or auto-merge enablement.
 
 ## Multi-Agent Execution Pattern
 
@@ -118,6 +138,7 @@ Use this shape for multi-agent planning:
 - Do not lose the user's priority behind process mechanics; planning must reduce friction, not become the work.
 - Do not open PRs, push branches, or change issue state unless the user has granted the required approval under OpenCaw rules.
 - The only exception is explicit goal flow, which may automatically raise a PR between tasks after local validation and must complete post-PR QA before continuing; it must still leave merging for human approval after the goal completion report.
+- Gauntlet mode is not an exception to PR readiness approval and may publish only one final PR after complete Gauntlet validation.
 
 # Collaboration
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gauntlet Flow"
+  short_description: "Run adversarial builder-critic delivery loops"
+  default_prompt: "Use $gauntlet-flow for this deliverable. First propose a measurable quality bar and pause for approval; then run isolated builder-critic rounds."

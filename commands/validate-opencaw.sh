@@ -12,5 +12,6 @@ set -euo pipefail
 ./commands/validate-readme.sh
 ./tests/test-memory-system.sh
 ./tests/test-windows-bash-bootstrap.sh
+./tests/test-gauntlet-flow.sh
 
 echo "OpenCaw validation passed."

@@ -5,10 +5,12 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]
        ./commands/pr-readiness-check.sh --goal [task_or_issue_ref] [validation_summary_file]
+       ./commands/pr-readiness-check.sh --gauntlet <gauntlet_name_or_path> [validation_summary_file]
 
 Creates a non-destructive PR readiness report and prints the required user
-confirmation prompt unless --goal is supplied. This command never commits,
-pushes, or opens a PR.
+confirmation prompt unless --goal is supplied. Gauntlet flow requires a passed,
+PR-eligible completion report and retains human confirmation. This command never
+commits, pushes, or opens a PR.
 EOF
 }
 
@@ -18,6 +20,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 goal_flow=0
+gauntlet_flow=0
 invocation_dir="$(pwd)"
 
 args=()
@@ -27,12 +30,21 @@ while [[ $# -gt 0 ]]; do
       goal_flow=1
       shift
       ;;
+    --gauntlet)
+      gauntlet_flow=1
+      shift
+      ;;
     *)
       args+=("$1")
       shift
       ;;
   esac
 done
+
+if [[ $goal_flow -eq 1 && $gauntlet_flow -eq 1 ]]; then
+  echo '--goal and --gauntlet are mutually exclusive.' >&2
+  exit 1
+fi
 
 task_ref="${args[0]:-Unspecified task}"
 validation_summary_file="${args[1]:-}"
@@ -43,6 +55,26 @@ opencaw_resolve_paths
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 output_dir="${OPENCAW_REPORT_DIR:-$host_root/.ai/reports}"
+
+if [[ $gauntlet_flow -eq 1 ]]; then
+  if [[ "${args[0]+set}" != 'set' ]]; then
+    echo '--gauntlet requires a Gauntlet name or path.' >&2
+    exit 1
+  fi
+  gauntlet_validation="$(bash "$script_dir/validate-gauntlet.sh" "${args[0]}" --phase complete)" || exit 1
+  gauntlet_file="$(awk -F= '$1 == "GAUNTLET_FILE" { sub(/^[^=]*=/, ""); print; exit }' <<< "$gauntlet_validation")"
+  gauntlet_report="$(dirname "$gauntlet_file")/GAUNTLET_REPORT.md"
+  [[ -f "$gauntlet_report" && ! -L "$gauntlet_report" ]] || {
+    echo "Gauntlet completion report is missing: $gauntlet_report" >&2
+    exit 1
+  }
+  if ! grep -Fqx -- '- Completion outcome: complete' "$gauntlet_report" \
+    || ! grep -Fqx -- '- Gauntlet status: passed' "$gauntlet_report" \
+    || ! grep -Fqx -- '- PR eligible: yes' "$gauntlet_report"; then
+    echo "Gauntlet completion report is stopped, blocked, stale, or not PR eligible: $gauntlet_report" >&2
+    exit 1
+  fi
+fi
 
 detect_repo_root() {
   if git -C "$host_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -118,6 +150,22 @@ The agent must still:
 6. If the next goal task depends on this unmerged work or risks conflicts later, branch it from this task branch or PR head.
 7. Move to the next goal task only after QA is complete.
 8. Never merge, approve, or enable auto-merge from goal flow."
+elif [[ $gauntlet_flow -eq 1 ]]; then
+  checkpoint_heading="## Required Gauntlet Human Checkpoint"
+  checkpoint_body="Gauntlet flow passed every active work unit and its latest independent integration review. It uses one coherent final PR and does not inherit goal flow's automatic PR exception.
+
+Before any PR-related push or PR creation, ask the user:
+
+> The Gauntlet passed its adversarial reviews and final integration check. Are you ready for me to push this branch and open its one final pull request?
+
+Do not run \`git push\`, \`gh pr create\`, \`github\` CLI PR creation, GitHub MCP/connector PR creation tools, auto-merge, or PR update automation until the user explicitly confirms."
+  next_steps_heading="## After Gauntlet Confirmation"
+  next_steps_body="1. Push/open exactly one final PR only after the user confirms readiness.
+2. Confirm the PR is available using the GitHub tool priority above.
+3. Start post-PR QA immediately.
+4. Post QA pass/fail evidence to the PR using GitHub comments.
+5. If post-PR QA fails, reopen this Gauntlet on the same branch and PR, run new builder/critic rounds, and repeat QA.
+6. Never merge, approve, or enable auto-merge from Gauntlet flow."
 else
   checkpoint_heading="## Required Human Checkpoint"
   checkpoint_body="Before any PR-related push or PR creation, ask the user:
@@ -148,6 +196,7 @@ cat >"$report_file" <<EOF
 - Ahead/behind: \`$ahead_behind\`
 - Last commit: \`$last_commit\`
 - Goal flow: \`$([[ $goal_flow -eq 1 ]] && printf 'enabled' || printf 'disabled')\`
+- Gauntlet flow: \`$([[ $gauntlet_flow -eq 1 ]] && printf 'enabled' || printf 'disabled')\`
 
 ## Working Tree
 
@@ -184,9 +233,16 @@ echo "REPORT_FILE=$report_file"
 if [[ $goal_flow -eq 1 ]]; then
   echo "USER_CONFIRMATION_REQUIRED=NO"
   echo "GOAL_FLOW_AUTOMATION=YES"
+  echo "GAUNTLET_FLOW=NO"
   echo "PROMPT=Goal flow is active. Automatically push/open the PR for this completed task, run post-PR QA, then continue to the next goal task only after QA completes."
+elif [[ $gauntlet_flow -eq 1 ]]; then
+  echo "USER_CONFIRMATION_REQUIRED=YES"
+  echo "GOAL_FLOW_AUTOMATION=NO"
+  echo "GAUNTLET_FLOW=YES"
+  echo "PROMPT=The Gauntlet passed its adversarial reviews and final integration check. Are you ready for me to push this branch and open its one final pull request?"
 else
   echo "USER_CONFIRMATION_REQUIRED=YES"
   echo "GOAL_FLOW_AUTOMATION=NO"
+  echo "GAUNTLET_FLOW=NO"
   echo "PROMPT=The implementation is complete enough for your validation. Are you ready for me to push this branch and open a pull request?"
 fi
