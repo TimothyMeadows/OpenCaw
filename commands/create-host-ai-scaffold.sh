@@ -128,8 +128,10 @@ EOF
 }
 
 mkdir -p \
+  "$host_ai_dir/gauntlets" \
   "$host_ai_dir/goals" \
   "$host_ai_dir/tasks" \
+  "$host_ai_dir/archive/gauntlets" \
   "$host_ai_dir/archive/goals" \
   "$host_ai_dir/archive/tasks" \
   "$host_ai_dir/archive/context-snapshots" \

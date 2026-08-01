@@ -7,3 +7,4 @@
 5. [x] Remove obsolete `demo/` assets from Git history (`.ai/tasks/remove-demo-history/TASK.md`)
 6. [x] Remove the legacy `.media/` directory (`.ai/tasks/remove-media-directory/TASK.md`)
 7. [x] Rewrite the README around natural-language-first usage (`.ai/tasks/readme-natural-language-first/TASK.md`)
+8. [x] Add first-class Gauntlet mode (`.ai/tasks/gauntlet-mode/TASK.md`)

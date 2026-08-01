@@ -31,7 +31,7 @@ On Windows without a usable Bash runtime, run the PowerShell bootstrap described
 1. Resolve the project root and repository-local `.ai` paths with `./commands/resolve-opencaw-paths.sh`.
 2. Run `./commands/create-host-ai-scaffold.sh` automatically when required files are missing. The command is idempotent and reports legacy-memory migration needs.
 3. Load all of `SYSTEM_MEMORY.md`. It has precedence over project memory and rules, but never over actual system, developer, or current user instructions.
-4. Review project `RULES.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, and open issues when present. Read `DEBUG.md` only for debugging work.
+4. Review project `RULES.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, active goal or Gauntlet state, and open issues when present. Read `DEBUG.md` only for debugging work.
 5. Run `./commands/query-project-context.sh --list-tags`, infer relevant tags from the request and active task, then query those tags with the default ranked limit before raw file searches.
 6. Run `./commands/repo-map-status.sh`. If the map is missing, empty, or stale, use `maintain-repository-map` before relying on it.
 7. If legacy memory is reported, prepare and complete the AI-classified migration before loading untagged entries. Never load legacy memory as a fallback.
@@ -187,14 +187,23 @@ When multiple roles are requested:
 - If the user names a role ambiguously, ask which available role they want
 - Do not invent role files that do not exist unless the user explicitly asks to create one
 
+## Work modes
+
+- Task mode is the default for one specific assignment. It uses one task file and issue, completes after scoped verification, and retains the human PR readiness gate.
+- Goal mode is an explicitly requested collection of ordered tasks. It may automatically raise each validated task PR, requires post-PR QA before advancing, and leaves merge approval to humans.
+- Gauntlet mode is an explicitly requested adversarial loop for one ambitious deliverable. It uses one parent task and issue, a human-approved quality bar, persistent builder-versus-fresh-critic rounds, a final integration critic, and one human-gated final PR.
+- Activate goal mode only when the user says `goal` or `goal flow`, or an artifact marks `Goal Flow: enabled` or `Flow: goal`.
+- Activate Gauntlet mode only when the user says `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or an artifact marks `Gauntlet Mode: enabled` or `Flow: gauntlet`.
+- Do not activate goal mode from the generic `## Goal` section in `TASK.md`; that field describes task intent.
+- If goal and Gauntlet are both explicitly selected for the same work, pause and ask which mode governs delivery before mutating project state.
+
 ## Plan mode default
 - Enter plan mode for any non-trivial task
 - Treat a task as non-trivial when it has 3+ steps, architectural decisions, cross-cutting impact, verification complexity, or ambiguity
 - Use plan mode for verification work, not just implementation
 - When the user specifies a developer count, agent count, worker count, or explicit parallel execution target, apply the `computer-science/project-manager` planning lens to align tasks into safe parallel lanes before implementation
 - Count-based plans should name lane ownership, scope, dependencies, verification, integration order, and any reason the effective parallelism is smaller than the requested count
-- When the user explicitly requests a `goal`, says `goal flow`, or a task planning artifact marks `Goal Flow: enabled` or `Flow: goal`, use goal flow instead of normal task flow
-- Do not activate goal flow from the generic `## Goal` section in `TASK.md`; that field describes task intent and is not the automated goal feature
+- Apply the explicit task, goal, or Gauntlet work-mode contract before creating execution artifacts
 - Write detailed specs up front to reduce ambiguity
 - If something goes sideways, stop and re-plan immediately instead of pushing through a stale plan
 
@@ -204,6 +213,9 @@ When multiple roles are requested:
 - Resolve every lane role with `./commands/resolve-role.sh` before assigning work; do not spawn a lane with unresolved role ambiguity, missing verification, overlapping write scope, or an immediate critical-path dependency
 - For Codex, map read-only investigation lanes to `explorer` agents and implementation lanes to `worker` agents with disjoint write sets
 - For non-Codex tools, use the same `SUBAGENTS.md` lane plan as portable delegation guidance or sequential fallback
+- In Gauntlet mode, parallelize only independently judgeable work units with disjoint write sets; keep coupled systems under one sequential owner
+- A Gauntlet critic is not the builder and is not a reused long-lived lane. Prefer a new Codex subagent with fresh context; otherwise use a fresh isolated session, and block if neither is possible
+- Give a Gauntlet critic the approved objective, current work-unit ID and frozen scope (or complete-artifact integration scope), frozen quality bar, constraints, and actual artifact or verifier evidence, but not the builder's history or justification
 - Keep the main agent responsible for orchestration, critical-path blockers, final integration, final verification, and user communication
 - Record completed lane evidence with `./commands/record-subagent-result.sh` when a task-backed `SUBAGENTS.md` exists
 
@@ -250,6 +262,7 @@ When multiple roles are requested:
 - Do not run `git push`, `gh pr create`, `github` CLI PR creation, GitHub MCP/connector PR creation tools, draft PR creation, PR branch updates, auto-merge, or PR publishing skills until the user explicitly confirms readiness after the implementation is complete
 - Prefer `./commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]` to create a durable readiness report and exact user prompt
 - Goal flow is the only exception to the human PR readiness confirmation requirement; use `./commands/pr-readiness-check.sh --goal [task_or_issue_ref] [validation_summary_file]` to record the exception before automatic PR creation
+- Gauntlet mode is not an exception: use `./commands/pr-readiness-check.sh --gauntlet <gauntlet_ref> [validation_summary_file]` only after the Gauntlet passes, and still obtain explicit human confirmation before its one final PR
 - Goal flow may automatically push/open a PR for the completed task, but it must still run post-PR QA before moving to the next goal task
 - Goal flow never auto-merges PRs, enables auto-merge, or grants merge approval; it only auto-raises PRs and runs/reports post-PR QA
 - Goal flow does not suppress validation, PR evidence, issue linkage, or post-PR QA
@@ -261,6 +274,7 @@ When multiple roles are requested:
 - Post QA pass/fail evidence to the PR using GitHub comments; when screenshots are part of the evidence, include inline screenshot URLs in the comment
 - Prefer `./commands/comment-pr-qa-results.sh "<pr_number_or_url>" "<results_summary_file>" [screenshot_or_artifact ...]` for the PR QA comment
 - Mirror or link QA evidence to the task issue when a task issue exists, but the PR comment is the primary post-PR signal
+- If post-PR QA fails for a Gauntlet PR, reopen affected work units on the same branch, run new builder/critic rounds and integration review, update the same PR after correction, and repeat QA
 - Once QA is complete, notify the user that the PR is ready for review and that you can move to the next task if any remain
 
 ## Demand elegance (balanced)
@@ -287,6 +301,7 @@ When multiple roles are requested:
 8. Sync task issues when reading active tasks and remove URLs for closed issues from `.ai/tasks` tracking
 9. Capture lessons proactively with `append-project-memory.sh --tags ... --entry ...` after corrections and durable discoveries
 10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
+11. A Gauntlet has one parent task file and issue. Its internal work units and immutable round evidence live under `.ai/gauntlets/<gauntlet_name>/`; do not create separate task issues for those units unless they become independently deliverable work
 
 ## Goal flow
 - A goal is an explicitly requested automated multi-task delivery flow, not the generic `## Goal` field in a task file
@@ -298,6 +313,21 @@ When multiple roles are requested:
 - When all goal tasks complete, generate a goal completion report with PR links in approval order, branch dependencies, QA evidence, and conflict-risk notes before asking for human approval
 - Do not continue to the next goal task if local validation fails, PR creation fails, post-PR QA fails, role resolution is ambiguous, a merge conflict blocks the PR path, or a required human/product/security decision was not already covered by the goal plan
 - Goal flow never grants automatic merge approval; merging remains governed by repository policy
+
+## Gauntlet flow
+
+- A Gauntlet is an explicitly requested adversarial quality loop, not a synonym for a task or goal queue
+- Gauntlet state lives under `../.ai/gauntlets/<gauntlet_name>/GAUNTLET.md`; create it with `./commands/create-gauntlet-file.sh "<gauntlet_name>" ["Title"] --task "<task_name>"`
+- Before building, define an inspectable objective, artifact, constraints, and concrete quality bar, then obtain human approval and freeze that bar
+- Changing an approved bar requires new human approval and invalidates affected prior pass evidence; preserve prior rounds, record the revision in Unit History, reopen active units, clear integration evidence, reset the current fingerprint to `pending`, and reset PR eligibility to `no`
+- Let the lead agent decompose the deliverable into stable, independently judgeable units; preserve split, merge, supersession, failure, and strategy history
+- For every round, a builder changes and verifies the actual artifact, then a separate fresh-context critic compares that artifact with the frozen bar and checks guardrails
+- Record each critic report immutably under `rounds/<item_id>/round-NNN.md`; require artifact inspected, bar comparison, guardrail results, verdict, largest remaining gap, and next strategy
+- A failing unit returns to its builder with the largest gap and must use a changed strategy; record that builder strategy in Review Notes, omit it from the critic packet, and use a new critic invocation for the next round
+- After every active unit passes, use a new integration critic to inspect the complete artifact. An integration failure reopens affected units and invalidates stale pass evidence; the bundled recorder conservatively reopens every active unit
+- Do not impose an automatic attempt, time, cost, or diminishing-return limit. Continue until success or explicit user interruption, subject to safety, permission, platform-policy, and unrecoverable-blocker stops; this does not authorize unapproved spending or external actions, and a user-approved resource boundary remains a permission constraint
+- A Gauntlet passes only when every active unit's latest verdict and the integration verdict are `pass`; stopped and blocked reports remain incomplete and PR-ineligible
+- Generate `GAUNTLET_REPORT.md`, run final validation, then use the normal human PR readiness gate for one final PR. Gauntlet mode never merges, approves, or enables auto-merge
 
 ## Issue-first task import
 - If the user prompt includes an issue reference (for example `Work on #123`), import that issue into task tracking first with `./commands/import-task-from-issue.sh "#123"`.
@@ -356,6 +386,7 @@ When multiple roles are requested:
 - Do not commit unless explicitly asked
 - Do not push or open a pull request until the PR readiness gate has been presented and the user explicitly confirms they are ready
 - The only exception is explicit goal flow, where PR creation is automatic between goal tasks after `./commands/pr-readiness-check.sh --goal` records validation and before post-PR QA runs; merging remains human-approved after the goal completion report
+- Gauntlet mode retains the normal human readiness confirmation and may create only one final PR after complete Gauntlet validation
 - Any PR created for task-backed work must be associated with its issue (for example `Closes #<issue-number>` in PR body)
 - When asked to commit, prefer conventional commits:
   - feat(scope): summary
