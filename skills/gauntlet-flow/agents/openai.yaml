@@ -1,4 +1,4 @@
 interface:
   display_name: "Gauntlet Flow"
   short_description: "Run adversarial builder-critic delivery loops"
-  default_prompt: "Use $gauntlet-flow for this deliverable. First propose a measurable quality bar and pause for approval; then run isolated builder-critic rounds."
+  default_prompt: "Use $gauntlet-flow for this deliverable. Propose a measurable quality bar and progressive integration-branch delivery contract, pause for approval, then bind publication checkpoints, isolated builder-critic rounds, live PR QA, human merges, and promotion QA to the approved manifest, real Git refs, and exact reviewed head SHAs."

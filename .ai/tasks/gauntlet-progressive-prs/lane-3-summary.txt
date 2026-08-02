@@ -1,0 +1,1 @@
+README now documents the durable integration branch, automatic work-unit and remediation PR publication, round-by-round critic and QA evidence, human-only merges, same-PR failure iteration, integration remediation, and final human-gated promotion. README validation passed with 33 anchors, 59 commands, and 11 paths; diff and obsolete-claim scans passed.
