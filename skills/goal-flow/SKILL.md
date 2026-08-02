@@ -19,7 +19,7 @@ Do not activate goal flow from the generic `## Goal` section in a normal `TASK.m
 - final goal completion report with PR links in approval order
 
 ## Notes
-- Goal flow is the only OpenCaw exception to the normal human PR readiness approval prompt.
+- Goal task publication is one scoped exception to the normal human PR readiness prompt. The other is work-unit progress publication under an explicitly approved Gauntlet contract; Gauntlet promotion remains human-gated.
 - Goal flow does not skip validation, PR creation evidence, issue linkage, or post-PR QA.
 - Goal flow never implies auto-merge, merge approval, or auto-merge enablement.
 - If a later goal task depends on an earlier task or would likely create merge conflicts when based on the original base branch, base the later task branch on the previous task branch or PR head and record the dependency.

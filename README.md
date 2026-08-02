@@ -20,7 +20,7 @@ Behind the conversation, OpenCaw provides a shared system for planning, architec
 ```mermaid
 flowchart TB
     accTitle: OpenCaw task, goal, and Gauntlet workflows
-    accDescr: A request enters task mode by default, explicit goal mode for an ordered series of task pull requests, or explicit Gauntlet mode for repeated builder and independent critic rounds followed by one pull request.
+    accDescr: A request enters task mode by default, explicit goal mode for an ordered series of task pull requests, or explicit Gauntlet mode where reviewed work-unit pull requests merge into a durable integration branch before a final promotion pull request.
 
     Request["Natural-language request"] --> Mode{"Work mode"}
 
@@ -39,17 +39,30 @@ flowchart TB
     GoalMore -->|"No"| GoalReport["Prepare goal completion report"]
     GoalReport --> HumanMerge
 
-    Mode -->|"Gauntlet: explicit"| Bar["Approve and freeze an inspectable quality bar"]
-    Bar --> Units["Derive independently judgeable work units"]
-    Units --> Build["Builder improves the real artifact"]
-    Build --> Critic["Fresh critic compares artifact with the bar"]
-    Critic -->|"Fail: record largest gap"| Build
-    Critic -->|"All units pass"| Integration["Fresh integration critic reviews the complete artifact"]
-    Integration -->|"Fail: reopen affected units"| Build
-    Integration -->|"Pass"| GauntletGate["Human PR readiness approval"]
-    GauntletGate --> GauntletQA["Open one final PR and run post-PR QA"]
-    GauntletQA -->|"Pass"| HumanMerge
-    GauntletQA -->|"Fail: reopen same PR"| Build
+    Mode -->|"Gauntlet: explicit"| Bar["Approve bar, delivery base, and progress-PR contract"]
+    Bar --> GBranch["Create durable gauntlet/name integration branch"]
+    GBranch --> Units["Derive independently judgeable work units"]
+    Units --> Build["Builder improves one unit"]
+    Build --> UnitPR["Publish or update its progress PR automatically to the integration branch"]
+    UnitPR --> Critic["Fresh critic reviews the artifact; post round evidence"]
+    Critic -->|"Fail"| RecordUnitFail["Post and record PR QA failure"]
+    RecordUnitFail --> Build
+    Critic -->|"Pass"| UnitQA["Run PR QA and post results"]
+    UnitQA -->|"Fail"| RecordUnitFail
+    UnitQA -->|"Pass"| UnitMerge["Human merges the unit PR"]
+    UnitMerge --> MoreUnits{"All active units integrated?"}
+    MoreUnits -->|"No; start independent or newly unblocked unit"| Build
+    MoreUnits -->|"Yes"| Integration["Fresh critic reviews the integrated artifact"]
+    Integration -->|"Fail"| Reopen["Record failure and reopen affected units"]
+    Reopen --> Remediation["Builder corrects and verifies affected work"]
+    Remediation --> RemediationPR["Run progress readiness and publish remediation PR"]
+    RemediationPR --> Critic
+    Integration -->|"Pass"| GauntletGate["Human promotion-PR readiness approval"]
+    GauntletGate --> Promotion["Open promotion PR to the approved delivery base"]
+    Promotion --> PromotionQA["Run promotion PR QA"]
+    PromotionQA -->|"Pass"| HumanMerge
+    PromotionQA -->|"Fail"| PromotionFail["Record failure, archive completion, and reopen named units"]
+    PromotionFail --> Remediation
 ```
 
 ---
@@ -141,7 +154,7 @@ OpenCaw has three work modes. A normal specific assignment uses task mode; goal 
 | --- | --- | --- | --- |
 | Task | One specific assignment | The requested result passes its relevant verification | One PR after human readiness approval |
 | Goal | An ordered collection of tasks | Every task is done and its post-PR QA has completed | A PR may open automatically for each task; merging remains human-controlled |
-| Gauntlet | One ambitious, inspectable deliverable that benefits from adversarial iteration | Every active work unit and a fresh integration review pass an approved quality bar | One final PR after human readiness approval |
+| Gauntlet | One ambitious, inspectable deliverable that benefits from adversarial iteration | Every active unit is critic-passed and PR-QA-passed at the same frozen scope and exact head SHA, that reviewed head is human-merged into its integration branch, then a fresh integration review passes | An approved contract permits automatic progress PRs; every merge and the final promotion PR remain human-controlled |
 
 For ordinary work, describe the assignment directly:
 
@@ -158,10 +171,10 @@ Use goal flow for these four migration tasks. Validate and open each task PR, ru
 Use Gauntlet mode when the result should survive repeated independent comparison against a concrete benchmark:
 
 ```text
-Use gauntlet mode for this onboarding redesign. First propose an inspectable quality bar for my approval. Use separate builders and fresh critics, and keep one final PR behind my readiness approval.
+Use gauntlet mode for this onboarding redesign. First propose an inspectable quality bar, delivery base, and integration-branch contract for my approval. Publish each unit's progress PR automatically after approval, use fresh critics, and leave every merge and the final promotion PR under human control.
 ```
 
-Gauntlet mode is appropriate only when a critic can inspect the real output—such as running code, rendered pixels, test or performance results, a finished document, or another concrete artifact. It never permits the builder to grade its own work.
+Gauntlet mode is appropriate only when a critic can inspect the real output—such as running code, rendered pixels, test or performance results, a finished document, or another concrete artifact. It never permits the builder to grade its own work. Its progress PRs provide review surfaces throughout the loop; the final promotion PR is the integration boundary back to the approved delivery base, not the first review surface.
 
 ## Planning Is a Conversation
 
@@ -246,7 +259,7 @@ For a substantial request, the normal flow is:
 7. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
 8. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
 9. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
-10. **Deliver by mode** — task and Gauntlet work pause for human PR approval; explicit goal flow may publish each validated task PR automatically; every path preserves post-PR QA and human merge control.
+10. **Deliver by mode** — task work pauses before publication; goal flow may publish validated task PRs; an approved Gauntlet contract may publish unit progress PRs to its integration branch; every path keeps merges human-controlled, and Gauntlet promotion still requires a final human gate.
 
 OpenCaw can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
 
@@ -340,10 +353,10 @@ Goal: modernize the reporting module across these five tasks. Raise each task PR
 Explicit Gauntlet example:
 
 ```text
-Use gauntlet flow for the reporting experience. Propose a concrete benchmark for my approval, let the lead derive judgeable work units, and use a fresh critic for every round and for final integration.
+Use gauntlet flow for the reporting experience. Propose a concrete benchmark and an approved delivery base, create a durable gauntlet integration branch, and let disjoint units publish progress PRs there automatically. Use a fresh critic for every round, require PR QA and human merge before a unit counts as integrated, and keep final promotion human-gated.
 ```
 
-Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because it changes the execution and evidence model, but it retains the human PR readiness gate. Ordinary natural-language work remains task mode and also pauses for human approval before publication.
+Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because its approved contract authorizes progress PR publication and changes the execution and evidence model. That authorization never includes a merge: unit, remediation, and promotion merges remain human decisions, and the final promotion PR retains a human readiness gate. Ordinary natural-language work remains task mode and pauses for approval before publication.
 
 ---
 
@@ -484,7 +497,7 @@ The rest of this README describes the machinery behind the conversational experi
 | Roles | Named specialist perspective and priorities | Optional precision control |
 | Skills | Reusable reasoning and workflow instructions | Selected automatically when relevant or explicitly requested |
 | Commands | Deterministic scripts for repeatable execution | Run by the agent or directly by developers |
-| Task, goal, and Gauntlet state | Assignment scope, multi-task delivery, adversarial round evidence, and GitHub traceability | Maintained for the selected work mode |
+| Task, goal, and Gauntlet state | Assignment scope, multi-task delivery, adversarial rounds, integration branches, PR/QA events, and GitHub traceability | Maintained for the selected work mode |
 | Memory and repository map | Durable facts and semantic repository structure | Queried selectively before broad searches |
 | Verification evidence | Tests, logs, browser artifacts, and PR QA comments | Required before completion |
 
@@ -539,7 +552,7 @@ OpenCaw separates reusable baseline behavior from host-project state.
     ├── CONTEXT_SUMMARY.md
     ├── tasks/
     ├── goals/
-    ├── gauntlets/
+    ├── gauntlets/              # contracts, immutable rounds, and ordered PR/QA ledgers
     ├── archive/
     │   ├── tasks/
     │   ├── goals/
@@ -695,7 +708,7 @@ $clean-context
 | Context | `maintain-memory`, `maintain-repository-map`, `clean-context` | Retrieve and preserve durable high-signal project knowledge |
 | Parallel work | `orchestrate-subagents` | Create safe role-resolved lanes and integrate their evidence |
 | Goal delivery | `goal-flow` | Manage explicit multi-task PR and post-PR-QA automation |
-| Adversarial delivery | `gauntlet-flow` | Run builder and fresh-critic rounds against an approved quality bar, then require independent integration review |
+| Adversarial delivery | `gauntlet-flow` | Run builder and fresh-critic rounds through reviewable unit PRs, human-controlled integration, and final promotion |
 | Build and test | `solution-build`, `test-dotnet` | Restore, build, test, and report repository results |
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
 | Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
@@ -734,7 +747,7 @@ Or run the command directly:
 | Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
 | Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
 | Goal flow | `create-goal-file.sh`, `create-goal-completion-report.sh` |
-| Gauntlet flow | `create-gauntlet-file.sh`, `validate-gauntlet.sh`, `record-gauntlet-round.sh`, `create-gauntlet-completion-report.sh` |
+| Gauntlet flow | `create-gauntlet-file.sh`, `validate-gauntlet.sh`, `record-gauntlet-round.sh`, `record-gauntlet-pr-event.sh`, `record-gauntlet-promotion-qa.sh`, `create-gauntlet-completion-report.sh` |
 | PR delivery | `pr-readiness-check.sh`, `link-pr-to-task-issue.sh`, `comment-pr-qa-results.sh`, `comment-issue-test-results.sh` |
 | Memory | `append-system-memory.sh`, `append-project-memory.sh`, `query-project-context.sh`, `purge-project-memory.sh`, `migrate-memory-v2.sh`, `clean-context.sh` |
 | Repository map | `repo-map-status.sh` |
@@ -799,9 +812,9 @@ The selected mode controls the unit of work, stopping condition, durable state, 
 | --- | --- | --- | --- | --- |
 | Task | Default for a specific assignment; may also be named explicitly | `.ai/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
 | Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.ai/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
-| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.ai/gauntlets/<gauntlet-name>/GAUNTLET.md` plus immutable round evidence | Build, independently criticize, and repeat until all units and integration pass | Human approval before one final PR |
+| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.ai/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
 
-These are sibling modes. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks, and Gauntlet mode never inherits goal mode's automatic PR exception. If a request explicitly selects both goal and Gauntlet for the same work, OpenCaw asks which mode governs before changing project state.
+These are sibling modes. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request explicitly selects both goal and Gauntlet for the same work, OpenCaw asks which mode governs before changing project state.
 
 ### Task lifecycle
 
@@ -824,50 +837,96 @@ The completion report orders PRs for approval and records branch dependencies, Q
 
 ### Gauntlet lifecycle
 
-A Gauntlet has one parent task and GitHub issue, one ambitious deliverable, and a quality bar that a critic can inspect. A useful bar may be a reference artifact, acceptance or recovery test, latency target, security review, or evidence-backed writing rubric. Before building begins, the lead proposes the benchmark when needed and the user approves it. Approval freezes the bar. An approved revision preserves old rounds, records the revision in Unit History, reopens active units, clears integration evidence, resets the current fingerprint to `pending`, and resets PR eligibility to `no`; only evidence produced against the new fingerprint can pass completion.
+A Gauntlet has one parent task and GitHub issue, one ambitious deliverable, and a quality bar that a critic can inspect. A useful bar may be a reference artifact, acceptance or recovery test, latency target, security review, or evidence-backed writing rubric.
 
-`GAUNTLET.md` is the live contract and index. It records flow and status, the parent task, objective, approved quality bar, constraints and permissions, work units, current state, round ledger, integration review, delivery state, and review notes.
+Before building begins, the user approves a durable delivery contract containing:
 
-The lead derives the smallest work units that can be improved and judged independently. Only disjoint units may run in parallel. Splits, merges, and superseded units stay in the ledger so failed work cannot silently disappear.
+- the inspectable quality bar and constraints
+- the original delivery-base branch and exact commit that will receive the finished work
+- a `gauntlet/<name>` integration branch created exactly at that commit
+- permission to publish progress and remediation PRs automatically to that integration branch
+- the rule that every PR merge, approval, and final promotion remains human-controlled
 
-Each active unit then follows the adversarial loop:
+The first accepted opened progress-PR event freezes the approved parent task, objective, constraints/permissions, base identity, static delivery policy, quality bar, and normalized work-unit manifest into separate execution-contract, quality, and manifest fingerprints. An approved quality-bar revision preserves old rounds, records the revision in Unit History, reopens affected units, clears integration evidence, and resets promotion eligibility; only current evidence can satisfy the revised bar. Every retained unit has a durable ID, title, and inspectable scope. The normalized manifest contains sorted retained ID/title/scope definitions and sorted supersession ID/scope/replacement edges, but excludes transient checkbox/status state. The initial manifest requires an approved fingerprint. Additions, definition changes, or edge changes require an approved manifest revision; changed title or scope also requires a matching scope-title revision. Existing definitions cannot vanish or be renamed. Every per-unit checkpoint, PR event, and critic round must reference a unit present in, and the title/scope definition committed by, the manifest generation active at its timestamp. Unchanged exact scopes may retain evidence from an authorized earlier manifest, while added, changed, superseding, superseded, and causally affected units require fresh evidence.
 
-1. A builder changes the real artifact and runs its objective verifier.
-2. A separate critic starts with fresh context containing only the objective, current unit ID and frozen scope, approved bar, relevant constraints, and actual artifact—not the builder's history or justification.
+Supersession requires exactly one canonical `- Unit supersession: <item-id> | scope: <scope-fingerprint> | replacements: <comma-sorted-active-item-ids> | reason: <substantive reason> | approved by: <identity> | approved at: <canonical-UTC>` Unit History marker. It must bind the old scope, name one or more active non-self replacements, follow all retained evidence chronologically, and prohibit later evidence for the superseded unit. The graph must be acyclic, every path must reach an active leaf, and every active descendant inherits each outstanding failure obligation from its ancestors; failed work cannot simply disappear. Every edge used to inherit a failure must already be approved when the replacement cycle's publication checkpoint is issued, before the live PR is created, so a later manifest revision cannot retroactively authorize earlier work.
+
+`GAUNTLET.md` is the live contract and index. It records flow and status, the parent task, objective, approved quality bar, constraints and permissions, retained work-unit definitions and active scopes, execution/quality/unit-manifest fingerprints, frozen base commit, round/progress-PR/completion/promotion ledgers, merge topology, integration review, delivery state, and review notes. Append-only publication checkpoints live beside it and are consumed by opened entries in the hashed progress-PR ledger.
+
+Do not fabricate progressive PR events for a Gauntlet started under the earlier single-final-PR contract. Preserve that run and report under `.ai/archive/gauntlets/`, then create a new progressive Gauntlet or explicitly supersede its old units and rebuild them through real work-unit PRs. Historical evidence without an observed PR head, QA result, and human merge cannot satisfy the new completion gate.
+
+#### Work units and progress PRs
+
+The lead derives the smallest work units that can be improved and judged independently. Each unit line freezes a stable ID, title, and inspectable scope/acceptance boundary. Each active unit gets one progress PR targeting `gauntlet/<name>` from `gauntlet-work/<name>/<item-id>`; later remediation or replacement cycles use `-remediation-N`. Builder/critic iterations normally update that open unit PR, so its comments show every failure and pass without creating throwaway PRs. A completed, closed, or causally superseded cycle gets a new PR. The separate `gauntlet-work/` namespace is required because Git cannot store `gauntlet/<name>` and a descendant branch beneath the same ref. Disjoint units may use separate branches and PRs in parallel. Coupled or dependent work waits until its prerequisite PR is human-merged, then starts from the resulting integration-branch state.
+
+The approved contract authorizes progress-PR publication; it does not authorize merging. Before publication, readiness fetches the recorded origin, proves every effective push URL belongs to the issue repository, compares local and remote integration/work refs, proves the work head descends from the exact integration-chain tip, and writes an immutable `publication-checkpoints/<item-id>/checkpoint-NNN.md`. Gauntlet evidence permits only authenticated SSH or HTTPS `github.com` remotes—never plaintext HTTP—and explicitly pins live API queries to `github.com` instead of trusting an ambient `GH_HOST`. Its quality fingerprint plus exact `Quality bar approved at` value, manifest fingerprint plus exact `Unit manifest approved at` value, and every supersession edge used for inherited remediation must already be approved and active at that checkpoint's issuance time. The PR body must begin with case-sensitive `Refs #<issue-number>` and include exactly one emitted `<!-- opencaw-gauntlet-publication:v1 checkpoint=<path> checkpoint-sha256=<sha> -->` marker; every GitHub closing-keyword alias is reserved for the human-gated promotion PR. The opened-event recorder queries the live same-repository PR body, base/head branches and OIDs, state, draft flag, and creation time; it verifies that the checkpoint still matches the contract, fingerprints, refs, and remediation root, then consumes it exactly once. Every later round and event re-observes the mutable body, and each later head on that open PR must fast-forward from its prior recorded head. An unused checkpoint may document an aborted publication attempt, but it cannot authorize a later changed PR; issuing a newer checkpoint supersedes every older unused checkpoint for that unit.
+
+A unit counts as integrated only when all three conditions are recorded for the current unit scope, unit-manifest, quality, and execution-contract fingerprints:
+
+1. Its latest fresh critic verdict passes the approved bar at an identified full PR-head SHA.
+2. Its progress PR QA passes after GitHub confirms that head SHA has not drifted.
+3. GitHub reports that the exact reviewed head was merged by an actor with `is_bot=false`; its observed `baseRefOid` extends the gapless frozen-base merge chain to the recorded `mergeCommit`, and the exact integration head equals the chain tip.
+
+Publication authorization is branch- and unit-scoped. A progress or remediation PR must target the recorded integration branch; it does not authorize changing the delivery base, force-pushing shared history, deleting branches, spending money, approving reviews, or merging.
+
+Each unit PR carries the complete review trail. Builder updates stay on that PR, and every critic round and PR QA result is posted as a comment or linked evidence. A failed critic or QA result leaves the unit unintegrated and returns it to the builder for a changed actual builder strategy; it never becomes a hidden local-only pass. The next round cannot begin until the previous round has a recorded QA failure. In particular, QA or CI failure after a critic pass reopens the unit and requires a new builder update, changed builder strategy, new head SHA, and fresh critic round on the same open PR before QA can pass and a human can merge it.
+
+For every critic round:
+
+1. A builder records the actual strategy for this attempt, changes the real artifact, runs its objective verifier, pushes it to the progress PR, and obtains the current full `headRefOid` from GitHub.
+2. A separate critic starts with fresh context containing only the objective, current unit ID and frozen scope, approved bar, relevant constraints, exact head SHA, and actual artifact—not the builder's history, justification, or prior PR comments.
 3. The critic uses blind comparison where feasible; otherwise it directly compares the artifact with the reference and checks objective tests and guardrails.
-4. A passing verdict closes that round. A failing verdict records the largest remaining gap and next strategy; the lead records the changed strategy actually used in Review Notes, keeps it out of the next critic packet, and then starts another round.
+4. The report identifies the exact head SHA and real project-relative artifacts inspected. A passing verdict advances the unit toward PR QA. A failing verdict records the largest remaining gap and critic recommendation; after its QA failure is recorded, the builder must use a different actual strategy for the next attempt on the same unit PR.
 
-The builder and critic IDs must differ, and every round requires a new critic invocation using a native fresh-context subagent or a fresh isolated session. If OpenCaw cannot obtain an isolated critic, it blocks the Gauntlet instead of accepting self-review. Critics inspect the running product, rendered output, test evidence, finished document, or other real artifact—not a builder-written summary.
+Builder and critic identity sets must remain globally disjoint across the Gauntlet, with case-normalized comparison, and every round requires a new critic invocation using a native fresh-context subagent or a fresh isolated session. If OpenCaw cannot obtain an isolated critic, it blocks the Gauntlet instead of accepting self-review. Critics inspect the running product, rendered output, test evidence, finished document, or other real artifact—not a builder-written summary.
 
-Every critic report records `Artifact Inspected`, `Bar Comparison`, `Guardrail Results`, `Verdict`, `Largest Remaining Gap`, and `Next Strategy`. Evidence is append-only under:
+Every critic report uses the exact contract documented by the `gauntlet-flow` skill: ordered `Artifact Inspected`, `Bar Comparison`, `Guardrail Results`, `Verdict`, `Largest Remaining Gap`, and `Next Strategy` sections; at least one `- Artifact: <project-relative-file>` entry that is a regular file in the reviewed commit tree; one `- Head SHA: <full-sha>` matching the live PR or integration head; and exactly one `- Verdict: pass|fail|blocked`. Evidence is append-only under:
 
 ```text
 .ai/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
 ```
 
-There is no automatic round, time, cost, or diminishing-return limit. The loop continues until it passes, the user stops it, or safety, permission, platform policy, or an unrecoverable blocker prevents progress. This does not authorize unapproved paid services or external actions; any user-approved resource boundary remains an explicit permission constraint.
+PR events are durable under `.ai/gauntlets/<gauntlet-name>/pr-events/<item-id>/event-NNN.md`. Recording `opened`, `qa-pass`, `qa-fail`, `merged`, or `closed` performs a fresh live-GitHub query and persists same-repository identity, PR-body checkpoint, state, draft flag, created/closed/merged times, head/base SHAs, all current fingerprints, target, merge actor and bot flag, and merge commit. Record human merges promptly in integration order so every `baseRefOid` connects the prior chain tip to the new `mergeCommit`; direct integration commits are forbidden. Any retained GitHub timeline event that enabled auto-merge, auto-rebase, auto-squash, or entry into a merge queue invalidates a progress or promotion PR, even if the automation was later disabled. Completion and readiness re-query every terminal PR used for topology or remediation causality rather than trusting mutable local text. For PR events recorded in the same UTC second, append order in the hashed Progress PR Ledger supplies causal order; equal-time records in different ledgers must be joined by an explicit evidence edge rather than lexical path or evidence-type ordering.
 
-After every active unit's latest round passes, a new integration critic reviews the complete artifact. Record that final review with the reserved item ID `integration`. An integration failure invalidates stale evidence; the bundled recorder conservatively reopens every active unit so no stale pass survives. The Gauntlet passes only after the rebuilt units and a fresh integration review pass.
+Each QA verdict requires a new exact same-PR comment containing `<!-- opencaw-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`. The recorder verifies its source hash, reviewed head, verdict, affected set, trusted human collaborator, creation/update timestamps, PR ownership, and uniqueness. Each unit round also binds the opened event and resolved remediation root by path and hash, making the external comment an anchor that cannot be locally reassigned to a different failure. Canonical ledger lines bind one-to-one to file hashes, and mutation commands use an atomic per-Gauntlet lock, compare-and-swap, and no-clobber installation.
 
-Gauntlet state uses `planning`, `ready`, `running`, `passed`, `stopped`, or `blocked`; work units use `pending`, `building`, `critic-failed`, `passed`, `blocked`, or `superseded`; round verdicts use `pass`, `fail`, or `blocked`. Passed, user-stopped, and blocked runs each produce a `GAUNTLET_REPORT.md`. Stopped and blocked runs preserve their ledger for an explicit resume, but their reports remain incomplete and cannot become PR-eligible.
+Each autonomous Gauntlet execution window lasts at most 45 minutes or two failed full-validation epochs, whichever occurs first. One epoch means evaluating one frozen candidate against the approved verification suite; targeted diagnosis does not reset or enlarge the window. When the budget is exhausted, OpenCaw records the elapsed time and failed-epoch count, persists resumable state, generates a stopped report, sets the Gauntlet to `stopped`, and asks for explicit user reauthorization before starting another build, audit, or validation epoch. Reauthorization starts a new window. Safety, permission, platform policy, and unrecoverable blockers still stop immediately, and this does not authorize unapproved paid services or external actions.
+
+#### Integration and promotion
+
+After every active unit is integrated, OpenCaw proves the fetch and every push identity still match the issue repository and the exact local and remote `gauntlet/<name>` heads are the unique gapless merge-chain tip descended from the frozen base. A rewind, force-push, fork, divergence, chain gap, or unrecorded direct commit fails. A new integration critic then reviews that SHA and aggregate scope. Unit critic/QA failures, integration fail/block evidence, and promotion failures each remain exact externally anchored causal roots until a later merged PR consumes them. Supersession transfers every outstanding ancestor root to every active descendant leaf. The replacement cycle's checkpoint, opened event, round, QA marker, and merge remain hash-linked to that root; old passing merges cannot be reused by manually flipping status.
+
+An integration pass can generate `GAUNTLET_REPORT.md` and an immutable `completion-events/event-NNN.md` entry in the Completion Ledger. The event binds a canonical projection hash of the entire report except the self-referential Immutable Completion Evidence section. Every older completion must be consumed exactly once by a later promotion failure; at most the newest can remain active. An active completion forces passed, PR-eligible, report-present, and unchanged source state even if mutable fields are edited. Readiness rechecks remote identity, all fingerprints, base ancestry, merge topology, live terminal PRs, report projection, source SHA, and that the frozen delivery base is still GitHub's default branch. The promotion PR targets that verified default branch, begins with exact case-sensitive `Closes #<parent-issue>`, and links the ordered unit, remediation, critic, completion, and QA ledgers.
+
+Promotion PR QA is mandatory and each verdict uses a new live same-PR semantic comment. The event binds the promotion PR's observed target `baseRefOid` as a descendant of the frozen base. One later failure may supersede a prior pass for the same completion, PR, and head; a second pass cannot follow that failure on the consumed completion. Failure archives the report, consumes the completion, binds the reviewed source, and names affected units. It is the only path that can reopen completion; direct state edits, rounds, progress events, report demotion, or stale merges are rejected. After causally linked remediation, integration must pass and create a new head and completion event before promotion QA repeats. Historical event heads remain verifiable through immutable comments and fast-forward ancestry, but the current live promotion PR must remain open, non-draft, and unmerged, and its source head plus the remote integration ref must exactly equal the reconstructed local merge-chain tip. Every merge remains human-controlled.
+
+Gauntlet state uses `planning`, `ready`, `running`, `passed`, `stopped`, or `blocked`; work units use `pending`, `building`, `critic-failed`, `passed`, `blocked`, or `superseded`; round verdicts use `pass`, `fail`, or `blocked`. Passed, user-stopped, and blocked runs each produce a `GAUNTLET_REPORT.md`. Stopped and blocked runs preserve their branch and evidence ledger for an explicit resume, but their reports remain incomplete and cannot become promotion-eligible.
 
 Create, validate, record, and report a Gauntlet with:
 
 ```bash
 ./commands/create-gauntlet-file.sh "<gauntlet-name>" "<Gauntlet Title>" --task "<task-name>" --dry-run
 ./commands/validate-gauntlet.sh "<gauntlet-name-or-path>" --phase ready
-./commands/record-gauntlet-round.sh "<gauntlet>" "<item-id>" "<pass|fail|blocked>" "<builder-id>" "<critic-id>" "<native-subagent|fresh-session>" "<critic-report.md>" --dry-run
-./commands/validate-gauntlet.sh "<gauntlet-name-or-path>" --phase complete
+bash ./commands/pr-readiness-check.sh --gauntlet-progress "<gauntlet>" "<item-id>" "<validation-summary-file>"
+./commands/record-gauntlet-round.sh "<gauntlet>" "<item-id>" "<pass|fail|blocked>" "<builder-id>" "<critic-id>" "<native-subagent|fresh-session>" "<critic-report.md>" --head-sha "<sha>" --builder-strategy "<strategy>" --dry-run
+./commands/record-gauntlet-pr-event.sh "<gauntlet>" "<item-id>" "<opened|qa-pass|qa-fail|merged|closed>" "<pr-url>" "<head-branch>" "<evidence-url|none>" --head-sha "<sha>" [--merge-commit "<sha>"] [--dry-run]
+./commands/record-gauntlet-promotion-qa.sh "<gauntlet>" "<pass|fail>" "<promotion-pr-url>" "<evidence-url>" --head-sha "<sha>" [--affected-unit "<item-id>"]... [--dry-run]
+./commands/comment-pr-qa-results.sh "<pr-url>" "<summary-file>" --gauntlet-verdict "<pass|fail>" --head-sha "<sha>" --gauntlet-source "<project-relative-round-or-completion-event>" [--gauntlet-affected-units "<none|comma-sorted-ids>"]
 ./commands/create-gauntlet-completion-report.sh "<gauntlet>" --status "<complete|stopped|blocked>" --dry-run
+./commands/validate-gauntlet.sh "<gauntlet-name-or-path>" --phase complete
 ```
 
-Remove `--dry-run` only after reviewing the resolved paths and intended state change. A passed Gauntlet produces `GAUNTLET_REPORT.md`, completes local validation, and runs the normal readiness gate in Gauntlet mode:
+The validation summary for `--gauntlet-progress` is optional. After the delivery contract is approved and readiness writes the unit's publication checkpoint, the agent may publish that exact progress PR without another prompt. Copy the emitted checkpoint marker into its body, then record the actual PR and each later QA or merge event; readiness itself never opens or merges a PR.
+
+Use `opened` only after the progress PR is available; the first accepted event freezes the execution contract. Before a critic, fetch/update the local branch and use its exact `headRefOid`. Every QA verdict consumes a new verified `COMMENT_URL`. Fetch integration before `merged`, then record the human merge promptly in target order so its observed `baseRefOid` extends the current chain tip exactly. A PR may close before any critic round or after its latest round has recorded QA, but never with unconsumed critic evidence. Event recording verifies observed state; it never grants merge permission.
+
+Remove `--dry-run` only after reviewing the resolved paths and intended state change. For successful completion, run the completion-report command after ready validation and the passing integration review. It creates the report and immutable completion event, then runs complete validation transactionally; a later explicit `--phase complete` invocation is a recheck, never a prerequisite for report generation. Once every unit is integrated and the fresh integration review passes, a complete `GAUNTLET_REPORT.md` can enter final promotion readiness:
 
 ```bash
-./commands/pr-readiness-check.sh --gauntlet "<gauntlet-ref>" "<validation-summary-file>"
+bash ./commands/pr-readiness-check.sh --gauntlet "<gauntlet-ref>" "<validation-summary-file>"
 ```
 
-The validation summary argument is optional, but readiness still waits for human approval before opening one final PR. If post-PR QA fails, OpenCaw reopens the Gauntlet on the same branch and PR, records new builder/critic rounds, and repeats QA. It never merges or enables auto-merge.
+The final validation summary is optional, but `--gauntlet` still requires human approval before publishing the promotion PR to the original delivery base, and that base must still be the repository's current GitHub default branch. Every merge remains human-controlled.
 
 ### Method sources
 
@@ -1048,7 +1107,7 @@ The integrated suite verifies, among other things:
 - style catalog and contract structure
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
-- Gauntlet scaffold isolation, lifecycle state, fresh-critic evidence, completion gates, and task/goal/Gauntlet PR-readiness compatibility
+- Gauntlet scaffold isolation, real commit/ref and live-GitHub binding, fresh-critic evidence, one-to-one hash ledgers, transactional progress events, authorized remediation, human-merge integration, and final promotion gates
 - Windows provider classification and explicit-install behavior
 
 Verification for host-project work remains proportional to the task: targeted tests first, broader suites when risk warrants them, and browser/log/artifact evidence where behavior cannot be proven by unit tests alone.
@@ -1069,7 +1128,7 @@ OpenCaw/
 ├── commands/                         # deterministic scripts
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures
-└── .ai/                              # repository-local memory, tasks, goals, Gauntlets, and evidence
+└── .ai/                              # repository-local memory, tasks, goals, and Gauntlet round/PR evidence
 ```
 
 Bundled Playwright assets include configuration, package-script, report, and CLI-reference templates under `assets/playwright/` and `assets/playwright-cli/`. Host repositories continue to own their actual application tests, credentials, runtime artifacts, and generated reports.

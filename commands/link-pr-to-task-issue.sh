@@ -4,8 +4,17 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage: ./commands/link-pr-to-task-issue.sh "<issue_url_or_number>" [pr_number_or_url]
+
+Adds a closing issue keyword to a delivery-completing task, Goal-task, or
+human-approved Gauntlet promotion PR. Do not use this command for Gauntlet
+progress or remediation PRs; link those non-destructively with `Refs #<issue>`.
 EOF
 }
+
+if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
+  usage
+  exit 0
+fi
 
 issue_ref="${1:-}"
 pr_ref="${2:-}"

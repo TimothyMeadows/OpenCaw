@@ -190,6 +190,7 @@ if [[ "${1:-} ${2:-}" == 'pr comment' ]]; then
   while [[ $# -gt 0 ]]; do
     if [[ "$1" == '--body-file' ]]; then
       printf '%s\n' "${2:-}" > "$OPENCAW_TEST_GH_LOG"
+      echo 'https://github.com/example/project/pull/73#issuecomment-7301'
       exit 0
     fi
     shift
@@ -199,8 +200,10 @@ exit 1
 EOF
 chmod +x "$fake_gh_dir/gh.exe"
 printf '# QA\n\nPASS\n' > "$fake_qa_summary"
-PATH="$fake_gh_dir:/usr/bin:/bin" OPENCAW_TEST_GH_LOG="$fake_gh_log" run_for "$project" bash commands/comment-pr-qa-results.sh 73 "$fake_qa_summary" >/dev/null
+PATH="$fake_gh_dir:/usr/bin:/bin" run_for "$project" bash commands/comment-pr-qa-results.sh --help >/dev/null
+qa_comment_output="$(PATH="$fake_gh_dir:/usr/bin:/bin" OPENCAW_TEST_GH_LOG="$fake_gh_log" run_for "$project" bash commands/comment-pr-qa-results.sh 73 "$fake_qa_summary")"
 grep -Eq '^([A-Za-z]:\\|\\\\)' "$fake_gh_log" || fail 'Windows gh.exe did not receive a translated body-file path'
+grep -Fq 'COMMENT_URL=https://github.com/example/project/pull/73#issuecomment-7301' <<< "$qa_comment_output" || fail 'PR QA helper did not return the durable GitHub comment URL'
 bash -n commands/lib/memory-common.sh commands/*memory*.sh commands/query-project-context.sh commands/repo-map-status.sh commands/resolve-opencaw-paths.sh
 bash commands/validate-commands.sh >/dev/null
 bash commands/validate-skills.sh >/dev/null

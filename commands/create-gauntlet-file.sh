@@ -87,6 +87,18 @@ fi
 if [[ -e "$gauntlet_dir/rounds" || -L "$gauntlet_dir/rounds" ]]; then
   gauntlet_assert_safe_ai_path "$gauntlet_dir/rounds" 'Gauntlet rounds directory'
 fi
+if [[ -e "$gauntlet_dir/pr-events" || -L "$gauntlet_dir/pr-events" ]]; then
+  gauntlet_assert_safe_ai_path "$gauntlet_dir/pr-events" 'Gauntlet PR events directory'
+fi
+if [[ -e "$gauntlet_dir/promotion-events" || -L "$gauntlet_dir/promotion-events" ]]; then
+  gauntlet_assert_safe_ai_path "$gauntlet_dir/promotion-events" 'Gauntlet promotion events directory'
+fi
+if [[ -e "$gauntlet_dir/completion-events" || -L "$gauntlet_dir/completion-events" ]]; then
+  gauntlet_assert_safe_ai_path "$gauntlet_dir/completion-events" 'Gauntlet completion events directory'
+fi
+if [[ -e "$gauntlet_dir/publication-checkpoints" || -L "$gauntlet_dir/publication-checkpoints" ]]; then
+  gauntlet_assert_safe_ai_path "$gauntlet_dir/publication-checkpoints" 'Gauntlet publication checkpoints directory'
+fi
 
 write_gauntlet() {
   cat <<EOF
@@ -122,7 +134,7 @@ write_gauntlet() {
 - TODO: Define allowed tools, writes, and external actions.
 
 ## Work Units
-- [ ] unit-1 | status: pending | title: Describe an independently judgeable unit
+- [ ] unit-1 | status: pending | title: Describe an independently judgeable unit | scope: Define inspectable artifact and acceptance boundary
 
 ### Unit History
 - No unit changes recorded.
@@ -131,26 +143,48 @@ write_gauntlet() {
 - Active work unit: none
 - Latest round: none
 - Quality bar fingerprint: pending
+- Unit manifest fingerprint: pending
+- Execution contract fingerprint: pending
 - Next action: Approve and freeze the quality bar before building.
 
 ## Round Ledger
 - No rounds recorded.
+
+## Progress PR Ledger
+- No progress PR events recorded.
+
+## Promotion QA Ledger
+- No promotion QA events recorded.
+
+## Completion Ledger
+- No completion events recorded.
 
 ## Integration Review
 - Verdict: pending
 - Critic ID:
 - Isolation:
 - Evidence:
+- Head SHA:
+- Scope fingerprint: pending
 - Quality bar fingerprint: pending
+- Unit manifest fingerprint: pending
+- Execution contract fingerprint: pending
+- Base commit SHA: pending
 
 ## Delivery
-- PR readiness confirmation: human required
-- One final PR: required
-- Post-PR QA: required
+- Base branch: pending
+- Base commit SHA: pending
+- Integration branch: gauntlet/$gauntlet_name
+- Progress PR publication: automatic after approval
+- Progress PR QA: required
+- Progress PR merge: human only
+- Promotion PR readiness confirmation: human required
+- Promotion PR: required
+- Post-promotion QA: required
 - Auto-merge: disabled
 - Merge approval: human only
 - PR eligible: no
-- PR:
+- Promotion PR URL:
 
 ## Review Notes
 EOF
@@ -163,7 +197,10 @@ if [[ $dry_run -eq 1 ]]; then
   exit 0
 fi
 
-mkdir -p "$gauntlet_dir/rounds"
+mkdir -p "$OPENCAW_GAUNTLETS_DIR"
+if [[ ! -d "$gauntlet_dir" ]]; then
+  mkdir "$gauntlet_dir" 2>/dev/null || true
+fi
 [[ ! -L "$target" ]] || {
   echo "Gauntlet file must not be a symbolic link: $target" >&2
   exit 1
@@ -173,9 +210,25 @@ if [[ -f "$target" ]]; then
   exit 0
 fi
 
+gauntlet_acquire_lock "$gauntlet_dir"
+trap 'gauntlet_release_lock' EXIT
+[[ ! -e "$target" && ! -L "$target" ]] || {
+  echo "$target already exists"
+  exit 0
+}
+mkdir -p "$gauntlet_dir/rounds" "$gauntlet_dir/pr-events" "$gauntlet_dir/promotion-events" \
+  "$gauntlet_dir/completion-events" "$gauntlet_dir/publication-checkpoints"
+gauntlet_assert_safe_ai_path "$gauntlet_dir/rounds" 'Gauntlet rounds directory'
+gauntlet_assert_safe_ai_path "$gauntlet_dir/pr-events" 'Gauntlet PR events directory'
+gauntlet_assert_safe_ai_path "$gauntlet_dir/promotion-events" 'Gauntlet promotion events directory'
+gauntlet_assert_safe_ai_path "$gauntlet_dir/completion-events" 'Gauntlet completion events directory'
+gauntlet_assert_safe_ai_path "$gauntlet_dir/publication-checkpoints" 'Gauntlet publication checkpoints directory'
+
 temporary="$(mktemp "$gauntlet_dir/.GAUNTLET.md.XXXXXX")"
-trap 'rm -f "$temporary"' EXIT
+trap 'rm -f "$temporary"; gauntlet_release_lock' EXIT
 write_gauntlet > "$temporary"
-mv "$temporary" "$target"
+chmod 0644 "$temporary"
+gauntlet_install_no_clobber "$temporary" "$target"
+gauntlet_release_lock
 trap - EXIT
 echo "Created $target"

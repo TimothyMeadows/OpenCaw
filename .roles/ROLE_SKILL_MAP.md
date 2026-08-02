@@ -770,6 +770,8 @@ Commands:
 - `commands/create-gauntlet-file.sh`
 - `commands/validate-gauntlet.sh`
 - `commands/record-gauntlet-round.sh`
+- `commands/record-gauntlet-pr-event.sh`
+- `commands/record-gauntlet-promotion-qa.sh`
 - `commands/create-gauntlet-completion-report.sh`
 - `commands/create-goal-file.sh`
 - `commands/create-goal-completion-report.sh`

@@ -6,13 +6,13 @@ Curated reusable skills included in OpenCaw.
 
 - `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding, Windows Bash guidance when applicable, and OpenCaw bootstrap wiring are in place.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
-- `gauntlet-flow` - Run explicit single-deliverable builder-versus-fresh-critic loops against a frozen, human-approved quality bar and one final human-gated PR.
+- `gauntlet-flow` - Run explicit builder-versus-fresh-critic loops with a frozen manifest, immutable publication checkpoints, live Git/GitHub-bound progressive PR and QA evidence, one integration branch, and human-gated promotion.
 - `goal-flow` - Manage explicitly requested automated goals across task completion, automatic PR creation, post-PR QA, branch chaining, and final human approval reporting.
 - `manage-task-issues` - Maintain one GitHub issue per task and keep only open issue URLs in tracking.
 - `update-todo-checklist` - Maintain concise numbered TODO checklist state for active tasks.
 - `archive-task-note` - Archive task notes into long-term context storage.
-- `pr-readiness-gate` - Stop before push/PR creation, summarize readiness, and ask for human PR approval.
-- `link-pr-to-task-issue` - Ensure PR bodies include issue-closing linkage.
+- `pr-readiness-gate` - Record mode-aware readiness: human approval for task and Gauntlet promotion PRs, with scoped automatic Goal and approved Gauntlet-progress publication paths.
+- `link-pr-to-task-issue` - Associate PRs with issues while reserving closing linkage for the delivery-completing PR.
 - `post-pr-qa` - Run post-PR QA and post PR comments with pass/fail evidence and inline screenshot links.
 - `comment-issue-test-results` - Post QA/Playwright outcomes and artifacts to linked issue threads.
 - `audit-untrusted-agent-source` - Statically inspect agent-facing source for unsafe instructions, executables, credentials, path escapes, and hidden side effects.
