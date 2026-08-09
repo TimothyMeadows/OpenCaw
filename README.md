@@ -725,6 +725,7 @@ Examples of role bias:
 - `security-engineer` emphasizes threat modeling, vulnerability review, and least privilege.
 - `sre` emphasizes resilience, observability, performance, and incident evidence.
 - `art-director` emphasizes visual language, asset consistency, production constraints, and specialist art routing.
+- `blender-production-artist` emphasizes immutable source scenes, stage-specific Blender 4.5 production, safe inspection, staged output, and explicit review verdicts.
 - `technical-3d-artist` emphasizes rig, animation, attachment, collision, optimization, and runtime handoff integrity.
 - `gameplay-engineer` emphasizes deterministic runtime systems, production tools, optimization, and playtesting.
 
@@ -771,9 +772,11 @@ $clean-context
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
 | Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
 | Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate reproducible media |
-| Art and experience | `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce original, implementation-ready runtime actors and web experiences |
+| Art and experience | `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce original, inspectable Blender art, runtime actors, and web experiences |
 
 See `skills/INDEX.md` for the complete catalog and `skills/EXTERNAL_SOURCES.md` for capability-adaptation boundaries and dispositions.
+
+Blender work is pinned to Blender 4.5 LTS. Eleven stage-specific skills cover direction, modeling, UVs/textures, materials/look development, procedural scenes, rigging/animation, simulations, cameras/lighting, rendering/compositing, optimization/export, and review. Existing `STYLE.md`, optional `MEDIA.md`, runtime handoffs, staging rules, and human approval remain authoritative. Live authoring requires a compatible connected Blender tool and prefers typed operations; the local CLI is inspection-only and never becomes a silent authoring fallback.
 
 ## Commands
 
@@ -815,7 +818,8 @@ Or run the command directly:
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
-| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
+| Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
+| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-blender-scene-report.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
 
 Commands should remain deterministic, reviewable, platform-safe, and non-self-installing unless an installation action is explicitly authorized.
 
@@ -1174,6 +1178,7 @@ The integrated suite verifies, among other things:
 - agreement between canonical JSON and generated role-map Markdown
 - command syntax and executable requirements
 - rigged-actor manifest identity, path confinement, runtime-file, and verification-evidence contracts
+- Blender 4.5 production skill metadata, role routing, safe CLI flags, scene-report integrity, profile completeness, dependency confinement, and restricted Python parsing
 - style catalog and contract structure
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
@@ -1195,12 +1200,14 @@ OpenCaw/
 ├── STYLE.md                          # visual-style contract for this repository
 ├── .architecture/                    # reusable architecture templates
 ├── .roles/                           # domain roles, aliases, and capability maps
+│   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
 │   └── .gpu/                         # all generative-media assets
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
+│   └── lib/inspect-blender-scene.py  # read-only Blender scene inventory
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures
 └── .ai/                              # repository-local memory, tasks, goals, and Gauntlet round/PR evidence

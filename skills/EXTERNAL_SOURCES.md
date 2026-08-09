@@ -30,6 +30,23 @@ This ledger records OpenCaw's disposition of each selected capability idea. It i
 | CA-016 | reject | Bundled web effect and style micro-catalog | Existing web, motion, WebGL, and style capabilities retain ownership without trigger duplication |
 | CA-017 | reject | Executable helpers, demos, and captured outputs | No executable or demonstration payload is imported from any source |
 | CA-018 | reject | Bundled runtimes, third-party libraries, and media | Each future dependency or asset requires an independent provenance, license, and trust review |
+| CA-019 | create | Blender production direction and safe session ownership | `direct-blender-production` and `arts/blender-production-artist` |
+| CA-020 | create | Blender asset modeling and topology preparation | `model-blender-assets` |
+| CA-021 | create | Blender UV, bake, and texture preparation | `prepare-blender-uvs-and-textures` |
+| CA-022 | create | Blender materials and style-directed look development | `author-blender-materials-and-lookdev` |
+| CA-023 | create | Deterministic procedural Blender scene assembly | `build-procedural-blender-scenes` |
+| CA-024 | create | Blender actor rigging and animation authoring | `rig-and-animate-blender-actors` |
+| CA-025 | create | Deterministic Blender simulation and cache preparation | `simulate-blender-effects` |
+| CA-026 | create | Blender camera, lighting, and framing production | `light-and-frame-blender-scenes` |
+| CA-027 | create | Blender render and composite delivery | `render-and-composite-blender-output` |
+| CA-028 | create | Blender optimization and verified export | `optimize-and-export-blender-assets` |
+| CA-029 | create | Blender scene and deliverable review | `review-blender-deliverables` |
+| CA-030 | create | Deterministic Blender production briefs | `print-blender-production-brief.sh` |
+| CA-031 | create | Read-only repository-confined Blender scene inspection | `inspect-blender-scene.sh` |
+| CA-032 | create | Versioned Blender scene-report validation | `validate-blender-scene-report.sh` |
+| CA-033 | create | Parse-only restricted Blender Python review | `validate-blender-python.sh` |
+| CA-034 | enhance | Existing style, hybrid-asset, handoff, rigged-actor, and VFX routing | Current parent skills retain their triggers and route Blender stages explicitly |
+| CA-035 | reject | Installers, addons, connected-tool configuration, provider endpoints, downloads, credentials, and arbitrary code runners | Existing environment, media, security, and human-review contracts remain authoritative |
 
 ## Adaptation boundary
 

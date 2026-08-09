@@ -54,6 +54,11 @@ Skills:
 - `validate-generated-media`
 - `prepare-rigged-runtime-actors`
 - `prepare-game-art-handoff`
+- `direct-blender-production`
+- `author-blender-materials-and-lookdev`
+- `light-and-frame-blender-scenes`
+- `render-and-composite-blender-output`
+- `review-blender-deliverables`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
 
@@ -66,11 +71,45 @@ Commands:
 - `commands/run-comfyui-workflow.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/validate-rigged-actor-manifest.sh`
+- `commands/print-blender-production-brief.sh`
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
 - `commands/build-originality-evidence.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
+
+### arts/blender-production-artist
+
+Skills:
+
+- `direct-blender-production`
+- `model-blender-assets`
+- `prepare-blender-uvs-and-textures`
+- `author-blender-materials-and-lookdev`
+- `build-procedural-blender-scenes`
+- `rig-and-animate-blender-actors`
+- `simulate-blender-effects`
+- `light-and-frame-blender-scenes`
+- `render-and-composite-blender-output`
+- `optimize-and-export-blender-assets`
+- `review-blender-deliverables`
+- `maintain-art-style-contract`
+- `plan-hybrid-game-assets`
+- `prepare-game-art-handoff`
+- `prepare-rigged-runtime-actors`
+- `create-game-vfx`
+
+Commands:
+
+- `commands/print-blender-production-brief.sh`
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
+- `commands/validate-blender-python.sh`
+- `commands/validate-style-contract.sh`
+- `commands/validate-rigged-actor-manifest.sh`
+- `commands/print-game-art-handoff-template.sh`
 
 ### arts/board-ui-artist
 
@@ -162,6 +201,9 @@ Commands:
 Skills:
 
 - `create-game-vfx`
+- `simulate-blender-effects`
+- `render-and-composite-blender-output`
+- `review-blender-deliverables`
 - `plan-hybrid-game-assets`
 - `maintain-art-style-contract`
 - `review-isometric-production`
@@ -173,6 +215,8 @@ Skills:
 Commands:
 
 - `commands/print-gameplay-system-brief.sh`
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
 - `commands/validate-style-contract.sh`
 - `commands/print-isometric-production-checklist.sh`
 - `commands/inspect-animation-sheet-folder.sh`
@@ -335,6 +379,9 @@ Commands:
 Skills:
 
 - `maintain-art-style-contract`
+- `light-and-frame-blender-scenes`
+- `render-and-composite-blender-output`
+- `review-blender-deliverables`
 - `review-isometric-production`
 - `create-game-art-sheets`
 - `plan-hybrid-game-assets`
@@ -345,6 +392,8 @@ Skills:
 Commands:
 
 - `commands/validate-style-contract.sh`
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
 - `commands/inspect-animation-sheet-folder.sh`
 - `commands/print-tileset-sheet-template.sh`
 - `commands/print-directional-animation-sheet-template.sh`
@@ -373,6 +422,10 @@ Commands:
 Skills:
 
 - `prepare-rigged-runtime-actors`
+- `model-blender-assets`
+- `rig-and-animate-blender-actors`
+- `optimize-and-export-blender-assets`
+- `review-blender-deliverables`
 - `plan-hybrid-game-assets`
 - `prepare-game-art-handoff`
 - `build-gameplay-runtime`
@@ -382,6 +435,8 @@ Skills:
 Commands:
 
 - `commands/validate-rigged-actor-manifest.sh`
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/validate-style-contract.sh`
 - `commands/art-sanity-checklist.sh`
@@ -820,6 +875,7 @@ Commands:
 Skills:
 
 - `verify-and-explain`
+- `review-blender-deliverables`
 - `capture-full-page-evidence`
 - `produce-browser-demo`
 - `profile-application-performance`
@@ -835,6 +891,8 @@ Skills:
 
 Commands:
 
+- `commands/inspect-blender-scene.sh`
+- `commands/validate-blender-scene-report.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
 - `commands/web-performance-report.sh`

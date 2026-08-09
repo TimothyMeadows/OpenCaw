@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Blender UVs and Textures"
+  short_description: "Prepare Blender UV and texture deliverables"
+  default_prompt: "Use $prepare-blender-uvs-and-textures to prepare UVs, bakes, textures, and packing for a Blender asset."

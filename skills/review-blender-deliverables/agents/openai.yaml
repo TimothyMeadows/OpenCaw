@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Blender Deliverables"
+  short_description: "Review and verdict Blender deliverables"
+  default_prompt: "Use $review-blender-deliverables to inspect Blender reports and visual evidence to issue a ship or block verdict."

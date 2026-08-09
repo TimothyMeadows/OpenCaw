@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: ba1c4e6483956e92e3135e44c303159a6849102faee075a3588694f6f1400411 -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: 52ff44195621c30121319ed9f38b590e2aefe0f0cac3fbba5ed1cefc6ad92af3 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:architecture] [scope:core] OpenCaw's hierarchy is optional explicit persistent Brainstorm discovery, planning, then one sibling delivery mode: default task, explicit Goal, or explicit Gauntlet.
@@ -13,10 +13,14 @@
 - [kind:component] [area:commands] [tech:bash] `commands/` contains deterministic executable workflows; `commands/lib/memory-common.sh` centralizes Memory v2 path, schema, safety, archive, and fingerprint behavior.
 - [kind:component] [area:skills] `skills/` contains reusable reasoning workflows and UI metadata; `skills/INDEX.md` is the human-facing catalog.
 - [kind:component] [area:skills] `skills/prepare-rigged-runtime-actors/` and `skills/build-scroll-authored-web-experiences/` own production rigged-actor handoff and scroll-authored narrative contracts; `skills/EXTERNAL_SOURCES.md` records capability-adaptation boundaries and dispositions without retaining source identity.
+- [kind:component] [area:skills] The eleven `*-blender-*` production skills plus `direct-blender-production` and `review-blender-deliverables` divide Blender 4.5 direction, modeling, UV/texture, look-development, procedural, rigging, simulation, lighting, rendering, export, and review ownership while preserving existing style, media, and runtime contracts.
 - [kind:config] [area:roles] `.roles/ROLE_SKILL_MAP.json` is the authoritative role capability mapping and generates `.roles/ROLE_SKILL_MAP.md`.
 - [kind:component] [area:roles] `.roles/arts/technical-3d-artist/ROLE.md` owns skeleton, animation, attachment, collider, optimization, and verified runtime-art handoff guidance.
+- [kind:component] [area:roles] `.roles/arts/blender-production-artist/ROLE.md` owns Blender 4.5 working-copy, checkpoint, stage-routing, safe-backend, inspection, staging, and visual-review guidance.
 - [kind:command] [area:skills] [tech:bash] `commands/validate-rigged-actor-manifest.sh` fail-closes `opencaw-rigged-actor/v1` identity, reference, path, shipped-file, hash, and verification-evidence contracts.
+- [kind:command] [area:commands] [tech:bash] `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, and `validate-blender-python.sh` provide deterministic Blender briefs, safe read-only 4.5.x inspection, versioned report integrity, and exact-hash restricted-script review.
 - [kind:test] [area:skills] [tech:bash] `tests/test-selected-capability-import.sh` verifies adaptation boundaries, parent-skill routing, new skill and role surfaces, rigged-actor fixture acceptance and rejection, and absence of imported payloads.
+- [kind:test] [area:skills] [tech:bash] `tests/test-blender-art-capabilities.sh` verifies eleven Blender skills, role aliases and mappings, deterministic briefs, all five scene-report profiles, fake-executable safety flags and confinement, restricted Python rejection, routing, and catalog integrity.
 - [kind:test] [area:memory] [tech:bash] `tests/test-memory-system.sh` verifies root isolation, system and tagged memory, migration, retrieval, purge, replacement, cleanup, and repository-map freshness.
 - [kind:test] [scope:core] [tech:bash] `commands/validate-opencaw.sh` is the integrated structural validation entry point.
 - [kind:command] [area:memory] [tech:bash] `commands/query-project-context.sh` lists tags and retrieves ranked memory and repository-map entries before raw searches.

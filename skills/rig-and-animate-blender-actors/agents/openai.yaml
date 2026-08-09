@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rig and Animate Blender Actors"
+  short_description: "Rig and animate Blender actors"
+  default_prompt: "Use $rig-and-animate-blender-actors to author and verify a Blender armature, weights, actions, and runtime handoff."

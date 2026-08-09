@@ -14,6 +14,8 @@ Use when sprites, tiles, props, VFX, UI icons, parallax layers, generated concep
 5. Include validation evidence or required checks: style contract, readability, transparency, seams, animation playback, sorting, contrast, performance budget, and licensing.
 6. Name downstream responsibilities clearly so art, design, engineering, QA, and documentation do not infer hidden contracts.
 
+For Blender-authored assets, use `optimize-and-export-blender-assets` to measure and verify the staged export before this handoff records runtime ownership.
+
 ## Output
 - concise handoff brief
 - source and runtime asset paths

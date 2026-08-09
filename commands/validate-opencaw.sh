@@ -14,6 +14,7 @@ set -euo pipefail
 ./tests/test-windows-bash-bootstrap.sh
 ./tests/test-brainstorm-flow.sh
 ./tests/test-selected-capability-import.sh
+./tests/test-blender-art-capabilities.sh
 ./tests/test-gauntlet-flow.sh
 
 echo "OpenCaw validation passed."

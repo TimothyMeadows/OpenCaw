@@ -20,6 +20,8 @@ description: Design and implement readable, performant game visual effects with 
 5. Provide reduced-flash, reduced-motion, contrast, and color-independent cues.
 6. Validate timing against authoritative gameplay events and test cleanup under repeated activation.
 
+When a staged effect is authored or simulated in Blender, use `simulate-blender-effects` for deterministic solver and cache ownership before this skill defines runtime timing, pooling, and gameplay validation.
+
 ## Output
 
 - A VFX timing and layer brief.
