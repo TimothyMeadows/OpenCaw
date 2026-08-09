@@ -23,6 +23,8 @@ description: Prepare, integrate, and verify rigged GLB or FBX characters and cre
 7. Record provenance and verification in an `opencaw-rigged-actor/v1` manifest.
 8. Run `./commands/validate-rigged-actor-manifest.sh <manifest> --root <repo>`; add `--require-verified` before claiming production readiness.
 
+When the authored source is Blender, use `rig-and-animate-blender-actors` for armature, weighting, action, NLA, root-motion, and exportable-deform-bone preparation before this runtime contract begins.
+
 Read [runtime-actor-contract.md](references/runtime-actor-contract.md) when designing the handoff or diagnosing runtime behavior. Read [rigged-actor-manifest.md](references/rigged-actor-manifest.md) when authoring or validating the durable manifest.
 
 ## Output

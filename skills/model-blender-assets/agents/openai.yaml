@@ -1,0 +1,4 @@
+interface:
+  display_name: "Model Blender Assets"
+  short_description: "Model production-ready Blender assets"
+  default_prompt: "Use $model-blender-assets to model and refine a Blender asset with appropriate topology and checkpoints."

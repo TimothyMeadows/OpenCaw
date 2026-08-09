@@ -1,0 +1,4 @@
+interface:
+  display_name: "Render and Composite Blender Output"
+  short_description: "Render and composite staged Blender output"
+  default_prompt: "Use $render-and-composite-blender-output to configure reviewed Blender renders, passes, compositing, and staged output."

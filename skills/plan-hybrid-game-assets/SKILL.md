@@ -20,6 +20,8 @@ description: Plan a traceable game asset pipeline across procedural, imported, g
 5. Validate the asset in representative gameplay rather than only an isolated viewer.
 6. Hand off through `prepare-game-art-handoff` with ownership and acceptance evidence.
 
+When Blender is the selected production lane, use `direct-blender-production` to establish the immutable source, working-copy, backend, checkpoint, inspection, staging, and review contract.
+
 ## Output
 
 - An asset decision matrix and production plan.

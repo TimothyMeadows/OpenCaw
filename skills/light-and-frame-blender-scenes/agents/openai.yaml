@@ -1,0 +1,4 @@
+interface:
+  display_name: "Light and Frame Blender Scenes"
+  short_description: "Light and frame readable Blender scenes"
+  default_prompt: "Use $light-and-frame-blender-scenes to design cameras, lighting, exposure, and framing for a Blender scene."

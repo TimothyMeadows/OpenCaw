@@ -25,6 +25,7 @@ Current role catalog location:
 
 ### Arts & Visual Design
 - `art-director`
+- `blender-production-artist`
 - `board-ui-artist`
 - `card-illustrator`
 - `css-vector-artist`
@@ -94,6 +95,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/code-migrator`: `code migrator`, `code-migrator`, `codemigrator`, `migration-engineer`, `modernization-engineer`
 - `computer-science/code-reviewer`: `code reviewer`, `code-reviewer`, `codereviewer`
 - `arts/art-director`: `art-director`, `art-direction`, `creative-director`, `visual-director`, `game-art-director`, `style-director`
+- `arts/blender-production-artist`: `blender-production-artist`, `blender-artist`, `blender-modeler`, `blender-technical-artist`, `3d-production-artist`
 - `arts/board-ui-artist`: `board-ui-artist`, `board-ui`, `card-board-ui`, `battlefield-ui`, `board-artist`
 - `arts/card-illustrator`: `card-illustrator`, `card-art-illustrator`, `card-art`
 - `arts/css-vector-artist`: `css-vector-artist`, `css-vector`, `interface-vector-artist`, `logo-vector-artist`, `vector-ui-artist`

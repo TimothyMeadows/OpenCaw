@@ -107,6 +107,17 @@ Curated reusable skills included in OpenCaw.
 
 ## Art Production
 
+- `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
+- `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.
+- `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, maps, atlases, UDIMs, and packed textures.
+- `author-blender-materials-and-lookdev` - Translate the active style contract into controlled Blender materials and look development.
+- `build-procedural-blender-scenes` - Build deterministic Geometry Nodes systems, modular kits, and procedural scene assemblies.
+- `rig-and-animate-blender-actors` - Author armatures, skinning, controls, actions, NLA, and runtime-ready animation handoffs.
+- `simulate-blender-effects` - Prepare deterministic Blender simulations, caches, and render or VFX handoffs.
+- `light-and-frame-blender-scenes` - Design Blender cameras, lighting rigs, exposure, composition, and final framing.
+- `render-and-composite-blender-output` - Produce staged still, animation, pass, alpha, and pre-rendered 2D or 2.5D output.
+- `optimize-and-export-blender-assets` - Measure, optimize, export, and independently verify GLB, FBX, USD, or Alembic deliverables.
+- `review-blender-deliverables` - Review scene reports and visual evidence with severity-ranked defects and ship/block verdicts.
 - `maintain-art-style-contract` - Maintain, generate, or validate `STYLE.md` against selected `.styles` templates.
 - `review-isometric-production` - Review isometric art for projection, anchors, depth sorting, occlusion, and gameplay readability.
 - `prepare-game-art-handoff` - Prepare game art assets for engine/runtime handoff with metadata and validation checks.

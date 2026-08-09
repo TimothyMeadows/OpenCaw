@@ -1,0 +1,4 @@
+interface:
+  display_name: "Author Blender Materials and Lookdev"
+  short_description: "Author Blender materials and lookdev"
+  default_prompt: "Use $author-blender-materials-and-lookdev to translate the active art style into controlled Blender materials and look development."

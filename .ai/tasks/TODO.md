@@ -11,3 +11,4 @@
 9. [ ] Add progressive Gauntlet PR delivery (`.ai/tasks/gauntlet-progressive-prs/TASK.md`)
 10. [x] Add first-class Brainstorm mode (`.ai/tasks/brainstorm-mode/TASK.md`)
 11. [x] Import selected capability adaptations (`.ai/tasks/import-selected-capabilities/TASK.md`)
+12. [x] Add Blender art production capabilities (`.ai/tasks/blender-art-production/TASK.md`)

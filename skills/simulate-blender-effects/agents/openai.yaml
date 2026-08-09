@@ -1,0 +1,4 @@
+interface:
+  display_name: "Simulate Blender Effects"
+  short_description: "Simulate cacheable Blender effects"
+  default_prompt: "Use $simulate-blender-effects to author deterministic Blender simulations and verified cache handoffs."

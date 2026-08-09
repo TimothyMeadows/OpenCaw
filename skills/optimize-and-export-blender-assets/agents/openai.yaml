@@ -1,0 +1,4 @@
+interface:
+  display_name: "Optimize and Export Blender Assets"
+  short_description: "Optimize and export Blender deliverables"
+  default_prompt: "Use $optimize-and-export-blender-assets to measure, optimize, export, and verify a Blender asset for its target runtime."

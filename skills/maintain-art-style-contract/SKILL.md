@@ -14,6 +14,8 @@ Use when `../STYLE.md` is missing, stale, newly generated, or relevant to any vi
 5. During art production, check outputs against both the active `STYLE.md` and the relevant role constraints.
 6. When a style conflict affects gameplay readability, asset metadata, engine loading, or UI contrast, call out the impacted owner role before proceeding.
 
+For Blender work, keep the selected templates authoritative and route their application through `author-blender-materials-and-lookdev`, `light-and-frame-blender-scenes`, and `render-and-composite-blender-output`; do not create a Blender-specific style template.
+
 ## Output
 - selected style template names
 - any missing or conflicting style instructions

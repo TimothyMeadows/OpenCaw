@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Procedural Blender Scenes"
+  short_description: "Build deterministic procedural Blender scenes"
+  default_prompt: "Use $build-procedural-blender-scenes to design a deterministic Geometry Nodes or modular Blender scene."
