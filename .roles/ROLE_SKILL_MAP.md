@@ -755,6 +755,7 @@ Commands:
 
 Skills:
 
+- `brainstorm-flow`
 - `create-task-file`
 - `gauntlet-flow`
 - `goal-flow`
@@ -767,6 +768,9 @@ Skills:
 
 Commands:
 
+- `commands/brainstorm-mode.sh`
+- `commands/validate-brainstorm.sh`
+- `commands/show-brainstorm.sh`
 - `commands/create-gauntlet-file.sh`
 - `commands/validate-gauntlet.sh`
 - `commands/record-gauntlet-round.sh`
@@ -834,6 +838,18 @@ Commands:
 - `commands/print-web-experience-brief.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/playwright-capture-page.sh`
+
+### computer-science/researcher
+
+Skills:
+
+- `brainstorm-flow`
+- `verify-and-explain`
+
+Commands:
+
+- `commands/validate-brainstorm.sh`
+- `commands/show-brainstorm.sh`
 
 ### computer-science/security-engineer
 

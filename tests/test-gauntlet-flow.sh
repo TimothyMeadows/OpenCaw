@@ -2045,10 +2045,18 @@ for budget_contract in AGENTS.md README.md skills/gauntlet-flow/SKILL.md \
   grep -Fq '45 minutes or two failed full-validation epochs' "$budget_contract" \
     || fail "Gauntlet autonomous-window checkpoint is missing from $budget_contract"
 done
-! rg -q 'Do not impose an automatic attempt, time, cost, or diminishing-return limit|There is no automatic round, time, cost, or diminishing-return limit' \
+obsolete_limit_pattern='Do not impose an automatic attempt, time, cost, or diminishing-return limit|There is no automatic round, time, cost, or diminishing-return limit'
+if command -v rg >/dev/null 2>&1; then
+  if rg -q "$obsolete_limit_pattern" \
+    AGENTS.md README.md skills/gauntlet-flow/SKILL.md \
+    .roles/computer-science/project-manager/ROLE.md; then
+    fail 'obsolete unlimited Gauntlet continuation language remains in a behavioral contract'
+  fi
+elif grep -Eq "$obsolete_limit_pattern" \
   AGENTS.md README.md skills/gauntlet-flow/SKILL.md \
-  .roles/computer-science/project-manager/ROLE.md \
-  || fail 'obsolete unlimited Gauntlet continuation language remains in a behavioral contract'
+  .roles/computer-science/project-manager/ROLE.md; then
+  fail 'obsolete unlimited Gauntlet continuation language remains in a behavioral contract'
+fi
 for command_name in create-gauntlet-file validate-gauntlet record-gauntlet-round \
   record-gauntlet-pr-event record-gauntlet-promotion-qa; do
   command_file="commands/$command_name.sh"

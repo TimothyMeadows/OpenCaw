@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brainstorm Flow"
+  short_description: "Run persistent researched Brainstorm sessions"
+  default_prompt: "Use $brainstorm-flow to capture, research, organize, and summarize ideas before planning."

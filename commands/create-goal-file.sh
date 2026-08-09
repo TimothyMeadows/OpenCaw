@@ -2,8 +2,7 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
+source "$script_dir/lib/brainstorm-common.sh"
 
 usage() {
   cat <<'EOF'
@@ -54,6 +53,10 @@ fi
 
 if [[ -z "$title" ]]; then
   title="$goal_name"
+fi
+
+if [[ $dry_run -eq 0 ]]; then
+  brainstorm_require_delivery_creation_allowed 'Goal creation'
 fi
 
 goal_dir="$OPENCAW_PROJECT_AI_DIR/goals/$goal_name"

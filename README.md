@@ -19,10 +19,20 @@ Behind the conversation, OpenCaw provides a shared system for planning, architec
 
 ```mermaid
 flowchart TB
-    accTitle: OpenCaw task, goal, and Gauntlet workflows
-    accDescr: A request enters task mode by default, explicit goal mode for an ordered series of task pull requests, or explicit Gauntlet mode where reviewed work-unit pull requests merge into a durable integration branch before a final promotion pull request.
+    accTitle: OpenCaw Brainstorm, planning, and delivery workflows
+    accDescr: A request may explicitly enter persistent Brainstorm discovery before planning, then uses task mode by default, explicit goal mode for ordered task pull requests, or explicit Gauntlet mode for reviewed work-unit pull requests and final promotion.
 
-    Request["Natural-language request"] --> Mode{"Work mode"}
+    Request["Natural-language request"] --> Discovery{"Explicit Brainstorm mode?"}
+    Discovery -->|"No"| Plan["Plan the understood work"]
+    Discovery -->|"Yes"| Brainstorm["Activate persistent Brainstorm state"]
+    Brainstorm --> Understand["Clarify one idea to baseline understanding"]
+    Understand --> Research["Project manager plus two independent researchers"]
+    Research --> Organize["Place the researched element in the branch graph"]
+    Organize --> Continue{"Explicitly exit Brainstorm?"}
+    Continue -->|"No; continue ideas"| Understand
+    Continue -->|"Yes"| Summary["Generate the hash-bound summary index"]
+    Summary --> Plan
+    Plan --> Mode{"Delivery mode"}
 
     Mode -->|"Task: default"| Task["Complete one assignment"]
     Task --> TaskVerify["Verify the result"]
@@ -72,6 +82,7 @@ flowchart TB
 - [Start with a Normal Request](#start-with-a-normal-request)
   - [No Magic Words](#no-magic-words)
   - [Choose a Work Mode](#choose-a-work-mode)
+  - [Brainstorm Before Planning](#brainstorm-before-planning)
   - [Planning Is a Conversation](#planning-is-a-conversation)
   - [A Realistic Planning Flow](#a-realistic-planning-flow)
   - [What OpenCaw Does Behind the Scenes](#what-opencaw-does-behind-the-scenes)
@@ -94,7 +105,7 @@ flowchart TB
   - [Skills](#skills)
   - [Commands](#commands)
   - [Sub-Agent Orchestration](#sub-agent-orchestration)
-  - [Task, Goal, and Gauntlet Modes](#task-goal-and-gauntlet-modes)
+  - [Brainstorm, Task, Goal, and Gauntlet](#brainstorm-task-goal-and-gauntlet)
   - [Task, Issue, and PR Delivery](#task-issue-and-pr-delivery)
   - [Memory v2](#memory-v2)
   - [Generative Media](#generative-media)
@@ -150,6 +161,8 @@ You may still say `use role security-engineer`, invoke a named skill, or request
 
 OpenCaw has three work modes. A normal specific assignment uses task mode; goal and Gauntlet modes begin only when you explicitly request them.
 
+Before those work modes, you may explicitly enter the optional Brainstorm discovery stage. The hierarchy is `Brainstorm → Plan → Task | Goal | Gauntlet`; Brainstorm never creates delivery work itself.
+
 | Mode | Best for | Completion | PR behavior |
 | --- | --- | --- | --- |
 | Task | One specific assignment | The requested result passes its relevant verification | One PR after human readiness approval |
@@ -175,6 +188,41 @@ Use gauntlet mode for this onboarding redesign. First propose an inspectable qua
 ```
 
 Gauntlet mode is appropriate only when a critic can inspect the real output—such as running code, rendered pixels, test or performance results, a finished document, or another concrete artifact. It never permits the builder to grade its own work. Its progress PRs provide review surfaces throughout the loop; the final promotion PR is the integration boundary back to the approved delivery base, not the first review surface.
+
+## Brainstorm Before Planning
+
+Use Brainstorm mode when an idea needs structured clarification and substantial research before it is ready to become a plan:
+
+```text
+Enter Brainstorm mode. I want to explore a cooperative city-building game where players recover after disasters. Research the audience, comparable systems, technical risks, and a concrete definition of complete.
+```
+
+Brainstorm is deliberately explicit and sticky. Once entered, repository-root `BRAINSTORM.md` remains active across conversations until you explicitly turn it off. While active, OpenCaw does not create tasks, issues, goals, Gauntlets, implementation changes, commits, or PRs.
+
+The Brainstorm team always has three participants: the main project-manager and two persistent read-only researcher subagents. One researcher focuses on the problem, audience, and precedent; the other focuses on feasibility, constraints, risks, start conditions, and measurable completeness. If both researcher slots are unavailable, idea processing stops rather than falling back to a smaller team.
+
+Each materially distinct idea receives a stable `IDEA-NNN` identifier and belongs to the deepest matching stable `BR-NNN` branch. Only the project-manager writes the synthesized element, including:
+
+- original user idea and established understanding
+- sourced research with facts, inference, disagreements, and uncertainty separated
+- dependencies, risks, and open questions
+- concrete start conditions and definition of complete
+- lifecycle status and plan readiness
+
+Ask to see the Brainstorm and OpenCaw returns a Mermaid mindmap. Ask to see it “in Markdown” and it returns the complete `BRAINSTORM.md` instead.
+
+Explicit exit preserves every complete or incomplete element and generates repository-root `BRAINSTORM_SUMMARY.md`, grouped by branch and bound to the final source hash. OpenCaw then waits; it plans only after you explicitly select an element.
+
+Lifecycle commands:
+
+```bash
+./commands/brainstorm-mode.sh start
+./commands/brainstorm-mode.sh status
+./commands/show-brainstorm.sh
+./commands/show-brainstorm.sh --markdown
+./commands/brainstorm-mode.sh stop
+./commands/validate-brainstorm.sh --phase inactive
+```
 
 ## Planning Is a Conversation
 
@@ -252,14 +300,15 @@ For a substantial request, the normal flow is:
 
 1. **Resolve the project safely** — find the actual host repository and mounted OpenCaw directory without guessing across workspace boundaries.
 2. **Load high-signal context** — read protected repository memory, project rules, architecture/style contracts, active tasks, and relevant tagged knowledge.
-3. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done.
-4. **Select and plan the work contract** — use task mode by default or an explicitly requested goal or Gauntlet lifecycle, then plan at the depth its risks and dependencies require.
-5. **Choose capabilities** — apply baseline behavior and automatically use relevant skills; explicit roles remain optional specialist lenses.
-6. **Track real work** — create or import a task, link its GitHub issue, and keep the active checklist concise.
-7. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
-8. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
-9. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
-10. **Deliver by mode** — task work pauses before publication; goal flow may publish validated task PRs; an approved Gauntlet contract may publish unit progress PRs to its integration branch; every path keeps merges human-controlled, and Gauntlet promotion still requires a final human gate.
+3. **Restore or choose discovery** — resume an active Brainstorm before planning, or enter it only after an explicit request.
+4. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done; Brainstorm may use two researcher lanes to deepen that understanding.
+5. **Select and plan the work contract** — after Brainstorm is explicitly closed when active, plan into task mode by default or an explicitly requested goal or Gauntlet lifecycle.
+6. **Choose capabilities** — apply baseline behavior and automatically use relevant skills; explicit roles remain optional specialist lenses.
+7. **Track real work** — create or import a task, link its GitHub issue, and keep the active checklist concise.
+8. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
+9. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
+10. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
+11. **Deliver by mode** — task work pauses before publication; goal flow may publish validated task PRs; an approved Gauntlet contract may publish unit progress PRs to its integration branch; every path keeps merges human-controlled, and Gauntlet promotion still requires a final human gate.
 
 OpenCaw can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
 
@@ -330,6 +379,7 @@ Natural language is the default. Explicit controls are useful when you want to c
 | Command | You want a deterministic repository script. | `Run the full OpenCaw validation command.` |
 | Agent count | You are authorizing parallel agent work and want a capacity ceiling. | `Use up to 3 agents, but only for independent lanes.` |
 | Issue reference | Existing GitHub issue content is the source task. | `Work on #123.` |
+| Brainstorm mode | An idea needs persistent, research-heavy discovery before planning. | `Enter Brainstorm mode and research this game idea.` |
 | Task mode | You want to emphasize that one assignment should end at the normal human PR gate. | `Use task mode for this bug fix.` |
 | Goal flow | You explicitly authorize automated task-to-PR progression across multiple tasks. | `Use goal flow for these four tasks; never merge automatically.` |
 | Gauntlet flow | You want one deliverable repeatedly judged by independent critics against an approved bar. | `Use gauntlet mode for this redesign.` |
@@ -350,13 +400,19 @@ Explicit goal-flow example:
 Goal: modernize the reporting module across these five tasks. Raise each task PR after validation, run post-PR QA, then continue. Never merge PRs automatically.
 ```
 
+Explicit Brainstorm example:
+
+```text
+Start Brainstorm mode for a privacy-first family scheduling app. Organize each idea into the existing graph, use both researchers, and do not create a plan until I explicitly exit and select an element.
+```
+
 Explicit Gauntlet example:
 
 ```text
 Use gauntlet flow for the reporting experience. Propose a concrete benchmark and an approved delivery base, create a durable gauntlet integration branch, and let disjoint units publish progress PRs there automatically. Use a fresh critic for every round, require PR QA and human merge before a unit counts as integrated, and keep final promotion human-gated.
 ```
 
-Goal flow is intentionally explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because its approved contract authorizes progress PR publication and changes the execution and evidence model. That authorization never includes a merge: unit, remediation, and promotion merges remain human decisions, and the final promotion PR retains a human readiness gate. Ordinary natural-language work remains task mode and pauses for approval before publication.
+Brainstorm is explicit because it creates persistent pre-planning state and suspends delivery-mode creation until explicit exit. Goal flow is explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because its approved contract authorizes progress PR publication and changes the execution and evidence model. That authorization never includes a merge: unit, remediation, and promotion merges remain human decisions, and the final promotion PR retains a human readiness gate. Ordinary natural-language work remains task mode and pauses for approval before publication.
 
 ---
 
@@ -704,6 +760,7 @@ $clean-context
 
 | Area | Examples | Purpose |
 | --- | --- | --- |
+| Discovery | `brainstorm-flow` | Persist, research, branch, visualize, and summarize ideas before planning |
 | Planning and governance | `create-task-file`, `manage-task-issues`, `pr-readiness-gate`, `post-pr-qa` | Track work, preserve authorization boundaries, and publish evidence |
 | Context | `maintain-memory`, `maintain-repository-map`, `clean-context` | Retrieve and preserve durable high-signal project knowledge |
 | Parallel work | `orchestrate-subagents` | Create safe role-resolved lanes and integrate their evidence |
@@ -743,6 +800,7 @@ Or run the command directly:
 | Group | Commands |
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Brainstorm discovery | `brainstorm-mode.sh`, `validate-brainstorm.sh`, `show-brainstorm.sh` |
 | Architecture and style | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh` |
 | Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
 | Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
@@ -794,6 +852,8 @@ It records:
 
 The main agent remains responsible for orchestration, critical-path blockers, integration, final verification, and user communication.
 
+Brainstorm is the deliberate exception to task-backed lane files: its fixed three-person team is owned by `brainstorm-flow`, both researchers are read-only, their reports remain ephemeral, and only the main project-manager writes `BRAINSTORM.md`.
+
 Helper commands:
 
 ```bash
@@ -804,17 +864,24 @@ Helper commands:
 
 Parallelism is reduced when lanes would overlap, roles are unresolved, verification is unclear, or coordination would cost more than the work.
 
-## Task, Goal, and Gauntlet Modes
+## Brainstorm, Task, Goal, and Gauntlet
 
-The selected mode controls the unit of work, stopping condition, durable state, and PR authorization boundary. It does not weaken planning, local validation, issue linkage, or post-PR QA.
+Brainstorm precedes planning; Task, Goal, and Gauntlet remain sibling delivery modes after planning. The selected stage or mode controls durable state, stopping conditions, and publication boundaries.
 
-| Mode | Activation | Durable state | Loop | Publication |
+| Stage or mode | Activation | Durable state | Loop | Publication |
 | --- | --- | --- | --- | --- |
+| Brainstorm | Explicit `start` or `enter Brainstorm mode`, or active repository state restored at startup | `BRAINSTORM.md`; hash-bound `BRAINSTORM_SUMMARY.md` on exit | Clarify, branch, research with two independent researchers, and synthesize ideas | None; delivery creation is blocked while active |
 | Task | Default for a specific assignment; may also be named explicitly | `.ai/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
 | Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.ai/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
 | Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.ai/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
 
-These are sibling modes. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request explicitly selects both goal and Gauntlet for the same work, OpenCaw asks which mode governs before changing project state.
+Task, Goal, and Gauntlet are sibling delivery modes. Brainstorm may feed planning for any one of them, but never nests with or creates them. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request selects conflicting stages or delivery modes, OpenCaw asks which governs before changing project state.
+
+### Brainstorm lifecycle
+
+Brainstorm starts only through explicit user wording. Startup restores active state before planning or task inspection. Every new idea is clarified, classified under a stable branch, independently researched by two read-only researcher instances, synthesized by the project-manager, and validated. Explicit exit regenerates the complete summary index and waits for a later element-to-plan request.
+
+Creation commands for tasks, task issues/imports, Goals, and Gauntlets fail closed while Brainstorm is active or malformed. When Brainstorm is absent or validly inactive, their behavior is unchanged.
 
 ### Task lifecycle
 
@@ -1107,6 +1174,7 @@ The integrated suite verifies, among other things:
 - style catalog and contract structure
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
+- Brainstorm path isolation, sticky lifecycle state, branch/element validation, summary hashing, graph rendering, and delivery-creation guards
 - Gauntlet scaffold isolation, real commit/ref and live-GitHub binding, fresh-critic evidence, one-to-one hash ledgers, transactional progress events, authorized remediation, human-merge integration, and final promotion gates
 - Windows provider classification and explicit-install behavior
 
@@ -1118,6 +1186,8 @@ Verification for host-project work remains proportional to the task: targeted te
 OpenCaw/
 ├── AGENTS.md                         # shared behavior contract
 ├── README.md
+├── BRAINSTORM.md                     # optional persistent pre-planning ideas and active state
+├── BRAINSTORM_SUMMARY.md             # optional generated hash-bound idea index
 ├── ARCHITECTURE.md                   # architecture contract for this repository
 ├── STYLE.md                          # visual-style contract for this repository
 ├── .architecture/                    # reusable architecture templates

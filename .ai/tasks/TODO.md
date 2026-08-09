@@ -9,3 +9,4 @@
 7. [x] Rewrite the README around natural-language-first usage (`.ai/tasks/readme-natural-language-first/TASK.md`)
 8. [x] Add first-class Gauntlet mode (`.ai/tasks/gauntlet-mode/TASK.md`)
 9. [ ] Add progressive Gauntlet PR delivery (`.ai/tasks/gauntlet-progressive-prs/TASK.md`)
+10. [x] Add first-class Brainstorm mode (`.ai/tasks/brainstorm-mode/TASK.md`)

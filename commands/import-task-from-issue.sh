@@ -42,8 +42,8 @@ resolve_gh() {
 }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
+source "$script_dir/lib/brainstorm-common.sh"
+brainstorm_require_delivery_creation_allowed 'Task import'
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 host_tasks_dir="$host_root/.ai/tasks"

@@ -8,8 +8,7 @@ EOF
 }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
+source "$script_dir/lib/brainstorm-common.sh"
 task_name=""
 title=""
 create_issue=1
@@ -46,6 +45,8 @@ fi
 if [[ -z "$title" ]]; then
   title="$task_name"
 fi
+
+brainstorm_require_delivery_creation_allowed 'Task creation'
 
 mkdir -p "$OPENCAW_PROJECT_AI_DIR/tasks/$task_name"
 target="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"

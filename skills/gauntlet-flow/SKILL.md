@@ -7,6 +7,8 @@ description: "Run an explicitly requested OpenCaw Gauntlet as a persistent build
 
 Use only for an explicit Gauntlet request. Ordinary assignments remain task mode, and ordered multi-task delivery remains goal mode.
 
+Do not activate or create Gauntlet flow while repository-root `BRAINSTORM.md` is active. Brainstorm must be explicitly closed and converted into a plan first.
+
 ## Workflow
 
 1. Create or import one parent task and GitHub issue through normal task flow, verify the issue URL is in its `TASK.md`, then create `.ai/gauntlets/<name>/GAUNTLET.md`; the Gauntlet scaffold requires that task to exist first.

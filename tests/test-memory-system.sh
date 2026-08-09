@@ -177,7 +177,9 @@ grep -q '^TASK_FILES_COMPACTED=0$' <<< "$cleanup_preview" || fail 'clean-context
 echo '[9/9] checking command syntax and repository validation hooks'
 fake_gh_dir="$temp_root/fake-gh"
 fake_gh_log="$temp_root/fake-gh.log"
+fake_path_conversion_log="$temp_root/fake-path-conversion.log"
 fake_qa_summary="$temp_root/fake-qa-summary.md"
+host_cygpath="$(command -v cygpath 2>/dev/null || true)"
 mkdir -p "$fake_gh_dir"
 cat > "$fake_gh_dir/gh.exe" <<'EOF'
 #!/usr/bin/env bash
@@ -199,10 +201,24 @@ fi
 exit 1
 EOF
 chmod +x "$fake_gh_dir/gh.exe"
+if [[ -n "$host_cygpath" ]]; then
+  cat > "$fake_gh_dir/cygpath" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >> "$OPENCAW_TEST_PATH_CONVERSION_LOG"
+exec "$OPENCAW_TEST_REAL_CYGPATH" "$@"
+EOF
+  chmod +x "$fake_gh_dir/cygpath"
+fi
 printf '# QA\n\nPASS\n' > "$fake_qa_summary"
-PATH="$fake_gh_dir:/usr/bin:/bin" run_for "$project" bash commands/comment-pr-qa-results.sh --help >/dev/null
-qa_comment_output="$(PATH="$fake_gh_dir:/usr/bin:/bin" OPENCAW_TEST_GH_LOG="$fake_gh_log" run_for "$project" bash commands/comment-pr-qa-results.sh 73 "$fake_qa_summary")"
-grep -Eq '^([A-Za-z]:\\|\\\\)' "$fake_gh_log" || fail 'Windows gh.exe did not receive a translated body-file path'
+PATH="$fake_gh_dir:$PATH" run_for "$project" bash commands/comment-pr-qa-results.sh --help >/dev/null
+qa_comment_output="$(PATH="$fake_gh_dir:$PATH" OPENCAW_TEST_GH_LOG="$fake_gh_log" OPENCAW_TEST_PATH_CONVERSION_LOG="$fake_path_conversion_log" OPENCAW_TEST_REAL_CYGPATH="$host_cygpath" run_for "$project" bash commands/comment-pr-qa-results.sh 73 "$fake_qa_summary")"
+if [[ -n "$host_cygpath" ]]; then
+  grep -Eq '^-w /' "$fake_path_conversion_log" || fail 'Git Bash gh.exe body path did not pass through cygpath'
+  grep -Eq '^(/|[A-Za-z]:\\|\\\\)' "$fake_gh_log" || fail 'Git Bash gh.exe did not receive an absolute body-file path'
+else
+  grep -Eq '^([A-Za-z]:\\|\\\\)' "$fake_gh_log" || fail 'Windows gh.exe did not receive a translated body-file path'
+fi
 grep -Fq 'COMMENT_URL=https://github.com/example/project/pull/73#issuecomment-7301' <<< "$qa_comment_output" || fail 'PR QA helper did not return the durable GitHub comment URL'
 bash -n commands/lib/memory-common.sh commands/*memory*.sh commands/query-project-context.sh commands/repo-map-status.sh commands/resolve-opencaw-paths.sh
 bash commands/validate-commands.sh >/dev/null

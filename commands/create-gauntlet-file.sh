@@ -12,6 +12,7 @@ EOF
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/gauntlet-common.sh"
+source "$script_dir/lib/brainstorm-common.sh"
 
 gauntlet_name=''
 title=''
@@ -63,6 +64,10 @@ if [[ -z "$title" ]]; then
   title="$gauntlet_name"
 fi
 opencaw_validate_single_line "$title" 'Title'
+
+if [[ $dry_run -eq 0 ]]; then
+  brainstorm_require_delivery_creation_allowed 'Gauntlet creation'
+fi
 
 task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"
 gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_AI_DIR/tasks" 'Task root'

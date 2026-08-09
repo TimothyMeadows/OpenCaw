@@ -19,6 +19,10 @@ All memory and context artifacts live under the resolved repository root:
 - debug history: `<project-root>/.ai/DEBUG.md`
 - task notes: `<project-root>/.ai/tasks/`
 
+Optional pre-planning Brainstorm state lives at the resolved repository root:
+- full durable ideas and active state: `<project-root>/BRAINSTORM.md`
+- generated exit index: `<project-root>/BRAINSTORM_SUMMARY.md`
+
 Resolve these paths with `./commands/resolve-opencaw-paths.sh`. Never infer a broad workspace parent when resolution fails.
 
 Never write project-specific learned state into this mounted baseline unless the user explicitly asks to modify the shared baseline.
@@ -31,10 +35,11 @@ On Windows without a usable Bash runtime, run the PowerShell bootstrap described
 1. Resolve the project root and repository-local `.ai` paths with `./commands/resolve-opencaw-paths.sh`.
 2. Run `./commands/create-host-ai-scaffold.sh` automatically when required files are missing. The command is idempotent and reports legacy-memory migration needs.
 3. Load all of `SYSTEM_MEMORY.md`. It has precedence over project memory and rules, but never over actual system, developer, or current user instructions.
-4. Review project `RULES.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, active goal or Gauntlet state, and open issues when present. Read `DEBUG.md` only for debugging work.
-5. Run `./commands/query-project-context.sh --list-tags`, infer relevant tags from the request and active task, then query those tags with the default ranked limit before raw file searches.
-6. Run `./commands/repo-map-status.sh`. If the map is missing, empty, or stale, use `maintain-repository-map` before relying on it.
-7. If legacy memory is reported, prepare and complete the AI-classified migration before loading untagged entries. Never load legacy memory as a fallback.
+4. Run `./commands/brainstorm-mode.sh status` when the command is available. If `BRAINSTORM.md` is active, load all of it and restore Brainstorm mode before planning, task tracking, Goal, or Gauntlet selection; reconstitute its two researcher subagents before processing ideas.
+5. Review project `RULES.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, active goal or Gauntlet state, and open issues when present. Read `DEBUG.md` only for debugging work.
+6. Run `./commands/query-project-context.sh --list-tags`, infer relevant tags from the request and active task, then query those tags with the default ranked limit before raw file searches.
+7. Run `./commands/repo-map-status.sh`. If the map is missing, empty, or stale, use `maintain-repository-map` before relying on it.
+8. If legacy memory is reported, prepare and complete the AI-classified migration before loading untagged entries. Never load legacy memory as a fallback.
 
 Read `../MEDIA.md` only when the current task configures, generates, validates, or promotes image or audio media. Do not load it for unrelated work.
 
@@ -187,29 +192,38 @@ When multiple roles are requested:
 - If the user names a role ambiguously, ask which available role they want
 - Do not invent role files that do not exist unless the user explicitly asks to create one
 
-## Work modes
+## Work hierarchy and modes
 
+- OpenCaw's hierarchy is optional Brainstorm discovery, then planning, then exactly one delivery mode: `Brainstorm -> Plan -> Task | Goal | Gauntlet`.
+- Brainstorm mode is an optional, explicitly activated pre-planning stage for researched ideas. It is not a delivery mode and creates no task, issue, Goal, Gauntlet, implementation, commit, or PR state.
+- Activate Brainstorm only when the user explicitly says `Brainstorm mode`, `start Brainstorm mode`, or `enter Brainstorm mode`; ordinary use of the verb “brainstorm” does not activate persistent mode.
+- Once active, Brainstorm persists in repository-root `BRAINSTORM.md` across conversations until the user explicitly turns it off. Never infer exit from inactivity or completeness.
+- Explicit exit regenerates repository-root `BRAINSTORM_SUMMARY.md` and waits. Planning begins only when the user explicitly selects an element to turn into a plan.
 - Task mode is the default for one specific assignment. It uses one task file and issue, completes after scoped verification, and retains the human PR readiness gate.
 - Goal mode is an explicitly requested collection of ordered tasks. It may automatically raise each validated task PR, requires post-PR QA before advancing, and leaves merge approval to humans.
 - Gauntlet mode is an explicitly requested adversarial loop for one ambitious deliverable. It uses one parent task and issue, a human-approved quality bar, persistent builder-versus-fresh-critic rounds, progressive work-unit PRs into one Gauntlet integration branch, and a final integration critic before human-gated promotion.
 - Activate goal mode only when the user says `goal` or `goal flow`, or an artifact marks `Goal Flow: enabled` or `Flow: goal`.
 - Activate Gauntlet mode only when the user says `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or an artifact marks `Gauntlet Mode: enabled` or `Flow: gauntlet`.
 - Do not activate goal mode from the generic `## Goal` section in `TASK.md`; that field describes task intent.
+- If Brainstorm is active, reject Task, Goal, and Gauntlet creation until explicit exit and an explicit plan request. If Brainstorm and a delivery mode are selected together, pause and ask which stage governs rather than nesting them.
 - If goal and Gauntlet are both explicitly selected for the same work, pause and ask which mode governs delivery before mutating project state.
 
 ## Plan mode default
 - Enter plan mode for any non-trivial task
+- Do not enter planning while Brainstorm is active. Complete explicit exit and summary generation first, then require the user to select an element for planning.
 - Treat a task as non-trivial when it has 3+ steps, architectural decisions, cross-cutting impact, verification complexity, or ambiguity
 - Use plan mode for verification work, not just implementation
 - When the user specifies a developer count, agent count, worker count, or explicit parallel execution target, apply the `computer-science/project-manager` planning lens to align tasks into safe parallel lanes before implementation
 - Count-based plans should name lane ownership, scope, dependencies, verification, integration order, and any reason the effective parallelism is smaller than the requested count
-- Apply the explicit task, goal, or Gauntlet work-mode contract before creating execution artifacts
+- Apply the explicit Brainstorm stage and task, goal, or Gauntlet work-mode contract before creating execution artifacts
 - Write detailed specs up front to reduce ambiguity
 - If something goes sideways, stop and re-plan immediately instead of pushing through a stale plan
 
 ## Subagent strategy
 - Use the `computer-science/project-manager` planning lens before subagent execution when the user requests multiple agents/developers/workers or when natural parallelism is clear
 - Create or update `../.ai/tasks/<task_name>/SUBAGENTS.md` for substantial parallel work using `./commands/create-subagent-plan.sh`, then validate it with `./commands/validate-subagent-plan.sh`
+- Brainstorm is the only exception to task-backed `SUBAGENTS.md`: maintain exactly three participants consisting of the main `computer-science/project-manager` and two persistent read-only `computer-science/researcher` subagents; keep their reports ephemeral and let only the project-manager write Brainstorm artifacts.
+- If two researcher slots are unavailable, preserve active Brainstorm state and block idea processing. Never use a smaller team or sequential fallback.
 - Resolve every lane role with `./commands/resolve-role.sh` before assigning work; do not spawn a lane with unresolved role ambiguity, missing verification, overlapping write scope, or an immediate critical-path dependency
 - For Codex, map read-only investigation lanes to `explorer` agents and implementation lanes to `worker` agents with disjoint write sets
 - For non-Codex tools, use the same `SUBAGENTS.md` lane plan as portable delegation guidance or sequential fallback
@@ -296,6 +310,7 @@ When multiple roles are requested:
 - Write reusable bug resolutions to `../.ai/DEBUG.md`
 
 ## Task management
+0. Do not run task management while Brainstorm mode is active. Brainstorm elements can become plans only after explicit exit; a later delivery-mode request may then create task state.
 1. Plan first: update `../.ai/tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
 2. For each real task, create `../.ai/tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
 3. Create or link a matching GitHub issue for each real task and record only the issue URL in `../.ai/tasks/OPEN_ISSUES.md`
@@ -308,8 +323,23 @@ When multiple roles are requested:
 10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
 11. A Gauntlet has one parent task file and issue. Its internal work units, progress and promotion-QA ledgers, PR-event evidence, and immutable critic rounds live under `.ai/gauntlets/<gauntlet_name>/`; do not create separate task issues for those units unless they become independently deliverable work
 
+## Brainstorm flow
+
+- Brainstorm is for app, game, product, feature, and other research-heavy idea discovery before planning.
+- Use `./commands/brainstorm-mode.sh start|stop|status`, `./commands/validate-brainstorm.sh`, and `./commands/show-brainstorm.sh [--markdown]` against the safely resolved project root.
+- Persist mode/session state, stable `BR-NNN` branch definitions, and stable `IDEA-NNN` elements only in repository-root `BRAINSTORM.md`. Never reuse or renumber retained IDs.
+- For each materially distinct user idea, clarify to baseline understanding, place it in the deepest fitting branch or create a new branch, then run two complementary researcher lanes: problem/audience/precedent and feasibility/constraints/completeness.
+- Require public/current factual claims to carry source URLs and distinguish evidence, inference, disagreement, and uncertainty. Only the project-manager synthesizes and writes the result.
+- Every element records title, branch, status, original idea, base understanding, research findings/citations, dependencies, risks, open questions, start conditions, definition of complete, and plan readiness.
+- Use only `captured`, `clarifying`, `researching`, `plan-ready`, and `parked`. Incomplete elements remain valid and must survive exit; only complete, cited elements may be `plan-ready`.
+- When the user asks to see the Brainstorm, show the Mermaid mindmap produced by `show-brainstorm.sh`. If the user explicitly requests Markdown, return the complete `BRAINSTORM.md` verbatim.
+- On explicit exit, atomically deactivate the live state and regenerate `BRAINSTORM_SUMMARY.md` with one linkable summary per element grouped by branch path and bound to the final source SHA-256.
+- Do not automatically plan on exit. Wait for an explicit element selection, then use that element as planning input without directly creating Task, Goal, or Gauntlet state.
+- Creation commands for tasks, task issues/imports, Goals, and Gauntlets must fail closed when Brainstorm is active, malformed, or inactive without a current exit summary. Absent state or valid inactive state with a current summary preserves existing behavior.
+
 ## Goal flow
 - A goal is an explicitly requested automated multi-task delivery flow, not the generic `## Goal` field in a task file
+- Never start or create Goal flow while Brainstorm mode is active.
 - Goal files live under `../.ai/goals/<goal_name>/GOAL.md`; create them with `./commands/create-goal-file.sh "<goal_name>" ["Goal Title"]`
 - In normal task flow, tasks proceed one by one unless the project-manager role defines safe parallel sub-agent lanes
 - In goal flow, tasks still proceed through planning, implementation, validation, PR creation, and post-PR QA, but the PR readiness human confirmation prompt is skipped
@@ -322,6 +352,7 @@ When multiple roles are requested:
 ## Gauntlet flow
 
 - A Gauntlet is an explicitly requested adversarial quality loop, not a synonym for a task or goal queue
+- Never start or create Gauntlet flow while Brainstorm mode is active.
 - Gauntlet state lives under `../.ai/gauntlets/<gauntlet_name>/GAUNTLET.md`; create it with `./commands/create-gauntlet-file.sh "<gauntlet_name>" ["Title"] --task "<task_name>"`
 - Before building, define an inspectable objective, artifact, constraints, concrete quality bar, delivery base branch plus exact base commit SHA, and `gauntlet/<gauntlet_name>` integration branch created exactly at that commit. Obtain human approval; the first accepted progress-PR event freezes the parent task, objective, constraints/permissions, base identity, static delivery policy, approved quality bar, and normalized unit manifest into separate execution-contract, quality, and unit-manifest fingerprints
 - Changing an approved bar requires new human approval and invalidates affected prior pass evidence; preserve prior rounds, record the revision in Unit History, reopen active units, clear integration evidence, reset the current fingerprint to `pending`, and reset PR eligibility to `no`
