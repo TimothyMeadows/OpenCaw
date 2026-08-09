@@ -52,6 +52,7 @@ Skills:
 - `plan-generative-media-pipeline`
 - `use-comfyui-local-generation`
 - `validate-generated-media`
+- `prepare-rigged-runtime-actors`
 - `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
@@ -64,6 +65,7 @@ Commands:
 - `commands/inspect-local-media-host.sh`
 - `commands/run-comfyui-workflow.sh`
 - `commands/validate-media-generation-manifest.sh`
+- `commands/validate-rigged-actor-manifest.sh`
 - `commands/build-originality-evidence.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/print-game-art-handoff-template.sh`
@@ -366,6 +368,25 @@ Commands:
 - `commands/run-comfyui-workflow.sh`
 - `commands/validate-media-generation-manifest.sh`
 
+### arts/technical-3d-artist
+
+Skills:
+
+- `prepare-rigged-runtime-actors`
+- `plan-hybrid-game-assets`
+- `prepare-game-art-handoff`
+- `build-gameplay-runtime`
+- `maintain-art-style-contract`
+- `iterate-art-to-sanity`
+
+Commands:
+
+- `commands/validate-rigged-actor-manifest.sh`
+- `commands/print-game-art-handoff-template.sh`
+- `commands/validate-style-contract.sh`
+- `commands/art-sanity-checklist.sh`
+- `commands/validate-art-sanity-report.sh`
+
 ### arts/tile-set-artist
 
 Skills:
@@ -410,6 +431,7 @@ Skills:
 - `design-conversion-pages`
 - `design-ui-from-constraints`
 - `develop-original-brand-directions`
+- `build-scroll-authored-web-experiences`
 - `build-accessible-motion-systems`
 - `build-interactive-web-effects`
 - `build-webgl-experiences`
@@ -603,6 +625,7 @@ Skills:
 
 - `design-web-experiences`
 - `design-ui-from-constraints`
+- `build-scroll-authored-web-experiences`
 - `build-accessible-motion-systems`
 - `build-interactive-web-effects`
 - `build-webgl-experiences`
@@ -666,6 +689,7 @@ Skills:
 - `build-gameplay-runtime`
 - `build-game-production-tools`
 - `design-action-gameplay`
+- `prepare-rigged-runtime-actors`
 - `plan-hybrid-game-assets`
 - `create-game-vfx`
 - `optimize-web-games`
@@ -677,6 +701,7 @@ Commands:
 
 - `commands/print-gameplay-system-brief.sh`
 - `commands/validate-gameplay-review.sh`
+- `commands/validate-rigged-actor-manifest.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
 - `commands/web-performance-report.sh`
@@ -830,6 +855,7 @@ Skills:
 - `prototype-from-reference-pack`
 - `design-ui-from-constraints`
 - `design-web-experiences`
+- `build-scroll-authored-web-experiences`
 - `build-gameplay-runtime`
 - `verify-and-explain`
 

@@ -1,0 +1,8 @@
+Implemented the capability-boundary ledger, production release-ledger reference, acceptance/evidence matrix reference, parent-skill routing, and focused capability-import test.
+
+Verification:
+- Bash syntax passed for the focused test.
+- Changed parent-skill safety and link validation passed.
+- Boundary and reference-routing test sections passed.
+- The initial integrated run failed closed only because the lane-1 rigged-actor validator had not yet landed; the integration owner will rerun the full test after lane-1 completion.
+- Lane-scoped whitespace validation passed with only platform line-ending notices.

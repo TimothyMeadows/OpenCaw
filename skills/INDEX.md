@@ -82,6 +82,7 @@ Curated reusable skills included in OpenCaw.
 
 - `design-web-experiences` - Design original responsive web systems with accessible enhancement paths.
 - `design-conversion-pages` - Design clear conversion journeys without coercive patterns or hidden mutations.
+- `build-scroll-authored-web-experiences` - Build source-backed scroll stories with one renderer, reversible native-scroll state, semantic content, and accessible fallbacks.
 - `build-accessible-motion-systems` - Define motion semantics, comfort controls, and equivalent reduced-motion states.
 - `build-interactive-web-effects` - Add bounded effects that support comprehension and degrade safely.
 - `build-webgl-experiences` - Build progressively enhanced 3D browser scenes with fallback and resource budgets.
@@ -93,6 +94,7 @@ Curated reusable skills included in OpenCaw.
 - `design-action-gameplay` - Specify responsive actions, counterplay, timing, feedback, and tuning hypotheses.
 - `build-gameplay-runtime` - Implement deterministic gameplay state and presentation boundaries.
 - `build-game-production-tools` - Create reversible, validated content tools with preview and rollback paths.
+- `prepare-rigged-runtime-actors` - Prepare validated rigged character and monster packages for runtime integration and representative gameplay proof.
 - `plan-hybrid-game-assets` - Plan coherent asset pipelines across runtime-native, rendered, and generated media.
 - `plan-generative-media-pipeline` - Plan reproducible cloud/session and local media generation with explicit selection and promotion gates.
 - `use-comfyui-local-generation` - Provision and run pinned local image and audio workflows through official ComfyUI tooling.

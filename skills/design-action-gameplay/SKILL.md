@@ -20,6 +20,11 @@ description: Specify fair, readable action gameplay across player verbs, combat 
 5. Require anticipation, counterplay, consistent hit rules, and visible failure causes.
 6. Create deterministic tests for state transitions, timing boundaries, targeting, occlusion, damage, and fairness.
 
+## References
+
+- Read [perception-and-fog.md](references/perception-and-fog.md) for shared perception truth, line-of-sight blockers, presentation-only fog, and AI/targeting integration.
+- Read [encounter-acceptance.md](references/encounter-acceptance.md) for role composition, pressure budgets, fair transitions, tuning, and deterministic encounter fixtures.
+
 ## Output
 
 - A combat and enemy decision specification.

@@ -1,0 +1,9 @@
+Implemented the engine-neutral build-scroll-authored-web-experiences skill with renderer selection and scroll experience contract references.
+
+Verification:
+- skill-creator quick validation passed.
+- OpenCaw skill safety validation passed for the skill.
+- Both relative reference links resolved.
+- Required renderer, story, state, accessibility, fallback, lifecycle, and performance concepts were present.
+- Vendor and project identity scan passed.
+- Whitespace validation passed.

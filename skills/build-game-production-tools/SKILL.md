@@ -19,6 +19,7 @@ description: Build reversible game-content tools that derive from authoritative 
 4. Implement bounded undo and redo, atomic gestures, local restore, reset confirmation, and explicit draft status.
 5. Treat exports as proposals and validate them against the current source manifest before integration.
 6. If remote access is required, fail closed with repository-approved authentication, authorization, session, and audit controls.
+7. For changelog or release-history tooling, apply the [production release ledger](references/release-ledger.md) contract before designing derived views or live-version checks.
 
 ## Output
 

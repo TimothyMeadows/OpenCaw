@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: 1e0c23425a7c8bf77fdc247d6fc7bc1b28695159389b8caf23b239c7b7b8e113 -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: ba1c4e6483956e92e3135e44c303159a6849102faee075a3588694f6f1400411 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:architecture] [scope:core] OpenCaw's hierarchy is optional explicit persistent Brainstorm discovery, planning, then one sibling delivery mode: default task, explicit Goal, or explicit Gauntlet.
@@ -12,7 +12,11 @@
 - [kind:test] [area:gauntlet] [tech:bash] `tests/test-gauntlet-flow.sh` covers real refs, frozen execution/bar/scope contracts, fetch/push and same-repo identity, semantic live QA comments, terminal GitHub replay, gapless merge topology, transitive causal remediation, supersession authorization, report-bound immutable completion, concurrency safety, promotion transitions, and task/goal compatibility.
 - [kind:component] [area:commands] [tech:bash] `commands/` contains deterministic executable workflows; `commands/lib/memory-common.sh` centralizes Memory v2 path, schema, safety, archive, and fingerprint behavior.
 - [kind:component] [area:skills] `skills/` contains reusable reasoning workflows and UI metadata; `skills/INDEX.md` is the human-facing catalog.
+- [kind:component] [area:skills] `skills/prepare-rigged-runtime-actors/` and `skills/build-scroll-authored-web-experiences/` own production rigged-actor handoff and scroll-authored narrative contracts; `skills/EXTERNAL_SOURCES.md` records capability-adaptation boundaries and dispositions without retaining source identity.
 - [kind:config] [area:roles] `.roles/ROLE_SKILL_MAP.json` is the authoritative role capability mapping and generates `.roles/ROLE_SKILL_MAP.md`.
+- [kind:component] [area:roles] `.roles/arts/technical-3d-artist/ROLE.md` owns skeleton, animation, attachment, collider, optimization, and verified runtime-art handoff guidance.
+- [kind:command] [area:skills] [tech:bash] `commands/validate-rigged-actor-manifest.sh` fail-closes `opencaw-rigged-actor/v1` identity, reference, path, shipped-file, hash, and verification-evidence contracts.
+- [kind:test] [area:skills] [tech:bash] `tests/test-selected-capability-import.sh` verifies adaptation boundaries, parent-skill routing, new skill and role surfaces, rigged-actor fixture acceptance and rejection, and absence of imported payloads.
 - [kind:test] [area:memory] [tech:bash] `tests/test-memory-system.sh` verifies root isolation, system and tagged memory, migration, retrieval, purge, replacement, cleanup, and repository-map freshness.
 - [kind:test] [scope:core] [tech:bash] `commands/validate-opencaw.sh` is the integrated structural validation entry point.
 - [kind:command] [area:memory] [tech:bash] `commands/query-project-context.sh` lists tags and retrieves ranked memory and repository-map entries before raw searches.

@@ -4,8 +4,8 @@
     "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/resolve-opencaw-paths.sh", "commands/install-windows-bash.ps1", "commands/query-project-context.sh", "commands/append-project-memory.sh", "commands/append-system-memory.sh", "commands/repo-map-status.sh", "commands/validate-memory.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh"]
   },
   "arts/art-director": {
-    "skills": ["maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
-    "commands": ["commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/build-originality-evidence.sh", "commands/print-web-experience-brief.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+    "skills": ["maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "prepare-rigged-runtime-actors", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/validate-rigged-actor-manifest.sh", "commands/build-originality-evidence.sh", "commands/print-web-experience-brief.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/board-ui-artist": {
     "skills": ["tcg-art-direction", "design-ui-from-constraints", "source-licensed-visual-assets", "enforce-art-language-safety"],
@@ -67,6 +67,10 @@
     "skills": ["plan-generative-media-pipeline", "produce-generative-audio", "validate-generated-media", "plan-hybrid-game-assets"],
     "commands": ["commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh"]
   },
+  "arts/technical-3d-artist": {
+    "skills": ["prepare-rigged-runtime-actors", "plan-hybrid-game-assets", "prepare-game-art-handoff", "build-gameplay-runtime", "maintain-art-style-contract", "iterate-art-to-sanity"],
+    "commands": ["commands/validate-rigged-actor-manifest.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-style-contract.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+  },
   "arts/tile-set-artist": {
     "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
     "commands": ["commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/print-tileset-sheet-template.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh"]
@@ -76,7 +80,7 @@
     "commands": ["commands/print-tcg-art-style-template.sh", "commands/print-gameplay-system-brief.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/web-experience-designer": {
-    "skills": ["design-web-experiences", "design-conversion-pages", "design-ui-from-constraints", "develop-original-brand-directions", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-ui-reference-pack", "extract-interaction-patterns", "prototype-from-reference-pack", "source-licensed-visual-assets", "audit-reference-originality"],
+    "skills": ["design-web-experiences", "design-conversion-pages", "design-ui-from-constraints", "develop-original-brand-directions", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-ui-reference-pack", "extract-interaction-patterns", "prototype-from-reference-pack", "source-licensed-visual-assets", "audit-reference-originality"],
     "commands": ["commands/print-web-experience-brief.sh", "commands/validate-style-contract.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/build-originality-evidence.sh"]
   },
   "computer-science/ai-data-remediation-engineer": {
@@ -120,7 +124,7 @@
     "commands": ["commands/generate-architecture.sh", "commands/validate-opencaw.sh"]
   },
   "computer-science/frontend-developer": {
-    "skills": ["design-web-experiences", "design-ui-from-constraints", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff"],
+    "skills": ["design-web-experiences", "design-ui-from-constraints", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff"],
     "commands": ["commands/print-web-experience-brief.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-style-contract.sh", "commands/validate-svg-assets.sh"]
   },
   "computer-science/fullstack-engineer": {
@@ -132,8 +136,8 @@
     "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh"]
   },
   "computer-science/gameplay-engineer": {
-    "skills": ["build-gameplay-runtime", "build-game-production-tools", "design-action-gameplay", "plan-hybrid-game-assets", "create-game-vfx", "optimize-web-games", "test-playable-games", "ship-web-games", "verify-and-explain"],
-    "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh"]
+    "skills": ["build-gameplay-runtime", "build-game-production-tools", "design-action-gameplay", "prepare-rigged-runtime-actors", "plan-hybrid-game-assets", "create-game-vfx", "optimize-web-games", "test-playable-games", "ship-web-games", "verify-and-explain"],
+    "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/validate-rigged-actor-manifest.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh"]
   },
   "computer-science/generative-media-pipeline-engineer": {
     "skills": ["plan-generative-media-pipeline", "use-comfyui-local-generation", "produce-generative-audio", "validate-generated-media", "audit-untrusted-agent-source", "verify-and-explain"],
@@ -160,7 +164,7 @@
     "commands": ["commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-gameplay-review.sh", "commands/playwright-test.sh", "commands/playwright-report-summary.sh", "commands/playwright-artifact-index.sh", "commands/playwright-discovery-report.sh", "commands/playwright-evidence-report.sh", "commands/dotnet-test.sh", "commands/comment-pr-qa-results.sh", "commands/comment-issue-test-results.sh"]
   },
   "computer-science/rapid-prototyper": {
-    "skills": ["prototype-from-reference-pack", "design-ui-from-constraints", "design-web-experiences", "build-gameplay-runtime", "verify-and-explain"],
+    "skills": ["prototype-from-reference-pack", "design-ui-from-constraints", "design-web-experiences", "build-scroll-authored-web-experiences", "build-gameplay-runtime", "verify-and-explain"],
     "commands": ["commands/print-web-experience-brief.sh", "commands/print-gameplay-system-brief.sh", "commands/playwright-capture-page.sh"]
   },
   "computer-science/researcher": {

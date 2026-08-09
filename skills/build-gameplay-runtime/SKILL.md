@@ -20,6 +20,11 @@ description: Implement deterministic gameplay systems with clear simulation, con
 5. Keep presentation adapters replaceable and provide honest fallbacks for unavailable assets.
 6. Dispose render resources, events, audio nodes, timers, workers, and observers on teardown.
 
+## References
+
+- Read [inventory-transactions.md](references/inventory-transactions.md) for conservation invariants, atomic transfers, serialization, migration, and no-loss testing.
+- Read [camera-and-runtime-audio.md](references/camera-and-runtime-audio.md) for camera ownership, modifiers, occlusion, browser audio activation, voice budgets, priority, and accessibility equivalents.
+
 ## Output
 
 - A runtime ownership and data-flow design.
