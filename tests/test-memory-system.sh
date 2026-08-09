@@ -131,6 +131,7 @@ grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-
 awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$project/.ai/REPO_MAP.md" > "$project/.ai/REPO_MAP.md.tmp"
 mv "$project/.ai/REPO_MAP.md.tmp" "$project/.ai/REPO_MAP.md"
 grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'CRLF repository-map marker was not recognized'
+run_for "$project" bash commands/validate-memory.sh >/dev/null || fail 'memory validation rejected a CRLF repository-map marker'
 printf 'content-only change\n' >> "$project/app.txt"
 grep -q 'REPO_MAP_STATUS=CURRENT' < <(run_for "$project" bash commands/repo-map-status.sh) || fail 'content-only edit made map stale'
 printf 'new tracked path\n' > "$project/new-component.txt"
