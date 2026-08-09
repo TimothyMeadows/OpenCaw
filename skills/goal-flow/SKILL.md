@@ -8,6 +8,8 @@ Use when the user explicitly requests a `goal`, says `goal flow`, or a task plan
 
 Do not activate goal flow from the generic `## Goal` section in a normal `TASK.md`. That section describes task intent; it is not the automated goal feature.
 
+Do not activate or create goal flow while repository-root `BRAINSTORM.md` is active. Brainstorm must be explicitly closed and converted into a plan first.
+
 ## Output
 - goal file path under `../.ai/goals/<goal_name>/GOAL.md`
 - ordered goal task list

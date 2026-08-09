@@ -75,6 +75,9 @@ fi
 resolve_gh() {
   if command -v gh >/dev/null 2>&1; then
     GH_BIN="$(command -v gh)"
+    if [[ "${GH_BIN,,}" != *.exe && -f "$GH_BIN.exe" ]]; then
+      GH_BIN="$GH_BIN.exe"
+    fi
     return
   fi
 
@@ -204,11 +207,21 @@ $inline_or_artifact_block
 EOF
 
 gh_comment_file="$comment_file"
-if [[ "${GH_BIN,,}" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
-  gh_comment_file="$(wslpath -w "$comment_file")"
+gh_comment_uses_cygpath=0
+if [[ "${GH_BIN,,}" == *.exe ]]; then
+  if command -v wslpath >/dev/null 2>&1; then
+    gh_comment_file="$(wslpath -w "$comment_file")"
+  elif command -v cygpath >/dev/null 2>&1; then
+    gh_comment_file="$(cygpath -w "$comment_file")"
+    gh_comment_uses_cygpath=1
+  fi
 fi
 
-comment_output="$("$GH_BIN" pr comment "$pr_ref" --body-file "$gh_comment_file")"
+if [[ $gh_comment_uses_cygpath -eq 1 ]]; then
+  comment_output="$(MSYS2_ARG_CONV_EXCL='*' "$GH_BIN" pr comment "$pr_ref" --body-file "$gh_comment_file")"
+else
+  comment_output="$("$GH_BIN" pr comment "$pr_ref" --body-file "$gh_comment_file")"
+fi
 comment_url="$(printf '%s\n' "$comment_output" \
   | grep -Eo 'https://github\.com/[^/[:space:]]+/[^/[:space:]]+/(pull|issues)/[0-9]+#issuecomment-[0-9]+' \
   | tail -n 1 || true)"

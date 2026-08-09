@@ -4,6 +4,7 @@ Curated reusable skills included in OpenCaw.
 
 ## Task And Governance
 
+- `brainstorm-flow` - Run explicit persistent pre-planning idea discovery with two independent researcher lanes, stable branches/elements, and a generated exit summary.
 - `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding, Windows Bash guidance when applicable, and OpenCaw bootstrap wiring are in place.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
 - `gauntlet-flow` - Run explicit builder-versus-fresh-critic loops with a frozen manifest, immutable publication checkpoints, live Git/GitHub-bound progressive PR and QA evidence, one integration branch, and human-gated promotion.

@@ -8,6 +8,8 @@ Use when a user specifies an agent, developer, worker, or parallel execution cou
 
 Use before spawning subagents or delegating work so each lane has a resolved role, explicit ownership, dependencies, expected output, and verification evidence.
 
+Do not use this task-backed lane workflow for active Brainstorm mode. `brainstorm-flow` owns its fixed main project-manager plus two read-only researcher team and keeps researcher reports ephemeral without `SUBAGENTS.md`.
+
 ## Output
 - `../.ai/tasks/<task_name>/SUBAGENTS.md` lane plan
 - requested and effective capacity
@@ -23,6 +25,7 @@ Use before spawning subagents or delegating work so each lane has a resolved rol
 - Worker lanes must have disjoint write sets. If safe disjoint ownership cannot be declared, keep the work local or sequential.
 - Never delegate the immediate critical-path blocker when the main agent needs that result before it can continue.
 - Keep OpenCaw portable: if a tool has no subagent runtime, use the same lane plan as delegation guidance or sequential execution order.
+- Brainstorm is the exception to portable fallback: if two researcher subagents are unavailable, preserve its active state and block idea processing instead of reducing or serializing the team.
 
 ## Subagent prompt template
 

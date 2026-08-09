@@ -6,6 +6,8 @@ description: Create a detailed task folder and TASK.md, then create/link a match
 ## When to use
 Use when a substantial task needs a dedicated instruction file and issue-backed tracking.
 
+Do not use while repository-root `BRAINSTORM.md` is active. Explicitly exit Brainstorm, generate its summary, and obtain an element-to-plan request before creating task state.
+
 ## Output
 - task file path
 - linked GitHub issue URL

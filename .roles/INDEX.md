@@ -53,6 +53,9 @@ Current role catalog location:
 ### Project & Delivery
 - `project-manager`
 
+### Research & Discovery
+- `researcher`
+
 ### Migration & Modernization
 - `code-migrator`
 
@@ -123,6 +126,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/project-manager`: `agent-coordinator`, `delivery-lead`, `delivery-manager`, `multi-agent-coordinator`, `pm`, `project manager`, `project-manager`, `projectmanager`
 - `computer-science/qa-engineer`: `qa`, `qa engineer`, `qa-engineer`, `quality assurance`, `quality engineer`, `quality-engineer`, `test engineer`, `test-engineer`
 - `computer-science/rapid-prototyper`: `rapid prototyper`, `rapid-prototyper`, `rapidprototyper`
+- `computer-science/researcher`: `idea-researcher`, `research-agent`, `researcher`
 - `computer-science/security-engineer`: `appsec`, `secure-coding`, `security`, `security engineer`, `security-engineer`, `securityengineer`
 - `computer-science/senior-developer`: `senior developer`, `senior-developer`, `seniordeveloper`
 - `computer-science/software-architect`: `architect`, `software architect`, `software-architect`, `softwarearchitect`
