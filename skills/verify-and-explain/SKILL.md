@@ -19,6 +19,7 @@ description: Audit a claim or implementation, prove what can be proven with conc
 4. Resolve contradictions before summarizing; do not average conflicting evidence.
 5. Explain the outcome from impact to cause to proof to next action.
 6. Match vocabulary and depth to the named audience without removing material risk.
+7. For multi-condition claims, use the [acceptance and evidence matrix](references/acceptance-evidence-matrix.md) to make coverage, freshness, contradictions, and unknowns explicit.
 
 ## Output
 

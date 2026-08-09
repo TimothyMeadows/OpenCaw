@@ -725,6 +725,7 @@ Examples of role bias:
 - `security-engineer` emphasizes threat modeling, vulnerability review, and least privilege.
 - `sre` emphasizes resilience, observability, performance, and incident evidence.
 - `art-director` emphasizes visual language, asset consistency, production constraints, and specialist art routing.
+- `technical-3d-artist` emphasizes rig, animation, attachment, collision, optimization, and runtime handoff integrity.
 - `gameplay-engineer` emphasizes deterministic runtime systems, production tools, optimization, and playtesting.
 
 Generate and validate the binding map with:
@@ -770,9 +771,9 @@ $clean-context
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
 | Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
 | Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate reproducible media |
-| Art and experience | `tcg-art-direction` and specialist web/game/art skills | Produce original, implementation-ready direction and evidence |
+| Art and experience | `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce original, implementation-ready runtime actors and web experiences |
 
-See `skills/INDEX.md` for the complete catalog.
+See `skills/INDEX.md` for the complete catalog and `skills/EXTERNAL_SOURCES.md` for capability-adaptation boundaries and dispositions.
 
 ## Commands
 
@@ -814,7 +815,7 @@ Or run the command directly:
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
-| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
+| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
 
 Commands should remain deterministic, reviewable, platform-safe, and non-self-installing unless an installation action is explicitly authorized.
 
@@ -1160,6 +1161,7 @@ Common focused validators:
 ./commands/validate-media-templates.sh
 ./commands/validate-readme.sh
 ./commands/validate-memory.sh
+./tests/test-selected-capability-import.sh
 ./tests/test-gauntlet-flow.sh
 ```
 
@@ -1171,6 +1173,7 @@ The integrated suite verifies, among other things:
 - complete domain-qualified role mappings
 - agreement between canonical JSON and generated role-map Markdown
 - command syntax and executable requirements
+- rigged-actor manifest identity, path confinement, runtime-file, and verification-evidence contracts
 - style catalog and contract structure
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
@@ -1192,9 +1195,11 @@ OpenCaw/
 ├── STYLE.md                          # visual-style contract for this repository
 ├── .architecture/                    # reusable architecture templates
 ├── .roles/                           # domain roles, aliases, and capability maps
+│   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
 │   └── .gpu/                         # all generative-media assets
 ├── skills/                           # reusable reasoning workflows
+│   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures

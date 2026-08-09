@@ -1,0 +1,8 @@
+Implemented the rigged runtime actor skill, technical 3D artist role, strict executable manifest validator, and gameplay/action reference expansions.
+
+Verification:
+- Valid shipped character and monster manifests passed.
+- Wrong schema, duplicate clip/socket/equipment IDs, missing action role, unknown socket, path escape, skeleton mismatch, missing file, incomplete verified evidence, and shipped-without-root cases failed closed.
+- Bash syntax, executable mode, skill-creator validation, OpenCaw skill safety, role, skill, command, prohibited-source, credential, and whitespace checks passed.
+- ShellCheck was unavailable in Git Bash and is not claimed.
+- Temporary fixtures were removed.

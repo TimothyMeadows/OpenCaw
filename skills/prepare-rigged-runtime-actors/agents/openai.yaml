@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Rigged Runtime Actors"
+  short_description: "Prepare validated rigged actors for runtime"
+  default_prompt: "Use $prepare-rigged-runtime-actors to define and verify a production-ready rigged game actor package."

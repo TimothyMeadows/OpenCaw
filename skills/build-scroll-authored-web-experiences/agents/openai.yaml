@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Scroll-Authored Web Experiences"
+  short_description: "Build accessible scroll-driven web stories"
+  default_prompt: "Use $build-scroll-authored-web-experiences to design a reversible, accessible scroll-driven web story."

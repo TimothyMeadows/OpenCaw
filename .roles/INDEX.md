@@ -40,6 +40,7 @@ Current role catalog location:
 - `pixel-artist`
 - `pre-rendered-2-5d-artist`
 - `sound-designer`
+- `technical-3d-artist`
 - `tile-set-artist`
 - `token-vfx-artist`
 - `web-experience-designer`
@@ -108,6 +109,7 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `arts/pixel-artist`: `pixel-artist`, `pixel-art`, `sprite-artist`, `sprite-sheet-artist`, `raster-game-artist`
 - `arts/pre-rendered-2-5d-artist`: `pre-rendered-2-5d-artist`, `prerendered-2-5d-artist`, `hd-2d-artist`, `rendered-sprite-artist`, `orthographic-render-artist`, `3d-to-2d-artist`
 - `arts/sound-designer`: `audio-designer`, `game-audio-designer`, `sound-art-director`
+- `arts/technical-3d-artist`: `technical-3d-artist`, `3d-technical-artist`, `rigging-artist`, `technical-animator`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `arts/token-vfx-artist`: `token-vfx-artist`, `token-vfx`, `token-artist`, `minion-artist`, `card-vfx`
 - `arts/web-experience-designer`: `web-experience-designer`, `web-designer`, `experience-designer`, `interactive-web-designer`
