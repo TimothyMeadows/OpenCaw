@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: e9e7b50f5fb1f8423f9c750ba6c0618122483178e333cb736e466c7a5471d8dc -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: aa1cf44c57fef3f19d244344eb5e02ad1ab6bdc09765100bd440ff262905b861 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:architecture] [scope:core] OpenCaw's hierarchy is optional explicit persistent Brainstorm discovery, planning, then one sibling delivery mode: default task, explicit Goal, or explicit Gauntlet.
@@ -29,4 +29,7 @@
 - [kind:command] [area:styles] [tech:bash] `commands/generate-style.sh` defaults to CSS3, records primary and allowed pipelines, and `commands/resolve-art-pipeline.sh` gives task-local prompt overrides precedence without silent fallback.
 - [kind:command] [area:media] [tech:bash] `commands/generate-media-contract.sh` composes CLOUD with optional LOCAL execution; local install, model, and inspection commands resolve pinned assets from `.styles/.pipelines/local/`.
 - [kind:component] [area:threejs] [tech:typescript] `build-threejs-code-models` and the code-model manifest commands govern procedural source through six ordered passes, deterministic budgets, semantic parts/anchors, disposal, and hashed multi-view evidence.
+- [kind:config] [area:styles] [area:assets] `STYLE.md` may optionally name absolute read-only external 3D asset-library roots; configured libraries are source precedence rather than art pipelines and are never prompted for during startup.
+- [kind:command] [area:assets] [tech:bash] `list-external-asset-libraries.sh`, `inspect-external-asset-library.sh`, and `copy-external-asset.sh` parse configured roots, inventory without loading, and copy hash-verified files or bundles into namespaced `assets/models/` destinations without following links or overwriting.
+- [kind:test] [area:assets] [area:styles] [tech:bash] `tests/test-external-asset-library.sh` verifies optional generation, preservation/clearing, POSIX/Windows/UNC syntax, source immutability, copy-first hashes, confinement, overlap, symlink, and no-library behavior.
 - [kind:test] [area:media] [area:styles] [tech:bash] `tests/test-art-pipelines.sh` and `tests/test-generative-media.sh` verify selection, contract composition, code-model state, local safety gates, staging, manifests, and no silent fallback.

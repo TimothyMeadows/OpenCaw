@@ -45,6 +45,7 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 Skills:
 
 - `select-art-pipeline`
+- `use-external-asset-library`
 - `maintain-art-style-contract`
 - `develop-original-brand-directions`
 - `design-ui-from-constraints`
@@ -66,6 +67,9 @@ Skills:
 Commands:
 
 - `commands/resolve-art-pipeline.sh`
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/validate-style-contract.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
@@ -87,6 +91,7 @@ Commands:
 Skills:
 
 - `select-art-pipeline`
+- `use-external-asset-library`
 - `direct-blender-production`
 - `model-blender-assets`
 - `prepare-blender-uvs-and-textures`
@@ -107,6 +112,9 @@ Skills:
 Commands:
 
 - `commands/resolve-art-pipeline.sh`
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/print-blender-production-brief.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
@@ -430,6 +438,7 @@ Commands:
 Skills:
 
 - `select-art-pipeline`
+- `use-external-asset-library`
 - `build-threejs-code-models`
 - `prepare-rigged-runtime-actors`
 - `model-blender-assets`
@@ -445,6 +454,9 @@ Skills:
 Commands:
 
 - `commands/resolve-art-pipeline.sh`
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/create-code-model-manifest.sh`
 - `commands/validate-code-model-manifest.sh`
 - `commands/next-code-model-pass.sh`
@@ -498,6 +510,7 @@ Commands:
 Skills:
 
 - `select-art-pipeline`
+- `use-external-asset-library`
 - `build-threejs-code-models`
 - `design-web-experiences`
 - `design-conversion-pages`
@@ -517,6 +530,9 @@ Skills:
 Commands:
 
 - `commands/resolve-art-pipeline.sh`
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/create-code-model-manifest.sh`
 - `commands/validate-code-model-manifest.sh`
 - `commands/next-code-model-pass.sh`
@@ -701,6 +717,7 @@ Commands:
 Skills:
 
 - `select-art-pipeline`
+- `use-external-asset-library`
 - `build-threejs-code-models`
 - `design-web-experiences`
 - `design-ui-from-constraints`
@@ -718,6 +735,9 @@ Skills:
 Commands:
 
 - `commands/resolve-art-pipeline.sh`
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/create-code-model-manifest.sh`
 - `commands/validate-code-model-manifest.sh`
 - `commands/next-code-model-pass.sh`
@@ -770,6 +790,7 @@ Commands:
 
 Skills:
 
+- `use-external-asset-library`
 - `build-gameplay-runtime`
 - `build-game-production-tools`
 - `design-action-gameplay`
@@ -783,6 +804,9 @@ Skills:
 
 Commands:
 
+- `commands/list-external-asset-libraries.sh`
+- `commands/inspect-external-asset-library.sh`
+- `commands/copy-external-asset.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/validate-gameplay-review.sh`
 - `commands/validate-rigged-actor-manifest.sh`

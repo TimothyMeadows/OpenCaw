@@ -14,13 +14,14 @@ description: Author procedural Three.js TypeScript or JavaScript models from a t
 ## Workflow
 
 1. Read `STYLE.md`, resolve `CODE` with `select-art-pipeline`, and read `.styles/.pipelines/code/PIPELINE.md`.
-2. Inspect the host's existing Three.js version and documented model interface. Do not add or install Three.js. Use the interface recorded by the code-model manifest when the host has no interface.
-3. Scaffold a manifest below `.ai/tasks/` with the text brief, semantic parts, pivots or anchors, deterministic seed, explicit budgets, cleanup ownership, and any authorized reference-image hashes.
-4. Validate the manifest before authoring. Treat reference images as review inputs only.
-5. Work in order: `blockout`, `structure`, `form`, `materials`, `interaction`, then `optimization`. Query the next unlocked pass before each change.
-6. For each pass, author source, build or typecheck with the host toolchain, and capture deterministic browser evidence. Non-planar models require front, orbit-left, and orbit-right views.
-7. Record exactly one review decision: `pass`, `revise-spec`, `revise-code`, `request-input`, or `stop`. Keep evidence hashed and project-confined.
-8. Stop after three attempts on one pass or twelve attempts overall. After all passes, run complete validation and representative browser verification, including budgets and disposal.
+2. If `STYLE.md` configures external asset libraries, inspect them first with `use-external-asset-library`. Copy any authorized template into the repository, but keep it as reference evidence rather than a primary runtime mesh.
+3. Inspect the host's existing Three.js version and documented model interface. Do not add or install Three.js. Use the interface recorded by the code-model manifest when the host has no interface.
+4. Scaffold a manifest below `.ai/tasks/` with the text brief, semantic parts, pivots or anchors, deterministic seed, explicit budgets, cleanup ownership, and any authorized reference-image hashes.
+5. Validate the manifest before authoring. Treat references as review inputs only.
+6. Work in order: `blockout`, `structure`, `form`, `materials`, `interaction`, then `optimization`. Query the next unlocked pass before each change.
+7. For each pass, author source, build or typecheck with the host toolchain, and capture deterministic browser evidence. Non-planar models require front, orbit-left, and orbit-right views.
+8. Record exactly one review decision: `pass`, `revise-spec`, `revise-code`, `request-input`, or `stop`. Keep evidence hashed and project-confined.
+9. Stop after three attempts on one pass or twelve attempts overall. After all passes, run complete validation and representative browser verification, including budgets and disposal.
 
 ## Output
 

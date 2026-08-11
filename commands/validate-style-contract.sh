@@ -18,6 +18,7 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/art-pipeline-common.sh"
+source "$script_dir/lib/external-asset-library-common.sh"
 opencaw_resolve_paths
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
@@ -168,6 +169,65 @@ grep -Eiq 'never (switch or )?fall back.*silently|never.*silently.*fall back' "$
   status=1
 }
 
+external_library_heading_count="$(grep -Ec '^## External Asset Libraries\r?$' "$style_file" || true)"
+if [[ "$external_library_heading_count" -gt 1 ]]; then
+  echo 'STYLE.md contains more than one External Asset Libraries section.' >&2
+  status=1
+fi
+
+external_library_entries_output=''
+if ! external_library_entries_output="$(external_asset_library_entries "$style_file")"; then
+  status=1
+fi
+external_library_ids=()
+external_library_paths=()
+while IFS=$'\t' read -r library_id library_path; do
+  [[ -n "$library_id" ]] || continue
+  external_library_ids+=("$library_id")
+  external_library_paths+=("$library_path")
+done <<< "$external_library_entries_output"
+
+if [[ "$external_library_heading_count" -eq 1 && ${#external_library_ids[@]} -eq 0 ]]; then
+  echo 'External Asset Libraries section must contain at least one configured library.' >&2
+  status=1
+fi
+
+declare -A seen_external_library_ids=()
+declare -A seen_external_library_paths=()
+for index in "${!external_library_ids[@]}"; do
+  library_id="${external_library_ids[$index]}"
+  library_path="${external_library_paths[$index]}"
+  external_asset_library_validate_id "$library_id" || status=1
+  external_asset_library_validate_path "$library_path" || status=1
+  if [[ -n "${seen_external_library_ids[$library_id]:-}" ]]; then
+    echo "Duplicate external asset library id in STYLE.md: $library_id" >&2
+    status=1
+  fi
+  path_key="$library_path"
+  [[ "$library_path" =~ ^[A-Za-z]:[\\/] || "$library_path" =~ ^\\\\ ]] && path_key="${library_path,,}"
+  if [[ -n "${seen_external_library_paths[$path_key]:-}" ]]; then
+    echo "Duplicate external asset library path in STYLE.md: $library_path" >&2
+    status=1
+  fi
+  seen_external_library_ids[$library_id]=1
+  seen_external_library_paths[$path_key]=1
+done
+
+if [[ ${#external_library_ids[@]} -gt 0 ]]; then
+  grep -Eiq 'external librar(y|ies).*before creating or downloading|before creating or downloading.*external librar(y|ies)' "$style_file" || {
+    echo 'STYLE.md external asset policy must prefer configured libraries before creating or downloading models.' >&2
+    status=1
+  }
+  grep -Eiq 'external librar(y|ies).*read-only|read-only.*external librar(y|ies)' "$style_file" || {
+    echo 'STYLE.md external asset policy must declare libraries read-only.' >&2
+    status=1
+  }
+  grep -Eiq 'assets/models/.+before (loading|importing|editing)|before (loading|importing|editing).+assets/models/' "$style_file" || {
+    echo 'STYLE.md external asset policy must require copying into assets/models before use.' >&2
+    status=1
+  }
+fi
+
 if [[ $status -eq 0 ]]; then
   echo "Style contract validation passed."
   printf 'Referenced styles:'
@@ -177,6 +237,9 @@ if [[ $status -eq 0 ]]; then
   printf '\n'
   printf 'Primary art pipeline: %s\n' "${primary_pipelines[0]}"
   printf 'Allowed art pipelines:'; printf ' %s' "${allowed_pipelines[@]}"; printf '\n'
+  printf 'External asset libraries:'
+  if [[ ${#external_library_ids[@]} -eq 0 ]]; then printf ' none'; else printf ' %s' "${external_library_ids[@]}"; fi
+  printf '\n'
 fi
 
 exit $status
