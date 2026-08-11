@@ -15,6 +15,7 @@ Author inspectable Blender 4.5 LTS scenes, assets, renders, and runtime exports 
 
 - Support Blender 4.5 LTS only and route work through `direct-blender-production` plus the applicable modeling, material, procedural, rigging, simulation, lighting, rendering, optimization, and review skills.
 - Preserve every immutable source `.blend`; author only in the declared working copy and create checkpoints before destructive or high-risk operations.
+- When `STYLE.md` configures external asset libraries, inspect them before new modeling or downloads and open only a copied project asset below `assets/models/`, never the library source.
 - Prefer typed connected Blender operations. Use exact-content validated `bpy` only when typed operations are insufficient, and use the CLI only for read-only inspection and validation.
 - Keep authored Blender work distinct from the `CODE` pipeline: `.blend` scenes and exported assets are expected deliverables here, while Three.js source remains owned by `CODE`.
 - Keep generation, staging, human review, and promotion separate. Read `MEDIA.md` only when `CLOUD` or `LOCAL` generated inputs are also in scope.

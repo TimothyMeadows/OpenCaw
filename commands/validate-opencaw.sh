@@ -17,6 +17,7 @@ set -euo pipefail
 ./tests/test-selected-capability-import.sh
 ./tests/test-art-pipelines.sh
 ./tests/test-blender-art-capabilities.sh
+./tests/test-external-asset-library.sh
 ./tests/test-gauntlet-flow.sh
 
 echo "OpenCaw validation passed."

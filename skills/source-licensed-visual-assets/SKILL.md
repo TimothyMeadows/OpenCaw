@@ -14,11 +14,12 @@ description: Select visual assets with documented source, license, intended use,
 ## Workflow
 
 1. Define the subject, emotional role, medium, dimensions, crop, color treatment, resolution, and performance budget.
-2. Use only repository-approved sources and verify the license at the asset level.
-3. Record the canonical source URL, creator, license or terms, retrieval date, and modification limits.
-4. Evaluate composition, readability, responsive crops, alt text, and fallback behavior.
-5. Prepare optimized derivatives only when the license and task authority permit it.
-6. Add provenance and usage notes to the host project handoff.
+2. For 3D assets, check optional external libraries in `STYLE.md` with `use-external-asset-library` before searching for or downloading another asset.
+3. Use only repository-approved sources and verify the license at the asset level.
+4. Record the canonical source, creator, license or terms, retrieval date, and modification limits.
+5. Evaluate composition, readability, responsive crops, alt text, and fallback behavior.
+6. Prepare optimized derivatives only when the license and task authority permit it.
+7. Add provenance and usage notes to the host project handoff.
 
 ## Output
 
@@ -31,3 +32,4 @@ description: Select visual assets with documented source, license, intended use,
 - Do not assume a repository-level license covers third-party media.
 - Do not hotlink assets unless the provider and host policy permit it.
 - Do not include assets with unclear ownership, model releases, or redistribution rights.
+- Never load or modify a configured external-library asset directly; copy it into `assets/models/` first.

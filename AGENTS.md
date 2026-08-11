@@ -103,7 +103,8 @@ Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. Every 
 - Ask the user which style templates in `./.styles/` apply to the repository, unless the user already named the desired style.
 - Support selecting multiple templates for mixed-style repositories.
 - Default the primary art pipeline to `CSS3` unless the user explicitly selects `CLOUD`, `LOCAL`, `CODE`, or `BLENDER`.
-- After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] "<STYLE1>" ["STYLE2" ...]`.
+- After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] [--asset-library ID=ABSOLUTE_PATH ...] "<STYLE1>" ["STYLE2" ...]`.
+- External asset libraries are optional. Never ask for or probe a library during startup or initial setup unless the user explicitly requests one.
 - Default generation must use concise read directives (for example `Read \`./<mount>/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
 - Use `--inline` only when the user explicitly asks for fully embedded template content.
 - Validate generated or edited style contracts with `./commands/validate-style-contract.sh`.
@@ -112,6 +113,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. Every 
 ### When regenerating style later
 - Ask the user again which style templates apply unless they already named the replacement style set.
 - Ask which primary and allowed art pipelines apply unless they already named them; default the primary to `CSS3`.
+- Preserve configured external asset libraries during regeneration unless the user explicitly replaces or clears them.
 - Regenerate `../STYLE.md` with the same default read-directive mode unless inline output is explicitly requested.
 - Validate the regenerated contract with `./commands/validate-style-contract.sh`.
 
@@ -124,6 +126,18 @@ Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. Every 
 - `BLENDER`: author Blender 4.5 LTS scenes, assets, renders, and runtime exports through immutable working-copy, validation, staging, and human-review controls.
 
 If a selected pipeline is unavailable or fails, stop and request direction. Never switch or fall back to a different pipeline silently.
+
+### Optional external asset libraries
+
+`STYLE.md` may contain named absolute filesystem roots under `## External Asset Libraries`. These are optional source locations for existing 3D models, rigs, animations, and complete asset bundles; they are not art pipelines.
+
+- When no library is configured, continue normally without prompting during startup, installation, scaffold creation, or unrelated work.
+- When at least one library is configured and a task needs a 3D asset, run `./commands/list-external-asset-libraries.sh` and inspect relevant libraries before creating, generating, or downloading a replacement.
+- Treat every configured library and all content beneath it as strictly read-only. Never edit, rename, delete, generate into, install into, or otherwise write beneath a library root.
+- Never load, import, execute, or use an asset directly from an external library. First copy the selected file or complete bundle with `./commands/copy-external-asset.sh` into `<project-root>/assets/models/<library-id>/...`.
+- Use only the repository-local copy as-is or as a modifiable template. Record task-local copy evidence when a task exists, and verify asset-level provenance, license, modification rights, format, budgets, selected pipeline, and architecture compatibility.
+- Do not follow symbolic links, overwrite an existing project asset, or allow source/destination path overlap. If a configured library is unavailable, stop and request direction instead of silently skipping the required search.
+- An external library never relaxes pipeline boundaries: `CSS3` cannot use model assets, and `CODE` may use a copied model only as template/reference evidence rather than its primary runtime mesh.
 
 ## Generative media workflow
 

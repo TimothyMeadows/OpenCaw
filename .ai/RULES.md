@@ -8,3 +8,4 @@
 - Do not delete or clear host-global caches, temporary data, or other files outside the resolved repository to make space for OpenCaw work without the user’s explicit approval; stop and report the storage blocker instead.
 - Stop autonomous Gauntlet execution after 45 minutes or two failed full-validation epochs, persist resumable evidence, and require explicit user reauthorization before starting another execution window.
 - When changing the art-pipeline registry, inventory every established production path, including Blender, and update selection, contracts, roles, skills, documentation, memory, and tests as one coherent change.
+- Treat configured external asset libraries as read-only source locations: inspect them before creating or downloading replacement 3D assets, and copy selected files or bundles into repository-root `assets/models/` before any load, import, edit, or use.

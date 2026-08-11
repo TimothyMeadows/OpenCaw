@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use External Asset Library"
+  short_description: "Copy read-only 3D assets into the project"
+  default_prompt: "Use $use-external-asset-library to inspect configured libraries and copy an eligible asset into this project before loading it."

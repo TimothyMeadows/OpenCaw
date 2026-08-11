@@ -17,6 +17,7 @@ Author procedural Three.js models as reviewable TypeScript or JavaScript instead
 - Work through `blockout`, `structure`, `form`, `materials`, `interaction`, and `optimization` passes in order.
 - Preserve model state outside the Three.js scene graph and expose cleanup for every owned GPU resource.
 - Treat references as review evidence rather than runtime dependencies.
+- When `STYLE.md` configures external asset libraries, inspect them before authoring and copy an authorized candidate into `assets/models/` only as template/reference evidence.
 - Do not use GLB, glTF, FBX, OBJ, downloaded model packs, or generated meshes as the primary implementation.
 - Stop when the selected pipeline fails or the correction budget is exhausted. Never switch pipelines silently.
 

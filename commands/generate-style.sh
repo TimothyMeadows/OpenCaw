@@ -3,10 +3,11 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./commands/generate-style.sh [--inline] [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] "<STYLE1>" ["STYLE2" ...]
+Usage: ./commands/generate-style.sh [--inline] [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] [--asset-library ID=ABSOLUTE_PATH ... | --clear-asset-libraries] "<STYLE1>" ["STYLE2" ...]
 
 Defaults to concise link-based output in ../STYLE.md.
 CSS3 is the default primary art pipeline when --pipeline is omitted.
+Existing external asset libraries are preserved unless explicitly replaced or cleared.
 Use --inline to embed full style template contents.
 EOF
 }
@@ -15,6 +16,8 @@ mode='link'
 styles=()
 primary_pipeline=''
 allowed_pipeline_inputs=()
+external_library_specs=()
+clear_external_libraries=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -32,6 +35,15 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || { echo "--allow-pipeline requires a value" >&2; exit 1; }
       allowed_pipeline_inputs+=("$2")
       shift 2
+      ;;
+    --asset-library)
+      [[ $# -ge 2 ]] || { echo "--asset-library requires ID=ABSOLUTE_PATH" >&2; exit 1; }
+      external_library_specs+=("$2")
+      shift 2
+      ;;
+    --clear-asset-libraries)
+      clear_external_libraries=1
+      shift
       ;;
     -h|--help)
       usage
@@ -64,12 +76,50 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/art-pipeline-common.sh"
+source "$script_dir/lib/external-asset-library-common.sh"
 opencaw_resolve_paths
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 mount_dir_name="$(basename "$opencaw_root")"
 if [[ "$opencaw_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
 style_target="$host_root/STYLE.md"
+
+if [[ $clear_external_libraries -eq 1 && ${#external_library_specs[@]} -gt 0 ]]; then
+  echo '--clear-asset-libraries cannot be combined with --asset-library.' >&2
+  exit 1
+fi
+
+external_library_ids=()
+external_library_paths=()
+if [[ ${#external_library_specs[@]} -gt 0 ]]; then
+  for raw_spec in "${external_library_specs[@]}"; do
+    external_asset_library_parse_spec "$raw_spec"
+    external_library_ids+=("$EXTERNAL_ASSET_LIBRARY_ID")
+    external_library_paths+=("$EXTERNAL_ASSET_LIBRARY_PATH")
+  done
+elif [[ $clear_external_libraries -eq 0 && -f "$style_target" ]]; then
+  preserved_external_libraries="$(external_asset_library_entries "$style_target")" || exit 1
+  while IFS=$'\t' read -r library_id library_path; do
+    [[ -n "$library_id" ]] || continue
+    external_library_ids+=("$library_id")
+    external_library_paths+=("$library_path")
+  done <<< "$preserved_external_libraries"
+fi
+
+declare -A seen_library_ids=()
+declare -A seen_library_paths=()
+for index in "${!external_library_ids[@]}"; do
+  library_id="${external_library_ids[$index]}"
+  library_path="${external_library_paths[$index]}"
+  external_asset_library_validate_id "$library_id"
+  external_asset_library_validate_path "$library_path"
+  [[ -z "${seen_library_ids[$library_id]:-}" ]] || { echo "Duplicate external asset library id: $library_id" >&2; exit 1; }
+  path_key="$library_path"
+  [[ "$library_path" =~ ^[A-Za-z]:[\\/] || "$library_path" =~ ^\\\\ ]] && path_key="${library_path,,}"
+  [[ -z "${seen_library_paths[$path_key]:-}" ]] || { echo "Duplicate external asset library path: $library_path" >&2; exit 1; }
+  seen_library_ids[$library_id]=1
+  seen_library_paths[$path_key]=1
+done
 
 selected=()
 for name in "${styles[@]}"; do
@@ -136,6 +186,23 @@ done
   echo "- A prompt override applies only to that task and does not rewrite this STYLE.md."
   echo "- Stop if the selected pipeline is unavailable or fails. Never switch or fall back to another pipeline silently."
   echo
+
+  if [[ ${#external_library_ids[@]} -gt 0 ]]; then
+    echo "## External Asset Libraries"
+    echo
+    echo "Configured read-only library roots:"
+    for index in "${!external_library_ids[@]}"; do
+      echo "- ${external_library_ids[$index]}: \`${external_library_paths[$index]}\`"
+    done
+    echo
+    echo "### External Asset Library Policy"
+    echo
+    echo "- Inspect configured external libraries before creating or downloading another 3D model, rig, or animation."
+    echo "- Treat every configured external library as read-only. Never edit, rename, delete, generate into, or otherwise write beneath it."
+    echo "- Copy each selected asset into \`assets/models/<library-id>/...\` before loading, importing, editing, executing, or using it."
+    echo "- Use a repository-local copy as-is or as a template only when asset-level rights, the selected art pipeline, and repository architecture permit it."
+    echo
+  fi
 
   if [[ "$mode" == 'link' ]]; then
     echo "This document intentionally stays concise by referencing selected style and pipeline templates."

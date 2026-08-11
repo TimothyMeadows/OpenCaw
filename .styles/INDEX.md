@@ -54,6 +54,10 @@ Pipeline contracts and their owned assets live under `.styles/.pipelines/` and a
 
 See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, the code-model schema, and Blender production boundaries.
 
+## Optional External Asset Libraries
+
+`STYLE.md` may also name absolute read-only filesystem roots for existing 3D models, rigs, animations, and bundles. This is source precedence, not an art pipeline. Library assets must be inspected before replacement work and copied into `assets/models/<library-id>/...` before they are loaded, imported, edited, or used. Style generation never prompts for this optional configuration and preserves existing entries unless explicitly replaced or cleared.
+
 ## Recommended Starting Points
 
 - Isometric tactics, town builders, ARPGs, and 2.5D exploration: `ISOMETRIC_2_5D`

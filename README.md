@@ -815,6 +815,7 @@ Or run the command directly:
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
 | Brainstorm discovery | `brainstorm-mode.sh`, `validate-brainstorm.sh`, `show-brainstorm.sh` |
 | Architecture, style, and art pipelines | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh`, `resolve-art-pipeline.sh`, `validate-art-pipelines.sh` |
+| External 3D asset libraries | `list-external-asset-libraries.sh`, `inspect-external-asset-library.sh`, `copy-external-asset.sh` |
 | Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
 | Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
 | Goal flow | `create-goal-file.sh`, `create-goal-completion-report.sh` |
@@ -1181,6 +1182,40 @@ The `CODE` pipeline uses six ordered passes: blockout, structure, form, material
 
 The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for modeling, UVs and textures, materials, procedural scenes, rigging, simulation, lighting, rendering, optimization, export, and review. It preserves the source `.blend`, authors only in declared repository-confined working copies, prefers typed connected Blender operations, validates exceptional exact-content `bpy`, and treats CLI tools as read-only inspection. Blender, addons, packages, and providers are never installed automatically. If live authoring is unavailable, the workflow stops instead of switching pipelines or backends.
 
+### Optional external 3D asset libraries
+
+Projects may point `STYLE.md` at an existing filesystem library of models, rigs, animations, and asset bundles. This is optional: OpenCaw does not ask for a library during startup or installation, and a project without one behaves exactly as before.
+
+Configure one or more named absolute roots when generating the style contract:
+
+```bash
+./commands/generate-style.sh \
+  --asset-library 'studio=D:\Shared Assets\Models' \
+  --asset-library 'mocap=/srv/art-library/mocap' \
+  "CEL_SHADED_COMIC"
+```
+
+This writes a concise contract such as:
+
+```markdown
+Configured read-only library roots:
+- studio: `D:\Shared Assets\Models`
+- mocap: `/srv/art-library/mocap`
+```
+
+Existing library entries survive later style regeneration. Supplying `--asset-library` replaces the configured set; `--clear-asset-libraries` removes it explicitly. Paths may be unavailable on another contributor's machine, so style validation checks their syntax and safety policy without probing the filesystem.
+
+When libraries are configured, OpenCaw searches them before creating, generating, or downloading another 3D asset. The source library is always read-only and is never loaded directly. A selected file or complete bundle must first be copied into the repository:
+
+```bash
+./commands/list-external-asset-libraries.sh
+./commands/inspect-external-asset-library.sh studio
+./commands/copy-external-asset.sh studio characters/hero \
+  --evidence .ai/tasks/current-task/external-asset-copy.json
+```
+
+The deterministic destination is `assets/models/<library-id>/<source-relative-path>`. Commands reject symbolic links, traversal, overlapping source/project roots, destination escapes, and overwrites. Only the repository-local copy may be loaded, imported, edited, or used. Asset-level provenance, licenses, selected pipeline, formats, and runtime budgets still apply: the library does not relax `CSS3` or `CODE` boundaries.
+
 ## Validation
 
 OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and generative-media assets.
@@ -1204,6 +1239,7 @@ Common focused validators:
 ./commands/validate-media-templates.sh
 ./commands/validate-readme.sh
 ./commands/validate-memory.sh
+./tests/test-external-asset-library.sh
 ./tests/test-selected-capability-import.sh
 ./tests/test-gauntlet-flow.sh
 ```
@@ -1219,6 +1255,7 @@ The integrated suite verifies, among other things:
 - rigged-actor manifest identity, path confinement, runtime-file, and verification-evidence contracts
 - Blender 4.5 production skill metadata, role routing, safe CLI flags, scene-report integrity, profile completeness, dependency confinement, and restricted Python parsing
 - style catalog and contract structure
+- optional external asset-library preservation, read-only inventory, copy-first confinement, source immutability, and copied-file hash evidence
 - pinned media toolchains, model packs, workflows, checksums, and manifests
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
 - Brainstorm path isolation, sticky lifecycle state, branch/element validation, summary hashing, graph rendering, and delivery-creation guards
