@@ -1,7 +1,7 @@
 # Add art pipelines and code-first Three.js models
 
 ## Status
-BLENDER follow-up implemented and locally verified; awaiting refreshed PR publication confirmation.
+BLENDER follow-up published to draft PR #108 and post-PR QA passed.
 
 ## Archive
 - /mnt/c/Repository/OpenCaw/.ai/archive/tasks/art-pipelines-code-first-20260810T233132Z.md
@@ -28,6 +28,12 @@ BLENDER follow-up implemented and locally verified; awaiting refreshed PR public
 - All directly affected art, Blender, media, style, role, command, skill, README, memory, and repository-map checks passed.
 - The repository-wide `validate-opencaw.sh` supplemental run timed out after 604 seconds without a verdict; affected suites pass independently.
 - ShellCheck is unavailable on this host; Bash syntax validation and `git diff --check` passed.
+
+## Pull Request
+
+https://github.com/TimothyMeadows/OpenCaw/pull/108
+
+Post-PR QA passed on feature commit `c217820b1c02def85037b9e75df1b4b7b2c2bae8` for art-pipeline, Blender, cloud/local media, skill, command, role, README, memory, and repository-map coverage.
 
 ## Issue
 
