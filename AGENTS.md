@@ -79,8 +79,8 @@ Architecture templates live in:
 - Ask the user again which templates apply.
 - Regenerate `../ARCHITECTURE.md` with the same default read-directive mode unless inline output is explicitly requested.
 
-## Art style workflow
-The canonical art style contract for the host repository is:
+## Art style and pipeline workflow
+The canonical visual contract for the host repository is:
 
 - `../STYLE.md`
 
@@ -88,13 +88,22 @@ Style templates live in:
 
 - `./.styles/`
 
+Art pipeline contracts live in:
+
+- `./.styles/.pipelines/`
+
+Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. Every generated `STYLE.md` contains at least one art style, exactly one primary pipeline, allowed alternatives, task-local prompt-override scope, and an explicit no-silent-fallback rule.
+
 ### When `../STYLE.md` exists
-- Read it and follow it as the authoritative art style contract for visual, game-art, generated-image, UI-art, and asset-production work.
+- Read it and follow it as the authoritative art style and pipeline contract for visual, game-art, generated-image, UI-art, code-model, and asset-production work.
+- Resolve the current pipeline with `./commands/resolve-art-pipeline.sh`. An explicit current-prompt pipeline selection takes precedence over the primary pipeline, applies only to that task, may select any registered pipeline, and does not rewrite `STYLE.md`.
+- Record prompt-override evidence below the active `.ai/tasks/<task>/` folder with `selectionSource: prompt` and the current style-contract hash.
 
 ### When `../STYLE.md` is missing
 - Ask the user which style templates in `./.styles/` apply to the repository, unless the user already named the desired style.
 - Support selecting multiple templates for mixed-style repositories.
-- After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh "<STYLE1>" ["STYLE2" ...]`.
+- Default the primary art pipeline to `CSS3` unless the user explicitly selects `CLOUD`, `LOCAL`, or `CODE`.
+- After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] "<STYLE1>" ["STYLE2" ...]`.
 - Default generation must use concise read directives (for example `Read \`./<mount>/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
 - Use `--inline` only when the user explicitly asks for fully embedded template content.
 - Validate generated or edited style contracts with `./commands/validate-style-contract.sh`.
@@ -102,8 +111,18 @@ Style templates live in:
 
 ### When regenerating style later
 - Ask the user again which style templates apply unless they already named the replacement style set.
+- Ask which primary and allowed art pipelines apply unless they already named them; default the primary to `CSS3`.
 - Regenerate `../STYLE.md` with the same default read-directive mode unless inline output is explicitly requested.
 - Validate the regenerated contract with `./commands/validate-style-contract.sh`.
+
+### Pipeline responsibilities
+
+- `CLOUD`: use compatible generation exposed by the active session with explicit budgets, non-runtime staging, provenance, and human review.
+- `LOCAL`: use pinned loopback-only ComfyUI image/audio execution on local GPU resources with license and checksum gates.
+- `CSS3`: author CSS, mathematical geometry, and inline SVG/vector output only; do not depend on raster generation, canvas, or WebGL.
+- `CODE`: author host-native Three.js TypeScript/JavaScript models; do not use downloaded/generated mesh assets or a model library as the primary implementation.
+
+If a selected pipeline is unavailable or fails, stop and request direction. Never switch or fall back to a different pipeline silently.
 
 ## Generative media workflow
 
@@ -111,27 +130,30 @@ The optional generative media contract for the host repository is:
 
 - `../MEDIA.md`
 
-Generative-media backend templates, schemas, and pinned local manifests live in:
+Cloud/local media contracts, shared provenance schemas, and pinned local manifests live in:
 
-- `./.styles/.gpu/`
+- `./.styles/.pipelines/cloud/`
+- `./.styles/.pipelines/local/`
+- `./.styles/.pipelines/_shared/`
 
 ### When `../MEDIA.md` exists
 
 - Read it only for image, music, sound-effect, voice, or media-pipeline work.
-- Treat it as the authority for backend selection, versions, staging, runtime destinations, budgets, rights, consent, provenance, review, and promotion policy.
-- Continue to treat `../STYLE.md` as the authority for visual language.
+- Treat it as the execution and provenance authority for `CLOUD` and `LOCAL`: versions, staging, runtime destinations, budgets, rights, consent, review, and promotion policy.
+- For image generation, obey both the resolved art pipeline and `MEDIA.md`. Music, sound effects, and voice use `MEDIA.md` without depending on visual style.
+- `CSS3` and `CODE` work do not require `MEDIA.md`.
 
 ### When `../MEDIA.md` is missing
 
 - Do not generate it for unrelated tasks.
 - When the user configures a media pipeline, discover capabilities separately for image, music, sound effects, and voice.
-- Treat a compatible session/cloud capability as the default for each modality.
-- Inspect a compatible local backend when one is available. If both local and session/cloud paths are viable, ask the user to choose before generation.
-- Generate the contract with `./commands/generate-media-contract.sh CLOUD_SESSION [COMFYUI_LOCAL]`, then validate it with `./commands/validate-media-contract.sh`.
+- For image generation, first resolve `CLOUD` or `LOCAL` through `STYLE.md` or the current prompt.
+- Inspect compatible cloud/session and local capabilities per modality. If both paths are viable and the pipeline is not already selected, ask the user to choose before generation.
+- Generate the contract with `./commands/generate-media-contract.sh CLOUD [LOCAL]`, then validate it with `./commands/validate-media-contract.sh`.
 
 ### Generation and promotion boundaries
 
-- Never switch or fall back between session/cloud and local backends silently. Report a selected-backend failure and request direction.
+- Never switch or fall back between `CLOUD` and `LOCAL` silently. Report a selected-pipeline failure and request direction.
 - Keep generated outputs in a non-runtime staging location until human review is recorded.
 - Record versioned generation manifests with explicit unavailable markers when a provider does not disclose a model, workflow, parameter, or seed.
 - Require input rights and applicable identity or voice consent, hash staged outputs, validate runtime budgets, and record acceptance or rejection reasons.

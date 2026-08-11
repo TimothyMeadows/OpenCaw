@@ -88,6 +88,12 @@ for (const command of commandNames) {
 if (/\.media\/(?:CLOUD_SESSION\.md|COMFYUI_LOCAL\.md|INDEX\.md|media-generation-manifest\.schema\.json|model-packs\.json|toolchain\.json)/.test(content)) {
   errors.push('README contains a stale legacy .media asset path.');
 }
+if (/\.styles\/\.gpu(?:\/|`)/.test(content)) {
+  errors.push('README contains a stale legacy .styles/.gpu path.');
+}
+for (const required of ['CLOUD', 'LOCAL', 'CSS3', 'CODE', 'resolve-art-pipeline.sh', 'create-code-model-manifest.sh']) {
+  if (!content.includes(required)) errors.push(`README omits art-pipeline documentation: ${required}`);
+}
 
 if (errors.length) {
   for (const error of errors) console.error(`README validation: ${error}`);

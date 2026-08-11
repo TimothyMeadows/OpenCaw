@@ -12,3 +12,4 @@
 10. [x] Add first-class Brainstorm mode (`.ai/tasks/brainstorm-mode/TASK.md`)
 11. [x] Import selected capability adaptations (`.ai/tasks/import-selected-capabilities/TASK.md`)
 12. [x] Add Blender art production capabilities (`.ai/tasks/blender-art-production/TASK.md`)
+13. [x] Add art pipelines and code-first Three.js models (`.ai/tasks/art-pipelines-code-first/TASK.md`)

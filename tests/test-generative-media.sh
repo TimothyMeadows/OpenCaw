@@ -3,9 +3,9 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
-runtime_dir="$(mktemp -d "$repo_root/tests/.gpu-media-runtime-XXXXXX")"
+runtime_dir="$(mktemp -d "$repo_root/tests/.pipeline-media-runtime-XXXXXX")"
 export OPENCAW_TEST_MODE=1
-cleanup() { case "$runtime_dir" in "$repo_root"/tests/.gpu-media-runtime-*) rm -rf -- "$runtime_dir" ;; esac; }
+cleanup() { case "$runtime_dir" in "$repo_root"/tests/.pipeline-media-runtime-*) rm -rf -- "$runtime_dir" ;; esac; }
 trap cleanup EXIT
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
@@ -23,9 +23,16 @@ for style in LAYERED_PAPERCRAFT PAPER_DIORAMA POPUP_STORYBOOK; do
   [[ -f ".styles/$style.md" ]] || fail "missing style $style"
   contains_exact_line "- $style" .styles/INDEX.md || fail "$style is not indexed"
 done
-for asset in INDEX.md CLOUD_SESSION.md COMFYUI_LOCAL.md media-generation-manifest.schema.json toolchain.json model-packs.json; do
-  [[ -f ".styles/.gpu/$asset" ]] || fail "missing generative-media asset: $asset"
+for asset in \
+  .styles/.pipelines/INDEX.md \
+  .styles/.pipelines/cloud/PIPELINE.md \
+  .styles/.pipelines/local/PIPELINE.md \
+  .styles/.pipelines/_shared/media-generation-manifest.schema.json \
+  .styles/.pipelines/local/toolchain.json \
+  .styles/.pipelines/local/model-packs.json; do
+  [[ -f "$asset" ]] || fail "missing pipeline-owned media asset: $asset"
 done
+[[ ! -e ".styles/.gpu" ]] || fail "legacy pipeline tree still exists"
 [[ ! -e ".media" ]] || fail "legacy .media directory still exists"
 for role in arts/papercraft-art-director arts/sound-designer computer-science/generative-media-pipeline-engineer; do
   [[ -f ".roles/$role/ROLE.md" ]] || fail "missing role $role"
@@ -42,17 +49,17 @@ done
 bash commands/validate-role-skill-map.sh
 
 echo "[2/8] generating cloud-only and hybrid contracts"
-bash commands/generate-media-contract.sh --output "$runtime_dir/cloud/MEDIA.md" CLOUD_SESSION
+bash commands/generate-media-contract.sh --output "$runtime_dir/cloud/MEDIA.md" CLOUD
 bash commands/validate-media-contract.sh "$runtime_dir/cloud/MEDIA.md"
-! grep -q '^- COMFYUI_LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
-bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD_SESSION COMFYUI_LOCAL
+! grep -q '^- LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
+bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD LOCAL
 bash commands/validate-media-contract.sh "$runtime_dir/hybrid/MEDIA.md"
-grep -Fq '.styles/.gpu/CLOUD_SESSION.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud template path"
-grep -Fq '.styles/.gpu/COMFYUI_LOCAL.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local GPU template path"
+grep -Fq '.styles/.pipelines/cloud/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud pipeline path"
+grep -Fq '.styles/.pipelines/local/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local pipeline path"
 ! grep -Fq '.media/' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained a stale .media path"
 grep -Eiq 'ask the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted user choice"
 grep -Eiq 'never switch or fall back.*silently' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted fallback boundary"
-expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" COMFYUI_LOCAL CLOUD_SESSION
+expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" LOCAL CLOUD
 cp "$runtime_dir/hybrid/MEDIA.md" "$runtime_dir/missing-choice.md"
 sed -i '/ask the user to choose/d' "$runtime_dir/missing-choice.md"
 expect_failure "$runtime_dir/missing-choice.log" bash commands/validate-media-contract.sh "$runtime_dir/missing-choice.md"
@@ -193,9 +200,11 @@ expect_failure "$runtime_dir/reproducibility.log" bash commands/validate-media-g
 cp "$runtime_dir/manifests/image/manifest.json" "$runtime_dir/no-rights.json"; cp "$runtime_dir/manifests/image/candidate.bin" "$runtime_dir/candidate.bin"; sed -i 's/,"rights":"owned fixture"//' "$runtime_dir/no-rights.json"
 expect_failure "$runtime_dir/rights.log" bash commands/validate-media-generation-manifest.sh "$runtime_dir/no-rights.json"
 
-echo "[8/8] validating the integrated OpenCaw tree"
+echo "[8/8] validating pipeline structure and integrated hooks"
 bash commands/validate-media-templates.sh
-bash commands/validate-opencaw.sh
+bash commands/validate-art-pipelines.sh
+grep -Fq './commands/validate-art-pipelines.sh' commands/validate-opencaw.sh || fail "integrated validation omits art pipelines"
+grep -Fq './commands/validate-media-templates.sh' commands/validate-opencaw.sh || fail "integrated validation omits media templates"
 git_check_bin="$(command -v git.exe 2>/dev/null || command -v git)"
 "$git_check_bin" diff --check
 echo "Generative media tests passed."

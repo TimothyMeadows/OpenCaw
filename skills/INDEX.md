@@ -46,7 +46,7 @@ Curated reusable skills included in OpenCaw.
 ## Architecture And Integration
 
 - `generate-architecture` - Generate `ARCHITECTURE.md` from selected templates.
-- `generate-style` - Generate `STYLE.md` from selected art style templates.
+- `generate-style` - Generate `STYLE.md` from selected art styles plus a primary art pipeline and allowed alternatives.
 - `apim-change-review` - Review Azure API Management changes for compatibility and risk.
 - `azure-settings-checklist` - Validate required Azure app settings and environment assumptions.
 - `function-app-checklist` - Validate Function App operational and deployment expectations.
@@ -107,6 +107,8 @@ Curated reusable skills included in OpenCaw.
 
 ## Art Production
 
+- `select-art-pipeline` - Resolve CLOUD, LOCAL, CSS3, or CODE from a prompt override or `STYLE.md` and record task-local evidence.
+- `build-threejs-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
 - `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
 - `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.
 - `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, maps, atlases, UDIMs, and packed textures.

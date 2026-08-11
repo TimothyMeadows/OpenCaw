@@ -72,7 +72,7 @@ validate_flat_system_file
 validate_tagged_file "$OPENCAW_PROJECT_MEMORY_FILE" 'project memory'
 validate_tagged_file "$OPENCAW_REPO_MAP_FILE" 'repository map'
 
-if ! tr -d '\r' <"$OPENCAW_REPO_MAP_FILE" | grep -Eq '^<!-- OPENCAW_REPO_MAP_FINGERPRINT: (pending|[a-f0-9]{64}) -->$'; then
+if ! awk '{ sub(/\r$/, ""); if ($0 ~ /^<!-- OPENCAW_REPO_MAP_FINGERPRINT: (pending|[a-f0-9]{64}) -->$/) found=1 } END { exit !found }' "$OPENCAW_REPO_MAP_FILE"; then
   echo 'Repository map is missing a valid fingerprint marker.' >&2
   status=1
 fi

@@ -108,7 +108,7 @@ flowchart TB
   - [Brainstorm, Task, Goal, and Gauntlet](#brainstorm-task-goal-and-gauntlet)
   - [Task, Issue, and PR Delivery](#task-issue-and-pr-delivery)
   - [Memory v2](#memory-v2)
-  - [Generative Media](#generative-media)
+  - [Art Pipelines and Generative Media](#art-pipelines-and-generative-media)
   - [Validation](#validation)
   - [Repository Layout](#repository-layout)
 - [Contributing](#contributing)
@@ -625,8 +625,8 @@ OpenCaw uses concise host-level contracts so agents do not have to rediscover fo
 | Contract | Host file | Template source | Purpose |
 | --- | --- | --- | --- |
 | Architecture | `ARCHITECTURE.md` | `.architecture/` | Technology, boundaries, data, deployment, and engineering conventions |
-| Visual style | `STYLE.md` | `.styles/*.md` | Visual language, UI/art constraints, asset direction, and review criteria |
-| Generative media | `MEDIA.md` | `.styles/.gpu/` | Backend selection, capability, provenance, staging, budgets, and promotion policy |
+| Visual style and art pipeline | `STYLE.md` | `.styles/*.md`, `.styles/.pipelines/` | Visual language plus one primary production path and supported alternatives |
+| Cloud/local media execution | `MEDIA.md` | `.styles/.pipelines/cloud/`, `.styles/.pipelines/local/` | Capability, provenance, staging, budgets, and promotion policy for generated media |
 
 When a required architecture or style contract is missing, OpenCaw asks which templates apply and supports composing more than one. Default generation uses concise read directives rather than copying entire templates into the host file. Inline generation is opt-in.
 
@@ -648,18 +648,26 @@ Generate a host contract with:
 ./commands/generate-architecture.sh "DOTNET" "POSTGRESDB"
 ```
 
-### Style contracts
+### Style and art-pipeline contracts
 
-Style templates live in `.styles/` and cover web experiences, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions.
+Style templates live in `.styles/` and cover web experiences, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions. Every `STYLE.md` also selects an art pipeline. `CSS3` is the default because most OpenCaw projects are web/frontend work.
 
-Generate and validate a host style contract with:
+Generate and validate the default CSS/vector contract with:
 
 ```bash
 ./commands/generate-style.sh "WEB_LIGHT_PAPER"
 ./commands/validate-style-contract.sh
 ```
 
-The complete style catalog is indexed in `.styles/INDEX.md`.
+Select a different primary pipeline or advertise project-supported alternatives explicitly:
+
+```bash
+./commands/generate-style.sh --pipeline CLOUD "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline LOCAL --allow-pipeline CSS3 "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline CODE --allow-pipeline CSS3 "CEL_SHADED_COMIC"
+```
+
+Friendly names such as `imagegen`, `comfyui`, `vector`, and `threejs` normalize to `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
 
 ## Roles
 
@@ -805,7 +813,7 @@ Or run the command directly:
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
 | Brainstorm discovery | `brainstorm-mode.sh`, `validate-brainstorm.sh`, `show-brainstorm.sh` |
-| Architecture and style | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh` |
+| Architecture, style, and art pipelines | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh`, `resolve-art-pipeline.sh`, `validate-art-pipelines.sh` |
 | Task and issue tracking | `create-task-file.sh`, `create-task-issue.sh`, `import-task-from-issue.sh`, `sync-task-issues.sh` |
 | Sub-agent planning | `create-subagent-plan.sh`, `validate-subagent-plan.sh`, `record-subagent-result.sh` |
 | Goal flow | `create-goal-file.sh`, `create-goal-completion-report.sh` |
@@ -818,6 +826,7 @@ Or run the command directly:
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
+| Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
 | Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-blender-scene-report.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
 
@@ -1092,39 +1101,61 @@ Useful commands:
 
 OpenCaw proactively records only verified, stable, reusable facts. It does not store secrets, identities, personal paths, guesses, raw logs, or transient task chatter. Replacement and purge workflows archive prior knowledge before removing it.
 
-## Generative Media
+## Art Pipelines and Generative Media
 
-OpenCaw supports governed image, music, sound-effect, ambience, and voice workflows while keeping `STYLE.md` authoritative for visual language.
+OpenCaw separates visual direction from production method. Every visual task combines an art style with one resolved art pipeline:
 
-All bundled generative-media assets live under:
+1. Choose one or more art styles for composition, color, shape, lighting, motion, and review guidance.
+2. Choose one primary art pipeline. New `STYLE.md` contracts default to `CSS3`.
+3. Use an explicit current-prompt override when one task needs a different registered pipeline.
+4. Configure `MEDIA.md` only when `CLOUD` or `LOCAL` generation is used.
+5. Stop when the selected pipeline is unavailable or fails; never switch pipelines silently.
+
+The four pipelines are:
+
+| Pipeline | Primary output | Boundary |
+| --- | --- | --- |
+| `CLOUD` | Session-supported generated images/audio | Token or cost budget, staging, provenance, human review |
+| `LOCAL` | Loopback-only ComfyUI images/audio | Local GPU, pinned tools/models, licenses, checksums |
+| `CSS3` | CSS, mathematical geometry, inline SVG/vector | No raster, canvas, WebGL, or generated-image dependency |
+| `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
+
+Pipeline contracts and owned assets live under:
 
 ```text
-.styles/.gpu/
-├── INDEX.md
-├── CLOUD_SESSION.md
-├── COMFYUI_LOCAL.md
-├── media-generation-manifest.schema.json
-├── model-packs.json
-└── toolchain.json
+.styles/.pipelines/
+├── _shared/media-generation-manifest.schema.json
+├── cloud/PIPELINE.md
+├── local/PIPELINE.md
+├── local/toolchain.json
+├── local/model-packs.json
+├── css3/PIPELINE.md
+├── css3/art-tokens.css
+├── code/PIPELINE.md
+└── code/code-model-manifest.schema.json
 ```
 
-The legacy `.media/` directory is prohibited.
+Legacy media-configuration directories are prohibited; pipeline assets belong only to their owners under `.styles/.pipelines/`.
 
-Backend choices:
-
-- `CLOUD_SESSION` uses compatible image or audio capabilities exposed by the active assistant session.
-- `COMFYUI_LOCAL` uses a pinned, loopback-only ComfyUI toolchain with reviewed model/workflow manifests.
-
-Generate a host contract:
+An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “make this pure CSS/vector,” or “build this as a Three.js code model” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`:
 
 ```bash
-./commands/generate-media-contract.sh CLOUD_SESSION
-./commands/generate-media-contract.sh CLOUD_SESSION COMFYUI_LOCAL
+./commands/resolve-art-pipeline.sh --override imagegen \
+  --evidence .ai/tasks/current-task/pipeline-selection.json
 ```
 
-Media guardrails include:
+For cloud/local execution, generate the optional media contract with canonical names or aliases:
 
-- explicit backend selection and no silent fallback
+```bash
+./commands/generate-media-contract.sh CLOUD
+./commands/generate-media-contract.sh CLOUD LOCAL
+```
+
+Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. `CSS3` and `CODE` do not require `MEDIA.md`.
+
+Cloud/local media guardrails include:
+
+- explicit pipeline selection and no silent fallback
 - per-modality capability inspection
 - revision-pinned tool and model sources
 - license, credential, disk, VRAM, and checksum gates
@@ -1142,6 +1173,8 @@ Local commands:
 ./commands/run-comfyui-workflow.sh --help
 ./commands/validate-media-generation-manifest.sh --help
 ```
+
+The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
 
 ## Validation
 
@@ -1162,6 +1195,7 @@ Common focused validators:
 ./commands/validate-skill-safety.sh
 ./commands/validate-role-skill-map.sh
 ./commands/validate-styles.sh
+./commands/validate-art-pipelines.sh
 ./commands/validate-media-templates.sh
 ./commands/validate-readme.sh
 ./commands/validate-memory.sh
@@ -1197,13 +1231,14 @@ OpenCaw/
 ├── BRAINSTORM.md                     # optional persistent pre-planning ideas and active state
 ├── BRAINSTORM_SUMMARY.md             # optional generated hash-bound idea index
 ├── ARCHITECTURE.md                   # architecture contract for this repository
-├── STYLE.md                          # visual-style contract for this repository
+├── STYLE.md                          # visual-style and art-pipeline contract
+├── MEDIA.md                          # optional CLOUD/LOCAL execution contract
 ├── .architecture/                    # reusable architecture templates
 ├── .roles/                           # domain roles, aliases, and capability maps
 │   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
-│   └── .gpu/                         # all generative-media assets
+│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, and CODE contracts/assets
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts

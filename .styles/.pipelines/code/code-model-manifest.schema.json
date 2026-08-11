@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/code-model-manifest-v1.json",
+  "title": "OpenCaw Code Model Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "modelId", "title", "intent", "pipelineSelection", "inputs", "target", "renderer", "runtime", "budgets", "reviewPolicy", "passes"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "modelId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brief", "intendedUse", "styleContract"],
+      "properties": {
+        "brief": { "type": "string", "minLength": 1 },
+        "intendedUse": { "type": "string", "minLength": 1 },
+        "styleContract": { "type": "string", "minLength": 1 }
+      }
+    },
+    "pipelineSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pipeline", "selectionSource", "styleContract", "styleSha256"],
+      "properties": {
+        "pipeline": { "const": "CODE" },
+        "selectionSource": { "enum": ["style", "prompt"] },
+        "styleContract": { "type": "string", "minLength": 1 },
+        "styleSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "source", "rights", "consent", "sha256"],
+        "properties": {
+          "kind": { "enum": ["brief", "reference-image"] },
+          "source": { "type": "string", "minLength": 1 },
+          "rights": { "type": "string", "minLength": 1 },
+          "consent": { "enum": ["not-applicable", "confirmed", "not-confirmed"] },
+          "sha256": { "$ref": "#/$defs/valueOrUnavailable" }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePath", "factoryExport"],
+      "properties": {
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "factoryExport": { "type": "string", "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$" }
+      }
+    },
+    "renderer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["library", "installedVersion", "language"],
+      "properties": {
+        "library": { "const": "three" },
+        "installedVersion": { "$ref": "#/$defs/valueOrUnavailable" },
+        "language": { "enum": ["typescript", "javascript"] }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interface", "deterministicSeed", "coordinateSystem", "parts", "anchors", "cleanup"],
+      "properties": {
+        "interface": { "type": "string", "minLength": 1 },
+        "deterministicSeed": { "type": "integer" },
+        "coordinateSystem": { "type": "string", "minLength": 1 },
+        "parts": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "anchors": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "cleanup": { "type": "string", "minLength": 1 }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["triangles", "drawCalls", "materials", "textures"],
+      "properties": {
+        "triangles": { "type": "integer", "minimum": 1 },
+        "drawCalls": { "type": "integer", "minimum": 1 },
+        "materials": { "type": "integer", "minimum": 1 },
+        "textures": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "reviewPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nonPlanar", "requiredViews", "maxAttemptsPerPass", "maxAttemptsTotal"],
+      "properties": {
+        "nonPlanar": { "type": "boolean" },
+        "requiredViews": { "type": "array", "items": { "enum": ["front", "orbit-left", "orbit-right"] }, "uniqueItems": true },
+        "maxAttemptsPerPass": { "type": "integer", "minimum": 1 },
+        "maxAttemptsTotal": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "passes": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/pass" }
+    }
+  },
+  "$defs": {
+    "unavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unavailable", "reason"],
+      "properties": {
+        "unavailable": { "const": true },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "valueOrUnavailable": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "view"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "view": { "enum": ["front", "orbit-left", "orbit-right", "runtime", "report"] }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "summary", "remainingGaps", "createdAt", "evidence"],
+      "properties": {
+        "decision": { "enum": ["pass", "revise-spec", "revise-code", "request-input", "stop"] },
+        "summary": { "type": "string", "minLength": 1 },
+        "remainingGaps": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
+      }
+    },
+    "pass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "attempts", "reviews"],
+      "properties": {
+        "id": { "enum": ["blockout", "structure", "form", "materials", "interaction", "optimization"] },
+        "status": { "enum": ["pending", "active", "passed", "blocked", "stopped"] },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "reviews": { "type": "array", "items": { "$ref": "#/$defs/review" } }
+      }
+    }
+  }
+}

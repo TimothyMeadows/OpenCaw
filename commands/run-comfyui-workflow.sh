@@ -44,7 +44,7 @@ output_dir="$(realpath -m "$output_dir")"
 workspace="$(realpath -m "$workspace")"
 if [[ -n "${OPENCAW_TEST_COMFY_SCRIPT:-}" ]]; then
   case "$output_dir" in
-    "$opencaw_root"/tests/.gpu-media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Fake comfy execution requires OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
+    "$opencaw_root"/tests/.pipeline-media-runtime-*) [[ "${OPENCAW_TEST_MODE:-0}" == "1" ]] || { echo "Fake comfy execution requires OPENCAW_TEST_MODE=1." >&2; exit 1; } ;;
     *) echo "Fake comfy execution is confined to OpenCaw test runtimes." >&2; exit 1 ;;
   esac
 fi
@@ -139,7 +139,7 @@ function walk(dir){ let out=[]; for(const e of fs.readdirSync(dir,{withFileTypes
 const ignored=new Set(['.opencaw-comfy-run.json','.opencaw-comfy-download.json','opencaw-run-receipt.json','opencaw-run-receipt.json.tmp']);
 const outputs=walk(root).filter(p=>!ignored.has(path.basename(p))).map(p=>({path:path.relative(root,p).split(path.sep).join('/'),sha256:crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'),sizeBytes:fs.statSync(p).size}));
 if (!outputs.length) { console.error('Workflow produced no downloaded outputs.'); process.exit(1); }
-console.log(JSON.stringify({schemaVersion:1,backend:'COMFYUI_LOCAL',provider:'comfy-cli',promptId:process.argv[5],workflow:{path:process.argv[3],sha256:crypto.createHash('sha256').update(fs.readFileSync(process.argv[3])).digest('hex')},workspace:process.argv[4],stagingDirectory:root,outputs,promotionStatus:'pending-human-review'},null,2));
+console.log(JSON.stringify({schemaVersion:1,pipeline:'LOCAL',provider:'comfy-cli',promptId:process.argv[5],workflow:{path:process.argv[3],sha256:crypto.createHash('sha256').update(fs.readFileSync(process.argv[3])).digest('hex')},workspace:process.argv[4],stagingDirectory:root,outputs,promotionStatus:'pending-human-review'},null,2));
 NODE
 mv "$receipt.tmp" "$receipt"
 echo "Local workflow completed."

@@ -1,6 +1,6 @@
 ---
 name: plan-generative-media-pipeline
-description: Plan a reproducible cloud or local media pipeline with explicit backend selection, budgets, provenance, staging, review, and promotion gates. Use when configuring image, music, sound-effect, or voice generation.
+description: Plan reproducible CLOUD or LOCAL media execution with explicit pipeline selection, budgets, provenance, staging, review, and promotion gates. Use when configuring image, music, sound-effect, or voice generation.
 ---
 
 # Plan Generative Media Pipeline
@@ -8,27 +8,28 @@ description: Plan a reproducible cloud or local media pipeline with explicit bac
 ## When to use
 
 - Configuring image, music, sound-effect, or voice generation for a repository.
-- Choosing between session/cloud capabilities and a compatible local backend.
+- Choosing between the `CLOUD` and `LOCAL` media pipelines.
 - Defining reproducibility, rights, budget, staging, review, and promotion policy.
 
 ## Workflow
 
 1. Read `MEDIA.md` when it exists and read `STYLE.md` for visual work.
-2. Discover capabilities per modality. Treat the compatible session/cloud capability as default.
-3. If a compatible local backend is viable, ask the user to choose cloud/session or local; do not infer the choice.
-4. Generate or update `MEDIA.md` with selected backends, versions, destinations, budgets, rights, consent, provenance, review, and promotion rules.
+2. For images, resolve `CLOUD` or `LOCAL` through `STYLE.md` or an explicit task prompt. For music, sound effects, and voice, use `MEDIA.md` independently of visual style.
+3. Discover capabilities per modality. If both cloud/session and local are viable, require an explicit choice; do not infer a fallback.
+4. Generate or update `MEDIA.md` with selected pipelines, versions, destinations, budgets, rights, consent, provenance, review, and promotion rules.
 5. Define a deterministic batch plan, naming scheme, staging location, manifest location, comparison format, and rejection criteria.
 6. Keep promotion separate from generation and require a recorded human review verdict.
 
 ## Output
 
 - A validated `MEDIA.md` contract.
-- A per-modality backend and capability matrix.
+- A per-modality pipeline and capability matrix.
 - A deterministic batch, staging, review, budget, and promotion plan.
 
 ## Guardrails
 
 - Never persist API keys, access tokens, credential-bearing URLs, or vendor account data.
-- Never switch between cloud/session and local backends silently.
+- Never switch between `CLOUD` and `LOCAL` silently.
+- Do not require `MEDIA.md` for `CSS3` or `CODE` work.
 - Do not treat generated candidates as approved runtime assets.
 - Do not proceed when input rights or required identity and voice consent are unclear.
