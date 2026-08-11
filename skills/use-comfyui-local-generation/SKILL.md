@@ -7,13 +7,13 @@ description: Provision and run pinned ComfyUI image or audio workflows through o
 
 ## When to use
 
-- The user has selected a local backend for a supported image or audio modality.
+- The user has selected the `LOCAL` pipeline for a supported image or audio modality.
 - Inspecting or provisioning a host for reviewed ComfyUI core-node workflows.
 - Running a versioned workflow into a non-runtime staging directory.
 
 ## Workflow
 
-1. Read `MEDIA.md` and confirm `COMFYUI_LOCAL` is selected for the requested modality.
+1. For images, resolve `LOCAL` through `STYLE.md` or the current prompt. Read `MEDIA.md` and confirm local execution is configured for the requested modality.
 2. Inspect the host before installing. Report GPU, VRAM, disk, Python, FFmpeg, CLI, server, workflow, and model-pack readiness.
 3. On first local use, require the pinned toolchain before continuing. Preview installation, then use `--execute` only with explicit user authorization; later runs must pass the same idempotent readiness check.
 4. Present each model source, revision, size, checksum, destination, and license; require matching license acceptance before download.

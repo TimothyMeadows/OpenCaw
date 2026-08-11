@@ -4,8 +4,8 @@
     "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/resolve-opencaw-paths.sh", "commands/install-windows-bash.ps1", "commands/query-project-context.sh", "commands/append-project-memory.sh", "commands/append-system-memory.sh", "commands/repo-map-status.sh", "commands/validate-memory.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh"]
   },
   "arts/art-director": {
-    "skills": ["maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "prepare-rigged-runtime-actors", "prepare-game-art-handoff", "direct-blender-production", "author-blender-materials-and-lookdev", "light-and-frame-blender-scenes", "render-and-composite-blender-output", "review-blender-deliverables", "iterate-art-to-sanity", "enforce-art-language-safety"],
-    "commands": ["commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/validate-rigged-actor-manifest.sh", "commands/print-blender-production-brief.sh", "commands/inspect-blender-scene.sh", "commands/validate-blender-scene-report.sh", "commands/build-originality-evidence.sh", "commands/print-web-experience-brief.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+    "skills": ["select-art-pipeline", "maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "prepare-rigged-runtime-actors", "prepare-game-art-handoff", "direct-blender-production", "author-blender-materials-and-lookdev", "light-and-frame-blender-scenes", "render-and-composite-blender-output", "review-blender-deliverables", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/validate-rigged-actor-manifest.sh", "commands/print-blender-production-brief.sh", "commands/inspect-blender-scene.sh", "commands/validate-blender-scene-report.sh", "commands/build-originality-evidence.sh", "commands/print-web-experience-brief.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/blender-production-artist": {
     "skills": ["direct-blender-production", "model-blender-assets", "prepare-blender-uvs-and-textures", "author-blender-materials-and-lookdev", "build-procedural-blender-scenes", "rig-and-animate-blender-actors", "simulate-blender-effects", "light-and-frame-blender-scenes", "render-and-composite-blender-output", "optimize-and-export-blender-assets", "review-blender-deliverables", "maintain-art-style-contract", "plan-hybrid-game-assets", "prepare-game-art-handoff", "prepare-rigged-runtime-actors", "create-game-vfx"],
@@ -20,8 +20,8 @@
     "commands": ["commands/print-tcg-art-style-template.sh", "commands/build-originality-evidence.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/css-vector-artist": {
-    "skills": ["maintain-art-style-contract", "design-ui-from-constraints", "prepare-game-art-handoff", "enforce-art-language-safety"],
-    "commands": ["commands/validate-style-contract.sh", "commands/print-css-art-token-template.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-svg-assets.sh"]
+    "skills": ["select-art-pipeline", "maintain-art-style-contract", "design-ui-from-constraints", "prepare-game-art-handoff", "enforce-art-language-safety"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/validate-style-contract.sh", "commands/print-css-art-token-template.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-svg-assets.sh"]
   },
   "arts/cutout-rig-animator": {
     "skills": ["maintain-art-style-contract", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
@@ -36,8 +36,8 @@
     "commands": ["commands/print-gameplay-system-brief.sh", "commands/inspect-blender-scene.sh", "commands/validate-blender-scene-report.sh", "commands/validate-style-contract.sh", "commands/print-isometric-production-checklist.sh", "commands/inspect-animation-sheet-folder.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/generative-art-designer": {
-    "skills": ["develop-original-brand-directions", "source-licensed-visual-assets", "audit-reference-originality", "maintain-art-style-contract", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "create-game-art-sheets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
-    "commands": ["commands/build-originality-evidence.sh", "commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+    "skills": ["select-art-pipeline", "develop-original-brand-directions", "source-licensed-visual-assets", "audit-reference-originality", "maintain-art-style-contract", "plan-generative-media-pipeline", "use-comfyui-local-generation", "validate-generated-media", "create-game-art-sheets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/build-originality-evidence.sh", "commands/validate-style-contract.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/print-game-art-handoff-template.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/illustrative-2d-artist": {
     "skills": ["maintain-art-style-contract", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "source-licensed-visual-assets", "iterate-art-to-sanity", "enforce-art-language-safety"],
@@ -72,8 +72,8 @@
     "commands": ["commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh"]
   },
   "arts/technical-3d-artist": {
-    "skills": ["prepare-rigged-runtime-actors", "model-blender-assets", "rig-and-animate-blender-actors", "optimize-and-export-blender-assets", "review-blender-deliverables", "plan-hybrid-game-assets", "prepare-game-art-handoff", "build-gameplay-runtime", "maintain-art-style-contract", "iterate-art-to-sanity"],
-    "commands": ["commands/validate-rigged-actor-manifest.sh", "commands/inspect-blender-scene.sh", "commands/validate-blender-scene-report.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-style-contract.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
+    "skills": ["select-art-pipeline", "build-threejs-code-models", "prepare-rigged-runtime-actors", "model-blender-assets", "rig-and-animate-blender-actors", "optimize-and-export-blender-assets", "review-blender-deliverables", "plan-hybrid-game-assets", "prepare-game-art-handoff", "build-gameplay-runtime", "maintain-art-style-contract", "iterate-art-to-sanity"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/create-code-model-manifest.sh", "commands/validate-code-model-manifest.sh", "commands/next-code-model-pass.sh", "commands/record-code-model-review.sh", "commands/validate-rigged-actor-manifest.sh", "commands/inspect-blender-scene.sh", "commands/validate-blender-scene-report.sh", "commands/print-game-art-handoff-template.sh", "commands/validate-style-contract.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/tile-set-artist": {
     "skills": ["maintain-art-style-contract", "review-isometric-production", "create-game-art-sheets", "plan-hybrid-game-assets", "prepare-game-art-handoff", "iterate-art-to-sanity", "enforce-art-language-safety"],
@@ -84,8 +84,8 @@
     "commands": ["commands/print-tcg-art-style-template.sh", "commands/print-gameplay-system-brief.sh", "commands/art-sanity-checklist.sh", "commands/validate-art-sanity-report.sh"]
   },
   "arts/web-experience-designer": {
-    "skills": ["design-web-experiences", "design-conversion-pages", "design-ui-from-constraints", "develop-original-brand-directions", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-ui-reference-pack", "extract-interaction-patterns", "prototype-from-reference-pack", "source-licensed-visual-assets", "audit-reference-originality"],
-    "commands": ["commands/print-web-experience-brief.sh", "commands/validate-style-contract.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/build-originality-evidence.sh"]
+    "skills": ["select-art-pipeline", "build-threejs-code-models", "design-web-experiences", "design-conversion-pages", "design-ui-from-constraints", "develop-original-brand-directions", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-ui-reference-pack", "extract-interaction-patterns", "prototype-from-reference-pack", "source-licensed-visual-assets", "audit-reference-originality"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/create-code-model-manifest.sh", "commands/validate-code-model-manifest.sh", "commands/next-code-model-pass.sh", "commands/record-code-model-review.sh", "commands/print-web-experience-brief.sh", "commands/validate-style-contract.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/build-originality-evidence.sh"]
   },
   "computer-science/ai-data-remediation-engineer": {
     "skills": ["audit-untrusted-agent-source", "adapt-external-agent-skills", "verify-and-explain", "repo-map-dotnet"],
@@ -128,8 +128,8 @@
     "commands": ["commands/generate-architecture.sh", "commands/validate-opencaw.sh"]
   },
   "computer-science/frontend-developer": {
-    "skills": ["design-web-experiences", "design-ui-from-constraints", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff"],
-    "commands": ["commands/print-web-experience-brief.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-style-contract.sh", "commands/validate-svg-assets.sh"]
+    "skills": ["select-art-pipeline", "build-threejs-code-models", "design-web-experiences", "design-ui-from-constraints", "build-scroll-authored-web-experiences", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/create-code-model-manifest.sh", "commands/validate-code-model-manifest.sh", "commands/next-code-model-pass.sh", "commands/record-code-model-review.sh", "commands/print-web-experience-brief.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh", "commands/validate-style-contract.sh", "commands/validate-svg-assets.sh"]
   },
   "computer-science/fullstack-engineer": {
     "skills": ["generate-architecture", "design-web-experiences", "capture-full-page-evidence", "profile-application-performance", "solution-build", "test-dotnet", "verify-and-explain"],
@@ -144,8 +144,8 @@
     "commands": ["commands/print-gameplay-system-brief.sh", "commands/validate-gameplay-review.sh", "commands/validate-rigged-actor-manifest.sh", "commands/playwright-capture-page.sh", "commands/render-browser-demo.sh", "commands/web-performance-report.sh"]
   },
   "computer-science/generative-media-pipeline-engineer": {
-    "skills": ["plan-generative-media-pipeline", "use-comfyui-local-generation", "produce-generative-audio", "validate-generated-media", "audit-untrusted-agent-source", "verify-and-explain"],
-    "commands": ["commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/install-comfyui-local.sh", "commands/install-comfyui-models.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/validate-media-templates.sh"]
+    "skills": ["select-art-pipeline", "plan-generative-media-pipeline", "use-comfyui-local-generation", "produce-generative-audio", "validate-generated-media", "audit-untrusted-agent-source", "verify-and-explain"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/generate-media-contract.sh", "commands/validate-media-contract.sh", "commands/install-comfyui-local.sh", "commands/install-comfyui-models.sh", "commands/inspect-local-media-host.sh", "commands/run-comfyui-workflow.sh", "commands/validate-media-generation-manifest.sh", "commands/validate-media-templates.sh"]
   },
   "computer-science/git-workflow-master": {
     "skills": ["branch-name-suggester", "git-commit-dotnet", "link-pr-to-task-issue", "pr-readiness-gate", "verify-and-explain"],
@@ -180,8 +180,8 @@
     "commands": ["commands/audit-agent-source.sh", "commands/validate-skill-safety.sh", "commands/build-originality-evidence.sh", "commands/veracode-scan.sh", "commands/snyk-scan.sh", "commands/stackhawk-scan.sh", "commands/security-scan.sh", "commands/dependency-check.sh"]
   },
   "computer-science/senior-developer": {
-    "skills": ["solution-restore", "solution-build", "test-dotnet", "format-dotnet", "verify-and-explain", "audit-untrusted-agent-source"],
-    "commands": ["commands/dotnet-restore.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh", "commands/dotnet-format.sh", "commands/audit-agent-source.sh"]
+    "skills": ["select-art-pipeline", "build-threejs-code-models", "solution-restore", "solution-build", "test-dotnet", "format-dotnet", "verify-and-explain", "audit-untrusted-agent-source"],
+    "commands": ["commands/resolve-art-pipeline.sh", "commands/create-code-model-manifest.sh", "commands/validate-code-model-manifest.sh", "commands/next-code-model-pass.sh", "commands/record-code-model-review.sh", "commands/dotnet-restore.sh", "commands/dotnet-build.sh", "commands/dotnet-test.sh", "commands/dotnet-format.sh", "commands/audit-agent-source.sh"]
   },
   "computer-science/software-architect": {
     "skills": ["generate-architecture", "verify-and-explain", "audit-untrusted-agent-source", "profile-application-performance"],

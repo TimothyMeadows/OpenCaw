@@ -40,18 +40,18 @@ Available OpenCaw art style templates:
 - WEB_SKEUOMORPHIC
 - WEB_TECHNICAL_GRID
 
-Use one or more of these when generating `../STYLE.md` for a host repository.
+Use one or more of these with exactly one primary art pipeline when generating `../STYLE.md` for a host repository. New contracts default to `CSS3` unless the user explicitly selects another registered pipeline.
 
-## Generative Media Support
+## Art Pipelines
 
-All generative-media assets are stored under `.styles/.gpu/` but are not selectable art-style templates:
+Pipeline contracts and their owned assets live under `.styles/.pipelines/` and are selected alongside, but independently from, the art style:
 
-- `.styles/.gpu/INDEX.md` indexes the complete media asset set.
-- `.styles/.gpu/CLOUD_SESSION.md` defines the session-provided cloud backend.
-- `.styles/.gpu/COMFYUI_LOCAL.md` defines the loopback-only ComfyUI backend.
-- `.styles/.gpu/media-generation-manifest.schema.json` defines generation provenance and review records.
-- `.styles/.gpu/toolchain.json` pins the supported local toolchain.
-- `.styles/.gpu/model-packs.json` defines reviewed model and workflow packs.
+- `CLOUD` uses active session-supported image/audio generation.
+- `LOCAL` uses pinned loopback-only ComfyUI image/audio generation.
+- `CSS3` uses CSS, mathematical geometry, and inline SVG/vector output only.
+- `CODE` authors procedural Three.js TypeScript/JavaScript models.
+
+See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, and the code-model schema.
 
 ## Recommended Starting Points
 

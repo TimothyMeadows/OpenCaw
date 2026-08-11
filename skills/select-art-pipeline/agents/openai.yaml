@@ -1,0 +1,4 @@
+interface:
+  display_name: "Select Art Pipeline"
+  short_description: "Resolve the art pipeline for a visual task"
+  default_prompt: "Use $select-art-pipeline to resolve and record the art pipeline for this request."

@@ -44,6 +44,7 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 
 Skills:
 
+- `select-art-pipeline`
 - `maintain-art-style-contract`
 - `develop-original-brand-directions`
 - `design-ui-from-constraints`
@@ -64,6 +65,7 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
 - `commands/validate-style-contract.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
@@ -148,6 +150,7 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
 - `maintain-art-style-contract`
 - `design-ui-from-constraints`
 - `prepare-game-art-handoff`
@@ -155,6 +158,7 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
 - `commands/validate-style-contract.sh`
 - `commands/print-css-art-token-template.sh`
 - `commands/print-game-art-handoff-template.sh`
@@ -228,6 +232,7 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
 - `develop-original-brand-directions`
 - `source-licensed-visual-assets`
 - `audit-reference-originality`
@@ -242,6 +247,7 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
 - `commands/build-originality-evidence.sh`
 - `commands/validate-style-contract.sh`
 - `commands/generate-media-contract.sh`
@@ -421,6 +427,8 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
+- `build-threejs-code-models`
 - `prepare-rigged-runtime-actors`
 - `model-blender-assets`
 - `rig-and-animate-blender-actors`
@@ -434,6 +442,11 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
+- `commands/create-code-model-manifest.sh`
+- `commands/validate-code-model-manifest.sh`
+- `commands/next-code-model-pass.sh`
+- `commands/record-code-model-review.sh`
 - `commands/validate-rigged-actor-manifest.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
@@ -482,6 +495,8 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
+- `build-threejs-code-models`
 - `design-web-experiences`
 - `design-conversion-pages`
 - `design-ui-from-constraints`
@@ -499,6 +514,11 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
+- `commands/create-code-model-manifest.sh`
+- `commands/validate-code-model-manifest.sh`
+- `commands/next-code-model-pass.sh`
+- `commands/record-code-model-review.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/validate-style-contract.sh`
 - `commands/playwright-capture-page.sh`
@@ -678,6 +698,8 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
+- `build-threejs-code-models`
 - `design-web-experiences`
 - `design-ui-from-constraints`
 - `build-scroll-authored-web-experiences`
@@ -693,6 +715,11 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
+- `commands/create-code-model-manifest.sh`
+- `commands/validate-code-model-manifest.sh`
+- `commands/next-code-model-pass.sh`
+- `commands/record-code-model-review.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
@@ -765,6 +792,7 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
 - `plan-generative-media-pipeline`
 - `use-comfyui-local-generation`
 - `produce-generative-audio`
@@ -774,6 +802,7 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
 - `commands/install-comfyui-local.sh`
@@ -960,6 +989,8 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
+- `build-threejs-code-models`
 - `solution-restore`
 - `solution-build`
 - `test-dotnet`
@@ -969,6 +1000,11 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
+- `commands/create-code-model-manifest.sh`
+- `commands/validate-code-model-manifest.sh`
+- `commands/next-code-model-pass.sh`
+- `commands/record-code-model-review.sh`
 - `commands/dotnet-restore.sh`
 - `commands/dotnet-build.sh`
 - `commands/dotnet-test.sh`

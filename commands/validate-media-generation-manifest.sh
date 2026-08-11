@@ -18,7 +18,7 @@ opencaw_root="$(cd "$script_dir/.." && pwd)"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required to validate media manifests." >&2; exit 1; }
 manifest_for_node="$(realpath "$1")"
-schema_for_node="$opencaw_root/.styles/.gpu/media-generation-manifest.schema.json"
+schema_for_node="$opencaw_root/.styles/.pipelines/_shared/media-generation-manifest.schema.json"
 if [[ "$node_bin" == *.exe && -n "$(command -v wslpath 2>/dev/null || true)" ]]; then
   manifest_for_node="$(wslpath -w "$manifest_for_node")"
   schema_for_node="$(wslpath -w "$schema_for_node")"

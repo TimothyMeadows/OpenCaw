@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: 52ff44195621c30121319ed9f38b590e2aefe0f0cac3fbba5ed1cefc6ad92af3 -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: a17fc10c20e5fcb78bc936dcb05e43258345bfecb5666282374c072f228d3e18 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:architecture] [scope:core] OpenCaw's hierarchy is optional explicit persistent Brainstorm discovery, planning, then one sibling delivery mode: default task, explicit Goal, or explicit Gauntlet.
@@ -25,6 +25,8 @@
 - [kind:test] [scope:core] [tech:bash] `commands/validate-opencaw.sh` is the integrated structural validation entry point.
 - [kind:command] [area:memory] [tech:bash] `commands/query-project-context.sh` lists tags and retrieves ranked memory and repository-map entries before raw searches.
 - [kind:command] [area:scaffold] [env:windows] [tech:powershell] `commands/install-windows-bash.ps1` discovers native Git Bash or WSL, performs only explicitly requested installation, and can invoke `create-host-ai-scaffold.sh` through the selected provider.
-- [kind:component] [area:media] `.styles/.gpu/` owns all generative-media backend templates, indexes, schemas, pinned toolchains, and reviewed model packs; `.media/` is prohibited.
-- [kind:command] [area:media] [tech:bash] `commands/generate-media-contract.sh` composes cloud and optional local backend instructions; local install, model, and inspection commands resolve pinned assets from `.styles/.gpu/`.
-- [kind:test] [area:media] [tech:bash] `tests/test-generative-media.sh` verifies backend path ownership, contract composition, local safety gates, staged workflows, manifests, and integrated validation.
+- [kind:component] [area:styles] [area:media] `.styles/.pipelines/` owns CLOUD, LOCAL, CSS3, and CODE contracts plus shared provenance, local manifests, vector tokens, and the code-model schema.
+- [kind:command] [area:styles] [tech:bash] `commands/generate-style.sh` defaults to CSS3, records primary and allowed pipelines, and `commands/resolve-art-pipeline.sh` gives task-local prompt overrides precedence without silent fallback.
+- [kind:command] [area:media] [tech:bash] `commands/generate-media-contract.sh` composes CLOUD with optional LOCAL execution; local install, model, and inspection commands resolve pinned assets from `.styles/.pipelines/local/`.
+- [kind:component] [area:threejs] [tech:typescript] `build-threejs-code-models` and the code-model manifest commands govern procedural source through six ordered passes, deterministic budgets, semantic parts/anchors, disposal, and hashed multi-view evidence.
+- [kind:test] [area:media] [area:styles] [tech:bash] `tests/test-art-pipelines.sh` and `tests/test-generative-media.sh` verify selection, contract composition, code-model state, local safety gates, staging, manifests, and no silent fallback.

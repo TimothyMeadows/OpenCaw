@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/validate-media-contract.sh [MEDIA.md]
 
-Validates a configured host generative-media contract. Defaults to ../MEDIA.md.
+Validates a configured host generated-media contract. Defaults to the resolved project MEDIA.md.
 EOF
 }
 
@@ -13,42 +13,45 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then usage; exit 0; fi
 [[ $# -le 1 ]] || { usage >&2; exit 1; }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
-host_root="$(cd "$opencaw_root/.." && pwd)"
+source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/art-pipeline-common.sh"
+opencaw_resolve_paths
+opencaw_root="$OPENCAW_ROOT"
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 media_file="${1:-$host_root/MEDIA.md}"
 [[ -f "$media_file" ]] || { echo "Missing MEDIA.md: $media_file" >&2; exit 1; }
 
 backend_template_path() {
   case "$1" in
-    CLOUD_SESSION) printf '%s\n' "$opencaw_root/.styles/.gpu/CLOUD_SESSION.md" ;;
-    COMFYUI_LOCAL) printf '%s\n' "$opencaw_root/.styles/.gpu/COMFYUI_LOCAL.md" ;;
+    CLOUD) printf '%s\n' "$opencaw_root/.styles/.pipelines/cloud/PIPELINE.md" ;;
+    LOCAL) printf '%s\n' "$opencaw_root/.styles/.pipelines/local/PIPELINE.md" ;;
     *) return 1 ;;
   esac
 }
 
 status=0
-for heading in "# MEDIA.md" "## Backend Selection" "## Capability Matrix" "## Destinations And Budgets" "## Rights, Consent, And Provenance" "## Review And Promotion"; do
-  grep -Fqx "$heading" "$media_file" || { echo "MEDIA.md is missing: $heading" >&2; status=1; }
+for heading in "# MEDIA.md" "## Pipeline Availability" "## Capability Matrix" "## Destinations And Budgets" "## Rights, Consent, And Provenance" "## Review And Promotion"; do
+  awk -v expected="$heading" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$media_file" || { echo "MEDIA.md is missing: $heading" >&2; status=1; }
 done
 
 mapfile -t selected < <(awk '
-  /^Generated from OpenCaw media backend templates:/ { list=1; next }
+  /^Generated from OpenCaw media pipeline templates:/ { list=1; next }
   /^---$/ { list=0 }
   list && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print }
 ' "$media_file")
 
-[[ ${#selected[@]} -ge 1 ]] || { echo "MEDIA.md does not list a backend." >&2; status=1; }
-if [[ ${#selected[@]} -ge 1 && "${selected[0]}" != "CLOUD_SESSION" ]]; then
-  echo "CLOUD_SESSION must be the first backend." >&2; status=1
+[[ ${#selected[@]} -ge 1 ]] || { echo "MEDIA.md does not list a pipeline." >&2; status=1; }
+if [[ ${#selected[@]} -ge 1 && "${selected[0]}" != "CLOUD" ]]; then
+  echo "CLOUD must be the first media pipeline." >&2; status=1
 fi
 for backend in "${selected[@]:-}"; do
-  case "$backend" in CLOUD_SESSION|COMFYUI_LOCAL) ;; *) echo "Unknown backend in MEDIA.md: $backend" >&2; status=1; continue ;; esac
+  case "$backend" in CLOUD|LOCAL) ;; *) echo "Unknown pipeline in MEDIA.md: $backend" >&2; status=1; continue ;; esac
   template_path="$(backend_template_path "$backend")"
-  [[ -f "$template_path" ]] || { echo "Missing backend template: $backend ($template_path)" >&2; status=1; }
+  [[ -f "$template_path" ]] || { echo "Missing pipeline template: $backend ($template_path)" >&2; status=1; }
 done
 
-if printf '%s\n' "${selected[@]:-}" | grep -qx 'COMFYUI_LOCAL'; then
-  grep -Eiq 'ask the user to choose|require the user to choose' "$media_file" || { echo "Hybrid MEDIA.md lacks an explicit backend choice gate." >&2; status=1; }
+if printf '%s\n' "${selected[@]:-}" | grep -qx 'LOCAL'; then
+  grep -Eiq 'ask the user to choose|require the user to choose' "$media_file" || { echo "Hybrid MEDIA.md lacks an explicit pipeline choice gate." >&2; status=1; }
   grep -Eiq 'never (switch or )?fall back.*silently|never.*silently.*fall back' "$media_file" || { echo "Hybrid MEDIA.md lacks a no-silent-fallback rule." >&2; status=1; }
 fi
 
@@ -58,6 +61,6 @@ fi
 
 if [[ $status -eq 0 ]]; then
   echo "Media contract validation passed."
-  printf 'Configured backends:'; printf ' %s' "${selected[@]}"; printf '\n'
+  printf 'Configured media pipelines:'; printf ' %s' "${selected[@]}"; printf '\n'
 fi
 exit $status
