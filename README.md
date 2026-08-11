@@ -3,8 +3,6 @@
 
 ![](OpenCaw.png)
 
-https://github.com/user-attachments/assets/eb32b378-7269-4aa7-90d4-cbc0cba535f9
-
 OpenCaw helps you work with an AI coding agent the way you would work with a thoughtful teammate: describe what you want in ordinary language, refine the plan together, and let the agent handle the repository-specific machinery.
 
 You do **not** need to memorize role names, invoke skills, or know command syntax before you can use it. Those controls are available when you want extra precision, but the normal interface is simply a conversation.
