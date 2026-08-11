@@ -9,7 +9,7 @@ Use when `../STYLE.md` is missing or when the user wants to regenerate it after 
 ## Workflow
 1. If `../STYLE.md` is missing, ask the user which templates from `./.styles/` apply unless the user already named the desired style. Default the art pipeline to `CSS3` unless the user names another one.
 2. Support multiple templates for mixed art-direction repositories.
-3. Normalize `imagegen` to `CLOUD`, `comfyui` to `LOCAL`, `vector` to `CSS3`, and `threejs` to `CODE`. Record exactly one primary and repeatable allowed alternatives.
+3. Normalize `imagegen` to `CLOUD`, `comfyui` to `LOCAL`, `vector` to `CSS3`, `threejs` to `CODE`, and `blender`, `blend`, or `bpy` to `BLENDER`. Record exactly one primary and repeatable allowed alternatives.
 4. Generate `../STYLE.md` from the selected style and pipeline templates using concise read directives by default.
 5. Use inline mode only when the user explicitly asks for fully embedded template content.
 6. Validate the generated contract and treat it as authoritative afterward.
@@ -28,5 +28,6 @@ Use when `../STYLE.md` is missing or when the user wants to regenerate it after 
 ## Commands
 - `./commands/generate-style.sh "<STYLE1>" ["STYLE2" ...]`
 - `./commands/generate-style.sh --pipeline CLOUD --allow-pipeline CODE "<STYLE1>"`
+- `./commands/generate-style.sh --pipeline BLENDER --allow-pipeline CSS3 "<STYLE1>"`
 - `./commands/generate-style.sh --inline "<STYLE1>" ["STYLE2" ...]`
 - `./commands/validate-style-contract.sh [STYLE.md]`

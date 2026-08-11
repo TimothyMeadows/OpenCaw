@@ -10,6 +10,7 @@ art_pipeline_normalize() {
     LOCAL|COMFYUI|COMFY_UI) printf '%s\n' 'LOCAL' ;;
     CSS|CSS3|CSS_VECTOR|VECTOR) printf '%s\n' 'CSS3' ;;
     CODE|THREE|THREEJS|THREE_JS) printf '%s\n' 'CODE' ;;
+    BLEND|BLENDER|BPY) printf '%s\n' 'BLENDER' ;;
     *) return 1 ;;
   esac
 }
@@ -20,12 +21,13 @@ art_pipeline_contract_relative_path() {
     LOCAL) printf '%s\n' '.styles/.pipelines/local/PIPELINE.md' ;;
     CSS3) printf '%s\n' '.styles/.pipelines/css3/PIPELINE.md' ;;
     CODE) printf '%s\n' '.styles/.pipelines/code/PIPELINE.md' ;;
+    BLENDER) printf '%s\n' '.styles/.pipelines/blender/PIPELINE.md' ;;
     *) return 1 ;;
   esac
 }
 
 art_pipeline_all() {
-  printf '%s\n' CLOUD LOCAL CSS3 CODE
+  printf '%s\n' CLOUD LOCAL CSS3 CODE BLENDER
 }
 
 art_pipeline_sha256_file() {

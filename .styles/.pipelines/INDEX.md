@@ -8,6 +8,7 @@ Selectable pipelines:
 - `LOCAL` - loopback-only ComfyUI image and audio generation using reviewed local GPU tooling.
 - `CSS3` - CSS, mathematical geometry, and inline SVG/vector production without raster or WebGL dependencies.
 - `CODE` - authored procedural Three.js models implemented as TypeScript or JavaScript.
+- `BLENDER` - authored Blender 4.5 LTS scenes, assets, renders, and exports with immutable-source and review controls.
 
 Pipeline contracts:
 
@@ -15,6 +16,7 @@ Pipeline contracts:
 - `local/PIPELINE.md`
 - `css3/PIPELINE.md`
 - `code/PIPELINE.md`
+- `blender/PIPELINE.md`
 
 Shared generated-media provenance lives under `_shared/`. Pipeline-specific schemas, manifests, and reusable assets remain beside the pipeline that owns them.
 

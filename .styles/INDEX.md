@@ -50,8 +50,9 @@ Pipeline contracts and their owned assets live under `.styles/.pipelines/` and a
 - `LOCAL` uses pinned loopback-only ComfyUI image/audio generation.
 - `CSS3` uses CSS, mathematical geometry, and inline SVG/vector output only.
 - `CODE` authors procedural Three.js TypeScript/JavaScript models.
+- `BLENDER` authors Blender 4.5 LTS scenes, assets, renders, and runtime exports.
 
-See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, and the code-model schema.
+See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, the code-model schema, and Blender production boundaries.
 
 ## Recommended Starting Points
 

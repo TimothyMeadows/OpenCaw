@@ -60,6 +60,7 @@ grep -Fq '.styles/.pipelines/local/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" |
 grep -Eiq 'ask the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted user choice"
 grep -Eiq 'never switch or fall back.*silently' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted fallback boundary"
 expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" LOCAL CLOUD
+expect_failure "$runtime_dir/blender-media.log" bash commands/generate-media-contract.sh --output "$runtime_dir/blender-media.md" BLENDER
 cp "$runtime_dir/hybrid/MEDIA.md" "$runtime_dir/missing-choice.md"
 sed -i '/ask the user to choose/d' "$runtime_dir/missing-choice.md"
 expect_failure "$runtime_dir/missing-choice.log" bash commands/validate-media-contract.sh "$runtime_dir/missing-choice.md"

@@ -34,13 +34,16 @@ bash commands/validate-art-pipelines.sh
 [[ ! -e .media ]] || fail "legacy media tree exists"
 grep -Eiq 'no raster|without raster|do not use raster' .styles/.pipelines/css3/PIPELINE.md || fail "CSS3 contract lacks raster boundary"
 ! grep -Eiq 'canvas|webgl|generated.image' .styles/.pipelines/css3/art-tokens.css || fail "CSS3 tokens depend on a prohibited renderer"
+grep -Fq 'Blender 4.5 LTS' .styles/.pipelines/blender/PIPELINE.md || fail "BLENDER contract lacks its version boundary"
+grep -Eiq 'immutable source|preserve every immutable source' .styles/.pipelines/blender/PIPELINE.md || fail "BLENDER contract lacks immutable-source protection"
+grep -Eiq 'never installed|never install' .styles/.pipelines/blender/PIPELINE.md || fail "BLENDER contract lacks its no-install boundary"
 
 echo "[2/6] generating default, explicit, aliased, allowed, and inline contracts"
 project_command bash commands/generate-style.sh CEL_SHADED_COMIC
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md"
 contains_exact_line '- CSS3' "$project/STYLE.md" || fail "default style contract did not select CSS3"
 
-for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'vector CSS3' 'threejs CODE'; do
+for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'vector CSS3' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
   read -r alias expected <<< "$pair"
   project_command bash commands/generate-style.sh --pipeline "$alias" CEL_SHADED_COMIC >/dev/null
   project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
@@ -52,11 +55,14 @@ for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'vector CSS3' 'threejs CODE'; do
   ' "$project/STYLE.md" || fail "$alias did not normalize to $expected"
 done
 
-project_command bash commands/generate-style.sh --pipeline CSS3 --allow-pipeline imagegen --allow-pipeline comfyui --allow-pipeline threejs CEL_SHADED_COMIC >/dev/null
-for pipeline in CSS3 CLOUD LOCAL CODE; do contains_exact_line "- $pipeline" "$project/STYLE.md" || fail "allowed list omits $pipeline"; done
+project_command bash commands/generate-style.sh --pipeline CSS3 --allow-pipeline imagegen --allow-pipeline comfyui --allow-pipeline threejs --allow-pipeline blender CEL_SHADED_COMIC >/dev/null
+for pipeline in CSS3 CLOUD LOCAL CODE BLENDER; do contains_exact_line "- $pipeline" "$project/STYLE.md" || fail "allowed list omits $pipeline"; done
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
 project_command bash commands/generate-style.sh --inline --pipeline CODE --allow-pipeline CSS3 CEL_SHADED_COMIC >/dev/null
 grep -Fq '<!-- BEGIN ART PIPELINE: CODE -->' "$project/STYLE.md" || fail "inline contract omitted CODE"
+project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
+project_command bash commands/generate-style.sh --inline --pipeline blender --allow-pipeline CSS3 CEL_SHADED_COMIC >/dev/null
+grep -Fq '<!-- BEGIN ART PIPELINE: BLENDER -->' "$project/STYLE.md" || fail "inline contract omitted BLENDER"
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
 expect_failure "$runtime_dir/invalid.log" bash commands/generate-style.sh --pipeline unknown CEL_SHADED_COMIC
 expect_failure "$runtime_dir/duplicate.log" bash commands/generate-style.sh --pipeline CSS3 --allow-pipeline vector CEL_SHADED_COMIC
@@ -67,7 +73,7 @@ expect_failure "$runtime_dir/missing-directive.log" bash commands/validate-style
 
 echo "[3/6] resolving task-only prompt overrides without changing STYLE.md"
 style_before="$(sha256sum "$project/STYLE.md" | awk '{print $1}')"
-for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'vector CSS3' 'threejs CODE'; do
+for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'vector CSS3' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
   read -r alias expected <<< "$pair"
   output="$(project_command bash commands/resolve-art-pipeline.sh --style "$project/STYLE.md" --override "$alias" --json)"
   grep -Fq "\"pipeline\": \"$expected\"" <<< "$output" || fail "override $alias did not resolve to $expected"

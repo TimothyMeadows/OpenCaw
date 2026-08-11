@@ -13,6 +13,7 @@ Allowed OpenCaw art pipelines:
 - CLOUD
 - LOCAL
 - CODE
+- BLENDER
 
 ---
 
@@ -34,5 +35,6 @@ Read `./.styles/.pipelines/css3/PIPELINE.md` instructions
 Read `./.styles/.pipelines/cloud/PIPELINE.md` instructions
 Read `./.styles/.pipelines/local/PIPELINE.md` instructions
 Read `./.styles/.pipelines/code/PIPELINE.md` instructions
+Read `./.styles/.pipelines/blender/PIPELINE.md` instructions
 
 Add repository-specific art style instructions below these read directives.

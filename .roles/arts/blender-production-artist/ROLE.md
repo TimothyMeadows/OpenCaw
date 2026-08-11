@@ -19,6 +19,7 @@ Own safe, reproducible Blender 4.5 production from brief and working copy throug
 
 - Direct modeling, UV, texturing, materials, procedural systems, rigging, animation, simulation, lighting, rendering, optimization, export, and review stages.
 - Translate the active `STYLE.md` into geometry, material, lighting, camera, and render decisions without inventing a new style contract.
+- Resolve and obey the `BLENDER` art pipeline, including task-local prompt evidence and no-silent-fallback policy.
 - Keep source files immutable and working, backup, cache, staging, and runtime paths explicit.
 - Prefer typed connected-tool operations and govern exceptional `bpy` use through exact-content validation and backup checkpoints.
 - Produce repository-confined inspection reports, required visual evidence, severity-ranked defects, and explicit delivery verdicts.

@@ -107,7 +107,7 @@ Curated reusable skills included in OpenCaw.
 
 ## Art Production
 
-- `select-art-pipeline` - Resolve CLOUD, LOCAL, CSS3, or CODE from a prompt override or `STYLE.md` and record task-local evidence.
+- `select-art-pipeline` - Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
 - `build-threejs-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
 - `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
 - `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.

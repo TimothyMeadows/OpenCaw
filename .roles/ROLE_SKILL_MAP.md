@@ -86,6 +86,7 @@ Commands:
 
 Skills:
 
+- `select-art-pipeline`
 - `direct-blender-production`
 - `model-blender-assets`
 - `prepare-blender-uvs-and-textures`
@@ -105,6 +106,7 @@ Skills:
 
 Commands:
 
+- `commands/resolve-art-pipeline.sh`
 - `commands/print-blender-production-brief.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
