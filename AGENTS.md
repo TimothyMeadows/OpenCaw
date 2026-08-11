@@ -92,7 +92,7 @@ Art pipeline contracts live in:
 
 - `./.styles/.pipelines/`
 
-Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. Every generated `STYLE.md` contains at least one art style, exactly one primary pipeline, allowed alternatives, task-local prompt-override scope, and an explicit no-silent-fallback rule.
+Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. Every generated `STYLE.md` contains at least one art style, exactly one primary pipeline, allowed alternatives, task-local prompt-override scope, and an explicit no-silent-fallback rule.
 
 ### When `../STYLE.md` exists
 - Read it and follow it as the authoritative art style and pipeline contract for visual, game-art, generated-image, UI-art, code-model, and asset-production work.
@@ -102,7 +102,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. Every generated `
 ### When `../STYLE.md` is missing
 - Ask the user which style templates in `./.styles/` apply to the repository, unless the user already named the desired style.
 - Support selecting multiple templates for mixed-style repositories.
-- Default the primary art pipeline to `CSS3` unless the user explicitly selects `CLOUD`, `LOCAL`, or `CODE`.
+- Default the primary art pipeline to `CSS3` unless the user explicitly selects `CLOUD`, `LOCAL`, `CODE`, or `BLENDER`.
 - After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] "<STYLE1>" ["STYLE2" ...]`.
 - Default generation must use concise read directives (for example `Read \`./<mount>/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
 - Use `--inline` only when the user explicitly asks for fully embedded template content.
@@ -121,6 +121,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. Every generated `
 - `LOCAL`: use pinned loopback-only ComfyUI image/audio execution on local GPU resources with license and checksum gates.
 - `CSS3`: author CSS, mathematical geometry, and inline SVG/vector output only; do not depend on raster generation, canvas, or WebGL.
 - `CODE`: author host-native Three.js TypeScript/JavaScript models; do not use downloaded/generated mesh assets or a model library as the primary implementation.
+- `BLENDER`: author Blender 4.5 LTS scenes, assets, renders, and runtime exports through immutable working-copy, validation, staging, and human-review controls.
 
 If a selected pipeline is unavailable or fails, stop and request direction. Never switch or fall back to a different pipeline silently.
 
@@ -141,7 +142,7 @@ Cloud/local media contracts, shared provenance schemas, and pinned local manifes
 - Read it only for image, music, sound-effect, voice, or media-pipeline work.
 - Treat it as the execution and provenance authority for `CLOUD` and `LOCAL`: versions, staging, runtime destinations, budgets, rights, consent, review, and promotion policy.
 - For image generation, obey both the resolved art pipeline and `MEDIA.md`. Music, sound effects, and voice use `MEDIA.md` without depending on visual style.
-- `CSS3` and `CODE` work do not require `MEDIA.md`.
+- `CSS3`, `CODE`, and `BLENDER` work do not require `MEDIA.md`; Blender work reads it only when cloud/local generated inputs are also in scope.
 
 ### When `../MEDIA.md` is missing
 

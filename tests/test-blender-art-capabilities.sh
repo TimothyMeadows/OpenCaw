@@ -27,6 +27,10 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 node_path() { if [[ "$node_bin" == *.exe ]]; then wslpath -w "$1"; else printf '%s\n' "$1"; fi; }
 
 echo "[1/8] checking skills, references, role, and mappings"
+require_file '.styles/.pipelines/blender/PIPELINE.md'
+require_text '.styles/.pipelines/INDEX.md' '`BLENDER`'
+require_text '.styles/.pipelines/blender/PIPELINE.md' 'Blender 4.5 LTS'
+require_text '.styles/.pipelines/blender/PIPELINE.md' '`direct-blender-production`'
 for skill in "${skills[@]}"; do
   require_file "skills/$skill/SKILL.md"
   require_file "skills/$skill/agents/openai.yaml"
@@ -37,8 +41,17 @@ role='.roles/arts/blender-production-artist/ROLE.md'
 require_file "$role"
 for alias in blender-artist blender-modeler blender-technical-artist 3d-production-artist; do require_text "$role" "  - $alias"; done
 require_text '.roles/ROLE_SKILL_MAP.json' '"arts/blender-production-artist"'
+require_text '.roles/ROLE_SKILL_MAP.json' '"select-art-pipeline"'
+require_text '.roles/ROLE_SKILL_MAP.json' '"commands/resolve-art-pipeline.sh"'
 for skill in "${skills[@]}"; do require_text '.roles/ROLE_SKILL_MAP.json' "\"$skill\""; done
 for command in "${commands[@]}"; do require_file "$command"; [[ -x "$command" ]] || fail "$command is not executable"; bash -n "$command"; done
+style_project="$temp_root/style-project"
+mkdir -p "$style_project/.ai/tasks/blender-pipeline-test"
+OPENCAW_PROJECT_ROOT="$style_project" bash commands/generate-style.sh --pipeline blender --allow-pipeline CSS3 CEL_SHADED_COMIC >/dev/null
+OPENCAW_PROJECT_ROOT="$style_project" bash commands/validate-style-contract.sh "$style_project/STYLE.md" >/dev/null
+grep -A1 '^Primary OpenCaw art pipeline:' "$style_project/STYLE.md" | grep -Fxq -- '- BLENDER' || fail "blender alias did not select BLENDER"
+selection="$(OPENCAW_PROJECT_ROOT="$style_project" bash commands/resolve-art-pipeline.sh --style "$style_project/STYLE.md" --override bpy --json)"
+grep -Fq '"pipeline": "BLENDER"' <<<"$selection" || fail "bpy override did not resolve to BLENDER"
 
 echo "[2/8] checking deterministic production brief"
 brief_one="$(commands/print-blender-production-brief.sh prop engine --profile static-asset)"

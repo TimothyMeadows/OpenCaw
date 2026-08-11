@@ -12,8 +12,9 @@ declare -A paths=(
   [LOCAL]="local/PIPELINE.md"
   [CSS3]="css3/PIPELINE.md"
   [CODE]="code/PIPELINE.md"
+  [BLENDER]="blender/PIPELINE.md"
 )
-for pipeline in CLOUD LOCAL CSS3 CODE; do
+for pipeline in CLOUD LOCAL CSS3 CODE BLENDER; do
   file="$root/${paths[$pipeline]}"
   [[ -f "$file" ]] || { echo "Missing art pipeline contract: $file" >&2; exit 1; }
   heading="$(head -n 1 "$file" | tr -d '\r')"
@@ -24,6 +25,10 @@ for pipeline in CLOUD LOCAL CSS3 CODE; do
   grep -Fq -- "- \`$pipeline\`" "$root/INDEX.md" || { echo "Art pipeline is not indexed: $pipeline" >&2; exit 1; }
   grep -Eiq 'never (switch|fall back)|never.*silently' "$file" || { echo "$file lacks a no-silent-fallback boundary" >&2; exit 1; }
 done
+
+grep -Fq 'Blender 4.5 LTS' "$root/blender/PIPELINE.md" || { echo "BLENDER contract must pin Blender 4.5 LTS." >&2; exit 1; }
+grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks immutable-source protection." >&2; exit 1; }
+grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
 for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json css3/art-tokens.css code/code-model-manifest.schema.json; do
   [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }

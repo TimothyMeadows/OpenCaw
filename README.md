@@ -665,9 +665,10 @@ Select a different primary pipeline or advertise project-supported alternatives 
 ./commands/generate-style.sh --pipeline CLOUD "CEL_SHADED_COMIC"
 ./commands/generate-style.sh --pipeline LOCAL --allow-pipeline CSS3 "CEL_SHADED_COMIC"
 ./commands/generate-style.sh --pipeline CODE --allow-pipeline CSS3 "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline BLENDER --allow-pipeline CSS3 "CEL_SHADED_COMIC"
 ```
 
-Friendly names such as `imagegen`, `comfyui`, `vector`, and `threejs` normalize to `CLOUD`, `LOCAL`, `CSS3`, and `CODE`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
+Friendly names such as `imagegen`, `comfyui`, `vector`, `threejs`, and `blender` normalize to `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
 
 ## Roles
 
@@ -1111,7 +1112,7 @@ OpenCaw separates visual direction from production method. Every visual task com
 4. Configure `MEDIA.md` only when `CLOUD` or `LOCAL` generation is used.
 5. Stop when the selected pipeline is unavailable or fails; never switch pipelines silently.
 
-The four pipelines are:
+The five pipelines are:
 
 | Pipeline | Primary output | Boundary |
 | --- | --- | --- |
@@ -1119,6 +1120,7 @@ The four pipelines are:
 | `LOCAL` | Loopback-only ComfyUI images/audio | Local GPU, pinned tools/models, licenses, checksums |
 | `CSS3` | CSS, mathematical geometry, inline SVG/vector | No raster, canvas, WebGL, or generated-image dependency |
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
+| `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
 
 Pipeline contracts and owned assets live under:
 
@@ -1132,12 +1134,13 @@ Pipeline contracts and owned assets live under:
 ├── css3/PIPELINE.md
 ├── css3/art-tokens.css
 ├── code/PIPELINE.md
-└── code/code-model-manifest.schema.json
+├── code/code-model-manifest.schema.json
+└── blender/PIPELINE.md
 ```
 
 Legacy media-configuration directories are prohibited; pipeline assets belong only to their owners under `.styles/.pipelines/`.
 
-An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “make this pure CSS/vector,” or “build this as a Three.js code model” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`:
+An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “make this pure CSS/vector,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`:
 
 ```bash
 ./commands/resolve-art-pipeline.sh --override imagegen \
@@ -1151,7 +1154,7 @@ For cloud/local execution, generate the optional media contract with canonical n
 ./commands/generate-media-contract.sh CLOUD LOCAL
 ```
 
-Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. `CSS3` and `CODE` do not require `MEDIA.md`.
+Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. `CSS3`, `CODE`, and `BLENDER` do not require `MEDIA.md`; Blender reads it only when cloud/local generated inputs are part of the production brief.
 
 Cloud/local media guardrails include:
 
@@ -1175,6 +1178,8 @@ Local commands:
 ```
 
 The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
+
+The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for modeling, UVs and textures, materials, procedural scenes, rigging, simulation, lighting, rendering, optimization, export, and review. It preserves the source `.blend`, authors only in declared repository-confined working copies, prefers typed connected Blender operations, validates exceptional exact-content `bpy`, and treats CLI tools as read-only inspection. Blender, addons, packages, and providers are never installed automatically. If live authoring is unavailable, the workflow stops instead of switching pipelines or backends.
 
 ## Validation
 
@@ -1238,7 +1243,7 @@ OpenCaw/
 │   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
-│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, and CODE contracts/assets
+│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, CODE, and BLENDER contracts/assets
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
