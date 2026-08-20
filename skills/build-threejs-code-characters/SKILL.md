@@ -39,6 +39,7 @@ description: Author source-native Three.js characters, creatures, and runtime ac
 
 - `./commands/create-code-character-profile.sh CHARACTER_ID --manifest MANIFEST --brief TEXT --intended-use TEXT [options]`
 - `./commands/validate-code-character-profile.sh [--strict|--complete] PROFILE.json`
+- `./commands/record-code-character-calibration.sh PROFILE.json --gate GATE --passing REPORT.json --failing REPORT.json [options]`
 - `./commands/record-code-character-gate.sh PROFILE.json --gate GATE --decision DECISION --summary TEXT --strategy TEXT --evidence KIND=FILE [options]`
 - `./commands/measure-code-character-evidence.sh analyze PROFILE.json --measurements FILE --output REPORT.json [--compare REPORT.json]`
 - `./commands/measure-code-character-evidence.sh capture PROFILE.json --adapter ADAPTER.mjs --output-dir DIR [options]`

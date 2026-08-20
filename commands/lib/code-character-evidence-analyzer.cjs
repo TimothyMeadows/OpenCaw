@@ -115,9 +115,9 @@ function evaluateCapture(profile, observation) {
   );
 }
 
-function evaluateStructure(profile, observation) {
+function evaluateStructure(profile, manifest, observation) {
   const structure = requireObject(observation.structure, 'structure');
-  onlyKeys(structure, ['parts', 'joints', 'sockets', 'colliders', 'minimumY', 'groundY', 'height', 'attachmentGaps', 'symmetry'], 'structure');
+  onlyKeys(structure, ['coordinateSystem', 'pivotStable', 'finiteTransforms', 'boundsFinite', 'parts', 'anchors', 'joints', 'sockets', 'colliders', 'minimumY', 'groundY', 'height', 'attachmentGaps', 'symmetry'], 'structure');
   const thresholds = gateThresholds(profile, 'structure-integrity');
   const groundingTolerance = finiteNumber(thresholds.groundingToleranceRatio, 'structure-integrity groundingToleranceRatio');
   const parts = requireArray(structure.parts, 'structure.parts');
@@ -132,6 +132,8 @@ function evaluateStructure(profile, observation) {
   }
   const requiredParts = profile.structure.parts.filter((part) => part.required);
   const missingParts = requiredParts.filter((part) => !observedParts.has(part.id)).map((part) => part.id);
+  const observedAnchors = stringArray(structure.anchors, 'structure.anchors');
+  const missingAnchors = manifest.runtime.anchors.filter((anchor) => !observedAnchors.includes(anchor));
   const wrongParents = profile.structure.parts
     .filter((part) => observedParts.has(part.id) && observedParts.get(part.id) !== part.parent)
     .map((part) => ({ id: part.id, observed: observedParts.get(part.id), expected: part.parent }));
@@ -173,7 +175,9 @@ function evaluateStructure(profile, observation) {
 
   return [
     evaluateCapture(profile, observation),
+    check('coordinate-pivot-bounds', structure.coordinateSystem === profile.structure.coordinateSystem && structure.pivotStable === true && structure.finiteTransforms === true && structure.boundsFinite === true ? 'pass' : 'fail', { coordinateSystem: structure.coordinateSystem, pivotStable: structure.pivotStable, finiteTransforms: structure.finiteTransforms, boundsFinite: structure.boundsFinite }, { coordinateSystem: profile.structure.coordinateSystem, pivotStable: true, finiteTransforms: true, boundsFinite: true }, 'The adapter must prove stable coordinates and pivot plus finite transforms and bounds.'),
     check('required-parts', missingParts.length ? 'fail' : 'pass', { missing: missingParts }, { required: requiredParts.map((part) => part.id) }, 'Every required semantic part must be exposed by the adapter.'),
+    check('required-anchors', missingAnchors.length ? 'fail' : 'pass', { missing: missingAnchors, observed: observedAnchors }, { required: manifest.runtime.anchors }, 'Every generic CODE anchor must remain available on the character instance.'),
     check('parent-relationships', wrongParents.length ? 'fail' : 'pass', { mismatches: wrongParents }, { declared: profile.structure.parts.map(({ id, parent }) => ({ id, parent })) }, 'Observed semantic parent relationships must match the frozen body plan.'),
     check('grounding', groundingRatio <= groundingTolerance ? 'pass' : 'fail', { ratio: groundingRatio, minimumY: structure.minimumY, groundY: structure.groundY }, { maximumRatio: groundingTolerance }, 'Grounding is normalized by observed character height.'),
     check('attachments', attachmentFailures.length ? 'fail' : 'pass', { failures: attachmentFailures }, { declared: profile.structure.attachments }, 'Each declared attachment is measured against its own contextual tolerance.'),
@@ -184,7 +188,7 @@ function evaluateStructure(profile, observation) {
 function evaluateInteraction(profile, observation) {
   const motion = requireObject(observation.motion, 'motion');
   const structure = requireObject(observation.structure, 'structure');
-  onlyKeys(motion, ['mode', 'skeletonId', 'maxInfluencesPerVertex', 'roles', 'contacts', 'movingPartCount'], 'motion');
+  onlyKeys(motion, ['mode', 'skeletonId', 'maxInfluencesPerVertex', 'weightsFiniteNormalized', 'deformationBoundsFinite', 'roles', 'poses', 'contacts', 'movingPartCount'], 'motion');
   const thresholds = gateThresholds(profile, 'interaction-runtime');
   const contactTolerance = finiteNumber(thresholds.contactToleranceRatio, 'interaction-runtime contactToleranceRatio');
   const lifecycleCycles = integer(thresholds.lifecycleCycles, 'interaction-runtime lifecycleCycles', 1);
@@ -192,6 +196,7 @@ function evaluateInteraction(profile, observation) {
   integer(motion.movingPartCount, 'motion.movingPartCount');
   integer(motion.maxInfluencesPerVertex, 'motion.maxInfluencesPerVertex');
   const roles = stringArray(motion.roles, 'motion.roles');
+  const poses = stringArray(motion.poses, 'motion.poses');
   const observedJoints = stringArray(structure.joints, 'structure.joints');
   const observedSockets = stringArray(structure.sockets, 'structure.sockets');
   const observedColliders = stringArray(structure.colliders, 'structure.colliders');
@@ -207,8 +212,11 @@ function evaluateInteraction(profile, observation) {
   if (profile.motion.mode === 'skinned') {
     if (motion.skeletonId !== profile.motion.skeletonId) modeFailures.push('skeleton identity differs from the profile');
     if (motion.maxInfluencesPerVertex > profile.motion.maxInfluencesPerVertex) modeFailures.push('skin influence limit is exceeded');
+    if (motion.weightsFiniteNormalized !== true) modeFailures.push('skin weights are not finite and normalized');
   }
+  if (profile.motion.mode !== 'static' && motion.deformationBoundsFinite !== true) modeFailures.push('sampled deformation bounds are not finite');
   const missingRoles = profile.motion.requiredRoles.filter((role) => !roles.includes(role));
+  const missingPoses = profile.motion.representativePoses.filter((pose) => !poses.includes(pose));
   const contacts = requireArray(motion.contacts, 'motion.contacts');
   if (profile.motion.mode === 'static' && contacts.length) modeFailures.push('static character reported animation contacts');
   const contactFailures = contacts.flatMap((contact, index) => {
@@ -235,6 +243,7 @@ function evaluateInteraction(profile, observation) {
     check('declared-motion-mode', modeFailures.length ? 'fail' : 'pass', { mode: motion.mode, failures: modeFailures }, { mode: profile.motion.mode }, 'Declaring a simpler motion mode cannot bypass checks for the frozen profile mode.'),
     check('interaction-semantics', missingSemantic.length ? 'fail' : 'pass', { missing: missingSemantic }, { joints: profile.structure.joints.map((item) => item.id), sockets: profile.structure.sockets.map((item) => item.id), colliders: profile.structure.colliders.map((item) => item.id) }, 'Declared runtime interaction semantics must be exposed.'),
     check('animation-roles', missingRoles.length ? 'fail' : profile.motion.mode === 'static' ? 'not-applicable' : 'pass', { missing: missingRoles, observed: roles }, { required: profile.motion.requiredRoles }, profile.motion.mode === 'static' ? 'Static characters have no animation-role requirement.' : 'All frozen animation roles must be measurable.'),
+    check('representative-poses', missingPoses.length ? 'fail' : profile.motion.mode === 'static' ? 'not-applicable' : 'pass', { missing: missingPoses, observed: poses }, { required: profile.motion.representativePoses }, profile.motion.mode === 'static' ? 'Static characters have no representative motion poses.' : 'All frozen representative poses must produce finite sampled bounds.'),
     check('animation-contacts', contactFailures.length ? 'fail' : requiredContacts.length ? 'pass' : 'not-applicable', { failures: contactFailures }, { required: requiredContacts, maximumErrorRatio: contactTolerance }, requiredContacts.length ? 'Declared contacts are normalized and checked against the contextual tolerance.' : 'No animation contacts are declared.'),
     check('interaction-lifecycle', lifecycle.length < lifecycleCycles || lifecycleFailures.length ? 'fail' : 'pass', { cycles: lifecycle.length, failures: lifecycleFailures }, { minimumCycles: lifecycleCycles, resourceDelta: 0, staleCallbacks: 0 }, 'Repeated update, attachment, animation, and dispose cycles must release owned state.')
   ];
@@ -316,7 +325,7 @@ function analyze(profile, manifest, observation, context) {
   const captureMode = context.captureMode;
   if (!['browser', 'fixture'].includes(captureMode)) fail('captureMode must be browser or fixture.');
   const gateResults = [
-    gateResult('structure-integrity', evaluateStructure(profile, observation)),
+    gateResult('structure-integrity', evaluateStructure(profile, manifest, observation)),
     gateResult('interaction-runtime', evaluateInteraction(profile, observation)),
     gateResult('optimization-budget', evaluateOptimization(profile, manifest, observation))
   ];

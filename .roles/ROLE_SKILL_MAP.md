@@ -465,6 +465,7 @@ Commands:
 - `commands/record-code-model-review.sh`
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-calibration.sh`
 - `commands/record-code-character-gate.sh`
 - `commands/measure-code-character-evidence.sh`
 - `commands/validate-rigged-actor-manifest.sh`
@@ -751,6 +752,7 @@ Commands:
 - `commands/record-code-model-review.sh`
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-calibration.sh`
 - `commands/record-code-character-gate.sh`
 - `commands/measure-code-character-evidence.sh`
 - `commands/print-web-experience-brief.sh`
@@ -824,6 +826,7 @@ Commands:
 - `commands/copy-external-asset.sh`
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-calibration.sh`
 - `commands/record-code-character-gate.sh`
 - `commands/measure-code-character-evidence.sh`
 - `commands/print-gameplay-system-brief.sh`

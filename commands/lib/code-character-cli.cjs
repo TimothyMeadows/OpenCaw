@@ -192,6 +192,17 @@ function profileContractProjection(profile) {
   return projection;
 }
 
+function profileMeasurementProjection(profile) {
+  const projection = JSON.parse(JSON.stringify(profile));
+  for (const gate of projection.gates ?? []) {
+    delete gate.status;
+    delete gate.calibration;
+    delete gate.attempts;
+    delete gate.results;
+  }
+  return projection;
+}
+
 function contractHashes(profile, manifest) {
   return {
     manifest: objectSha256(manifestContractProjection(manifest)),
@@ -220,6 +231,59 @@ function validatePathHash(root, record, label, usedPaths = null) {
     usedPaths.add(located.relative);
   }
   return located;
+}
+
+function validateCalibrationReport(root, profile, linked, gate, record, decision, label, usedPaths = null) {
+  const located = validatePathHash(root, record, label, usedPaths);
+  const report = readJson(located.absolute, label);
+  if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) {
+    fail(`${label} has the wrong schema or character identity.`);
+  }
+  if (report.captureMode !== 'fixture' || report.trustedMachineEvidence !== false) fail(`${label} must be an untrusted deterministic fixture report.`);
+  const expectedGateIds = GATE_CONTRACTS.filter((contract) => contract[2] === 'machine').map((contract) => contract[0]);
+  if (!Array.isArray(report.gateResults) || report.gateResults.length !== expectedGateIds.length) fail(`${label} must report exactly the three machine gates.`);
+  for (const id of expectedGateIds) {
+    const result = report.gateResults.find((candidate) => candidate?.id === id);
+    const expectedDecision = id === gate.id ? decision : 'pass';
+    if (!result || result.decision !== expectedDecision) fail(`${label} must produce ${expectedDecision} for ${id}.`);
+  }
+  if (report.overallDecision !== (decision === 'pass' ? 'pass' : 'fail')) fail(`${label} overallDecision does not match its focused calibration outcome.`);
+  if (typeof report.reviewerBoundary !== 'string' || !report.reviewerBoundary) fail(`${label} must preserve the machine-versus-reviewer boundary.`);
+  const measurementSpecSha256 = objectSha256(profileMeasurementProjection(profile));
+  const hashes = contractHashes(profile, linked.manifest);
+  const source = relativeArtifact(root, linked.manifest.target.sourcePath, 'Linked code-model source');
+  if (report.contracts?.profile?.measurementSpecSha256 !== measurementSpecSha256) fail(`${label} is stale against the current measurement specification.`);
+  if (report.contracts?.manifest?.sha256 !== hashes.manifest || report.contracts?.source?.sha256 !== sha256(source.absolute)) {
+    fail(`${label} is stale against the linked manifest or source.`);
+  }
+  return located;
+}
+
+function validateMachineResultReport(root, profile, linked, gate, evidence) {
+  const located = relativeArtifact(root, evidence.path, `${gate.id} machine report`);
+  const report = readJson(located.absolute, `${gate.id} machine report`);
+  if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) fail(`${gate.id} machine report has the wrong schema or character identity.`);
+  if (report.captureMode !== 'browser' || report.trustedMachineEvidence !== true) fail(`${gate.id} pass requires trusted sandboxed browser evidence.`);
+  const result = report.gateResults?.find((candidate) => candidate?.id === gate.id);
+  if (!result || result.decision !== 'pass') fail(`${gate.id} machine report does not pass the target gate.`);
+  if (typeof report.reviewerBoundary !== 'string' || !report.reviewerBoundary) fail(`${gate.id} machine report omits the machine-versus-reviewer boundary.`);
+  const measurementSpecSha256 = objectSha256(profileMeasurementProjection(profile));
+  const hashes = contractHashes(profile, linked.manifest);
+  const source = relativeArtifact(root, linked.manifest.target.sourcePath, 'Linked code-model source');
+  if (report.contracts?.profile?.measurementSpecSha256 !== measurementSpecSha256) fail(`${gate.id} machine report is stale against the current measurement specification.`);
+  if (report.contracts?.manifest?.sha256 !== hashes.manifest || report.contracts?.source?.sha256 !== sha256(source.absolute)) fail(`${gate.id} machine report is stale against the linked manifest or source.`);
+  const adapterRecord = report.contracts?.adapter;
+  const adapter = adapterRecord?.path ? relativeArtifact(root, adapterRecord.path, `${gate.id} machine adapter`) : null;
+  if (!adapter || !SHA_PATTERN.test(adapterRecord.sha256 ?? '') || sha256(adapter.absolute) !== adapterRecord.sha256) fail(`${gate.id} machine report adapter hash does not match.`);
+  if (!SHA_PATTERN.test(report.contracts?.captureConfiguration?.sha256 ?? '') || !SHA_PATTERN.test(report.observationSha256 ?? '')) fail(`${gate.id} machine report has an invalid capture or observation hash.`);
+  const security = report.browserSecurity;
+  let origin;
+  try { origin = new URL(security?.origin); } catch { fail(`${gate.id} machine report has an invalid browser origin.`); }
+  if (origin.protocol !== 'http:' || origin.hostname !== '127.0.0.1' || !origin.port
+    || security.osAssignedPort !== true || security.chromiumSandbox !== true || security.serviceWorkers !== 'blocked'
+    || !Array.isArray(security.externalRequests) || security.externalRequests.length) {
+    fail(`${gate.id} machine report does not prove the confined sandboxed browser contract.`);
+  }
 }
 
 function validateIdentityList(items, label, allowedParents = null) {
@@ -398,11 +462,13 @@ function validateProfile(root, profileValue, mode = 'base', profilePath = null) 
   if (profile.gates.length !== GATE_CONTRACTS.length) fail(`gates must contain exactly ${GATE_CONTRACTS.length} entries.`);
   const gateIds = new Set();
   const usedEvidencePaths = new Set();
+  const usedCalibrationPaths = new Set();
   let lastPassIndex = -1;
   let activeCount = 0;
   let encounteredRequiredIncomplete = false;
-  const hasResults = profile.gates.some((gate) => Array.isArray(gate?.results) && gate.results.length > 0);
-  const currentLinked = linkedModel(root, profile, mode, mode === 'complete' || hasResults);
+  const hasRuntimeEvidence = profile.gates.some((gate) => (Array.isArray(gate?.results) && gate.results.length > 0)
+    || gate?.calibration?.passing?.length || gate?.calibration?.failing?.length);
+  const currentLinked = linkedModel(root, profile, mode, mode === 'complete' || hasRuntimeEvidence);
   const currentHashes = contractHashes(profile, currentLinked.manifest);
   const currentSourceSha = fs.existsSync(currentLinked.source.absolute) ? sha256(currentLinked.source.absolute) : null;
   const passCoverage = new Set();
@@ -443,7 +509,11 @@ function validateProfile(root, profileValue, mode = 'base', profilePath = null) 
     onlyKeys(gate.calibration, ['passing', 'failing'], `${label}.calibration`);
     for (const category of ['passing', 'failing']) {
       requireArray(gate.calibration[category], `${label}.calibration.${category}`);
-      for (const [index, item] of gate.calibration[category].entries()) validatePathHash(root, item, `${label}.calibration.${category}[${index}]`);
+      for (const [index, item] of gate.calibration[category].entries()) {
+        const calibrationLabel = `${label}.calibration.${category}[${index}]`;
+        if (gate.type === 'machine') validateCalibrationReport(root, profile, currentLinked, gate, item, category === 'passing' ? 'pass' : 'fail', calibrationLabel, usedCalibrationPaths);
+        else validatePathHash(root, item, calibrationLabel);
+      }
     }
     requireInteger(gate.attempts, `${label}.attempts`);
     if (gate.attempts > profile.reviewPolicy.maxGateAttempts) fail(`${gate.id} exceeds maxGateAttempts.`);
@@ -672,6 +742,58 @@ function parseEvidence(root, entries) {
   return evidence;
 }
 
+function calibrationEvidence(root, profile, linked, gate, entries, decision, usedPaths) {
+  const evidence = [];
+  const measurementSpecSha256 = objectSha256(profileMeasurementProjection(profile));
+  const hashes = contractHashes(profile, linked.manifest);
+  const source = relativeArtifact(root, linked.manifest.target.sourcePath, 'Linked code-model source');
+  for (const [index, entry] of entries.entries()) {
+    const located = relativeArtifact(root, entry, `${gate.id} ${decision} calibration report ${index + 1}`);
+    if (usedPaths.has(located.relative)) fail(`Calibration report path is reused: ${located.relative}`);
+    usedPaths.add(located.relative);
+    const report = readJson(located.absolute, `${gate.id} ${decision} calibration report ${index + 1}`);
+    if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) {
+      fail(`${gate.id} ${decision} calibration report has the wrong schema or character identity.`);
+    }
+    if (report.captureMode !== 'fixture' || report.trustedMachineEvidence !== false) {
+      fail(`${gate.id} calibration must use an untrusted deterministic fixture report.`);
+    }
+    const gateResult = report.gateResults?.find((candidate) => candidate.id === gate.id);
+    if (!gateResult || gateResult.decision !== decision) fail(`${gate.id} calibration report must produce ${decision} for the target gate.`);
+    if (report.contracts?.profile?.measurementSpecSha256 !== measurementSpecSha256) fail(`${gate.id} calibration report is stale against the current measurement specification.`);
+    if (report.contracts?.manifest?.sha256 !== hashes.manifest || report.contracts?.source?.sha256 !== sha256(source.absolute)) {
+      fail(`${gate.id} calibration report is stale against the linked manifest or source.`);
+    }
+    evidence.push({ path: located.relative, sha256: sha256(located.absolute) });
+  }
+  return evidence;
+}
+
+function calibrate(root, values) {
+  const options = parseOptions(values, new Set(['passing', 'failing']));
+  rejectUnknownOptions(options, new Set(['gate', 'passing', 'failing']));
+  if (options._.length !== 1) fail('Calibrate requires exactly one PROFILE.');
+  requireString(options.gate, '--gate');
+  if (!options.passing?.length || !options.failing?.length) fail('Calibrate requires at least one --passing and one --failing report.');
+  const profileLocated = relativeArtifact(root, options._[0], 'Character profile');
+  return withProfileLock(profileLocated.absolute, () => {
+    const beforeSha = sha256(profileLocated.absolute);
+    const result = validateProfile(root, null, 'strict', profileLocated.absolute);
+    const { profile, linked } = result;
+    const gate = profile.gates.find((candidate) => candidate.id === options.gate);
+    if (!gate) fail(`Unknown character gate: ${options.gate}`);
+    if (gate.type !== 'machine') fail(`Reviewer gate ${gate.id} does not accept machine calibration.`);
+    if (gate.attempts || gate.results.length) fail(`${gate.id} calibration must be frozen before its first result.`);
+    if (gate.calibration.passing.length || gate.calibration.failing.length) fail(`${gate.id} calibration is already frozen.`);
+    const usedPaths = new Set();
+    gate.calibration.passing = calibrationEvidence(root, profile, linked, gate, options.passing, 'pass', usedPaths);
+    gate.calibration.failing = calibrationEvidence(root, profile, linked, gate, options.failing, 'fail', usedPaths);
+    validateProfile(root, profile, 'strict');
+    atomicWrite(profileLocated.absolute, profile, beforeSha);
+    process.stdout.write(`Recorded calibrated passing and failing reports for ${gate.id}.\n`);
+  });
+}
+
 function record(root, values) {
   const options = parseOptions(values, new Set(['evidence']));
   rejectUnknownOptions(options, new Set(['gate', 'decision', 'summary', 'remaining-gaps', 'failure-class', 'strategy', 'evidence', 'reviewer-id', 'reviewer-type', 'reviewer-packet', 'observed-answer']));
@@ -725,6 +847,9 @@ function record(root, values) {
     if (options.decision === 'pass' && gate.type === 'machine') {
       if (!gate.calibration.passing.length || !gate.calibration.failing.length) fail(`Machine gate ${gate.id} needs passing and failing calibration evidence before it can pass.`);
       for (const category of ['passing', 'failing']) for (const item of gate.calibration[category]) validatePathHash(root, item, `${gate.id} ${category} calibration`);
+      const machineReports = evidence.filter((entry) => entry.kind === 'machine-report');
+      if (machineReports.length !== 1) fail(`Machine gate ${gate.id} pass requires exactly one machine-report evidence file.`);
+      validateMachineResultReport(root, profile, linked, gate, machineReports[0]);
     }
     const hashes = contractHashes(profile, linked.manifest);
     const newResult = {
@@ -781,6 +906,7 @@ function main() {
   const root = rootPath(rootArg);
   if (operation === 'create') return create(root, values);
   if (operation === 'validate') return validateOperation(root, values);
+  if (operation === 'calibrate') return calibrate(root, values);
   if (operation === 'record') return record(root, values);
   fail(`Unknown code-character operation: ${operation}`);
 }
@@ -794,4 +920,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { assertPassReady, contractHashes, profileContractProjection, validateProfile };
+module.exports = { assertPassReady, contractHashes, profileContractProjection, profileMeasurementProjection, validateProfile };

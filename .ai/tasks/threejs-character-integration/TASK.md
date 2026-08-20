@@ -2,7 +2,7 @@
 
 ## Status
 
-Queued in Goal Flow.
+Implemented; local validation passed in Goal Flow.
 
 ## Flow
 
@@ -43,3 +43,11 @@ https://github.com/TimothyMeadows/OpenCaw/issues/116
 - Base: `feature/threejs-character-evidence`
 - Head: `feature/threejs-character-integration`
 - Depends on: `threejs-character-evidence`
+
+## Review Notes
+
+- Integrated the linked character profile, transactional calibration command, gate workflow, isolated reviewer boundary, deterministic evidence harness, and applicable runtime checks into the CODE pipeline and public README.
+- Added explicit observation coverage for generic anchors, coordinate/pivot stability, finite transforms and bounds, normalized finite skin weights, representative poses, and sampled deformation bounds.
+- Kept generic CODE callers unchanged and retained GLB/FBX runtime packages under the existing rigged-actor capability.
+- Updated skill/pipeline indexes, role-command ownership, capability dispositions, durable memory, and the semantic repository map without adding a dependency, installer, provider, asset, or publication workflow.
+- Registered a lightweight integration suite in the main validator and ran the complete affected supported-environment matrix without unrelated delivery-mode suites.

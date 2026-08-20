@@ -5,8 +5,8 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const { createRequire } = require('module');
-const { analyze, canonical, objectSha256 } = require('./code-character-evidence-analyzer.cjs');
-const { contractHashes, validateProfile } = require('./code-character-cli.cjs');
+const { analyze, objectSha256 } = require('./code-character-evidence-analyzer.cjs');
+const { contractHashes, profileMeasurementProjection, validateProfile } = require('./code-character-cli.cjs');
 const { relativeInside, rootPath, sha256 } = require('./code-model-cli.cjs');
 
 const VIEW_IDS = new Set(['front', 'rear', 'left', 'right', 'top', 'bottom', 'orbit-left', 'orbit-right', 'hero', 'runtime']);
@@ -76,7 +76,7 @@ function reportContext(root, validated, captureMode, comparisonPath = null) {
   const source = regularFile(root, validated.linked.manifest.target.sourcePath, 'Linked code-model source');
   const hashes = contractHashes(validated.profile, validated.linked.manifest);
   const contracts = {
-    profile: { path: validated.located.relative, sha256: hashes.profile },
+    profile: { path: validated.located.relative, sha256: hashes.profile, measurementSpecSha256: objectSha256(profileMeasurementProjection(validated.profile)) },
     manifest: { path: validated.linked.linked.relative, sha256: hashes.manifest },
     source: { path: source.relative, sha256: sha256(source.absolute) }
   };
@@ -105,7 +105,9 @@ function analyzeOperation(root, values) {
   const validated = validateProfile(root, null, 'strict', options._[0]);
   const measurement = regularFile(root, options.measurements, 'Measurement fixture');
   const output = outputFile(root, options.output, 'Evidence report output');
-  const report = analyze(validated.profile, validated.linked.manifest, readJson(measurement.absolute, 'Measurement fixture'), reportContext(root, validated, 'fixture', options.compare));
+  const context = reportContext(root, validated, 'fixture', options.compare);
+  context.contracts.measurements = { path: measurement.relative, sha256: sha256(measurement.absolute) };
+  const report = analyze(validated.profile, validated.linked.manifest, readJson(measurement.absolute, 'Measurement fixture'), context);
   atomicWrite(output.absolute, report);
   process.stdout.write(`Analyzed untrusted calibration fixture: ${measurement.relative}\n`);
   process.stdout.write(`Evidence report: ${output.relative}\n`);
@@ -335,7 +337,12 @@ async function captureOperation(root, values) {
     };
     const observationPath = path.join(output.absolute, 'observation.json');
     atomicWrite(observationPath, observation);
-    const report = analyze(validated.profile, validated.linked.manifest, observation, reportContext(root, validated, 'browser', options.compare));
+    const reportAnalysisContext = reportContext(root, validated, 'browser', options.compare);
+    reportAnalysisContext.contracts.adapter = { path: adapter.relative, sha256: sha256(adapter.absolute) };
+    reportAnalysisContext.contracts.captureConfiguration = {
+      sha256: objectSha256({ seed, viewport: { width, height, pixelRatio }, requestedViews, pixelHeights: validated.profile.intent.presentation.pixelHeights, signatureParts: validated.profile.intent.signatureParts, sampleConfig })
+    };
+    const report = analyze(validated.profile, validated.linked.manifest, observation, reportAnalysisContext);
     report.browserSecurity = { origin: options.origin, osAssignedPort: true, chromiumSandbox: true, serviceWorkers: 'blocked', externalRequests };
     const reportPath = path.join(output.absolute, 'report.json');
     atomicWrite(reportPath, report);

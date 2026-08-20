@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented; local validation passed in Goal Flow.
+Completed in Goal Flow; PR open and post-PR QA passed.
 
 ## Flow
 
@@ -59,3 +59,4 @@ https://github.com/TimothyMeadows/OpenCaw/issues/115
 - Emitted descriptive checks for exactly the three machine gates; readability, form, materials, style, identity, and appeal remain reviewer-owned.
 - Added deterministic pass/focused-fail fixtures for structure, interaction, and optimization plus static, articulated, skinned, attachment, symmetry, lifecycle, capture, comparison, budget, path, concurrency, and missing-tool regressions.
 - Verified the capture orchestration with a controlled browser test double because this repository does not install Three.js or Playwright; separately proved clear no-install stops for missing Three.js, Playwright, and Chromium.
+- Published as https://github.com/TimothyMeadows/OpenCaw/pull/119 with post-PR QA evidence at https://github.com/TimothyMeadows/OpenCaw/pull/119#issuecomment-5352210639.
