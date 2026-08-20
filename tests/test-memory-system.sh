@@ -82,6 +82,22 @@ run_for "$project" bash commands/create-task-file.sh boundary-task 'Boundary tas
 [[ "$(grep -c 'Never store passwords' "$project/.ai/SYSTEM_MEMORY.md")" -eq 1 ]] || fail 'protected defaults were duplicated'
 [[ ! -e "$temp_root/ignored-home/SYSTEM_MEMORY.md" ]] || fail 'OPENCAW_HOME redirected system memory outside the repository'
 
+sync_project="$(new_project issue-sync-project)"
+mkdir -p "$sync_project/.ai/tasks" "$temp_root/fake-gh"
+printf '%s\n' \
+  'https://github.com/example/project/issues/1' \
+  'https://github.com/example/project/issues/2' \
+  'https://github.com/example/project/issues/3' > "$sync_project/.ai/tasks/OPEN_ISSUES.md"
+cat > "$temp_root/fake-gh/gh" <<'EOF'
+#!/usr/bin/env bash
+cat >/dev/null
+printf 'OPEN\n'
+EOF
+chmod +x "$temp_root/fake-gh/gh"
+PATH="$temp_root/fake-gh:$PATH" run_for "$sync_project" bash commands/sync-task-issues.sh > "$temp_root/issue-sync.log"
+[[ "$(wc -l < "$sync_project/.ai/tasks/OPEN_ISSUES.md")" -eq 3 ]] || fail 'issue sync lost URLs after gh consumed stdin'
+grep -Fq 'Total tracked URLs: 3' "$temp_root/issue-sync.log" || fail 'issue sync did not process every tracked URL'
+
 echo '[3/9] validating safe tagged writes and replacement'
 run_for "$project" bash commands/append-project-memory.sh --tags 'kind:workflow,area:auth,tech:dotnet' --entry 'Run focused authentication tests before the full suite.' >/dev/null
 run_for "$project" bash commands/append-project-memory.sh --tags 'kind:workflow,area:auth,tech:dotnet' --entry 'Run focused authentication tests before the full suite.' >/dev/null

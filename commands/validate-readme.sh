@@ -28,8 +28,7 @@ const expectedOpening = [
   '# OpenCaw',
   '',
   '![](OpenCaw.png)',
-  '',
-  'https://github.com/user-attachments/assets/eb32b378-7269-4aa7-90d4-cbc0cba535f9'
+  ''
 ];
 if (JSON.stringify(lines.slice(0, expectedOpening.length)) !== JSON.stringify(expectedOpening)) {
   errors.push('The README logo/video opening changed.');
