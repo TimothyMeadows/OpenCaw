@@ -7,6 +7,7 @@ The packet includes only what a fresh reviewer needs:
 - frozen brief, identity, style, intended use, presentation distance, pixel heights, and required views;
 - the gate's exact questions and relevant contextual thresholds;
 - neutral view labels, deterministic captures, and semantic-part isolation evidence;
+- the evidence report's trust marker, contract hashes, descriptive machine checks, and explicit machine-versus-reviewer boundary;
 - explicit unavailable or not-applicable markers with reasons.
 
 The packet excludes:

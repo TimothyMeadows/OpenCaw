@@ -33,20 +33,20 @@ Deliver a complete OpenCaw-native character and creature specialization for the 
 
 ## Task Queue
 1. [x] Build the code-character contract and gate state (`.ai/tasks/threejs-character-contract/TASK.md`)
-2. [ ] Add code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
+2. [x] Add code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
 3. [ ] Add deterministic character evidence and runtime gates (`.ai/tasks/threejs-character-evidence/TASK.md`)
 4. [ ] Integrate and document code-character production (`.ai/tasks/threejs-character-integration/TASK.md`)
 
 ## Current Task
 
-- `threejs-character-skills`
+- `threejs-character-evidence`
 
 ## Branch Chain
 - Record each task as: `task-name | base: <branch> | head: <branch> | PR: <url> | depends on: <prior task or none>`.
 - If a later task requires unmerged work from a previous task, or would likely create merge conflicts when based on the original base branch, branch from the previous task branch or PR head.
 - Keep stacked branches ordered so human approval can happen from earliest dependency to latest dependent PR.
 - `threejs-character-contract | base: main | head: feature/threejs-character-contract | PR: https://github.com/TimothyMeadows/OpenCaw/pull/117 | depends on: none`
-- `threejs-character-skills | base: feature/threejs-character-contract | head: feature/threejs-character-skills | PR: pending | depends on: threejs-character-contract`
+- `threejs-character-skills | base: feature/threejs-character-contract | head: feature/threejs-character-skills | PR: https://github.com/TimothyMeadows/OpenCaw/pull/118 | depends on: threejs-character-contract`
 - `threejs-character-evidence | base: feature/threejs-character-skills | head: feature/threejs-character-evidence | PR: pending | depends on: threejs-character-skills`
 - `threejs-character-integration | base: feature/threejs-character-evidence | head: feature/threejs-character-integration | PR: pending | depends on: threejs-character-evidence`
 
@@ -64,10 +64,12 @@ Deliver a complete OpenCaw-native character and creature specialization for the 
 ## PRs
 
 - Task 1: https://github.com/TimothyMeadows/OpenCaw/pull/117
+- Task 2: https://github.com/TimothyMeadows/OpenCaw/pull/118
 
 ## QA Evidence
 
 - Task 1 PASS: https://github.com/TimothyMeadows/OpenCaw/pull/117#issuecomment-5351851600
+- Task 2 PASS: https://github.com/TimothyMeadows/OpenCaw/pull/118#issuecomment-5351973755
 
 ## Goal Completion Report
 - Generate with `./commands/create-goal-completion-report.sh "threejs-code-characters"`.

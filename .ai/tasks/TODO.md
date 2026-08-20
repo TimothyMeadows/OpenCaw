@@ -16,6 +16,6 @@
 14. [x] Add optional external asset libraries (`.ai/tasks/external-asset-library/TASK.md`)
 15. [ ] Goal: complete character-focused Three.js CODE production and verification (`.ai/goals/threejs-code-characters/GOAL.md`)
 16. [x] Build the Three.js code-character contract and gate state (`.ai/tasks/threejs-character-contract/TASK.md`)
-17. [ ] Add Three.js code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
+17. [x] Add Three.js code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
 18. [ ] Add deterministic Three.js character evidence and runtime gates (`.ai/tasks/threejs-character-evidence/TASK.md`)
 19. [ ] Integrate and document Three.js code-character production (`.ai/tasks/threejs-character-integration/TASK.md`)

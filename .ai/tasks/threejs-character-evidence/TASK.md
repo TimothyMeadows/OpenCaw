@@ -2,7 +2,7 @@
 
 ## Status
 
-Queued in Goal Flow.
+Implemented; local validation passed in Goal Flow.
 
 ## Flow
 
@@ -51,3 +51,11 @@ https://github.com/TimothyMeadows/OpenCaw/issues/115
 - Base: `feature/threejs-character-skills`
 - Head: `feature/threejs-character-evidence`
 - Depends on: `threejs-character-skills`
+
+## Review Notes
+
+- Added explicit normalized grounding/contact thresholds, construction-run counts, and lifecycle-cycle counts to each generated machine-gate contract.
+- Kept calibration analysis untrusted and limited trusted reports to sandboxed, loopback-only browser capture using host-installed Three.js and Playwright.
+- Emitted descriptive checks for exactly the three machine gates; readability, form, materials, style, identity, and appeal remain reviewer-owned.
+- Added deterministic pass/focused-fail fixtures for structure, interaction, and optimization plus static, articulated, skinned, attachment, symmetry, lifecycle, capture, comparison, budget, path, concurrency, and missing-tool regressions.
+- Verified the capture orchestration with a controlled browser test double because this repository does not install Three.js or Playwright; separately proved clear no-install stops for missing Three.js, Playwright, and Chromium.

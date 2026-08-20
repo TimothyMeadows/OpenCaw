@@ -109,6 +109,13 @@ function requireNumberOrNull(value, label) {
   }
 }
 
+function requireRatio(value, label) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) {
+    fail(`${label} must be a finite number from 0 to 1.`);
+  }
+  return value;
+}
+
 function requireArray(value, label, minimum = 0) {
   if (!Array.isArray(value) || value.length < minimum) fail(`${label} must contain at least ${minimum} item(s).`);
   return value;
@@ -421,6 +428,18 @@ function validateProfile(root, profileValue, mode = 'base', profilePath = null) 
     requireString(gate.claim.context, `${label}.claim.context`);
     requireString(gate.claim.rationale, `${label}.claim.rationale`);
     requireObject(gate.claim.thresholds, `${label}.claim.thresholds`);
+    if (gate.id === 'structure-integrity') {
+      onlyKeys(gate.claim.thresholds, ['groundingToleranceRatio'], `${label}.claim.thresholds`);
+      requireRatio(gate.claim.thresholds.groundingToleranceRatio, `${label}.claim.thresholds.groundingToleranceRatio`);
+    } else if (gate.id === 'interaction-runtime') {
+      onlyKeys(gate.claim.thresholds, ['contactToleranceRatio', 'lifecycleCycles'], `${label}.claim.thresholds`);
+      requireRatio(gate.claim.thresholds.contactToleranceRatio, `${label}.claim.thresholds.contactToleranceRatio`);
+      requireInteger(gate.claim.thresholds.lifecycleCycles, `${label}.claim.thresholds.lifecycleCycles`, 1);
+    } else if (gate.id === 'optimization-budget') {
+      onlyKeys(gate.claim.thresholds, ['constructionRuns', 'lifecycleCycles'], `${label}.claim.thresholds`);
+      requireInteger(gate.claim.thresholds.constructionRuns, `${label}.claim.thresholds.constructionRuns`, 2);
+      requireInteger(gate.claim.thresholds.lifecycleCycles, `${label}.claim.thresholds.lifecycleCycles`, 1);
+    }
     onlyKeys(gate.calibration, ['passing', 'failing'], `${label}.calibration`);
     for (const category of ['passing', 'failing']) {
       requireArray(gate.calibration[category], `${label}.calibration.${category}`);
@@ -508,10 +527,10 @@ function validateProfile(root, profileValue, mode = 'base', profilePath = null) 
   return { profile, located, linked: currentLinked, hashes: currentHashes, sourceSha256: currentSourceSha };
 }
 
-function defaultGates() {
+function defaultGates(thresholds) {
   return GATE_CONTRACTS.map(([id, pass, type, kind, context, rationale], index) => ({
     id, pass, type, required: true, status: index === 0 ? 'active' : 'pending',
-    claim: { kind, context, rationale, thresholds: {} },
+    claim: { kind, context, rationale, thresholds: thresholds[id] ?? {} },
     calibration: { passing: [], failing: [] }, attempts: 0, results: []
   }));
 }
@@ -523,9 +542,16 @@ function positiveInteger(value, fallback, label, minimum = 1) {
   return parsed;
 }
 
+function ratioOption(value, fallback, label) {
+  if (value === undefined) return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) fail(`${label} must be from 0 to 1.`);
+  return parsed;
+}
+
 function create(root, values) {
   const options = parseOptions(values, new Set(['signature-part', 'builder', 'view', 'pixel-height', 'animation-role']));
-  rejectUnknownOptions(options, new Set(['manifest', 'output', 'title', 'kind', 'brief', 'intended-use', 'presentation-distance', 'representative-actors', 'temperament', 'identity', 'signature-part', 'builder', 'view', 'pixel-height', 'motion-mode', 'skeleton-id', 'max-influences', 'animation-role', 'max-gate-attempts', 'repeated-failure-limit']));
+  rejectUnknownOptions(options, new Set(['manifest', 'output', 'title', 'kind', 'brief', 'intended-use', 'presentation-distance', 'representative-actors', 'temperament', 'identity', 'signature-part', 'builder', 'view', 'pixel-height', 'motion-mode', 'skeleton-id', 'max-influences', 'animation-role', 'grounding-tolerance-ratio', 'contact-tolerance-ratio', 'construction-runs', 'lifecycle-cycles', 'max-gate-attempts', 'repeated-failure-limit']));
   if (options._.length !== 1) fail('Create requires exactly one CHARACTER_ID.');
   const characterId = requireId(options._[0], 'CHARACTER_ID');
   requireString(options.manifest, '--manifest');
@@ -596,7 +622,19 @@ function create(root, values) {
       maxGateAttempts: positiveInteger(options['max-gate-attempts'], 3, '--max-gate-attempts'),
       repeatedFailureLimit: positiveInteger(options['repeated-failure-limit'], 2, '--repeated-failure-limit')
     },
-    gates: defaultGates()
+    gates: defaultGates({
+      'structure-integrity': {
+        groundingToleranceRatio: ratioOption(options['grounding-tolerance-ratio'], 0.01, '--grounding-tolerance-ratio')
+      },
+      'interaction-runtime': {
+        contactToleranceRatio: ratioOption(options['contact-tolerance-ratio'], 0.02, '--contact-tolerance-ratio'),
+        lifecycleCycles: positiveInteger(options['lifecycle-cycles'], 3, '--lifecycle-cycles')
+      },
+      'optimization-budget': {
+        constructionRuns: positiveInteger(options['construction-runs'], 3, '--construction-runs', 2),
+        lifecycleCycles: positiveInteger(options['lifecycle-cycles'], 3, '--lifecycle-cycles')
+      }
+    })
   };
   if (profile.reviewPolicy.repeatedFailureLimit > profile.reviewPolicy.maxGateAttempts) fail('Repeated failure limit cannot exceed max gate attempts.');
   validateProfile(root, profile, 'base');

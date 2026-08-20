@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented; local validation passed in Goal Flow.
+Completed in Goal Flow; PR open and post-PR QA passed.
 
 ## Flow
 
@@ -56,3 +56,4 @@ https://github.com/TimothyMeadows/OpenCaw/issues/114
 - Kept generic props and environments routed through `build-threejs-code-models` while specializing embodied actor prompts.
 - Routed builder ownership to technical-3D, gameplay, and frontend roles; routed reviewer ownership to technical-3D, QA, and game-design roles.
 - Froze one-level design, gate, rig/animation, reviewer-packet, and failure-recovery references without executable helpers or auxiliary files.
+- Published as https://github.com/TimothyMeadows/OpenCaw/pull/118 with post-PR QA evidence at https://github.com/TimothyMeadows/OpenCaw/pull/118#issuecomment-5351973755.
