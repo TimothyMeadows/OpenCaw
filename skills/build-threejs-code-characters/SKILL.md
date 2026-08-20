@@ -17,7 +17,7 @@ description: Author source-native Three.js characters, creatures, and runtime ac
 2. Freeze the character brief, presentation context, semantic graph, motion mode, and budgets using [design-contract.md](references/design-contract.md).
 3. Create and validate the generic code-model manifest, then create the linked code-character profile. Keep profile creation source-independent.
 4. Author the model in generic pass order. Apply the character-specific acceptance gate paired to each pass from [build-gates.md](references/build-gates.md).
-5. For reviewer gates, prepare an answer-neutral packet and invoke `review-threejs-code-characters` with an identity outside the active builder set. For machine gates, require calibrated passing and failing fixtures; stop if the required measurement adapter is unavailable.
+5. For reviewer gates, prepare an answer-neutral packet and invoke `review-threejs-code-characters` with an identity outside the active builder set. For machine gates, follow [evidence-adapter.md](references/evidence-adapter.md), require calibrated passing and failing fixtures, and stop if the required measurement adapter is unavailable.
 6. Record the character-gate result before recording a passing generic CODE review for that pass. Change strategy after failure and follow [failure-recovery.md](references/failure-recovery.md).
 7. For articulated or skinned work, apply [rig-animation.md](references/rig-animation.md) before accepting interaction or optimization.
 8. Run complete validation for both linked artifacts and representative host build/runtime checks, including repeated create, update, animation, attachment, and dispose cycles.
@@ -40,4 +40,6 @@ description: Author source-native Three.js characters, creatures, and runtime ac
 - `./commands/create-code-character-profile.sh CHARACTER_ID --manifest MANIFEST --brief TEXT --intended-use TEXT [options]`
 - `./commands/validate-code-character-profile.sh [--strict|--complete] PROFILE.json`
 - `./commands/record-code-character-gate.sh PROFILE.json --gate GATE --decision DECISION --summary TEXT --strategy TEXT --evidence KIND=FILE [options]`
+- `./commands/measure-code-character-evidence.sh analyze PROFILE.json --measurements FILE --output REPORT.json [--compare REPORT.json]`
+- `./commands/measure-code-character-evidence.sh capture PROFILE.json --adapter ADAPTER.mjs --output-dir DIR [options]`
 - `./commands/record-code-model-review.sh MANIFEST.json --pass PASS --decision pass --summary TEXT --character-profile PROFILE.json --evidence VIEW=FILE ...`

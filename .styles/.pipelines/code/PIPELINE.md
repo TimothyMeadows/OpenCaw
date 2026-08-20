@@ -25,6 +25,7 @@ Author procedural Three.js models as reviewable TypeScript or JavaScript instead
 
 - Produce a typed factory returning the host model interface or an instance containing `root`, semantic `parts`, `anchors`, optional `update`, and `dispose`.
 - Bind implementation and review evidence to a validated code-model manifest.
+- For characters and creatures, bind deterministic observations to the linked character profile and preserve the machine-versus-reviewer boundary in the evidence report.
 - Store review renders and task state outside runtime asset directories.
 
 ## Acceptance Checks

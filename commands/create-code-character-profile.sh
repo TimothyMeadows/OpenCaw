@@ -23,6 +23,10 @@ Options:
   --skeleton-id ID              Skeleton identity for skinned motion
   --max-influences N            Maximum skin influences per vertex
   --animation-role ID           Repeatable required animation role
+  --grounding-tolerance-ratio N Normalized ground-contact tolerance (default: 0.01)
+  --contact-tolerance-ratio N   Normalized animation-contact tolerance (default: 0.02)
+  --construction-runs N         Determinism calibration runs, minimum 2 (default: 3)
+  --lifecycle-cycles N          Repeated ownership cycles (default: 3)
   --max-gate-attempts N         Maximum attempts per character gate (default: 3)
   --repeated-failure-limit N     Escalation threshold for one failure class (default: 2)
 EOF

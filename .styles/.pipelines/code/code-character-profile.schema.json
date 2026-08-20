@@ -205,7 +205,12 @@
                 "id": { "const": "structure-integrity" },
                 "pass": { "const": "structure" },
                 "type": { "const": "machine" },
-                "required": { "const": true }
+                "required": { "const": true },
+                "claim": {
+                  "properties": {
+                    "thresholds": { "$ref": "#/$defs/structureThresholds" }
+                  }
+                }
               }
             }
           ]
@@ -244,7 +249,12 @@
                 "id": { "const": "interaction-runtime" },
                 "pass": { "const": "interaction" },
                 "type": { "const": "machine" },
-                "required": { "const": true }
+                "required": { "const": true },
+                "claim": {
+                  "properties": {
+                    "thresholds": { "$ref": "#/$defs/interactionThresholds" }
+                  }
+                }
               }
             }
           ]
@@ -257,7 +267,12 @@
                 "id": { "const": "optimization-budget" },
                 "pass": { "const": "optimization" },
                 "type": { "const": "machine" },
-                "required": { "const": true }
+                "required": { "const": true },
+                "claim": {
+                  "properties": {
+                    "thresholds": { "$ref": "#/$defs/optimizationThresholds" }
+                  }
+                }
               }
             }
           ]
@@ -288,6 +303,32 @@
         { "type": "number", "minimum": 0 },
         { "type": "null" }
       ]
+    },
+    "structureThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groundingToleranceRatio"],
+      "properties": {
+        "groundingToleranceRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "interactionThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contactToleranceRatio", "lifecycleCycles"],
+      "properties": {
+        "contactToleranceRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "lifecycleCycles": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "optimizationThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constructionRuns", "lifecycleCycles"],
+      "properties": {
+        "constructionRuns": { "type": "integer", "minimum": 2 },
+        "lifecycleCycles": { "type": "integer", "minimum": 1 }
+      }
     },
     "part": {
       "type": "object",

@@ -466,6 +466,7 @@ Commands:
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
 - `commands/record-code-character-gate.sh`
+- `commands/measure-code-character-evidence.sh`
 - `commands/validate-rigged-actor-manifest.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
@@ -751,6 +752,7 @@ Commands:
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
 - `commands/record-code-character-gate.sh`
+- `commands/measure-code-character-evidence.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
@@ -823,6 +825,7 @@ Commands:
 - `commands/create-code-character-profile.sh`
 - `commands/validate-code-character-profile.sh`
 - `commands/record-code-character-gate.sh`
+- `commands/measure-code-character-evidence.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/validate-gameplay-review.sh`
 - `commands/validate-rigged-actor-manifest.sh`
