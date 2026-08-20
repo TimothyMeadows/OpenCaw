@@ -15,6 +15,7 @@
 - PASS: `tests/test-code-character-integration.sh` (4 sections).
 - PASS: `tests/test-blender-art-capabilities.sh` (8 sections) and `tests/test-external-asset-library.sh` (7 sections), preserving adjacent art-pipeline ownership.
 - PASS: source-identity exclusion scan and `git diff --check`.
+- PASS: Goal completion report generation and live topology review for PRs #117–#120; every PR is open, targets its recorded stacked base, is GitHub-reported mergeable, and has auto-merge disabled.
 
 ## Behavior and Compatibility Evidence
 

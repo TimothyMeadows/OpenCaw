@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented; local validation passed in Goal Flow.
+Completed in Goal Flow; PR open and initial post-PR QA passed.
 
 ## Flow
 
@@ -51,3 +51,5 @@ https://github.com/TimothyMeadows/OpenCaw/issues/116
 - Kept generic CODE callers unchanged and retained GLB/FBX runtime packages under the existing rigged-actor capability.
 - Updated skill/pipeline indexes, role-command ownership, capability dispositions, durable memory, and the semantic repository map without adding a dependency, installer, provider, asset, or publication workflow.
 - Registered a lightweight integration suite in the main validator and ran the complete affected supported-environment matrix without unrelated delivery-mode suites.
+- Published as https://github.com/TimothyMeadows/OpenCaw/pull/120 with initial post-PR QA evidence at https://github.com/TimothyMeadows/OpenCaw/pull/120#issuecomment-5352438565; final-head QA follows Goal-report generation.
+- Generated `.ai/goals/threejs-code-characters/GOAL_REPORT.md` with the ordered PR chain, QA evidence, compatibility proof, residual risks, and live mergeability/auto-merge review.
