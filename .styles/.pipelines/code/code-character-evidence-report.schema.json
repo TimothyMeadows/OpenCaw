@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/code-character-evidence-report-v1.json",
+  "title": "OpenCaw Code Character Evidence Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "characterId", "captureMode", "trustedMachineEvidence", "trustReason", "contracts", "observationSha256", "overallDecision", "gateResults", "comparison", "reviewerBoundary"],
+  "properties": {
+    "schemaVersion": { "const": "opencaw-code-character-evidence/v1" },
+    "characterId": { "type": "string" },
+    "captureMode": { "enum": ["browser", "fixture"] },
+    "trustedMachineEvidence": { "type": "boolean" },
+    "trustReason": { "type": "string", "minLength": 1 },
+    "contracts": { "type": "object" },
+    "observationSha256": { "$ref": "#/$defs/sha256" },
+    "overallDecision": { "enum": ["pass", "fail"] },
+    "gateResults": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        { "$ref": "#/$defs/structureGate" },
+        { "$ref": "#/$defs/interactionGate" },
+        { "$ref": "#/$defs/optimizationGate" }
+      ],
+      "items": false
+    },
+    "comparison": { "type": ["object", "null"] },
+    "reviewerBoundary": { "type": "string", "minLength": 1 },
+    "browserSecurity": { "type": "object" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "observed", "expected", "rationale"],
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "enum": ["pass", "fail", "not-applicable"] },
+        "observed": {},
+        "expected": {},
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "decision", "checks"],
+      "properties": {
+        "id": { "type": "string" },
+        "decision": { "enum": ["pass", "fail"] },
+        "checks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/check" } }
+      }
+    },
+    "structureGate": { "allOf": [{ "$ref": "#/$defs/gate" }, { "properties": { "id": { "const": "structure-integrity" } } }] },
+    "interactionGate": { "allOf": [{ "$ref": "#/$defs/gate" }, { "properties": { "id": { "const": "interaction-runtime" } } }] },
+    "optimizationGate": { "allOf": [{ "$ref": "#/$defs/gate" }, { "properties": { "id": { "const": "optimization-budget" } } }] }
+  }
+}

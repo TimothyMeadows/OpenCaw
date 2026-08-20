@@ -90,7 +90,7 @@ if (/\.media\/(?:CLOUD_SESSION\.md|COMFYUI_LOCAL\.md|INDEX\.md|media-generation-
 if (/\.styles\/\.gpu(?:\/|`)/.test(content)) {
   errors.push('README contains a stale legacy .styles/.gpu path.');
 }
-for (const required of ['CLOUD', 'LOCAL', 'CSS3', 'CODE', 'BLENDER', 'resolve-art-pipeline.sh', 'create-code-model-manifest.sh', 'list-external-asset-libraries.sh', 'inspect-external-asset-library.sh', 'copy-external-asset.sh', 'assets/models/']) {
+for (const required of ['CLOUD', 'LOCAL', 'CSS3', 'CODE', 'BLENDER', 'resolve-art-pipeline.sh', 'create-code-model-manifest.sh', 'create-code-character-profile.sh', 'validate-code-character-profile.sh', 'record-code-character-calibration.sh', 'record-code-character-gate.sh', 'measure-code-character-evidence.sh', 'code-character-profile.schema.json', 'code-character-observation.schema.json', 'code-character-evidence-report.schema.json', 'list-external-asset-libraries.sh', 'inspect-external-asset-library.sh', 'copy-external-asset.sh', 'assets/models/']) {
   if (!content.includes(required)) errors.push(`README omits art-pipeline documentation: ${required}`);
 }
 

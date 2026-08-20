@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/code-character-observation-v1.json",
+  "title": "OpenCaw Code Character Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "capture", "structure", "motion", "runtime"],
+  "properties": {
+    "schemaVersion": { "const": "opencaw-code-character-observation/v1" },
+    "capture": {
+      "type": "object",
+      "required": ["seed", "viewport", "views", "externalRequests", "serviceWorkers"],
+      "properties": {
+        "seed": { "type": "integer" },
+        "viewport": {
+          "type": "object",
+          "required": ["width", "height", "pixelRatio"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "pixelRatio": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1 },
+              "path": { "type": "string", "minLength": 1 },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        },
+        "externalRequests": { "type": "array", "items": { "type": "string" } },
+        "serviceWorkers": { "const": "blocked" }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "required": ["coordinateSystem", "pivotStable", "finiteTransforms", "boundsFinite", "parts", "anchors", "joints", "sockets", "colliders", "minimumY", "groundY", "height", "attachmentGaps", "symmetry"],
+      "properties": {
+        "coordinateSystem": { "type": "string", "minLength": 1 },
+        "pivotStable": { "type": "boolean" },
+        "finiteTransforms": { "type": "boolean" },
+        "boundsFinite": { "type": "boolean" },
+        "parts": { "type": "array", "items": { "$ref": "#/$defs/part" } },
+        "anchors": { "$ref": "#/$defs/stringArray" },
+        "joints": { "$ref": "#/$defs/stringArray" },
+        "sockets": { "$ref": "#/$defs/stringArray" },
+        "colliders": { "$ref": "#/$defs/stringArray" },
+        "minimumY": { "type": "number" },
+        "groundY": { "type": "number" },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "attachmentGaps": { "type": "array", "items": { "$ref": "#/$defs/attachmentGap" } },
+        "symmetry": { "type": "array", "items": { "$ref": "#/$defs/symmetry" } }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "required": ["mode", "skeletonId", "maxInfluencesPerVertex", "weightsFiniteNormalized", "deformationBoundsFinite", "roles", "poses", "contacts", "movingPartCount"],
+      "properties": {
+        "mode": { "enum": ["static", "articulated", "skinned"] },
+        "skeletonId": { "type": ["string", "null"] },
+        "maxInfluencesPerVertex": { "type": "integer", "minimum": 0 },
+        "weightsFiniteNormalized": { "type": "boolean" },
+        "deformationBoundsFinite": { "type": "boolean" },
+        "roles": { "$ref": "#/$defs/stringArray" },
+        "poses": { "$ref": "#/$defs/stringArray" },
+        "contacts": { "type": "array", "items": { "$ref": "#/$defs/contact" } },
+        "movingPartCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["constructionHashes", "lifecycle", "actors", "metrics"],
+      "properties": {
+        "constructionHashes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "lifecycle": { "type": "array", "items": { "$ref": "#/$defs/lifecycle" } },
+        "actors": { "type": "integer", "minimum": 1 },
+        "metrics": { "$ref": "#/$defs/metrics" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "stringArray": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "part": {
+      "type": "object",
+      "required": ["id", "parent"],
+      "properties": { "id": { "type": "string" }, "parent": { "type": ["string", "null"] } }
+    },
+    "attachmentGap": {
+      "type": "object",
+      "required": ["part", "host", "gapRatio"],
+      "properties": { "part": { "type": "string" }, "host": { "type": "string" }, "gapRatio": { "type": "number", "minimum": 0 } }
+    },
+    "symmetry": {
+      "type": "object",
+      "required": ["id", "deviationRatio"],
+      "properties": { "id": { "type": "string" }, "deviationRatio": { "type": "number", "minimum": 0 } }
+    },
+    "contact": {
+      "type": "object",
+      "required": ["id", "errorRatio"],
+      "properties": { "id": { "type": "string" }, "errorRatio": { "type": "number", "minimum": 0 } }
+    },
+    "lifecycle": {
+      "type": "object",
+      "required": ["cycle", "resourceDelta", "staleCallbacks"],
+      "properties": {
+        "cycle": { "type": "integer", "minimum": 1 },
+        "resourceDelta": { "type": "integer", "minimum": 0 },
+        "staleCallbacks": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["triangles", "drawCalls", "materials", "textures", "bones", "clips", "shaderVariants", "textureBytes", "cpuMilliseconds", "gpuMilliseconds"],
+      "properties": {
+        "triangles": { "type": "integer", "minimum": 0 },
+        "drawCalls": { "type": "integer", "minimum": 0 },
+        "materials": { "type": "integer", "minimum": 0 },
+        "textures": { "type": "integer", "minimum": 0 },
+        "bones": { "type": "integer", "minimum": 0 },
+        "clips": { "type": "integer", "minimum": 0 },
+        "shaderVariants": { "type": "integer", "minimum": 0 },
+        "textureBytes": { "type": "integer", "minimum": 0 },
+        "cpuMilliseconds": { "type": ["number", "null"], "minimum": 0 },
+        "gpuMilliseconds": { "type": ["number", "null"], "minimum": 0 }
+      }
+    }
+  }
+}

@@ -59,8 +59,10 @@ Add thin Bash wrappers over one deterministic Node command library:
 
 - `create-code-character-profile.sh CHARACTER_ID --manifest MANIFEST [options]`
 - `validate-code-character-profile.sh [--strict|--complete] PROFILE`
+- `record-code-character-calibration.sh PROFILE --gate GATE --passing REPORT --failing REPORT [options]`
 - `record-code-character-gate.sh PROFILE --gate GATE --decision DECISION --summary TEXT [options]`
-- `measure-code-character-evidence.sh PROFILE --url URL --output DIR [options]`
+- `measure-code-character-evidence.sh analyze PROFILE --measurements FILE --output REPORT [--compare REPORT]`
+- `measure-code-character-evidence.sh capture PROFILE --adapter ADAPTER.mjs --output-dir DIR [options]`
 
 Extend `record-code-model-review.sh` with an optional `--character-profile PROFILE`. Existing calls remain unchanged. When present, a `pass` decision is accepted only after every required character gate owned by that pass is current and passing.
 
@@ -70,7 +72,7 @@ Extend `record-code-model-review.sh` with an optional `--character-profile PROFI
 - Capture profile-selected orthographic and contextual views at deterministic camera, lighting, viewport, seed, pose, and renderer settings.
 - Produce full renders, semantic-part masks, low-resolution readability renders derived from intended on-screen size, isolated-part views where context remains meaningful, runtime captures, and machine-readable reports.
 - Record configuration, adapter, source, linked manifest, evidence, and comparison hashes.
-- Support revision comparisons such as mask overlap, bounds, mass distribution, part visibility, and outline change as evidence. A numeric result cannot independently approve an aesthetic gate.
+- Support hash-bound revision comparisons that record prior source and machine-gate decisions without revealing or manufacturing a subjective target. A numeric result cannot independently approve an aesthetic gate.
 - Build reviewer packets with only the frozen intent/questions and relevant evidence. Record reviewer type, invocation or human decision identifier, verdict, observed answer, remaining gap, packet hash, and evidence hashes.
 - Reject reviewer identity overlap with the active builder identity set for the same acceptance cycle.
 

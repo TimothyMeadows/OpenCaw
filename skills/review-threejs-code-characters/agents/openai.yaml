@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Three.js Code Characters"
+  short_description: "Review source-native Three.js characters and creatures."
+  default_prompt: "Use $review-threejs-code-characters to independently review a source-native Three.js character or creature."

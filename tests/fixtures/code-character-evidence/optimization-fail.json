@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "opencaw-code-character-observation/v1",
+  "capture": {
+    "seed": 1337,
+    "viewport": { "width": 900, "height": 600, "pixelRatio": 1 },
+    "views": [
+      { "key": "front:32:whole" },
+      { "key": "front:32:semantic-mask" },
+      { "key": "front:32:isolated:torso" },
+      { "key": "runtime:runtime:whole" }
+    ],
+    "externalRequests": [],
+    "serviceWorkers": "blocked"
+  },
+  "structure": {
+    "coordinateSystem": "Y-up, right-handed, local origin at ground center",
+    "pivotStable": true, "finiteTransforms": true, "boundsFinite": true,
+    "parts": [{ "id": "torso", "parent": null }],
+    "anchors": ["origin"],
+    "joints": [], "sockets": [], "colliders": [],
+    "minimumY": 0, "groundY": 0, "height": 1,
+    "attachmentGaps": [], "symmetry": []
+  },
+  "motion": {
+    "mode": "static", "skeletonId": null, "maxInfluencesPerVertex": 0,
+    "weightsFiniteNormalized": true, "deformationBoundsFinite": true,
+    "roles": [], "poses": [], "contacts": [], "movingPartCount": 0
+  },
+  "runtime": {
+    "constructionHashes": ["construction-a", "construction-b", "construction-c"],
+    "lifecycle": [
+      { "cycle": 1, "resourceDelta": 0, "staleCallbacks": 0 },
+      { "cycle": 2, "resourceDelta": 0, "staleCallbacks": 0 },
+      { "cycle": 3, "resourceDelta": 0, "staleCallbacks": 0 }
+    ],
+    "actors": 1,
+    "metrics": { "triangles": 12, "drawCalls": 1, "materials": 1, "textures": 0, "bones": 0, "clips": 0, "shaderVariants": 1, "textureBytes": 0, "cpuMilliseconds": null, "gpuMilliseconds": null }
+  }
+}

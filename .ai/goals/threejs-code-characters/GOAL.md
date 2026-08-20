@@ -32,23 +32,23 @@ Deliver a complete OpenCaw-native character and creature specialization for the 
 - Execute tasks sequentially because each later task depends on interfaces established by its predecessor.
 
 ## Task Queue
-1. [ ] Build the code-character contract and gate state (`.ai/tasks/threejs-character-contract/TASK.md`)
-2. [ ] Add code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
-3. [ ] Add deterministic character evidence and runtime gates (`.ai/tasks/threejs-character-evidence/TASK.md`)
-4. [ ] Integrate and document code-character production (`.ai/tasks/threejs-character-integration/TASK.md`)
+1. [x] Build the code-character contract and gate state (`.ai/tasks/threejs-character-contract/TASK.md`)
+2. [x] Add code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
+3. [x] Add deterministic character evidence and runtime gates (`.ai/tasks/threejs-character-evidence/TASK.md`)
+4. [x] Integrate and document code-character production (`.ai/tasks/threejs-character-integration/TASK.md`)
 
 ## Current Task
 
-- `threejs-character-contract`
+- `complete`
 
 ## Branch Chain
 - Record each task as: `task-name | base: <branch> | head: <branch> | PR: <url> | depends on: <prior task or none>`.
 - If a later task requires unmerged work from a previous task, or would likely create merge conflicts when based on the original base branch, branch from the previous task branch or PR head.
 - Keep stacked branches ordered so human approval can happen from earliest dependency to latest dependent PR.
-- `threejs-character-contract | base: main | head: feature/threejs-character-contract | PR: pending | depends on: none`
-- `threejs-character-skills | base: feature/threejs-character-contract | head: feature/threejs-character-skills | PR: pending | depends on: threejs-character-contract`
-- `threejs-character-evidence | base: feature/threejs-character-skills | head: feature/threejs-character-evidence | PR: pending | depends on: threejs-character-skills`
-- `threejs-character-integration | base: feature/threejs-character-evidence | head: feature/threejs-character-integration | PR: pending | depends on: threejs-character-evidence`
+- `threejs-character-contract | base: main | head: feature/threejs-character-contract | PR: https://github.com/TimothyMeadows/OpenCaw/pull/117 | depends on: none`
+- `threejs-character-skills | base: feature/threejs-character-contract | head: feature/threejs-character-skills | PR: https://github.com/TimothyMeadows/OpenCaw/pull/118 | depends on: threejs-character-contract`
+- `threejs-character-evidence | base: feature/threejs-character-skills | head: feature/threejs-character-evidence | PR: https://github.com/TimothyMeadows/OpenCaw/pull/119 | depends on: threejs-character-skills`
+- `threejs-character-integration | base: feature/threejs-character-evidence | head: feature/threejs-character-integration | PR: https://github.com/TimothyMeadows/OpenCaw/pull/120 | depends on: threejs-character-evidence`
 
 ## Automation Rules
 - Complete one task at a time unless the project-manager lane plan explicitly marks safe parallel work.
@@ -63,16 +63,29 @@ Deliver a complete OpenCaw-native character and creature specialization for the 
 
 ## PRs
 
-- Pending task validation and publication.
+- Task 1: https://github.com/TimothyMeadows/OpenCaw/pull/117
+- Task 2: https://github.com/TimothyMeadows/OpenCaw/pull/118
+- Task 3: https://github.com/TimothyMeadows/OpenCaw/pull/119
+- Task 4: https://github.com/TimothyMeadows/OpenCaw/pull/120
 
 ## QA Evidence
 
-- Pending task PR publication.
+- Task 1 PASS: https://github.com/TimothyMeadows/OpenCaw/pull/117#issuecomment-5351851600
+- Task 2 PASS: https://github.com/TimothyMeadows/OpenCaw/pull/118#issuecomment-5351973755
+- Task 3 PASS: https://github.com/TimothyMeadows/OpenCaw/pull/119#issuecomment-5352210639
+- Task 4 initial PASS: https://github.com/TimothyMeadows/OpenCaw/pull/120#issuecomment-5352438565
+- Task 4 Goal-report-head PASS: https://github.com/TimothyMeadows/OpenCaw/pull/120#issuecomment-5352469057
 
 ## Goal Completion Report
 - Generate with `./commands/create-goal-completion-report.sh "threejs-code-characters"`.
 - Include PR links in dependency order, branch base/head notes, post-PR QA evidence, and merge-conflict risk notes.
 - Use this report for human approval after goal completion; do not merge automatically.
+
+## Completion
+
+- Completed in Goal Flow on 2026-08-19.
+- Goal-report-head QA passed on PR #120 at `4ee378ee22ae122cb6bf70701e988189ce3d735c`.
+- Human approval and merges remain pending in the dependency order recorded by `GOAL_REPORT.md`.
 
 ## Review Notes
 

@@ -53,11 +53,89 @@ printf '%s\n' \
   "  const anchors = new Map([['origin', root], ['head-pivot', root]]);" \
   '  return { root, parts, anchors, dispose() { root.traverse((item) => item.geometry?.dispose?.()); } };' \
   '}' > "$project/src/models/test-character.ts"
-for state in passing failing; do printf '%s calibration\n' "$state" > "$project/evidence/calibration-$state.json"; done
+printf 'export function createCodeCharacterEvidenceAdapter() { return {}; }\n' > "$project/evidence/adapter.mjs"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || fail "Node.js is required for the test fixture"
 node_profile="$profile"
-if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then node_profile="$(wslpath -w "$profile")"; fi
+node_manifest="$manifest"
+node_source="$project/src/models/test-character.ts"
+node_character_cli="$repo_root/commands/lib/code-character-cli.cjs"
+node_evidence_dir="$project/evidence"
+if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  node_profile="$(wslpath -w "$profile")"
+  node_manifest="$(wslpath -w "$manifest")"
+  node_source="$(wslpath -w "$node_source")"
+  node_character_cli="$(wslpath -w "$node_character_cli")"
+  node_evidence_dir="$(wslpath -w "$node_evidence_dir")"
+fi
+"$node_bin" - "$node_profile" "$node_manifest" "$node_source" "$node_character_cli" "$node_evidence_dir" <<'NODE'
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const [profilePath, manifestPath, sourcePath, cliPath, evidenceDir] = process.argv.slice(2);
+const { contractHashes, profileMeasurementProjection } = require(cliPath);
+const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+const canonical = (value) => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object'
+  ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])])) : value;
+const objectSha = (value) => crypto.createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
+const fileSha = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const machineIds = ['structure-integrity', 'interaction-runtime', 'optimization-budget'];
+const hashes = contractHashes(profile, manifest);
+const adapterPath = path.join(evidenceDir, 'adapter.mjs');
+for (const target of machineIds) {
+  for (const decision of ['pass', 'fail']) {
+    const gateResults = machineIds.map((id) => ({
+      id,
+      decision: id === target ? decision : 'pass',
+      checks: [{ id: 'calibration-contract', status: id === target && decision === 'fail' ? 'fail' : 'pass', observed: decision, expected: id === target ? decision : 'pass', rationale: 'Focused transaction-contract calibration fixture.' }]
+    }));
+    const report = {
+      schemaVersion: 'opencaw-code-character-evidence/v1',
+      characterId: profile.characterId,
+      captureMode: 'fixture',
+      trustedMachineEvidence: false,
+      trustReason: 'Transaction-contract calibration fixture.',
+      contracts: {
+        profile: { path: '.ai/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
+        manifest: { path: '.ai/tasks/character-test/code-model.json', sha256: hashes.manifest },
+        source: { path: 'src/models/test-character.ts', sha256: fileSha(sourcePath) }
+      },
+      observationSha256: '0'.repeat(64),
+      overallDecision: decision,
+      gateResults,
+      comparison: null,
+      reviewerBoundary: 'Transaction tests do not grant aesthetic approval.'
+    };
+    fs.writeFileSync(path.join(evidenceDir, `${target}-${decision}.json`), `${JSON.stringify(report, null, 2)}\n`);
+  }
+  const browserReport = {
+    schemaVersion: 'opencaw-code-character-evidence/v1',
+    characterId: profile.characterId,
+    captureMode: 'browser',
+    trustedMachineEvidence: true,
+    trustReason: 'Sandboxed browser transaction fixture.',
+    contracts: {
+      profile: { path: '.ai/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
+      manifest: { path: '.ai/tasks/character-test/code-model.json', sha256: hashes.manifest },
+      source: { path: 'src/models/test-character.ts', sha256: fileSha(sourcePath) },
+      adapter: { path: 'evidence/adapter.mjs', sha256: fileSha(adapterPath) },
+      captureConfiguration: { sha256: objectSha({ target, fixture: 'transaction' }) }
+    },
+    observationSha256: objectSha({ target, observation: 'transaction' }),
+    overallDecision: 'pass',
+    gateResults: machineIds.map((id) => ({ id, decision: 'pass', checks: [{ id: 'transaction-contract', status: 'pass', observed: 'pass', expected: 'pass', rationale: 'Trusted machine-result transaction fixture.' }] })),
+    comparison: null,
+    reviewerBoundary: 'Transaction tests do not grant aesthetic approval.',
+    browserSecurity: { origin: 'http://127.0.0.1:43123', osAssignedPort: true, chromiumSandbox: true, serviceWorkers: 'blocked', externalRequests: [] }
+  };
+  fs.writeFileSync(path.join(evidenceDir, `${target}-browser.json`), `${JSON.stringify(browserReport, null, 2)}\n`);
+}
+NODE
+for gate in structure-integrity interaction-runtime optimization-budget; do
+  project_command bash commands/record-code-character-calibration.sh "$profile" --gate "$gate" \
+    --passing "evidence/$gate-pass.json" --failing "evidence/$gate-fail.json" >/dev/null
+done
 cycle_profile="$project/.ai/tasks/character-test/cyclic-character.json"
 cp "$profile" "$cycle_profile"
 node_cycle_profile="$cycle_profile"
@@ -86,18 +164,6 @@ NODE
 expect_failure "$runtime_dir/optional-gate.log" bash commands/validate-code-character-profile.sh --strict "$gate_tamper_profile"
 grep -Fq 'must be required reviewer gate blockout-readability for blockout' "$runtime_dir/optional-gate.log" \
   || fail "optional character gate did not reach the immutable gate-contract check"
-pass_sha="$(sha256sum "$project/evidence/calibration-passing.json" | awk '{print $1}')"
-fail_sha="$(sha256sum "$project/evidence/calibration-failing.json" | awk '{print $1}')"
-"$node_bin" - "$node_profile" "$pass_sha" "$fail_sha" <<'NODE'
-const fs = require('fs');
-const [profilePath, passingSha, failingSha] = process.argv.slice(2);
-const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
-for (const gate of profile.gates.filter((item) => item.type === 'machine')) {
-  gate.calibration.passing = [{ path: 'evidence/calibration-passing.json', sha256: passingSha }];
-  gate.calibration.failing = [{ path: 'evidence/calibration-failing.json', sha256: failingSha }];
-}
-fs.writeFileSync(profilePath, `${JSON.stringify(profile, null, 2)}\n`);
-NODE
 printf 'first reviewer packet\n' > "$project/evidence/blockout-packet-1.md"
 printf 'first blockout evidence\n' > "$project/evidence/blockout-1.txt"
 expect_failure "$runtime_dir/early-parent-pass.log" bash commands/record-code-model-review.sh "$manifest" \
@@ -170,6 +236,13 @@ for pass in blockout structure form materials interaction optimization; do
     printf '%s independent packet\n' "$gate" > "$project/evidence/$gate-packet.md"
     record_args+=(--reviewer-id independent-reviewer --reviewer-type agent --reviewer-packet "evidence/$gate-packet.md"
       --observed-answer "$gate is readable against the frozen question" --evidence "reviewer-packet=evidence/$gate-packet.md")
+  else
+    expect_failure "$runtime_dir/$gate-untrusted-pass.log" bash commands/record-code-character-gate.sh "$profile" \
+      --gate "$gate" --decision pass --summary 'untrusted machine pass' \
+      --strategy "attempt $gate without trusted browser evidence" --evidence "metric=evidence/$gate.txt"
+    grep -Fq 'requires exactly one machine-report evidence file' "$runtime_dir/$gate-untrusted-pass.log" \
+      || fail "$gate accepted or misreported an untrusted machine pass"
+    record_args+=(--evidence "machine-report=evidence/$gate-browser.json")
   fi
   project_command bash commands/record-code-character-gate.sh "${record_args[@]}" >/dev/null
   project_command bash commands/record-code-model-review.sh "$manifest" --pass "$pass" --decision pass --summary "$pass accepted" \

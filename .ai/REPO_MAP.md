@@ -1,6 +1,6 @@
 # Repository Map
 
-<!-- OPENCAW_REPO_MAP_FINGERPRINT: aa1cf44c57fef3f19d244344eb5e02ad1ab6bdc09765100bd440ff262905b861 -->
+<!-- OPENCAW_REPO_MAP_FINGERPRINT: e6624bd35f403a402f72dcc9bfee5eaea01bc014519c310717647c5585b2c918 -->
 
 - [kind:component] [scope:core] `AGENTS.md` is the authoritative OpenCaw baseline contract for startup, memory, task, verification, and delivery behavior.
 - [kind:architecture] [scope:core] OpenCaw's hierarchy is optional explicit persistent Brainstorm discovery, planning, then one sibling delivery mode: default task, explicit Goal, or explicit Gauntlet.
@@ -28,7 +28,11 @@
 - [kind:component] [area:styles] [area:media] `.styles/.pipelines/` owns CLOUD, LOCAL, CSS3, CODE, and BLENDER contracts plus shared provenance, local manifests, vector tokens, the code-model schema, and Blender 4.5 production boundaries.
 - [kind:command] [area:styles] [tech:bash] `commands/generate-style.sh` defaults to CSS3, records primary and allowed pipelines, and `commands/resolve-art-pipeline.sh` gives task-local prompt overrides precedence without silent fallback.
 - [kind:command] [area:media] [tech:bash] `commands/generate-media-contract.sh` composes CLOUD with optional LOCAL execution; local install, model, and inspection commands resolve pinned assets from `.styles/.pipelines/local/`.
-- [kind:component] [area:threejs] [tech:typescript] `build-threejs-code-models` and the code-model manifest commands govern procedural source through six ordered passes, deterministic budgets, semantic parts/anchors, disposal, and hashed multi-view evidence.
+- [kind:component] [area:threejs] [tech:typescript] `build-threejs-code-models` and the code-model manifest commands govern generic procedural source through six ordered passes, deterministic budgets, semantic parts/anchors, disposal, and hashed multi-view evidence; generic callers need no character sidecar.
+- [kind:component] [area:threejs] [area:skills] `build-threejs-code-characters` owns source-native embodied actor production through a linked `opencaw-code-character/v1` profile, while `review-threejs-code-characters` owns answer-neutral visual gates under concrete-cycle builder/reviewer identity separation.
+- [kind:command] [area:threejs] [tech:bash] `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `record-code-character-calibration.sh`, and `record-code-character-gate.sh` create, freeze calibrated reports for, and transactionally advance six ordered linked gates; `measure-code-character-evidence.sh` analyzes untrusted calibration fixtures or captures trusted loopback-only sandboxed browser evidence without installing host tooling.
+- [kind:config] [area:threejs] [area:styles] Character profile, observation, and evidence-report schemas live beside the CODE pipeline and separate reviewer-owned readability/style decisions from calibrated machine-owned structure, interaction/runtime, and optimization/budget facts.
+- [kind:test] [area:threejs] [tech:bash] `tests/test-code-character-contract.sh`, `test-code-character-skills.sh`, `test-code-character-evidence.sh`, and `test-code-character-integration.sh` verify linked gate transactions, role/reviewer separation, static/articulated/skinned applicability, confinement, calibration, generic CODE compatibility, and public documentation.
 - [kind:config] [area:styles] [area:assets] `STYLE.md` may optionally name absolute read-only external 3D asset-library roots; configured libraries are source precedence rather than art pipelines and are never prompted for during startup.
 - [kind:command] [area:assets] [tech:bash] `list-external-asset-libraries.sh`, `inspect-external-asset-library.sh`, and `copy-external-asset.sh` parse configured roots, inventory without loading, and copy hash-verified files or bundles into namespaced `assets/models/` destinations without following links or overwriting.
 - [kind:test] [area:assets] [area:styles] [tech:bash] `tests/test-external-asset-library.sh` verifies optional generation, preservation/clearing, POSIX/Windows/UNC syntax, source immutability, copy-first hashes, confinement, overlap, symlink, and no-library behavior.
