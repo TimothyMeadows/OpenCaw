@@ -2,7 +2,7 @@
 
 ## Status
 
-Queued in Goal Flow.
+Implemented; local validation passed in Goal Flow.
 
 ## Flow
 
@@ -49,3 +49,10 @@ https://github.com/TimothyMeadows/OpenCaw/issues/114
 - Base: `feature/threejs-character-contract`
 - Head: `feature/threejs-character-skills`
 - Depends on: `threejs-character-contract`
+
+## Review Notes
+
+- Added separate builder and answer-neutral reviewer skills using the canonical skill initializer.
+- Kept generic props and environments routed through `build-threejs-code-models` while specializing embodied actor prompts.
+- Routed builder ownership to technical-3D, gameplay, and frontend roles; routed reviewer ownership to technical-3D, QA, and game-design roles.
+- Froze one-level design, gate, rig/animation, reviewer-packet, and failure-recovery references without executable helpers or auxiliary files.

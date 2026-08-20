@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Three.js Code Characters"
+  short_description: "Build source-native Three.js characters and creatures."
+  default_prompt: "Use $build-threejs-code-characters to author and verify a source-native Three.js character or creature."

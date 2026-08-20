@@ -10,6 +10,7 @@ description: Author procedural Three.js TypeScript or JavaScript models from a t
 - The resolved art pipeline is `CODE`.
 - A web, frontend, game, or technical-3D task needs a procedural Three.js model authored in source.
 - Optional reference images are authorized for review evidence but must not become runtime dependencies.
+- Route characters, creatures, animated actors, enemies, NPCs, avatars, mounts, and other embodied subjects to `build-threejs-code-characters`; keep props, environments, and generic procedural models in this skill.
 
 ## Workflow
 

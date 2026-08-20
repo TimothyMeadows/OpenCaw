@@ -440,6 +440,8 @@ Skills:
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `build-threejs-code-models`
+- `build-threejs-code-characters`
+- `review-threejs-code-characters`
 - `prepare-rigged-runtime-actors`
 - `model-blender-assets`
 - `rig-and-animate-blender-actors`
@@ -461,6 +463,9 @@ Commands:
 - `commands/validate-code-model-manifest.sh`
 - `commands/next-code-model-pass.sh`
 - `commands/record-code-model-review.sh`
+- `commands/create-code-character-profile.sh`
+- `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-gate.sh`
 - `commands/validate-rigged-actor-manifest.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
@@ -719,6 +724,7 @@ Skills:
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `build-threejs-code-models`
+- `build-threejs-code-characters`
 - `design-web-experiences`
 - `design-ui-from-constraints`
 - `build-scroll-authored-web-experiences`
@@ -742,6 +748,9 @@ Commands:
 - `commands/validate-code-model-manifest.sh`
 - `commands/next-code-model-pass.sh`
 - `commands/record-code-model-review.sh`
+- `commands/create-code-character-profile.sh`
+- `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-gate.sh`
 - `commands/print-web-experience-brief.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
@@ -776,6 +785,7 @@ Skills:
 - `author-game-worlds`
 - `design-action-gameplay`
 - `test-playable-games`
+- `review-threejs-code-characters`
 - `maintain-art-style-contract`
 - `review-isometric-production`
 
@@ -783,6 +793,8 @@ Commands:
 
 - `commands/print-gameplay-system-brief.sh`
 - `commands/validate-gameplay-review.sh`
+- `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-gate.sh`
 - `commands/validate-style-contract.sh`
 - `commands/print-isometric-production-checklist.sh`
 
@@ -791,6 +803,7 @@ Commands:
 Skills:
 
 - `use-external-asset-library`
+- `build-threejs-code-characters`
 - `build-gameplay-runtime`
 - `build-game-production-tools`
 - `design-action-gameplay`
@@ -807,6 +820,9 @@ Commands:
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
 - `commands/copy-external-asset.sh`
+- `commands/create-code-character-profile.sh`
+- `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-gate.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/validate-gameplay-review.sh`
 - `commands/validate-rigged-actor-manifest.sh`
@@ -930,6 +946,7 @@ Commands:
 Skills:
 
 - `verify-and-explain`
+- `review-threejs-code-characters`
 - `review-blender-deliverables`
 - `capture-full-page-evidence`
 - `produce-browser-demo`
@@ -946,6 +963,8 @@ Skills:
 
 Commands:
 
+- `commands/validate-code-character-profile.sh`
+- `commands/record-code-character-gate.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
 - `commands/playwright-capture-page.sh`
