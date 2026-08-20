@@ -16,6 +16,7 @@ set -euo pipefail
 ./tests/test-brainstorm-flow.sh
 ./tests/test-selected-capability-import.sh
 ./tests/test-art-pipelines.sh
+./tests/test-code-character-contract.sh
 ./tests/test-blender-art-capabilities.sh
 ./tests/test-external-asset-library.sh
 ./tests/test-gauntlet-flow.sh

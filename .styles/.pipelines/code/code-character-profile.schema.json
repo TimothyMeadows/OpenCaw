@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/code-character-profile-v1.json",
+  "title": "OpenCaw Code Character Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "characterId",
+    "title",
+    "codeModel",
+    "intent",
+    "silhouette",
+    "structure",
+    "motion",
+    "budgets",
+    "reviewPolicy",
+    "gates"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "opencaw-code-character/v1" },
+    "characterId": { "$ref": "#/$defs/id" },
+    "title": { "$ref": "#/$defs/nonEmpty" },
+    "codeModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "modelId"],
+      "properties": {
+        "manifest": { "$ref": "#/$defs/relativePath" },
+        "modelId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "brief", "intendedUse", "presentation", "temperament", "identity", "signatureParts"],
+      "properties": {
+        "kind": { "enum": ["character", "creature"] },
+        "brief": { "$ref": "#/$defs/nonEmpty" },
+        "intendedUse": { "$ref": "#/$defs/nonEmpty" },
+        "presentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["distance", "pixelHeights", "representativeActors"],
+          "properties": {
+            "distance": { "enum": ["close", "mid", "far", "mixed"] },
+            "pixelHeights": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "integer", "minimum": 8, "maximum": 4096 }
+            },
+            "representativeActors": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "temperament": { "$ref": "#/$defs/nonEmpty" },
+        "identity": { "$ref": "#/$defs/nonEmpty" },
+        "signatureParts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "silhouette": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primaryView", "requiredViews", "negativeSpace", "asymmetryPolicy", "questions"],
+      "properties": {
+        "primaryView": { "$ref": "#/$defs/view" },
+        "requiredViews": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/view" }
+        },
+        "negativeSpace": { "$ref": "#/$defs/nonEmpty" },
+        "asymmetryPolicy": { "$ref": "#/$defs/nonEmpty" },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmpty" }
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coordinateSystem", "pivot", "grounding", "parts", "joints", "symmetryGroups", "attachments", "sockets", "colliders"],
+      "properties": {
+        "coordinateSystem": { "$ref": "#/$defs/nonEmpty" },
+        "pivot": { "$ref": "#/$defs/nonEmpty" },
+        "grounding": { "$ref": "#/$defs/nonEmpty" },
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/part" }
+        },
+        "joints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/joint" }
+        },
+        "symmetryGroups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/symmetryGroup" }
+        },
+        "attachments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attachment" }
+        },
+        "sockets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/socket" }
+        },
+        "colliders": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/collider" }
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "skeletonId", "maxInfluencesPerVertex", "requiredRoles", "clips", "representativePoses"],
+      "properties": {
+        "mode": { "enum": ["static", "articulated", "skinned"] },
+        "skeletonId": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "maxInfluencesPerVertex": { "type": "integer", "minimum": 0 },
+        "requiredRoles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "clips": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clip" }
+        },
+        "representativePoses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bones", "clips", "shaderVariants", "textureBytes", "representativeActors", "cpuMilliseconds", "gpuMilliseconds"],
+      "properties": {
+        "bones": { "type": "integer", "minimum": 0 },
+        "clips": { "type": "integer", "minimum": 0 },
+        "shaderVariants": { "type": "integer", "minimum": 0 },
+        "textureBytes": { "type": "integer", "minimum": 0 },
+        "representativeActors": { "type": "integer", "minimum": 1 },
+        "cpuMilliseconds": { "$ref": "#/$defs/optionalNonNegativeNumber" },
+        "gpuMilliseconds": { "$ref": "#/$defs/optionalNonNegativeNumber" }
+      }
+    },
+    "reviewPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["builderIds", "independentReview", "maxGateAttempts", "repeatedFailureLimit"],
+      "properties": {
+        "builderIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "independentReview": { "const": true },
+        "maxGateAttempts": { "type": "integer", "minimum": 1 },
+        "repeatedFailureLimit": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "prefixItems": [
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "blockout-readability" },
+                "pass": { "const": "blockout" },
+                "type": { "const": "reviewer" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "structure-integrity" },
+                "pass": { "const": "structure" },
+                "type": { "const": "machine" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "form-readability" },
+                "pass": { "const": "form" },
+                "type": { "const": "reviewer" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "materials-style" },
+                "pass": { "const": "materials" },
+                "type": { "const": "reviewer" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "interaction-runtime" },
+                "pass": { "const": "interaction" },
+                "type": { "const": "machine" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/gate" },
+            {
+              "properties": {
+                "id": { "const": "optimization-budget" },
+                "pass": { "const": "optimization" },
+                "type": { "const": "machine" },
+                "required": { "const": true }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "nonEmpty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "view": {
+      "enum": ["front", "rear", "left", "right", "top", "bottom", "orbit-left", "orbit-right", "hero", "runtime"]
+    },
+    "optionalNonNegativeNumber": {
+      "oneOf": [
+        { "type": "number", "minimum": 0 },
+        { "type": "null" }
+      ]
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parent", "role", "required"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "parent": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "role": { "enum": ["primary", "secondary", "detail"] },
+        "required": { "type": "boolean" }
+      }
+    },
+    "joint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parent", "semantic"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "parent": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "semantic": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "symmetryGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "members", "toleranceRatio"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "toleranceRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["part", "host", "toleranceRatio"],
+      "properties": {
+        "part": { "$ref": "#/$defs/id" },
+        "host": { "$ref": "#/$defs/id" },
+        "toleranceRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "socket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parent", "purpose"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "parent": { "$ref": "#/$defs/id" },
+        "purpose": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "collider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "parent", "shape"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["navigation", "hurt", "attack", "targeting", "interaction"] },
+        "parent": { "$ref": "#/$defs/id" },
+        "shape": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "clip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "loop", "rootMotion", "contacts"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "role": { "$ref": "#/$defs/id" },
+        "loop": { "type": "boolean" },
+        "rootMotion": { "enum": ["none", "runtime", "baked"] },
+        "contacts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "context", "rationale", "thresholds"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/id" },
+        "context": { "$ref": "#/$defs/nonEmpty" },
+        "rationale": { "$ref": "#/$defs/nonEmpty" },
+        "thresholds": { "type": "object" }
+      }
+    },
+    "calibrationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passing", "failing"],
+      "properties": {
+        "passing": { "type": "array", "items": { "$ref": "#/$defs/calibrationEvidence" } },
+        "failing": { "type": "array", "items": { "$ref": "#/$defs/calibrationEvidence" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "sha256"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/id" },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "packetPath", "packetSha256", "observedAnswer"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["agent", "human"] },
+        "packetPath": { "$ref": "#/$defs/relativePath" },
+        "packetSha256": { "$ref": "#/$defs/sha256" },
+        "observedAnswer": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "summary",
+        "remainingGaps",
+        "failureClass",
+        "strategySummary",
+        "strategySha256",
+        "reviewer",
+        "evidence",
+        "manifestContractSha256",
+        "profileContractSha256",
+        "sourceSha256",
+        "createdAt"
+      ],
+      "properties": {
+        "decision": { "enum": ["pass", "revise-spec", "revise-code", "request-input", "stop"] },
+        "summary": { "$ref": "#/$defs/nonEmpty" },
+        "remainingGaps": { "type": "string" },
+        "failureClass": { "type": "string" },
+        "strategySummary": { "$ref": "#/$defs/nonEmpty" },
+        "strategySha256": { "$ref": "#/$defs/sha256" },
+        "reviewer": {
+          "oneOf": [
+            { "$ref": "#/$defs/reviewer" },
+            { "type": "null" }
+          ]
+        },
+        "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence" } },
+        "manifestContractSha256": { "$ref": "#/$defs/sha256" },
+        "profileContractSha256": { "$ref": "#/$defs/sha256" },
+        "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pass", "type", "required", "status", "claim", "calibration", "attempts", "results"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "pass": { "enum": ["blockout", "structure", "form", "materials", "interaction", "optimization"] },
+        "type": { "enum": ["machine", "reviewer"] },
+        "required": { "type": "boolean" },
+        "status": { "enum": ["pending", "active", "passed", "blocked", "stopped"] },
+        "claim": { "$ref": "#/$defs/claim" },
+        "calibration": { "$ref": "#/$defs/calibration" },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "results": { "type": "array", "items": { "$ref": "#/$defs/result" } }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

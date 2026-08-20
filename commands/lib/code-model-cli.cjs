@@ -417,7 +417,7 @@ function next(root, values) {
 
 function record(root, values) {
   const options = parseOptions(values, new Set(['evidence']));
-  rejectUnknownOptions(options, new Set(['pass', 'decision', 'summary', 'remaining-gaps', 'evidence']));
+  rejectUnknownOptions(options, new Set(['pass', 'decision', 'summary', 'remaining-gaps', 'evidence', 'character-profile']));
   if (options._.length !== 1) fail('record requires one manifest path.');
   if (!PASS_IDS.includes(options.pass)) fail('--pass must name an ordered CODE pass.');
   if (!DECISIONS.has(options.decision)) fail('--decision is invalid.');
@@ -447,6 +447,10 @@ function record(root, values) {
   if (options.decision === 'pass') {
     for (const view of manifest.reviewPolicy.requiredViews) {
       if (!seenViews.has(view)) fail(`A passing review requires ${view} evidence.`);
+    }
+    if (options['character-profile']) {
+      const { assertPassReady } = require('./code-character-cli.cjs');
+      assertPassReady(root, options['character-profile'], result.located.relative, current.id);
     }
   }
   current.attempts += 1;
@@ -481,9 +485,13 @@ function main() {
   fail(`Unknown code-model operation: ${operation}`);
 }
 
-try {
-  main();
-} catch (error) {
-  process.stderr.write(`${error.message}\n`);
-  process.exitCode = 1;
+module.exports = { PASS_IDS, rootPath, relativeInside, sha256, validateManifest };
+
+if (require.main === module) {
+  try {
+    main();
+  } catch (error) {
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 1;
+  }
 }

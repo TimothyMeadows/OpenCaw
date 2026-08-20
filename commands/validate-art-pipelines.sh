@@ -30,7 +30,7 @@ grep -Fq 'Blender 4.5 LTS' "$root/blender/PIPELINE.md" || { echo "BLENDER contra
 grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks immutable-source protection." >&2; exit 1; }
 grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
-for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json css3/art-tokens.css code/code-model-manifest.schema.json; do
+for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json css3/art-tokens.css code/code-model-manifest.schema.json code/code-character-profile.schema.json; do
   [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }
 done
 
@@ -42,12 +42,17 @@ const files = [
   '.styles/.pipelines/_shared/media-generation-manifest.schema.json',
   '.styles/.pipelines/local/toolchain.json',
   '.styles/.pipelines/local/model-packs.json',
-  '.styles/.pipelines/code/code-model-manifest.schema.json'
+  '.styles/.pipelines/code/code-model-manifest.schema.json',
+  '.styles/.pipelines/code/code-character-profile.schema.json'
 ];
 for (const file of files) JSON.parse(fs.readFileSync(file, 'utf8'));
 const code = JSON.parse(fs.readFileSync(files[3], 'utf8'));
 const required = ['schemaVersion','modelId','intent','pipelineSelection','inputs','target','renderer','runtime','budgets','reviewPolicy','passes'];
 for (const key of required) if (!code.required.includes(key)) throw new Error(`Code model schema omits ${key}`);
+const character = JSON.parse(fs.readFileSync(files[4], 'utf8'));
+const characterRequired = ['schemaVersion','characterId','codeModel','intent','silhouette','structure','motion','budgets','reviewPolicy','gates'];
+for (const key of characterRequired) if (!character.required.includes(key)) throw new Error(`Code character schema omits ${key}`);
+if (character.properties.schemaVersion.const !== 'opencaw-code-character/v1') throw new Error('Code character schema version is invalid.');
 const css = fs.readFileSync('.styles/.pipelines/css3/art-tokens.css', 'utf8');
 if (!css.includes(':root') || !css.includes('--art-')) throw new Error('CSS3 token asset is incomplete.');
 if (/url\s*\(|canvas|webgl|data:image/i.test(css)) throw new Error('CSS3 token asset contains a prohibited raster or rendering dependency.');
