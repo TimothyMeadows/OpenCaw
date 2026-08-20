@@ -19,3 +19,4 @@
 17. [x] Add Three.js code-character builder and reviewer skills (`.ai/tasks/threejs-character-skills/TASK.md`)
 18. [x] Add deterministic Three.js character evidence and runtime gates (`.ai/tasks/threejs-character-evidence/TASK.md`)
 19. [x] Integrate and document Three.js code-character production (`.ai/tasks/threejs-character-integration/TASK.md`)
+20. [x] Land the completed Three.js character stack on `main` (`.ai/tasks/threejs-character-rollup/TASK.md`)
