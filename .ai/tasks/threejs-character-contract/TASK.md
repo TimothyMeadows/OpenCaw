@@ -2,7 +2,7 @@
 
 ## Status
 
-Active in Goal Flow.
+Completed in Goal Flow; PR open and post-PR QA passed.
 
 ## Flow
 
@@ -62,3 +62,4 @@ https://github.com/TimothyMeadows/OpenCaw/issues/113
 - Kept profile creation source-independent so the frozen character contract can precede model authoring; any recorded result requires the real source and complete validation rejects stale source, manifest, or profile generations.
 - Hardened issue synchronization against subprocess stdin consumption and aligned README validation with the current repository opening so the normal task stack remains reliable.
 - Kept unrelated delivery-mode behavior outside this character-contract task.
+- Published as https://github.com/TimothyMeadows/OpenCaw/pull/117 with post-PR QA evidence at https://github.com/TimothyMeadows/OpenCaw/pull/117#issuecomment-5351851600.
