@@ -13,14 +13,18 @@
     "serviceWorkers": "blocked"
   },
   "structure": {
+    "coordinateSystem": "Y-up, right-handed, local origin at ground center",
+    "pivotStable": true, "finiteTransforms": true, "boundsFinite": true,
     "parts": [{ "id": "torso", "parent": null }],
+    "anchors": ["origin"],
     "joints": [], "sockets": [], "colliders": [],
     "minimumY": 0, "groundY": 0, "height": 1,
     "attachmentGaps": [], "symmetry": []
   },
   "motion": {
     "mode": "static", "skeletonId": null, "maxInfluencesPerVertex": 0,
-    "roles": [], "contacts": [], "movingPartCount": 0
+    "weightsFiniteNormalized": true, "deformationBoundsFinite": true,
+    "roles": [], "poses": [], "contacts": [], "movingPartCount": 0
   },
   "runtime": {
     "constructionHashes": ["stable-optimization", "stable-optimization", "stable-optimization"],

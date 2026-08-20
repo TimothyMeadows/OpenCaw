@@ -39,9 +39,14 @@
     },
     "structure": {
       "type": "object",
-      "required": ["parts", "joints", "sockets", "colliders", "minimumY", "groundY", "height", "attachmentGaps", "symmetry"],
+      "required": ["coordinateSystem", "pivotStable", "finiteTransforms", "boundsFinite", "parts", "anchors", "joints", "sockets", "colliders", "minimumY", "groundY", "height", "attachmentGaps", "symmetry"],
       "properties": {
+        "coordinateSystem": { "type": "string", "minLength": 1 },
+        "pivotStable": { "type": "boolean" },
+        "finiteTransforms": { "type": "boolean" },
+        "boundsFinite": { "type": "boolean" },
         "parts": { "type": "array", "items": { "$ref": "#/$defs/part" } },
+        "anchors": { "$ref": "#/$defs/stringArray" },
         "joints": { "$ref": "#/$defs/stringArray" },
         "sockets": { "$ref": "#/$defs/stringArray" },
         "colliders": { "$ref": "#/$defs/stringArray" },
@@ -54,12 +59,15 @@
     },
     "motion": {
       "type": "object",
-      "required": ["mode", "skeletonId", "maxInfluencesPerVertex", "roles", "contacts", "movingPartCount"],
+      "required": ["mode", "skeletonId", "maxInfluencesPerVertex", "weightsFiniteNormalized", "deformationBoundsFinite", "roles", "poses", "contacts", "movingPartCount"],
       "properties": {
         "mode": { "enum": ["static", "articulated", "skinned"] },
         "skeletonId": { "type": ["string", "null"] },
         "maxInfluencesPerVertex": { "type": "integer", "minimum": 0 },
+        "weightsFiniteNormalized": { "type": "boolean" },
+        "deformationBoundsFinite": { "type": "boolean" },
         "roles": { "$ref": "#/$defs/stringArray" },
+        "poses": { "$ref": "#/$defs/stringArray" },
         "contacts": { "type": "array", "items": { "$ref": "#/$defs/contact" } },
         "movingPartCount": { "type": "integer", "minimum": 0 }
       }

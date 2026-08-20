@@ -110,8 +110,8 @@ Curated reusable skills included in OpenCaw.
 - `select-art-pipeline` - Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
 - `use-external-asset-library` - Inspect optional read-only 3D asset libraries and copy an authorized candidate into `assets/models/` before use.
 - `build-threejs-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
-- `build-threejs-code-characters` - Author source-native Three.js characters and creatures through six ordered character gates.
-- `review-threejs-code-characters` - Independently review Three.js character readability and style from answer-neutral evidence packets.
+- `build-threejs-code-characters` - Author source-native Three.js characters and creatures through linked profiles, six ordered gates, calibrated machine evidence, and explicit lifecycle ownership.
+- `review-threejs-code-characters` - Independently review Three.js character readability and style from answer-neutral, hash-bound evidence packets.
 - `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
 - `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.
 - `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, maps, atlases, UDIMs, and packed textures.

@@ -7,7 +7,7 @@ Selectable pipelines:
 - `CLOUD` - session-provided image generation with explicit cost, provenance, staging, and review controls.
 - `LOCAL` - loopback-only ComfyUI image and audio generation using reviewed local GPU tooling.
 - `CSS3` - CSS, mathematical geometry, and inline SVG/vector production without raster or WebGL dependencies.
-- `CODE` - authored procedural Three.js models implemented as TypeScript or JavaScript.
+- `CODE` - authored procedural Three.js models, with linked character profiles, isolated visual review, and calibrated runtime evidence for characters and creatures.
 - `BLENDER` - authored Blender 4.5 LTS scenes, assets, renders, and exports with immutable-source and review controls.
 
 Pipeline contracts:

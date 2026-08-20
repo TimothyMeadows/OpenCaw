@@ -779,7 +779,7 @@ $clean-context
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
 | Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
 | Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate reproducible media |
-| Art and experience | `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce original, inspectable Blender art, runtime actors, and web experiences |
+| Art and experience | `build-threejs-code-characters`, `review-threejs-code-characters`, `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce and independently review source-native characters, original Blender art, runtime actors, and web experiences |
 
 See `skills/INDEX.md` for the complete catalog and `skills/EXTERNAL_SOURCES.md` for capability-adaptation boundaries and dispositions.
 
@@ -827,6 +827,7 @@ Or run the command directly:
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
 | Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
+| Code-first Three.js characters | `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `measure-code-character-evidence.sh`, `record-code-character-calibration.sh`, `record-code-character-gate.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
 | Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-blender-scene-report.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
 
@@ -1134,6 +1135,9 @@ Pipeline contracts and owned assets live under:
 ├── css3/art-tokens.css
 ├── code/PIPELINE.md
 ├── code/code-model-manifest.schema.json
+├── code/code-character-profile.schema.json
+├── code/code-character-observation.schema.json
+├── code/code-character-evidence-report.schema.json
 └── blender/PIPELINE.md
 ```
 
@@ -1177,6 +1181,49 @@ Local commands:
 ```
 
 The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
+
+Characters, creatures, and embodied runtime actors add a linked `opencaw-code-character/v1` profile without changing generic model callers. The profile freezes presentation sizes and views, semantic body structure, static/articulated/skinned motion, contextual tolerances and budgets, active builder identities, and exactly six character gates paired with the generic passes. Blockout, form, and materials/style remain independent-review decisions. Structure, interaction/runtime, and optimization/budget use descriptive machine observations with both passing and focused failing calibration.
+
+Create and validate the linked contract before authoring or collecting gate evidence:
+
+```bash
+./commands/create-code-character-profile.sh actor-id \
+  --manifest .ai/tasks/current-task/code-model.json \
+  --brief "Readable source-native runtime actor" \
+  --intended-use "representative gameplay"
+./commands/validate-code-character-profile.sh --strict \
+  .ai/tasks/current-task/code-character.json
+```
+
+The deterministic evidence command has two explicit modes. `analyze` evaluates repository-contained calibration observations and marks the report untrusted. Freeze each machine gate's passing and focused failing reports transactionally before recording a passing gate result. `capture` uses a task-local ESM adapter and only host-installed Three.js, Playwright, and Chromium to collect trusted machine evidence:
+
+```bash
+./commands/measure-code-character-evidence.sh analyze \
+  .ai/tasks/current-task/code-character.json \
+  --measurements .ai/tasks/current-task/evidence/structure-pass.json \
+  --output .ai/tasks/current-task/evidence/structure-pass-report.json
+./commands/measure-code-character-evidence.sh analyze \
+  .ai/tasks/current-task/code-character.json \
+  --measurements .ai/tasks/current-task/evidence/structure-fail.json \
+  --output .ai/tasks/current-task/evidence/structure-fail-report.json
+./commands/record-code-character-calibration.sh \
+  .ai/tasks/current-task/code-character.json \
+  --gate structure-integrity \
+  --passing .ai/tasks/current-task/evidence/structure-pass-report.json \
+  --failing .ai/tasks/current-task/evidence/structure-fail-report.json
+./commands/measure-code-character-evidence.sh capture \
+  .ai/tasks/current-task/code-character.json \
+  --adapter .ai/tasks/current-task/evidence/adapter.mjs \
+  --output-dir .ai/tasks/current-task/evidence/browser-capture
+./commands/record-code-character-gate.sh \
+  .ai/tasks/current-task/code-character.json \
+  --gate structure-integrity --decision pass \
+  --summary "Declared structure satisfies its contextual checks" \
+  --strategy "Measure the frozen semantic graph and normalized tolerances" \
+  --evidence machine-report=.ai/tasks/current-task/evidence/browser-capture/report.json
+```
+
+Capture uses `127.0.0.1` with an OS-assigned port, keeps the Chromium sandbox enabled, blocks service workers and external requests, confines served modules and new outputs to the project, and serializes one output directory. It captures required views and intended sizes, semantic masks, isolated signature parts, and runtime evidence. Missing Three.js, Playwright, or Chromium stops clearly without installation or pipeline fallback. Machine results never approve identity, silhouette, form, materials, style, or appeal.
 
 The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for modeling, UVs and textures, materials, procedural scenes, rigging, simulation, lighting, rendering, optimization, export, and review. It preserves the source `.blend`, authors only in declared repository-confined working copies, prefers typed connected Blender operations, validates exceptional exact-content `bpy`, and treats CLI tools as read-only inspection. Blender, addons, packages, and providers are never installed automatically. If live authoring is unavailable, the workflow stops instead of switching pipelines or backends.
 
@@ -1239,6 +1286,9 @@ Common focused validators:
 ./commands/validate-memory.sh
 ./tests/test-external-asset-library.sh
 ./tests/test-selected-capability-import.sh
+./tests/test-code-character-contract.sh
+./tests/test-code-character-skills.sh
+./tests/test-code-character-evidence.sh
 ./tests/test-gauntlet-flow.sh
 ```
 
@@ -1251,6 +1301,7 @@ The integrated suite verifies, among other things:
 - agreement between canonical JSON and generated role-map Markdown
 - command syntax and executable requirements
 - rigged-actor manifest identity, path confinement, runtime-file, and verification-evidence contracts
+- linked CODE character profiles, ordered transactional gates, independent reviewer identities, calibrated machine evidence, static/articulated/skinned applicability, browser confinement, contextual budgets, and repeated lifecycle ownership
 - Blender 4.5 production skill metadata, role routing, safe CLI flags, scene-report integrity, profile completeness, dependency confinement, and restricted Python parsing
 - style catalog and contract structure
 - optional external asset-library preservation, read-only inventory, copy-first confinement, source immutability, and copied-file hash evidence
@@ -1278,7 +1329,7 @@ OpenCaw/
 │   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
-│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, CODE, and BLENDER contracts/assets
+│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, CODE model/character, and BLENDER contracts/assets
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts

@@ -32,7 +32,12 @@ module.exports = {
                     const symmetry = profile.structure.symmetryGroups.map(({ id }) => ({ id, deviationRatio: 0 }));
                     return {
                       structure: {
+                        coordinateSystem: profile.structure.coordinateSystem,
+                        pivotStable: true,
+                        finiteTransforms: true,
+                        boundsFinite: true,
                         parts: profile.structure.parts.map(({ id, parent }) => ({ id, parent })),
+                        anchors: ['origin'],
                         joints: profile.structure.joints.map(({ id }) => id),
                         sockets: profile.structure.sockets.map(({ id }) => id),
                         colliders: profile.structure.colliders.map(({ id }) => id),
@@ -46,7 +51,10 @@ module.exports = {
                         mode: profile.motion.mode,
                         skeletonId: profile.motion.skeletonId,
                         maxInfluencesPerVertex: profile.motion.maxInfluencesPerVertex,
+                        weightsFiniteNormalized: true,
+                        deformationBoundsFinite: true,
                         roles: profile.motion.requiredRoles,
+                        poses: profile.motion.representativePoses,
                         contacts: profile.motion.clips.flatMap((clip) => clip.contacts.map((id) => ({ id, errorRatio: 0 }))),
                         movingPartCount: profile.motion.mode === 'static' ? 0 : 1
                       },

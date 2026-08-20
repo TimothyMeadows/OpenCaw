@@ -47,6 +47,11 @@ This ledger records OpenCaw's disposition of each selected capability idea. It i
 | CA-033 | create | Parse-only restricted Blender Python review | `validate-blender-python.sh` |
 | CA-034 | enhance | Existing style, hybrid-asset, handoff, rigged-actor, and VFX routing | Current parent skills retain their triggers and route Blender stages explicitly |
 | CA-035 | reject | Installers, addons, connected-tool configuration, provider endpoints, downloads, credentials, and arbitrary code runners | Existing environment, media, security, and human-review contracts remain authoritative |
+| CA-036 | create | Source-native procedural character and creature production | `build-threejs-code-characters` with a linked character profile and the existing generic CODE pass order |
+| CA-037 | create | Isolated visual acceptance for procedural characters | `review-threejs-code-characters` with answer-neutral packets and concrete-cycle identity separation |
+| CA-038 | create | Deterministic character structure, runtime, lifecycle, and budget evidence | `measure-code-character-evidence.sh`, transactional calibration recording, and the character observation and evidence-report schemas |
+| CA-039 | enhance | Generic CODE review readiness for embodied actors | Optional linked-profile enforcement preserves unchanged generic model callers while fail-closing character passes |
+| CA-040 | enhance | Runtime-file rigged actor preparation | `prepare-rigged-runtime-actors` remains the owner for GLB/FBX packages; source-native character factories use the CODE character workflow |
 
 ## Adaptation boundary
 

@@ -38,7 +38,7 @@ for file in \
 done
 require_text "$builder/references/build-gates.md" 'blockout-readability'
 require_text "$builder/references/build-gates.md" 'optimization-budget'
-require_text "$builder/references/evidence-adapter.md" 'Only a successful browser capture is trusted machine evidence'
+require_text "$builder/references/evidence-adapter.md" 'A machine-gate pass then requires exactly one successful browser capture report'
 require_text "$reviewer/references/reviewer-packet.md" 'intended answers'
 require_text "$reviewer/references/reviewer-packet.md" 'builder reasoning'
 require_text "$reviewer/SKILL.md" 'Do not rewrite the model'
@@ -68,7 +68,7 @@ const reviewers = [
 ];
 for (const role of builders) {
   if (!map[role].skills.includes('build-threejs-code-characters')) throw new Error(`Missing builder routing: ${role}`);
-  for (const command of ['commands/create-code-character-profile.sh', 'commands/validate-code-character-profile.sh', 'commands/record-code-character-gate.sh', 'commands/measure-code-character-evidence.sh']) {
+  for (const command of ['commands/create-code-character-profile.sh', 'commands/validate-code-character-profile.sh', 'commands/record-code-character-calibration.sh', 'commands/record-code-character-gate.sh', 'commands/measure-code-character-evidence.sh']) {
     if (!map[role].commands.includes(command)) throw new Error(`Missing builder command ${command}: ${role}`);
   }
 }

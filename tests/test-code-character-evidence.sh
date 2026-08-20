@@ -77,6 +77,36 @@ for (const gate of ['structure', 'interaction', 'optimization']) {
   if (passing.gateResults.some((item) => /readability|materials|style/.test(item.id))) throw new Error('Analyzer emitted an aesthetic verdict.');
 }
 NODE
+declare -A calibration_gate=(
+  [structure]=structure-integrity
+  [interaction]=interaction-runtime
+  [optimization]=optimization-budget
+)
+for gate in structure interaction optimization; do
+  project_command bash commands/record-code-character-calibration.sh "$profile" \
+    --gate "${calibration_gate[$gate]}" --passing "evidence/$gate-pass-report.json" \
+    --failing "evidence/$gate-fail-report.json" >/dev/null
+done
+project_command bash commands/validate-code-character-profile.sh --strict "$profile" >/dev/null
+stale_calibration_profile="$project/.ai/tasks/evidence-test/stale-calibration-character.json"
+cp "$profile" "$stale_calibration_profile"
+node_stale_calibration_profile="$stale_calibration_profile"
+if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then node_stale_calibration_profile="$(wslpath -w "$node_stale_calibration_profile")"; fi
+"$node_bin" - "$node_stale_calibration_profile" <<'NODE'
+const fs = require('fs');
+const file = process.argv[2];
+const profile = JSON.parse(fs.readFileSync(file, 'utf8'));
+profile.gates.find((gate) => gate.id === 'structure-integrity').claim.thresholds.groundingToleranceRatio = 0.5;
+fs.writeFileSync(file, `${JSON.stringify(profile, null, 2)}\n`);
+NODE
+expect_failure "$runtime_dir/stale-calibration.log" bash commands/validate-code-character-profile.sh --strict "$stale_calibration_profile"
+grep -Fq 'stale against the current measurement specification' "$runtime_dir/stale-calibration.log" || fail "calibration did not stale after a measurement-spec change"
+expect_failure "$runtime_dir/recalibrate.log" bash commands/record-code-character-calibration.sh "$profile" \
+  --gate structure-integrity --passing evidence/structure-pass-report.json --failing evidence/structure-fail-report.json
+grep -Fq 'calibration is already frozen' "$runtime_dir/recalibrate.log" || fail "calibration overwrite was not rejected"
+expect_failure "$runtime_dir/reviewer-calibration.log" bash commands/record-code-character-calibration.sh "$profile" \
+  --gate form-readability --passing evidence/structure-pass-report.json --failing evidence/structure-fail-report.json
+grep -Fq 'does not accept machine calibration' "$runtime_dir/reviewer-calibration.log" || fail "reviewer calibration was not rejected"
 
 echo "[3/6] checking structural, motion-mode, lifecycle, budget, capture, and comparison regressions"
 node_analyzer="$repo_root/commands/lib/code-character-evidence-analyzer.cjs"
@@ -108,12 +138,17 @@ observation.structure.attachmentGaps = [{ part: 'left-arm', host: 'torso', gapRa
 observation.structure.symmetry = [{ id: 'arms', deviationRatio: 0.2 }];
 let report = run(profile, observation);
 if (item(report, 'structure-integrity', 'attachments').status !== 'fail' || item(report, 'structure-integrity', 'symmetry').status !== 'fail') throw new Error('Attachment or symmetry focused failure was missed.');
+observation = clone(baseObservation);
+observation.structure.anchors = [];
+observation.structure.finiteTransforms = false;
+report = run(baseProfile, observation);
+if (item(report, 'structure-integrity', 'required-anchors').status !== 'fail' || item(report, 'structure-integrity', 'coordinate-pivot-bounds').status !== 'fail') throw new Error('Missing anchor or non-finite transform was accepted.');
 
 profile = clone(baseProfile);
 observation = clone(baseObservation);
 profile.motion = { mode: 'articulated', skeletonId: null, maxInfluencesPerVertex: 0, requiredRoles: ['idle'], clips: [{ id: 'idle', role: 'idle', loop: true, rootMotion: 'none', contacts: [] }], representativePoses: ['rest'] };
 profile.budgets.clips = 1;
-observation.motion = { mode: 'articulated', skeletonId: null, maxInfluencesPerVertex: 0, roles: ['idle'], contacts: [], movingPartCount: 1 };
+observation.motion = { mode: 'articulated', skeletonId: null, maxInfluencesPerVertex: 0, weightsFiniteNormalized: true, deformationBoundsFinite: true, roles: ['idle'], poses: ['rest'], contacts: [], movingPartCount: 1 };
 observation.runtime.metrics.clips = 1;
 report = run(profile, observation);
 if (item(report, 'interaction-runtime', 'declared-motion-mode').status !== 'pass' || item(report, 'interaction-runtime', 'animation-roles').status !== 'pass') throw new Error('Articulated applicability failed.');
@@ -122,12 +157,18 @@ profile = clone(baseProfile);
 observation = clone(baseObservation);
 profile.motion = { mode: 'skinned', skeletonId: 'actor-skeleton', maxInfluencesPerVertex: 4, requiredRoles: ['idle'], clips: [{ id: 'idle', role: 'idle', loop: true, rootMotion: 'none', contacts: [] }], representativePoses: ['rest'] };
 profile.budgets.bones = 16; profile.budgets.clips = 1;
-observation.motion = { mode: 'skinned', skeletonId: 'actor-skeleton', maxInfluencesPerVertex: 4, roles: ['idle'], contacts: [], movingPartCount: 4 };
+observation.motion = { mode: 'skinned', skeletonId: 'actor-skeleton', maxInfluencesPerVertex: 4, weightsFiniteNormalized: true, deformationBoundsFinite: true, roles: ['idle'], poses: ['rest'], contacts: [], movingPartCount: 4 };
 observation.runtime.metrics.bones = 8; observation.runtime.metrics.clips = 1;
 report = run(profile, observation);
 if (item(report, 'interaction-runtime', 'declared-motion-mode').status !== 'pass') throw new Error('Skinned applicability failed.');
 observation.motion.maxInfluencesPerVertex = 8;
 if (item(run(profile, observation), 'interaction-runtime', 'declared-motion-mode').status !== 'fail') throw new Error('Skinned influence bypass was accepted.');
+observation.motion.maxInfluencesPerVertex = 4;
+observation.motion.weightsFiniteNormalized = false;
+if (item(run(profile, observation), 'interaction-runtime', 'declared-motion-mode').status !== 'fail') throw new Error('Invalid skin weights were accepted.');
+observation.motion.weightsFiniteNormalized = true;
+observation.motion.poses = [];
+if (item(run(profile, observation), 'interaction-runtime', 'representative-poses').status !== 'fail') throw new Error('Missing representative pose was accepted.');
 
 profile = clone(baseProfile);
 observation = clone(baseObservation);
@@ -227,6 +268,7 @@ const report = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 if (!report.trustedMachineEvidence || report.captureMode !== 'browser' || report.overallDecision !== 'pass') throw new Error('Sandboxed capture did not emit trusted passing machine evidence.');
 if (report.browserSecurity?.chromiumSandbox !== true || report.browserSecurity?.serviceWorkers !== 'blocked' || report.browserSecurity?.osAssignedPort !== true) throw new Error('Browser security evidence is incomplete.');
 if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(report.browserSecurity.origin)) throw new Error('Evidence server did not use loopback and an OS-assigned port.');
+if (report.contracts?.adapter?.path !== 'evidence/adapter.mjs' || !/^[a-f0-9]{64}$/.test(report.contracts?.adapter?.sha256 ?? '') || !/^[a-f0-9]{64}$/.test(report.contracts?.captureConfiguration?.sha256 ?? '')) throw new Error('Adapter or capture-configuration hashes are missing.');
 NODE
 "$node_bin" - "$node_cli" <<'NODE'
 const { pageSource } = require(process.argv[2]);

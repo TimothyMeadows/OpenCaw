@@ -11,6 +11,6 @@ Apply exactly one required character gate to each generic CODE pass:
 | `interaction` | `interaction-runtime` | calibrated machine evidence | Applicable motion, contacts, sockets, colliders, and teardown behave correctly. |
 | `optimization` | `optimization-budget` | calibrated machine evidence | Construction is deterministic and contextual budgets and repeated lifecycle limits hold. |
 
-For reviewer gates, supply the reviewer packet as both a hashed packet field and `reviewer-packet` evidence. For machine gates, require at least one independently authored passing fixture and one focused failing fixture tied to the same measurement semantics.
+For reviewer gates, supply the reviewer packet as both a hashed packet field and `reviewer-packet` evidence. For machine gates, transactionally freeze at least one independently authored all-pass fixture report and one focused failing fixture report tied to the same measurement semantics, then supply exactly one current trusted sandboxed browser report as `machine-report` evidence for a passing result.
 
 A character gate passes before its paired generic CODE pass. Record the generic pass with `--character-profile`; the parent command then rejects missing, incomplete, or stale character evidence.
