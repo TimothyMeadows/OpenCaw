@@ -9,6 +9,8 @@ Decisions: pass, revise-spec, revise-code, request-input, stop
 Options:
   --remaining-gaps TEXT
   --evidence VIEW=FILE    Repeatable; passing non-planar reviews require front and two orbit views
+  --character-profile FILE
+                          Require current character gates for PASS before accepting a pass decision
 EOF
 }
 

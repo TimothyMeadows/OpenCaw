@@ -72,7 +72,7 @@ while IFS= read -r raw_line || [[ -n "$raw_line" ]]; do
   total=$((total + 1))
 
   pushd "$repo_root" >/dev/null
-  issue_state="$("$GH_BIN" issue view "$issue_url" --json state -q .state 2>/dev/null || true)"
+  issue_state="$("$GH_BIN" issue view "$issue_url" --json state -q .state </dev/null 2>/dev/null || true)"
   popd >/dev/null
 
   case "$issue_state" in
