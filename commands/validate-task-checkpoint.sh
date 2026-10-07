@@ -8,8 +8,8 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 # Help must work even outside an initialized host repository.
 if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
-  exec python3 "$script_dir/lib/task-execution.py" --root . create-task --help
+  exec python3 "$script_dir/lib/task-execution.py" --root . validate --help
 fi
 source "$script_dir/lib/brainstorm-common.sh"
-brainstorm_require_delivery_creation_allowed 'Task creation'
-exec python3 "$script_dir/lib/task-execution.py" --root "$OPENCAW_PROJECT_ROOT_RESOLVED" create-task "$@"
+brainstorm_require_delivery_creation_allowed 'Task checkpoint validation'
+exec python3 "$script_dir/lib/task-execution.py" --root "$OPENCAW_PROJECT_ROOT_RESOLVED" validate "$@"

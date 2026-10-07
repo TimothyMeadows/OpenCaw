@@ -18,6 +18,7 @@ Use when implementation and local verification are complete and the next likely 
 - Run the applicable readiness interface before any `gh`, `github` CLI/wrapper, GitHub MCP/connector, or publishing skill that could create or update a PR.
 - Once the applicable gate authorizes publication and the PR is available, choose GitHub PR tools in this order: local `gh` first, an available `github` CLI executable or repository-provided GitHub CLI wrapper second, and GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable.
 - Start post-PR QA immediately after the PR is confirmed available, regardless of which authorized publication path created it.
+- For checkpointed ordinary tasks, run `commands/validate-task-checkpoint.sh <task> --phase complete` and review its scope/limitations before preparing readiness. Changed HEADs, declared files, or pending external writes require reconciliation and affected verification. This check is additional evidence, never a replacement for readiness authorization or Gauntlet's canonical validators.
 
 ## Command
 ../commands/pr-readiness-check.sh [task_or_issue_ref] [validation_summary_file]
