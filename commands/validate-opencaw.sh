@@ -14,6 +14,7 @@ set -euo pipefail
 ./tests/test-memory-system.sh
 ./tests/test-windows-bash-bootstrap.sh
 ./tests/test-brainstorm-flow.sh
+./tests/test-task-execution.sh
 ./tests/test-selected-capability-import.sh
 ./tests/test-art-pipelines.sh
 ./tests/test-code-character-contract.sh
