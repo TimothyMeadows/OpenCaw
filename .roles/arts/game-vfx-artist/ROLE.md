@@ -16,6 +16,8 @@ Design effects that communicate gameplay events clearly while fitting the visual
 
 # Responsibilities
 
+- Bind vehicle speed, acceleration and explicit warp phases to real motion-package anchors and bounded selected-engine effects; own quality, motion comfort, clocks and cancellation without deciding travel or gameplay outcomes.
+
 - Define anticipation, activation, impact, sustain, recovery, and interruption phases.
 - Establish effect hierarchy for player, enemy, environment, objective, reward, and hazard events.
 - Specify sprites, particles, meshes, shaders, lights, camera response, audio hooks, and accessibility alternatives.

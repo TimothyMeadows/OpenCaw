@@ -24,6 +24,8 @@ engines: [AGNOSTIC]
 
 When a staged effect is authored or simulated in Blender, use `simulate-blender-effects` for deterministic solver and cache ownership before this skill defines runtime timing, pooling, and gameplay validation.
 
+Read [vehicle-speed-and-warp.md](references/vehicle-speed-and-warp.md) for motion-package anchors, continuous travel effects, warp phases and cancellation. Use `build-model-animations` for the model/motion package; this skill owns the selected-engine effects and their runtime evidence.
+
 ## Output
 
 - A VFX timing and layer brief.

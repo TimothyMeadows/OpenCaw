@@ -50,6 +50,7 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 
 Skills:
 
+- `build-model-animations`
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `maintain-art-style-contract`
@@ -99,6 +100,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/resolve-art-pipeline.sh`
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
@@ -123,6 +125,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `direct-blender-production`
@@ -145,6 +148,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/resolve-art-pipeline.sh`
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
@@ -248,6 +252,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `create-game-vfx`
 - `simulate-blender-effects`
 - `render-and-composite-blender-output`
@@ -285,6 +290,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
@@ -496,6 +502,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `threejs-build-code-models`
@@ -539,6 +546,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/resolve-art-pipeline.sh`
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
@@ -734,6 +742,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `select-art-pipeline`
 - `use-external-asset-library`
 - `threejs-build-code-models`
@@ -784,6 +793,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/resolve-art-pipeline.sh`
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
@@ -848,6 +858,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `use-external-asset-library`
 - `threejs-build-code-characters`
 - `build-gameplay-runtime`
@@ -935,6 +946,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/list-external-asset-libraries.sh`
 - `commands/inspect-external-asset-library.sh`
 - `commands/copy-external-asset.sh`
@@ -954,6 +966,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `select-art-pipeline`
 - `plan-generative-media-pipeline`
 - `use-comfyui-local-generation`
@@ -965,6 +978,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/resolve-art-pipeline.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
@@ -1050,6 +1064,7 @@ Commands:
 
 Skills:
 
+- `build-model-animations`
 - `verify-and-explain`
 - `threejs-review-code-characters`
 - `review-blender-deliverables`
@@ -1073,6 +1088,7 @@ Skills:
 
 Commands:
 
+- `commands/model-to-animation.sh`
 - `commands/validate-code-character-profile.sh`
 - `commands/record-code-character-gate.sh`
 - `commands/inspect-blender-scene.sh`

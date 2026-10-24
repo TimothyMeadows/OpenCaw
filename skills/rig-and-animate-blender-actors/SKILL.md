@@ -1,6 +1,6 @@
 ---
 name: rig-and-animate-blender-actors
-description: Rig, skin, constrain, and animate Blender 4.5 characters and creatures for verified handoff. Use for armatures, weights, IK/FK, constraints, actions, NLA, root motion, sockets, deformation review, and preparation for runtime actor delivery.
+description: Rig, skin, constrain, and animate Blender 4.5 actors for verified handoff. Use for character deformation, mechanical articulation, armatures, weights, actions, root motion, pivots, sockets, and motion review before runtime delivery.
 engines: [AGNOSTIC]
 ---
 
@@ -9,6 +9,8 @@ engines: [AGNOSTIC]
 ## When to use
 
 Use for Blender armatures, skin weights, constraints, IK/FK, actions, NLA, root motion, sockets, or runtime actor authoring handoff.
+
+For native model-to-animation production, route through `build-model-animations` and its explicit fixed-batch authoring contract. Skinned characters, articulated mechanisms and rigid objects have different preparation and evidence requirements; independent wheels, steering/suspension pivots and ship anchors must exist in the actual model. Preserve standalone BLENDER connected-authoring policy outside that contract.
 
 ## Workflow
 
@@ -26,3 +28,4 @@ Read [rig-animation-authoring-contract.md](references/rig-animation-authoring-co
 - Do not bind gameplay truth to control bones or editor-only constraints.
 - Do not rename a published skeleton identity without an explicit compatibility migration.
 - Do not claim runtime readiness from a Blender playback alone.
+- Use explicit owned/licensed clip sources and independently reviewed mappings. Adobe authoring products and service integrations are excluded from model-to-animation production.

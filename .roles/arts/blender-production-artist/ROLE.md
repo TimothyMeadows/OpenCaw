@@ -17,7 +17,9 @@ Own safe, reproducible Blender 4.5 production from brief and working copy throug
 
 # Responsibilities
 
-- Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Fixed audited Blender batch scripts are allowed only under that contract; standalone BLENDER authoring rules remain unchanged.
+- Route native model-to-animation batch authoring through its explicit audited Blender 4.5 contract; preserve working copies, full-clip/transition evidence and profile-specific rig/hierarchy requirements.
+
+- Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Its fixed audited Blender scripts are specific to that contract; standalone BLENDER authoring rules remain unchanged.
 
 - Direct modeling, UV, texturing, materials, procedural systems, rigging, animation, simulation, lighting, rendering, optimization, export, and review stages.
 - Translate the active `STYLE.md` into geometry, material, lighting, camera, and render decisions without inventing a new style contract.

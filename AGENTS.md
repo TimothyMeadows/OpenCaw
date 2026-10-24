@@ -154,6 +154,19 @@ If a selected pipeline is unavailable or fails, stop and request direction. Neve
 - Do not follow symbolic links, overwrite an existing project asset, or allow source/destination path overlap. If a configured library is unavailable, stop and request direction instead of silently skipping the required search.
 - An external library never relaxes pipeline boundaries: `PROOF_TO_MODEL` validates copied-model ancestry, rights and recipe evidence, and `CODE` may use a copied model only as template/reference evidence rather than its primary runtime mesh.
 
+## Model-to-animation workflow
+
+MODEL_TO_ANIMATION is a downstream asset-production workflow, defined in `./.styles/.workflows/model-to-animation/WORKFLOW.md`, not another primary STYLE pipeline. It accepts explicitly reviewed compatible model handoffs and preserves `STYLE.md` and `ENGINE.md` authority. Use `build-model-animations` and `./commands/model-to-animation.sh`; resolve the coordinating skill and engine-specific integration skills before production.
+
+- Inspect animation readiness before rigging: source rights, scale, topology, pose, fused/missing parts, materials and independent articulation. Preserve immutable originals and record required modeling repairs rather than relabeling a static display mesh as ready to deform.
+- Select skinned, articulated or rigid profiles. Reuse approved skeletons/clips or author explicit rigs/parts and motions; do not invent skeletons, attacks or combat colliders for vehicles/noncombatants. Keep the existing rigged-actor/v1 contract intact for its valid consumers.
+- Author only through this workflow's fixed, audited, hash-bound Blender 4.5 LTS batch scripts on declared repository-local working copies, or use the separately selected connected-authoring workflow. The motion batch contract does not authorize arbitrary scripts or relax standalone BLENDER policy. Never execute embedded source code, install add-ons or silently select another authoring backend.
+- Native authoring and explicit owned/licensed clip retargeting are the baseline. Adobe products, services, adapters and Adobe-dependent authoring integrations are excluded; do not add Mixamo support. Optional AI models, hosted services, paid libraries, uploads, installations and license acceptance require separate selection and authorization.
+- Preserve versioned model, rig/hierarchy, clip, retarget, tool/script/recipe and engine identities. Review complete motion ranges and transitions, including contact, loops, deformation and interruption; a manifest or a single rendered frame does not certify motion quality.
+- Keep authoritative movement/collision/gameplay separate from clip playback and particles. Speed/acceleration/turn and explicit warp phases drive bounded selected-engine presentation through stable anchors, clocks, cancellation, pooling and accessibility controls. GPU effect replay does not imply deterministic gameplay.
+- State and reviews remain under `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs remain in versioned non-runtime staging. Require current rig/hierarchy and motion review, independent review and separate human runtime acceptance before explicit promotion.
+- A GLB does not contain a portable engine state machine or native particle system. Use compatible engine owners and actual target evidence. Phaser's 2D path requires an explicit sprite/pre-rendered handoff; CODE remains THREEJS-specific source authoring. Missing native or browser prerequisites remain blocked/not-run, without a silent fallback or installation.
+
 ## Generative media workflow
 
 The optional generative media contract for the host repository is:

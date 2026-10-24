@@ -80,4 +80,26 @@ if (evidence.properties.schemaVersion.const !== 'opencaw-code-character-evidence
 NODE
 
 bash commands/validate-media-templates.sh
+
+# MODEL_TO_ANIMATION is a downstream workflow, not another primary pipeline.
+for asset in WORKFLOW.md manifest.schema.json recipe.schema.json motion-package.schema.json blender/motion.py blender/scripts.json engines/threejs-motion.mjs; do
+  [[ -f ".styles/.workflows/model-to-animation/$asset" ]] || { echo "Missing motion workflow asset: $asset" >&2; exit 1; }
+done
+"$node_bin" <<'NODE'
+const fs = require('fs'), path = require('path'), crypto = require('crypto');
+const base = '.styles/.workflows/model-to-animation';
+for (const name of ['manifest.schema.json', 'recipe.schema.json', 'motion-package.schema.json']) {
+  const schema = JSON.parse(fs.readFileSync(path.join(base, name), 'utf8'));
+  if (!schema.$schema || !schema.properties) throw new Error(`Incomplete motion schema: ${name}`);
+}
+const scripts = JSON.parse(fs.readFileSync(path.join(base, 'blender/scripts.json'), 'utf8'));
+if (scripts.schemaVersion !== 1 || !scripts.files?.['motion.py']) throw new Error('Motion script inventory is incomplete.');
+for (const [name, expected] of Object.entries(scripts.files)) {
+  if (!/^[a-z][a-z0-9_]*\.py$/.test(name)) throw new Error('Invalid motion script basename.');
+  const actual = crypto.createHash('sha256').update(fs.readFileSync(path.join(base, 'blender', name))).digest('hex');
+  if (actual !== expected) throw new Error(`Changed audited motion script: ${name}`);
+}
+const actual = fs.readdirSync(path.join(base, 'blender')).filter(name => name.endsWith('.py')).sort();
+if (JSON.stringify(actual) !== JSON.stringify(Object.keys(scripts.files).sort())) throw new Error('Motion script inventory does not cover the exact Python bundle.');
+NODE
 echo "Art pipeline validation passed."

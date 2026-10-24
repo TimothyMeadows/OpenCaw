@@ -27,6 +27,7 @@ engines: [AGNOSTIC]
 - Read [inventory-transactions.md](references/inventory-transactions.md) for conservation invariants, atomic transfers, serialization, migration, and no-loss testing.
 - Read [camera-and-runtime-audio.md](references/camera-and-runtime-audio.md) for camera ownership, modifiers, occlusion, browser audio activation, voice budgets, priority, and accessibility equivalents.
 - Read [gameplay-feedback-and-haptics.md](references/gameplay-feedback-and-haptics.md) when coordinating animation, camera, sound, VFX, UI, hit-stop, or tactile device output.
+- Read [motion-package-integration.md](references/motion-package-integration.md) when connecting authored character/vehicle motion, root displacement or speed/warp presentation to authoritative movement.
 
 ## Output
 

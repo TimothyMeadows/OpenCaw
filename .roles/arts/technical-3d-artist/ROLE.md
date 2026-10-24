@@ -16,6 +16,8 @@ Turn authored 3D characters and creatures into coherent, performant, traceable r
 
 # Responsibilities
 
+- Own native model-to-animation readiness, skinned/articulated/rigid profile selection, real hierarchy/weights/clips and complete-motion review through `build-model-animations`; keep independent and human runtime acceptance separate.
+
 - Define scale, axes, pivots, grounding, skeleton, skinning, socket, and bind-pose contracts.
 - Prepare versioned runtime meshes, rigs, clips, equipment, detachable parts, and collider handoffs.
 - Establish animation roles, root-motion policy, event timing, retargeting compatibility, and runtime budgets.

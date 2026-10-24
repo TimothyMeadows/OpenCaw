@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "profile": "articulated",
+  "fps": 24,
+  "requiredClips": [
+    "idle",
+    "drive"
+  ],
+  "rig": {
+    "mode": "preserve",
+    "rootNode": "MotionRoot"
+  },
+  "parts": [
+    {
+      "node": "Chassis"
+    },
+    {
+      "node": "Wheel.front-left",
+      "parent": "Chassis",
+      "pivot": [
+        0.48,
+        -0.5,
+        0.22
+      ],
+      "independent": true
+    },
+    {
+      "node": "Wheel.front-right",
+      "parent": "Chassis",
+      "pivot": [
+        -0.48,
+        -0.5,
+        0.22
+      ],
+      "independent": true
+    },
+    {
+      "node": "Wheel.rear-left",
+      "parent": "Chassis",
+      "pivot": [
+        0.48,
+        0.5,
+        0.22
+      ],
+      "independent": true
+    },
+    {
+      "node": "Wheel.rear-right",
+      "parent": "Chassis",
+      "pivot": [
+        -0.48,
+        0.5,
+        0.22
+      ],
+      "independent": true
+    }
+  ],
+  "anchors": [
+    {
+      "id": "wheel.front-left.contact",
+      "node": "Wheel.front-left",
+      "position": [
+        0,
+        0,
+        -0.22
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "id": "idle",
+      "role": "idle",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "node": "Chassis"
+          },
+          "property": "location",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0.45
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                0,
+                0.455
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0,
+                0.45
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "drive",
+      "role": "drive",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "node": "Chassis"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                0.01999866669333308,
+                0,
+                0.9998000066665778
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "states": [
+    {
+      "id": "idle",
+      "clip": "idle",
+      "terminal": false
+    },
+    {
+      "id": "drive",
+      "clip": "drive",
+      "terminal": false
+    }
+  ],
+  "transitions": [
+    {
+      "from": "idle",
+      "to": "drive",
+      "trigger": "drive",
+      "duration": 0.25
+    }
+  ],
+  "parameters": [
+    {
+      "id": "speed",
+      "unit": "metres-per-second",
+      "min": 0,
+      "max": 50,
+      "default": 0,
+      "bindings": [
+        {
+          "node": "Wheel.front-left",
+          "property": "rotation",
+          "axis": "x",
+          "mode": "angular-speed",
+          "scale": 4.545454545454546
+        },
+        {
+          "node": "Wheel.front-right",
+          "property": "rotation",
+          "axis": "x",
+          "mode": "angular-speed",
+          "scale": 4.545454545454546
+        },
+        {
+          "node": "Wheel.rear-left",
+          "property": "rotation",
+          "axis": "x",
+          "mode": "angular-speed",
+          "scale": 4.545454545454546
+        },
+        {
+          "node": "Wheel.rear-right",
+          "property": "rotation",
+          "axis": "x",
+          "mode": "angular-speed",
+          "scale": 4.545454545454546
+        }
+      ]
+    }
+  ],
+  "effects": [],
+  "budgets": {
+    "maxTriangles": 10000,
+    "maxBones": 0,
+    "maxInfluences": 0,
+    "maxMaterials": 6,
+    "maxTextureBytes": 1048576,
+    "maxRuntimeBytes": 8388608,
+    "maxClips": 24,
+    "maxClipSeconds": 5,
+    "maxSamples": 10000,
+    "maxPreviewFrames": 600,
+    "maxAttempts": 20,
+    "timeoutSeconds": 120,
+    "maxLogBytes": 16777216
+  },
+  "review": {
+    "renderer": "BLENDER_WORKBENCH",
+    "fps": 12,
+    "resolution": [
+      256,
+      256
+    ],
+    "cameras": [
+      "front",
+      "three-quarter"
+    ]
+  },
+  "provenance": {
+    "provider": "native-blender",
+    "purpose": "Editable authoring example; fit declared geometry, parts and skeleton to the actual reviewed model",
+    "rights": "Supply actual model and imported clip rights separately"
+  }
+}

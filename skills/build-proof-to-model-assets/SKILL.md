@@ -22,6 +22,8 @@ Use when PROOF_TO_MODEL is resolved for 2D-to-3D asset production or when resumi
 8. Run `review` and `validate`; inspect independent re-import findings, original-source comparisons and six matching-camera proof/render pairs. Nominal camera alignment does not establish likeness or anatomical correctness. Route required rig/animation work through subject-specific skills with evidence before declaring readiness.
 9. Use `record` for current independent reviewer and separate human acceptance/rejection receipts. Check `status`; changed inputs invalidate affected proofs, approvals and dependent results. Use `promote` only after explicit current human acceptance and task authorization.
 
+For model-to-animation production, hand the reviewed model to `build-model-animations`. Preserve original-only classification as source evidence; record new topology/articulation findings separately. Animation readiness may require neutral-pose or geometry repair work, especially fused limbs/equipment. Its motion package and complete-clip/runtime review do not inherit proof-set or static-asset acceptance.
+
 ## Guardrails
 
 - No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling application dependency. Native process guards are not an OS sandbox.

@@ -26,6 +26,8 @@ engines: [AGNOSTIC]
 
 When the authored source is Blender, use `rig-and-animate-blender-actors` for armature, weighting, action, NLA, root-motion, and exportable-deform-bone preparation before this runtime contract begins.
 
+Use `build-model-animations` for the native downstream readiness, rig/hierarchy, motion authoring/retargeting, full-clip review and selected-engine handoff workflow. Its skinned/articulated/rigid motion package can represent noncombatants and vehicles; the existing rigged-actor/v1 contract still requires its declared combat actor roles. Do not add fake attacks, colliders or bones to make another profile pass v1.
+
 Read [runtime-actor-contract.md](references/runtime-actor-contract.md) when designing the handoff or diagnosing runtime behavior. Read [rigged-actor-manifest.md](references/rigged-actor-manifest.md) when authoring or validating the durable manifest.
 
 ## Output

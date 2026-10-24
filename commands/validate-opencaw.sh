@@ -51,6 +51,9 @@ done
 [[ -n "$python_bin" ]] || { echo 'Python 3.10+ is required for native proof-to-model integration checks.' >&2; exit 1; }
 "$python_bin" tests/test-proof-model-blender.py
 "$python_bin" tests/test-proof-model-native-integration.py
+bash ./tests/test-model-to-animation.sh
+"$python_bin" tests/test-model-animation-blender.py
+"$python_bin" tests/test-model-animation-native-integration.py
 ./tests/test-code-character-contract.sh
 ./tests/test-code-character-skills.sh
 ./tests/test-code-character-evidence.sh

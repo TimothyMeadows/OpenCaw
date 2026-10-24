@@ -19,7 +19,7 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
     {
         w.Save(manifestPath, m);
         var audit = new AuditEvent { Type = "state", Message = "Asset state persisted", Data = new Dictionary<string, string> { { "asset", m.Asset }, { "manifest", manifestPath } } };
-        File.AppendAllText(w.Resolve(State + "/audit.jsonl"), JsonSerializer.Serialize(audit, Serialization.Json).Replace("\n", "") + "\n");
+        OpenCaw.AssetProduction.AuditJournal.Append(w, State + "/audit.jsonl", audit);
     }
     JsonObject Toolchain => w.Load<JsonObject>(m.Toolchain);
     bool IsMultiView => m.SchemaVersion == 2;

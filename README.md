@@ -82,7 +82,7 @@ Use OpenCaw to take a game concept toward a playable, reviewed result, or to imp
 | Game design | Player decisions, core loops, progression, economies, difficulty, and balance hypotheses | Design briefs and observed playtest results |
 | Gameplay and worlds | Movement, combat, physics, actors, level systems, persistence, and engine integration | Tests and representative playable scenarios |
 | Game UI and feedback | HUD synchronization, screen/input ownership, controller focus, accessibility, camera, VFX, audio cues, and haptics | Layout/input checks and supported-device testing |
-| Art and assets | Visual direction, 2D proofs, native proof-to-model production, Blender authoring, rigging, animation, and runtime handoff | Source ancestry, technical budgets, independent reviews, and human acceptance |
+| Art and assets | Visual direction, 2D proofs, native proof-to-model production, model-to-animation, Blender authoring, and runtime handoff | Source ancestry, technical budgets, complete motion review, independent reviews, and human acceptance |
 | Audio | Music, ambience, sound effects, and voice through explicitly selected tools | Rights, provenance, listening review, and runtime budgets |
 | QA and performance | Gameplay regressions, scene budgets, lifecycle cleanup, profiling, and target-platform builds | Actual engine/device results, with blocked checks stated |
 | Game services and delivery | Multiplayer integration, databases, backend services, security, CI/CD, and release preparation | Service/integration tests and reviewed delivery evidence |
@@ -824,6 +824,7 @@ Or run the command directly:
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
 | Native proof-to-model assets | `proof-to-model.sh` |
+| Native model-to-animation production | `model-to-animation.sh` |
 | Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
 | Code-first Three.js characters | `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `measure-code-character-evidence.sh`, `record-code-character-calibration.sh`, `record-code-character-gate.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
@@ -1318,6 +1319,35 @@ flowchart TB
 ```
 
 Rejected or changed inputs return to the affected stage and invalidate dependent results. Reconstruction does not establish likeness, rigging, animation, or production readiness by itself.
+
+### Model to animation
+
+`MODEL_TO_ANIMATION` continues from a reviewed model into motion production and selected-engine integration. It composes after PROOF_TO_MODEL, Blender, copied libraries or an explicitly compatible CODE handoff; it does not replace the primary art pipeline or select another engine. Use `build-model-animations` and `model-to-animation.sh` with `--help`. Its contract, schemas, recipes, audited Blender scripts and engine adapter live in `.styles/.workflows/model-to-animation/`.
+
+Start by checking animation readiness. A display mesh may have fused limbs, attached equipment or missing independent wheels and may need modeling repair. Choose a skinned character, articulated mechanism or rigid-object profile. The existing combat-focused rigged-actor/v1 manifest remains available for valid consumers; vehicles and noncombatants do not need fake bones, attacks or combat colliders.
+
+The native .NET 10 workflow preserves the source and recipe, runs fixed hash-bound Blender 4.5 LTS stages, authors declarative motion or explicitly retargets owned/licensed clips, bakes and exports editable sources/GLB, and reviews full motion ranges. Rig/hierarchy and motion selection, independent review and human runtime acceptance remain separate hash-bound evidence. This audited batch contract does not relax standalone BLENDER connected-authoring policy. Inputs cannot select arbitrary scripts or execute embedded code.
+
+Humanoids can declare run, jump takeoff/air/landing, swimming and death motions. Cars use real wheel, steering and suspension parts. Ships can use rigid hulls, thruster anchors and cruise/boost/warp states. Continuous speed and acceleration drive presentation; warp has explicit enter/sustain/exit/cancel phases. The gameplay controller retains movement, collision and travel authority. Clips, particles and completion callbacks do not decide gameplay outcomes.
+
+Motion packages keep clips, hierarchy, parameters and effect anchors alongside selected-engine bindings. A GLB does not instantiate a portable particle system or state machine. Compatible animation/VFX/material/camera/audio owners implement bounded effects and cleanup in the selected engine. Three.js uses host-provided animation and point/mesh/material primitives without an implicit CDN or extra particle library. Other native engines require their actual import/tooling evidence; Phaser's 2D path needs an explicit sprite/pre-rendered handoff. CODE remains Three.js source authoring.
+
+No Adobe products, services or authoring integrations are supported by this workflow. Native authoring and reviewed non-Adobe clip imports are the baseline. Optional rig aids, AI models, hosted services and paid motion libraries remain separate dependency and rights decisions; ordinary production installs and downloads nothing. Source, rig, clip, mapping, recipe, tool or engine changes invalidate dependent evidence. State stays in `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs stay in `.art-staging/model-to-animation/`; explicit promotion targets reviewed runtime assets under `<project-root>/assets/models/`.
+
+```mermaid
+flowchart TB
+    accTitle: Native model-to-animation game production
+    accDescr: Inspect a reviewed model for animation readiness, prepare an actual skeleton or articulated or rigid hierarchy, author or retarget motion, bake and independently re-import exports, review complete clips and transitions, and verify compatible engine playback and effects before human runtime acceptance and promotion.
+
+    Model["Reviewed model and rights"] --> Ready["Animation readiness<br/>Repair fused or missing articulation"]
+    Ready --> Rig["Skinned, articulated or rigid profile<br/>Human rig/hierarchy review"]
+    Rig --> Motion["Native motion authoring<br/>or reviewed clip retargeting"]
+    Motion --> Bake["Bake, export and independently re-import"]
+    Bake --> Review["Full-clip and transition review<br/>Human motion selection"]
+    Review --> Engine["Compatible engine animation and effects<br/>Movement remains simulation-owned"]
+    Engine --> Accept["Independent review and separate<br/>human runtime acceptance"]
+    Accept --> Promote["Explicit reviewed asset promotion"]
+```
 
 ### Optional external 3D asset libraries
 
