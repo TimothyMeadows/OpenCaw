@@ -6,7 +6,7 @@ using OpenCaw.ProofToModel.Domain;
 
 namespace OpenCaw.ProofToModel.Application;
 
-public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, INativeProcess native, IAlphaProcessor alpha)
+public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> options, INativeProcess native, IAlphaProcessor alpha)
 {
 
     string manifestPath = ""; Manifest m = new();
@@ -22,6 +22,9 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         File.AppendAllText(w.Resolve(State + "/audit.jsonl"), JsonSerializer.Serialize(audit, Serialization.Json).Replace("\n", "") + "\n");
     }
     JsonObject Toolchain => w.Load<JsonObject>(m.Toolchain);
+    bool IsMultiView => m.SchemaVersion == 2;
+    string[] StageOrder => IsMultiView ? ["classify", "prepare-proofs", "preprocess", "reconstruct", "finish", "guided", "review"] : ["preprocess", "reconstruct", "finish", "guided", "review"];
+    string ProofApprovalKind => IsMultiView ? "proof-set" : "proof";
     string CurrentStyle => Hash("STYLE.md");
     IEnumerable<string> MetadataPaths => new[] { m.ProofMetadata, m.Brief }.Where(path => !string.IsNullOrEmpty(path));
     void Fresh(string? rerun = null)
@@ -37,7 +40,19 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         }
         if (CurrentStyle != m.StyleHash)
             throw new InvalidOperationException("Style contract changed; initialize a new asset version");
-        var ordered = new[] { "preprocess", "reconstruct", "finish", "guided", "review" };
+        if (IsMultiView)
+        {
+            var classification = m.Classification;
+            var proofSet = m.ProofSet;
+            try
+            {
+                if (rerun == "classify") m.Classification = "";
+                if (rerun is "classify" or "prepare-proofs") m.ProofSet = "";
+                ValidatePreparation();
+            }
+            finally { m.Classification = classification; m.ProofSet = proofSet; }
+        }
+        var ordered = StageOrder;
         var stop = Array.IndexOf(ordered, rerun);
         var relevant = stop < 0 ? m.Stages.Values : m.Stages.Where(pair => Array.IndexOf(ordered, pair.Key) < stop).Select(pair => pair.Value);
         foreach (var stage in relevant.Where(s => s.Status == "complete"))
@@ -52,8 +67,8 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     }
     string ApprovalFingerprint(string kind)
     {
-        IEnumerable<string> outputs = kind == "proof" ? [] : kind == "preprocessing" ? (m.Stages.GetValueOrDefault("preprocess")?.Outputs.Keys ?? Enumerable.Empty<string>()) : m.Stages.Where(p => p.Value.Status == "complete" && (!(kind is "rigging" or "animation") || p.Key != "review")).SelectMany(p => p.Value.Outputs.Keys);
-        return Fingerprint(outputs.Append(m.Proof).Append(m.Rights).Append(m.Recipe).Append(m.Toolchain).Append("STYLE.md").Concat(MetadataPaths));
+        IEnumerable<string> outputs = kind is "proof" or "proof-set" ? [] : kind == "preprocessing" ? (m.Stages.GetValueOrDefault("preprocess")?.Outputs.Keys ?? Enumerable.Empty<string>()) : m.Stages.Where(p => p.Value.Status == "complete" && (!(kind is "rigging" or "animation") || p.Key != "review")).SelectMany(p => p.Value.Outputs.Keys);
+        return Fingerprint(outputs.Append(m.Proof).Append(m.Rights).Append(m.Recipe).Append(m.Toolchain).Append("STYLE.md").Concat(MetadataPaths).Concat(IsMultiView ? PreparationPaths() : []));
     }
     bool Approved(string kind) => m.Approvals.Any(a => a.Kind == kind && a.Fingerprint == ApprovalFingerprint(kind) && File.Exists(w.Resolve(a.Evidence)) && Hash(a.Evidence) == a.EvidenceHash);
     void RequireApproval(string kind)
@@ -74,6 +89,12 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         m = w.Load<Manifest>(manifestPath);
         CheckStatePaths();
         using var assetLock = w.Lock(State + "/asset.lock");
+        // Re-read after acquiring ownership: a preceding run may have atomically
+        // saved newer state between the initial layout check and this lock.
+        m = w.Load<Manifest>(manifestPath);
+        CheckStatePaths();
+        if (!IsMultiView && command is not ("status" or "doctor") && options.GetValueOrDefault("mode") != "single-view-diagnostic")
+            throw new InvalidOperationException("Historical v1 state is single-view. Initialize a fresh v2 version for six-view production; --mode single-view-diagnostic explicitly selects diagnostic execution only.");
         if (command == "status")
         {
             Console.WriteLine(JsonSerializer.Serialize(new
@@ -82,6 +103,7 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
                 approvalFingerprints = new
                 {
                     proof = ApprovalFingerprint("proof"),
+                    proofSet = ApprovalFingerprint("proof-set"),
                     preprocessing = ApprovalFingerprint("preprocessing"),
                     rigging = ApprovalFingerprint("rigging"),
                     animation = ApprovalFingerprint("animation"),
@@ -99,25 +121,41 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         Fresh(command);
         switch (command)
         {
+            case "reuse":
+                if (!IsMultiView) throw new InvalidOperationException("Use a fresh v2 six-view asset for production reuse");
+                await ReuseMultiView(cancellation);
+                break;
+            case "classify":
+                if (!IsMultiView) throw new InvalidOperationException("Classification requires a new v2 asset version");
+                m.Classification = "";
+                m.ProofSet = "";
+                await RunStage(command, PreparationPaths().Append(Need("classification")), RegisterClassification, cancellation);
+                break;
+            case "prepare-proofs":
+                if (!IsMultiView) throw new InvalidOperationException("Six-view proof preparation requires a new v2 asset version");
+                RequireStage("classify");
+                await RunStage(command, PreparationPaths().Append(Need("proof-set")), RegisterProofSet, cancellation);
+                break;
             case "preprocess":
-                RequireApproval("proof");
-                await RunStage(command, [m.Proof, m.Rights, m.Recipe, m.Toolchain, "STYLE.md"], Preprocess, cancellation);
+                if (IsMultiView) { RequireStage("classify"); RequireStage("prepare-proofs"); }
+                RequireApproval(ProofApprovalKind);
+                await RunStage(command, new[] { m.Proof, m.Rights, m.Recipe, m.Toolchain, "STYLE.md" }.Concat(IsMultiView ? PreparationPaths() : []), IsMultiView ? PreprocessViews : Preprocess, cancellation);
                 break;
             case "reconstruct":
-                RequireApproval("proof");
+                RequireApproval(ProofApprovalKind);
                 RequireApproval("preprocessing");
                 RequireStage("preprocess");
-                await RunStage(command, RequireStage("preprocess").Outputs.Keys.Append(m.Toolchain), Reconstruct, cancellation);
+                await RunStage(command, RequireStage("preprocess").Outputs.Keys.Append(m.Toolchain).Concat(IsMultiView ? PreparationPaths() : []), IsMultiView ? ReconstructViews : Reconstruct, cancellation);
                 break;
             case "finish":
-                RequireApproval("proof");
+                RequireApproval(ProofApprovalKind);
                 RequireApproval("preprocessing");
                 RequireStage("reconstruct");
                 await RunStage(command, RequireStage("reconstruct").Outputs.Keys.Append(m.Recipe).Append(m.Toolchain), Finish, cancellation);
                 break;
             case "review":
                 RequireStage("finish");
-                await RunStage(command, RequireStage("finish").Outputs.Keys.Append(m.Proof).Append(m.Toolchain), Review, cancellation);
+                await RunStage(command, RequireStage("finish").Outputs.Keys.Append(m.Proof).Append(m.Toolchain).Concat(IsMultiView ? PreparationPaths() : []), Review, cancellation);
                 break;
             case "record":
                 Record();
@@ -135,6 +173,16 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     }
     void Init()
     {
+        var selectedMode = options.GetValueOrDefault("mode", "multi-view");
+        if (selectedMode is not ("multi-view" or "single-view-diagnostic"))
+            throw new InvalidOperationException("Mode must be multi-view or explicitly single-view-diagnostic; no silent fallback");
+        if (selectedMode == "multi-view" && options.ContainsKey("reuse-manifest"))
+            throw new InvalidOperationException("Register/classify/approve the new six-view asset first, then use reuse --reuse-manifest; init cannot inherit a donor's approvals");
+        if (options.ContainsKey("sources") && options.ContainsKey("proof"))
+            throw new InvalidOperationException("Supply --proof as one original or --sources as a source set, not both");
+        var initialProof = options.TryGetValue("sources", out var sourceSetPath)
+            ? w.Load<JsonObject>(sourceSetPath)["images"]?.AsArray().FirstOrDefault()?["path"]?.GetValue<string>() ?? throw new InvalidOperationException("Source set requires images with paths")
+            : Need("proof");
         var asset = Id(Need("asset"));
         var version = Id(Need("version"));
         var task = Id(Need("task"));
@@ -146,11 +194,12 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         using var assetLock = w.Lock(Path.GetDirectoryName(manifestPath) + "/asset.lock");
         m = new()
         {
+            SchemaVersion = selectedMode == "multi-view" ? 2 : 1,
             Asset = asset,
             Version = version,
             Task = task,
             Staging = $".art-staging/proof-to-model/{asset}/{version}",
-            Proof = w.Relative(Need("proof")),
+            Proof = w.Relative(initialProof),
             Rights = w.Relative(Need("rights")),
             Recipe = w.Relative(Need("recipe")),
             Toolchain = w.Relative(Need("toolchain")),
@@ -208,6 +257,8 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
             m.Brief = m.Staging + "/original/brief.json";
             w.Save(m.Brief, initialBrief);
         }
+        if (IsMultiView)
+            InitializeSources();
         Save();
         if (options.TryGetValue("reuse-manifest", out var donor))
             Reuse(donor);
@@ -254,7 +305,7 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     }
     void CheckStatePaths()
     {
-        if (m.SchemaVersion != 1)
+        if (m.SchemaVersion is not (1 or 2))
             throw new InvalidOperationException("Unsupported manifest schema version");
         Id(m.Asset);
         Id(m.Version);
@@ -263,6 +314,11 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
             throw new InvalidOperationException("Manifest/staging/original proof paths violate the repository-local asset layout");
         foreach (var approval in m.Approvals)
             RequireTaskEvidence(approval.Evidence);
+        if (IsMultiView && (!m.SourceSet.StartsWith(m.Staging + "/original/", StringComparison.Ordinal) || !File.Exists(w.Resolve(m.SourceSet))))
+            throw new InvalidOperationException("V2 requires its immutable original source set; initialize a fresh asset version");
+        foreach (var path in new[] { m.Classification, m.ProofSet }.Where(x => !string.IsNullOrEmpty(x)))
+            if (!w.Relative(path).StartsWith(m.Staging + "/attempts/", StringComparison.Ordinal))
+                throw new InvalidOperationException("Preparation records must remain in this asset's immutable attempts");
     }
     void RequireTaskEvidence(string evidence)
     {
@@ -271,6 +327,8 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     }
     void Reuse(string donorPath)
     {
+        if (IsMultiView)
+            throw new InvalidOperationException("V2 reuse requires current classification and approved six-view preparation; use reuse after preparation, never a single-view donor at init");
         var donorOptions = new Dictionary<string, string> { { "manifest", w.Relative(donorPath) } };
         var donor = new Pipeline(w, donorOptions, native, alpha) { manifestPath = w.Relative(donorPath) };
         donor.m = w.Load<Manifest>(donor.manifestPath);
@@ -325,10 +383,14 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         var ratios = recipe["lodRatios"]!.AsArray().Select(x => x!.GetValue<double>()).ToArray();
         if (ratios.Length == 0 || ratios.Any(x => x <= 0 || x >= 1) || ratios.Zip(ratios.Skip(1)).Any(x => x.First <= x.Second))
             throw new InvalidOperationException("LOD ratios must decrease inside (0,1)");
+        if (IsMultiView && (recipe["proofPreparation"]?["maxSetRevisions"]?.GetValue<int>() is not int revisions || revisions < 1 || revisions > 100))
+            throw new InvalidOperationException("V2 recipe requires proofPreparation.maxSetRevisions inside 1..100");
     }
     async Task RunStage(string name, IEnumerable<string> inputs, Func<Stage, CancellationToken, Task> run, CancellationToken cancellation)
     {
-        var maxAttempts = Toolchain["limits"]?["maxAttempts"]?.GetValue<int>() ?? 3;
+        var maxAttempts = IsMultiView && name is "classify" or "prepare-proofs"
+            ? w.Load<JsonObject>(m.Recipe)["proofPreparation"]!["maxSetRevisions"]!.GetValue<int>()
+            : Toolchain["limits"]?["maxAttempts"]?.GetValue<int>() ?? 3;
         if (maxAttempts < 1 || m.History.Count(item => item["event"]?.GetValue<string>() == "stage-start" && item["stage"]?.GetValue<string>() == name) >= maxAttempts)
             throw new InvalidOperationException("Stage attempt budget exhausted; select a new asset version/budget explicitly");
         _ = Timeout;
@@ -343,10 +405,13 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
             ["timestamp"] = DateTimeOffset.UtcNow.ToString("O")
         });
         m.Stages[name] = stage;
-        var order = new[] { "preprocess", "reconstruct", "finish", "guided", "review" };
+        var order = StageOrder;
         foreach (var later in order.Skip(Array.IndexOf(order, name) + 1))
             m.Stages.Remove(later);
-        m.Approvals.RemoveAll(a => a.Kind != "proof" && (name == "preprocess" || a.Kind != "preprocessing") && !(name == "review" && (a.Kind is "rigging" or "animation")));
+        if (IsMultiView)
+            m.Approvals.RemoveAll(a => name is "classify" or "prepare-proofs" || (a.Kind != "proof-set" && (name == "preprocess" || a.Kind != "preprocessing") && !(name == "review" && (a.Kind is "rigging" or "animation"))));
+        else
+            m.Approvals.RemoveAll(a => a.Kind != "proof" && (name == "preprocess" || a.Kind != "preprocessing") && !(name == "review" && (a.Kind is "rigging" or "animation")));
         Save();
         try
         {
@@ -356,6 +421,12 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
                 ValidateArtifact(artifact);
                 stage.Outputs[artifact] = Hash(artifact);
             }
+            foreach (var input in stage.Inputs)
+                if (!File.Exists(w.Resolve(input.Key)) || Hash(input.Key) != input.Value)
+                    throw new InvalidOperationException("Stage changed a bound input: " + input.Key);
+            foreach (var input in stage.ExternalInputs)
+                if (!File.Exists(input.Key) || w.HashFile(input.Key) != input.Value)
+                    throw new InvalidOperationException("Stage changed a bound tool/script: " + input.Key);
             if (stage.Outputs.Count == 0)
                 throw new InvalidOperationException("Stage emitted no artifacts");
             stage.Fingerprint = Fingerprint(stage.Inputs.Keys);
@@ -605,10 +676,16 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         }
         w.Save(job, new
         {
-            schemaVersion = 1,
+            schemaVersion = IsMultiView && mode == "review" ? 2 : 1,
+            mode = IsMultiView ? "multi-view" : "single-view-diagnostic",
             root = w.Root,
             input,
-            proof = m.Proof,
+            inputFrame = IsMultiView ? mode == "finish" ? "pixal3d-mv-export" : "opencaw-proof-z-up" : "legacy-native",
+            engineToProofScale = IsMultiView ? 1.0 / CurrentProofSet()["camera"]!["meshScale"]!.GetValue<double>() : 1.0,
+            proof = IsMultiView ? CurrentFrontProof() : m.Proof,
+            proofSet = IsMultiView && mode == "review" ? w.Load<JsonObject>(Artifact("preprocess", "dataset")) : null,
+            sourceSet = IsMultiView && mode == "review" ? w.Load<JsonObject>(m.SourceSet) : null,
+            classification = IsMultiView && mode == "review" ? w.Load<JsonObject>(m.Classification) : null,
             outputDir = s.Attempt + "/outputs",
             recipe,
             subjectRequirements,
@@ -630,8 +707,16 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     void Record()
     {
         var kind = Need("kind");
-        if (!new[] { "proof", "preprocessing", "independent", "human", "rigging", "animation" }.Contains(kind))
+        if (!new[] { "proof", "proof-set", "preprocessing", "independent", "human", "rigging", "animation" }.Contains(kind))
             throw new InvalidOperationException("Unknown approval kind");
+        if (kind == "proof" && IsMultiView || kind == "proof-set" && !IsMultiView)
+            throw new InvalidOperationException("Record the current " + ProofApprovalKind + " approval; single-image approval cannot approve six-view production");
+        if (kind == "proof-set")
+        {
+            RequireStage("classify");
+            RequireStage("prepare-proofs");
+            _ = CurrentProofSet();
+        }
         var reviewer = Need("reviewer");
         if (kind == "independent" && reviewer == m.CreatedBy)
             throw new InvalidOperationException("Independent reviewer must differ from asset creator");
@@ -647,7 +732,7 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         var fingerprint = ApprovalFingerprint(kind);
         if (receipt["kind"]?.GetValue<string>() != kind || receipt["reviewer"]?.GetValue<string>() != reviewer || receipt["decision"]?.GetValue<string>() != "approved" || receipt["fingerprint"]?.GetValue<string>() != fingerprint || string.IsNullOrWhiteSpace(receipt["reason"]?.GetValue<string>()))
             throw new InvalidOperationException("Review evidence must identify kind, reviewer, approved decision, reason and current fingerprint: " + fingerprint);
-        if (kind is "proof" or "human" && receipt["human"]?.GetValue<bool>() != true)
+        if (kind is "proof" or "proof-set" or "human" && receipt["human"]?.GetValue<bool>() != true)
             throw new InvalidOperationException("Human decision assertion required; CLI does not authenticate reviewer identity");
         if (kind is "rigging" or "animation")
         {
@@ -729,11 +814,17 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
         if (m.Stages.ContainsKey("reconstruct"))
         {
             RequireStage("preprocess");
-            RequireApproval("proof");
+            RequireApproval(ProofApprovalKind);
             RequireApproval("preprocessing");
+            if (IsMultiView) ValidateMultiViewDataset(w.Load<JsonObject>(Artifact("preprocess", "dataset")));
         }
         if (m.Stages.ContainsKey("preprocess"))
-            RequireApproval("proof");
+            RequireApproval(ProofApprovalKind);
+        if (IsMultiView && m.Stages.ContainsKey("preprocess"))
+        {
+            RequireStage("classify");
+            RequireStage("prepare-proofs");
+        }
         if (m.Stages.ContainsKey("finish"))
             RequireStage("reconstruct");
         if (m.Stages.ContainsKey("review"))
@@ -761,6 +852,8 @@ public sealed class Pipeline(IWorkspace w, Dictionary<string, string> options, I
     }
     void Promote()
     {
+        if (!IsMultiView)
+            throw new InvalidOperationException("Single-view diagnostic assets cannot be promoted; initialize an approved six-view v2 production asset");
         Validate();
         if (string.IsNullOrEmpty(m.Brief))
             throw new InvalidOperationException("Promotion requires an immutable --brief at init (purpose, scale.units=metres, scale.metersPerUnit=1, interfaces). Initialize a new version with a brief; no scale is inferred.");

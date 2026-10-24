@@ -9,6 +9,9 @@ public sealed class Manifest
     public string StyleHash { get; set; } = ""; public string Proof { get; set; } = "";
     public string Rights { get; set; } = ""; public string Recipe { get; set; } = "";
     public string ProofMetadata { get; set; } = "";
+    public string SourceSet { get; set; } = "";
+    public string Classification { get; set; } = "";
+    public string ProofSet { get; set; } = "";
     public string Brief { get; set; } = "";
     public string Toolchain { get; set; } = ""; public string CreatedBy { get; set; } = "";
     public Dictionary<string, Stage> Stages { get; set; } = new(StringComparer.Ordinal);

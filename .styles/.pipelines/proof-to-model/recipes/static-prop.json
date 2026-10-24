@@ -1,5 +1,8 @@
 {
   "schemaVersion": 1,
+  "proofPreparation": {
+    "maxSetRevisions": 4
+  },
   "targetFaces": 1500,
   "textureSize": 512,
   "cageExtrusion": 0.01,

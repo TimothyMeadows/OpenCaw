@@ -62,7 +62,7 @@ try
         riggingRequired = false,
         animationRequired = false
     });
-    var opts = new Dictionary<string, string> { { "asset", "fixture" }, { "version", "v1" }, { "task", "tests" }, { "proof", "proof.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
+    var opts = new Dictionary<string, string> { { "mode", "single-view-diagnostic" }, { "asset", "fixture" }, { "version", "v1" }, { "task", "tests" }, { "proof", "proof.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
     await new Pipeline(w, opts, new NativeProcess(), new AlphaProcessor()).Execute("init", default);
     var manifest = ".opencaw/.cache/tasks/tests/proof-to-model/fixture/v1/manifest.json";
     opts["manifest"] = manifest;
@@ -101,6 +101,10 @@ try
     Check(w.Load<Manifest>(manifest).Stages["preprocess"].Status == "failed", "failed attempts persist for recovery");
     await ExtendedTests.Run(w, Check, Reject);
     await PolicyTests.Run(w, Check, Reject);
+    await PreparationTests.Run(w, Check, Reject);
+    await MultiViewReuseTests.Run(w, Check, Reject);
+    await MultiViewGeometryTests.Run(w, Check, Reject);
+    await MultiViewPipelineTests.Run(w, Check, Reject);
     passed += CompatibilityTests.Run();
     File.AppendAllText(w.Resolve("STYLE.md"), "changed");
     await Reject(() => new Pipeline(w, opts, new NativeProcess(), new AlphaProcessor()).Execute("validate", default), "changed style invalidates evidence");

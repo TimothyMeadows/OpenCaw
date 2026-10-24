@@ -6,7 +6,7 @@ Selectable pipelines:
 
 - `CLOUD` - session-provided image generation with explicit cost, provenance, staging, and review controls.
 - `LOCAL` - loopback-only ComfyUI image and audio generation using reviewed local GPU tooling.
-- `PROOF_TO_MODEL` - approved 2D proof to pinned native reconstruction, Blender finishing and reviewed runtime packages.
+- `PROOF_TO_MODEL` - original-only anatomy/structure classification, reviewed six-view proofs, pinned native multi-view reconstruction, Blender finishing and reviewed runtime packages.
 - `CODE` - authored procedural Three.js models, with linked character profiles, isolated visual review, and calibrated runtime evidence for characters and creatures.
 - `BLENDER` - authored Blender 4.5 LTS scenes, assets, renders, and exports with immutable-source and review controls.
 

@@ -132,11 +132,13 @@ Registered pipelines are `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDE
 
 - `CLOUD`: use compatible generation exposed by the active session with explicit budgets, non-runtime staging, provenance, and human review.
 - `LOCAL`: use pinned loopback-only ComfyUI image/audio execution on local GPU resources with license and checksum gates.
-- `PROOF_TO_MODEL`: run native approved-proof preprocessing, pinned Pixal3D reconstruction and Blender 4.5 LTS finishing with immutable ancestry, independent review and separate human promotion; use `build-proof-to-model-assets`.
+- `PROOF_TO_MODEL`: classify/research immutable original sources first, prepare and obtain human approval of six consistent views, then run native per-view preprocessing, pinned Pixal3D multi-view reconstruction and Blender 4.5 LTS finishing with immutable ancestry, independent review and separate human promotion; use `build-proof-to-model-assets`.
 - `CODE`: author host-native Three.js TypeScript/JavaScript models; do not use downloaded/generated mesh assets or a model library as the primary implementation.
 - `BLENDER`: author Blender 4.5 LTS scenes, assets, renders, and runtime exports through immutable working-copy, validation, staging, and human-review controls.
 
-PROOF_TO_MODEL uses only its fixed, audited, hash-bound Blender batch scripts on repository-local working copies. This batch-authoring exception does not relax standalone BLENDER connected-authoring policy or authorize arbitrary scripts. Setup is dry-run unless explicitly executed with applicable license evidence; never install drivers or download during ordinary production. Preserve proof approvals, immutable originals, recipe/tool hashes, and independent review evidence. Rigging and animation require subject-specific evidence when applicable. CSS/SVG game interface work remains supported outside the retired CSS3 pipeline.
+PROOF_TO_MODEL classifies only registered original images; generated proofs and model renders cannot establish source anatomy, structure or material. Separate observation, supported inference and uncertainty. Preserve distinct entities, intentional anatomy and attachment ownership. One usable canonical source supplies one angle and needs five additional proofs; an oblique/cropped source remains an anchor and may need all six canonical views. Show originals and front/right/back/left/top/bottom together, allow targeted revisions and require approval of the exact complete set. `classify` and `prepare-proofs` register real assistant/provider artifacts; they do not run vision or image generation. Generated views require separately authorized CLOUD/LOCAL production under MEDIA.md and explicit candidate/revision budgets. A set revision invalidates whole-set approval. Six separate prepared images and camera matrices must reach MV inference; contact sheets and single-view diagnostics cannot satisfy production.
+
+PROOF_TO_MODEL uses only its fixed, audited, hash-bound Blender batch scripts on repository-local working copies. This batch-authoring exception does not relax standalone BLENDER connected-authoring policy or authorize arbitrary scripts. Setup is dry-run unless explicitly executed with applicable license evidence; never install drivers or download during ordinary production. Preserve set approvals, immutable originals, recipe/tool hashes, and independent review evidence. The pinned engine accepts six views but upstream validation covers four; structural/simulated checks do not establish six-view visual quality. Rigging and animation require subject-specific evidence when applicable. CSS/SVG game interface work remains supported outside the retired CSS3 pipeline.
 
 If a selected pipeline is unavailable or fails, stop and request direction. Never switch or fall back to a different pipeline silently.
 
@@ -169,7 +171,7 @@ Cloud/local media contracts, shared provenance schemas, and pinned local manifes
 - Read it only for image, music, sound-effect, voice, or media-pipeline work.
 - Treat it as the execution and provenance authority for `CLOUD` and `LOCAL`: versions, staging, runtime destinations, budgets, rights, consent, review, and promotion policy.
 - For image generation, obey both the resolved art pipeline and `MEDIA.md`. Music, sound effects, and voice use `MEDIA.md` without depending on visual style.
-- Existing-proof `PROOF_TO_MODEL`, `CODE`, and `BLENDER` work do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Selecting PROOF_TO_MODEL never implicitly generates a proof or creates a media contract.
+- All-original six-view `PROOF_TO_MODEL`, `CODE`, and `BLENDER` work do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Selecting PROOF_TO_MODEL never implicitly authorizes proof generation or creates a media contract.
 
 ### When `../MEDIA.md` is missing
 

@@ -30,7 +30,7 @@ grep -Fq 'Blender 4.5 LTS' "$root/blender/PIPELINE.md" || { echo "BLENDER contra
 grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks immutable-source protection." >&2; exit 1; }
 grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
-for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json proof-to-model/manifest.schema.json proof-to-model/toolchain.json proof-to-model/recipes/static-prop.json code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
+for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json proof-to-model/manifest.schema.json proof-to-model/source-set.schema.json proof-to-model/classification.schema.json proof-to-model/proof-set.schema.json proof-to-model/toolchain.json proof-to-model/toolchain.single-view-diagnostic.json proof-to-model/recipes/static-prop.json code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
   [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }
 done
 
@@ -48,7 +48,24 @@ const files = [
   '.styles/.pipelines/code/code-character-evidence-report.schema.json'
 ];
 files.push('.styles/.pipelines/proof-to-model/manifest.schema.json', '.styles/.pipelines/proof-to-model/toolchain.json', '.styles/.pipelines/proof-to-model/recipes/static-prop.json');
+const proofRoot = '.styles/.pipelines/proof-to-model/';
+files.push(...['source-set.schema.json', 'classification.schema.json', 'proof-set.schema.json', 'toolchain.single-view-diagnostic.json'].map(file => proofRoot + file));
 for (const file of files) JSON.parse(fs.readFileSync(file, 'utf8'));
+const readProof = file => JSON.parse(fs.readFileSync(proofRoot + file, 'utf8'));
+const manifest = readProof('manifest.schema.json');
+if (!manifest.properties.schemaVersion.enum.includes(2)) throw new Error('Proof production requires manifest v2.');
+for (const key of ['sourceSet', 'classification', 'proofSet']) if (!manifest.properties[key]) throw new Error(`Proof manifest omits ${key}`);
+const classification = readProof('classification.schema.json');
+for (const key of ['sources', 'sourceViews', 'subjects', 'research', 'unknowns', 'conflicts']) if (!classification.required.includes(key)) throw new Error(`Classification schema omits ${key}`);
+const proofSet = readProof('proof-set.schema.json');
+if (proofSet.properties.views.minItems !== 6 || proofSet.properties.views.maxItems !== 6 || !proofSet.properties.views.items.properties.cameraAngleX) throw new Error('Proof schema requires six views and per-view intrinsics.');
+const mv = readProof('toolchain.json'), diagnostic = readProof('toolchain.single-view-diagnostic.json');
+if (mv.modelFamily !== 'mv' || mv.viewCount !== 6) throw new Error('Default proof toolchain must select six-view MV inference.');
+if (mv.modelDir === diagnostic.modelDir || mv.reconstruction.arguments.includes('--sv-image')) throw new Error('MV must remain separate from single-view diagnostics.');
+for (const [flag, value] of [['--pixal3d-weights','mv'], ['--num-views','6'], ['--res','1024']]) if (mv.reconstruction.arguments[mv.reconstruction.arguments.indexOf(flag) + 1] !== value) throw new Error(`Missing pinned MV argument ${flag}`);
+if (mv.models.filter(model => /\.gguf$/.test(model.path) && !/\/birefnet\.gguf$/.test(model.path)).length !== 9 || mv.models.some(model => model.licenseAccepted !== false || /_sv\.gguf$/.test(model.path))) throw new Error('Default MV requires nine explicit unaccepted model pins plus its explicit matting dependency.');
+if (mv.models.filter(model => /_mv\.gguf$/.test(model.path)).length !== 4) throw new Error('MV flow inventory is incomplete.');
+if (!Number.isInteger(readProof('recipes/static-prop.json').proofPreparation.maxSetRevisions)) throw new Error('Proof preparation requires an explicit revision budget.');
 const code = JSON.parse(fs.readFileSync(files[3], 'utf8'));
 const required = ['schemaVersion','modelId','intent','pipelineSelection','inputs','target','renderer','runtime','budgets','reviewPolicy','passes'];
 for (const key of required) if (!code.required.includes(key)) throw new Error(`Code model schema omits ${key}`);

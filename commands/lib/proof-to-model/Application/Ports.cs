@@ -23,6 +23,7 @@ public interface IAlphaProcessor
 {
     AlphaMatte? Inspect(string path);
     void SaveMask(string path, AlphaMatte matte);
+    void PadSquare(string input, string output, int side);
 }
 public static class Serialization
 {

@@ -102,7 +102,7 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 
 ## Art Production
 
-- `build-proof-to-model-assets` - Produce reviewed 3D assets from approved proofs through native reconstruction and Blender finishing.
+- `build-proof-to-model-assets` - Classify original anatomy/structure, prepare a reviewed six-view proof set, and produce staged 3D assets through native multi-view reconstruction and Blender finishing.
 - `select-art-pipeline` - Resolve CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
 - `use-external-asset-library` - Inspect optional read-only 3D asset libraries and copy an authorized candidate into `assets/models/` before use.
 - `threejs-build-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.

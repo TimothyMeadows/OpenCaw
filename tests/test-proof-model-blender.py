@@ -9,6 +9,8 @@ import sys
 import tempfile
 import unittest
 
+sys.dont_write_bytecode = True
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / ".styles/.pipelines/proof-to-model/blender"
 import shutil
@@ -20,7 +22,7 @@ class BlenderProduction(unittest.TestCase):
     def setUpClass(cls):
         if not Path(BLENDER).is_file():
             raise unittest.SkipTest("Blender 4.5 executable unavailable; set BLENDER_EXE")
-        evidence = ROOT / ".opencaw/.cache/tasks/proof-to-model/evidence"
+        evidence = ROOT / ".opencaw/.cache/tasks/proof-multiview-classification/evidence"
         evidence.mkdir(parents=True, exist_ok=True)
         cls.work = Path(tempfile.mkdtemp(prefix="lane-blender-", dir=evidence))
         cls.recipe = {"targetFaces": 100, "textureSize": 32, "cageExtrusion": 0.1,
@@ -87,6 +89,64 @@ bone.rotation_euler[0] = 1.2
 bone.keyframe_insert("rotation_euler", frame=25)
 rig.animation_data.action.name = "GuidedFixtureMotion"
 bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-guided.glb"), export_format="GLB", export_animations=True)
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.mesh.primitive_cube_add(size=1)
+obj = bpy.context.object
+obj.name = "SixDistinctFaces"
+obj.dimensions = (0.7, 0.5, 1.0)
+bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+colors = ((1, 0.02, 0.02, 1), (0.02, 1, 0.02, 1), (0.02, 0.02, 1, 1),
+          (1, 1, 0.02, 1), (1, 0.02, 1, 1), (0.02, 1, 1, 1))
+for index, color in enumerate(colors):
+    material = bpy.data.materials.new("KnownFace" + str(index))
+    material.use_nodes = True
+    shader = material.node_tree.nodes.get("Principled BSDF")
+    shader.inputs["Base Color"].default_value = color
+    shader.inputs["Emission Color"].default_value = color
+    shader.inputs["Emission Strength"].default_value = 1
+    shader.inputs["Roughness"].default_value = 1
+    obj.data.materials.append(material)
+for polygon in obj.data.polygons:
+    normal = polygon.normal
+    axis = max(range(3), key=lambda index: abs(normal[index]))
+    polygon.material_index = axis * 2 + int(normal[axis] < 0)
+obj.rotation_euler.z = 3.141592653589793
+bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-six-view.glb"), export_format="GLB")
+obj.rotation_euler.z = 0
+bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-six-view-proof-frame.glb"), export_format="GLB")
+from mathutils import Matrix
+distance = 3.1192049980163574
+cameras = {
+    "front": [[1,0,0,0],[0,0,-1,-distance],[0,1,0,0],[0,0,0,1]],
+    "right": [[0,0,-1,-distance],[-1,0,0,0],[0,1,0,0],[0,0,0,1]],
+    "back": [[-1,0,0,0],[0,0,1,distance],[0,1,0,0],[0,0,0,1]],
+    "left": [[0,0,1,distance],[1,0,0,0],[0,1,0,0],[0,0,0,1]],
+    "top": [[1,0,0,0],[0,1,0,0],[0,0,1,distance],[0,0,0,1]],
+    "bottom": [[1,0,0,0],[0,-1,0,0],[0,0,-1,-distance],[0,0,0,1]],
+}
+scene = bpy.context.scene
+scene.render.engine = "CYCLES"
+scene.cycles.device = "CPU"
+scene.cycles.samples = 8
+scene.render.resolution_x = scene.render.resolution_y = 384
+scene.render.resolution_percentage = 100
+scene.render.image_settings.file_format = "PNG"
+scene.world = bpy.data.worlds.new("Known source world")
+scene.world.use_nodes = True
+scene.world.node_tree.nodes["Background"].inputs[0].default_value = (0.12, 0.12, 0.12, 1)
+scene.world.node_tree.nodes["Background"].inputs[1].default_value = 0.5
+camera_data = bpy.data.cameras.new("Known camera")
+camera = bpy.data.objects.new("Known camera", camera_data)
+scene.collection.objects.link(camera)
+scene.camera = camera
+camera_data.type = "PERSP"
+camera_data.sensor_fit = "HORIZONTAL"
+import math
+camera_data.lens = camera_data.sensor_width / (2 * math.tan(0.3490658503988659 / 2))
+for name, matrix in cameras.items():
+    camera.matrix_world = Matrix(matrix)
+    scene.render.filepath = str(folder / ("known-" + name + ".png"))
+    bpy.ops.render.render(write_still=True)
 ''', encoding="utf-8")
         cls.run_blender(fixture, None, "fixture")
 
@@ -107,13 +167,57 @@ bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-guided.glb"), export_
     def job(cls, name, **changes):
         relative_work = cls.work.relative_to(ROOT)
         output = relative_work / name
-        value = {"schemaVersion": 1, "root": str(ROOT), "input": (relative_work / "synthetic.glb").as_posix(),
+        value = {"schemaVersion": 1, "mode": "single-view-diagnostic", "root": str(ROOT), "input": (relative_work / "synthetic.glb").as_posix(),
                  "outputDir": output.as_posix(), "result": (output / "result.json").as_posix(),
                  "recipe": dict(cls.recipe)}
         value.update(changes)
         path = cls.work / (name + ".json")
         path.write_text(json.dumps(value), encoding="utf-8")
         return path, value
+
+    @classmethod
+    def multiview(cls, name, mutate=None, frame="pixal3d-mv-export"):
+        work = cls.work.relative_to(ROOT)
+        sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+        distance = 3.1192049980163574
+        matrices = {
+            "front": [[1, 0, 0, 0], [0, 0, -1, -distance], [0, 1, 0, 0], [0, 0, 0, 1]],
+            "right": [[0, 0, -1, -distance], [-1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1]],
+            "back": [[-1, 0, 0, 0], [0, 0, 1, distance], [0, 1, 0, 0], [0, 0, 0, 1]],
+            "left": [[0, 0, 1, distance], [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1]],
+            "top": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, distance], [0, 0, 0, 1]],
+            "bottom": [[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, -distance], [0, 0, 0, 1]],
+        }
+        originals = ["front", "back"]
+        source_set = {"schemaVersion": 1, "primarySourceId": "source-front", "images": [
+            {"id": "source-" + view, "path": (work / ("known-" + view + ".png")).as_posix(),
+             "sha256": sha(cls.work / ("known-" + view + ".png"))} for view in originals]}
+        source_set_hash = hashlib.sha256(json.dumps(source_set).encode()).hexdigest()
+        classification = {"schemaVersion": 1, "sourceSetHash": source_set_hash,
+                          "sources": [{"sourceId": item["id"], "sha256": item["sha256"]} for item in source_set["images"]],
+                          "sourceViews": [{"sourceId": "source-" + view, "view": view, "usable": True,
+                                           "reason": "Known independent synthetic camera"} for view in originals],
+                          "subjects": [{"id": "box", "kind": "nonliving", "classification": "Synthetic six-color box"}],
+                          "research": [], "unknowns": [], "preservationConstraints": ["Preserve axis-specific face colors"],
+                          "prohibitedSubstitutions": [], "conflicts": []}
+        proof_set = {"schemaVersion": 1, "revision": 1, "sourceSetHash": source_set_hash,
+                     "classificationHash": hashlib.sha256(json.dumps(classification).encode()).hexdigest(),
+                     "camera": {"convention": "blender-nerf-z-up", "calibration": "nominal-prescribed", "meshScale": 1,
+                                "cameraAngleX": 0.3490658503988659, "distance": distance}, "views": []}
+        for view, matrix in matrices.items():
+            image = cls.work / ("known-" + view + ".png")
+            proof_set["views"].append({"view": view, "image": image.relative_to(ROOT).as_posix(), "sha256": sha(image),
+                                       "approvedImage": image.relative_to(ROOT).as_posix(), "approvedSha256": sha(image),
+                                       "origin": "source" if view in originals else "generated", "revision": 1,
+                                       "sourceIds": ["source-" + view] if view in originals else ["source-front", "source-back"],
+                                       "cameraToWorld": matrix})
+        input_name = "synthetic-six-view.glb" if frame == "pixal3d-mv-export" else "synthetic-six-view-proof-frame.glb"
+        job, value = cls.job(name, schemaVersion=2, mode="multi-view", inputFrame=frame, input=(work / input_name).as_posix(),
+                             recipe=dict(cls.recipe, maxMaterials=6), sourceSet=source_set, classification=classification, proofSet=proof_set)
+        if mutate:
+            mutate(value)
+            job.write_text(json.dumps(value), encoding="utf-8")
+        return job, value
 
     def test_01_real_finishing_and_review(self):
         source = self.work / "synthetic.glb"
@@ -144,6 +248,8 @@ bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-guided.glb"), export_
         self.assertEqual(review["measurements"]["views"], 4)
         self.assertEqual(review["independentReview"], "pending")
         self.assertIn("Proof versus", (ROOT / review["artifacts"]["comparison"]).read_text())
+        self.assertEqual(review["mode"], "single-view-diagnostic")
+        self.assertEqual(review["alignment"]["method"], "four-arbitrary-orthographic-views")
         for relative in review["artifacts"].values():
             self.assertTrue((ROOT / relative).is_file())
 
@@ -249,6 +355,118 @@ bpy.ops.export_scene.gltf(filepath=str(folder / "synthetic-guided.glb"), export_
         process = self.run_blender(SCRIPTS / "review.py", job, "over-budget-derivative", success=False)
         self.assertIn("maxTriangles", process.stdout)
         self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_15_real_six_camera_source_and_proof_comparison(self):
+        job, value = self.multiview("six-reviewed")
+        self.run_blender(SCRIPTS / "review.py", job, "six-reviewed")
+        result = json.loads((ROOT / value["result"]).read_text())
+        self.assertEqual(result["mode"], "multi-view")
+        self.assertEqual(result["measurements"]["views"], 6)
+        self.assertEqual(result["alignment"]["method"], "shared-bounds-fit")
+        self.assertEqual(result["alignment"]["calibration"], "nominal-prescribed")
+        self.assertIn("not measured", result["alignment"]["limitation"])
+        self.assertEqual(result["humanApproval"], "pending")
+        self.assertEqual(result["independentReview"], "pending")
+        self.assertEqual(len([name for name in result["artifacts"] if name.startswith("original-")]), 2)
+        self.assertEqual(len([name for name in result["artifacts"] if name.startswith("approved-")]), 6)
+        self.assertEqual(len([name for name in result["artifacts"] if name.startswith("conditioning-")]), 6)
+        for expected, actual in zip(value["proofSet"]["views"], result["cameras"]):
+            self.assertEqual(actual["view"], expected["view"])
+            self.assertEqual(actual["cameraToWorld"], expected["cameraToWorld"])
+            self.assertEqual(actual["cameraAngleX"], value["proofSet"]["camera"]["cameraAngleX"])
+            for row in range(4):
+                for column in range(4):
+                    expected_mapping = (-1 if row in (0, 1) else 1) * expected["cameraToWorld"][row][column]
+                    self.assertAlmostEqual(actual["effectiveBlenderCameraToWorld"][row][column], expected_mapping, places=5)
+        page = (ROOT / result["artifacts"]["comparison"]).read_text(encoding="utf-8")
+        self.assertIn("Immutable original sources", page)
+        self.assertIn("Source-only classification", page)
+        self.assertIn("source-front", page)
+        for name, expected in result["outputHashes"].items():
+            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), expected)
+        self.assert_six_camera_colors("six-reviewed")
+
+    def assert_six_camera_colors(self, case):
+        inspect = self.work / ("inspect-" + case + ".py")
+        inspect.write_text('''import bpy, json
+from pathlib import Path
+folder = Path(__file__).parent
+case = ''' + repr(case) + '''
+report = json.loads((folder / case / "result.json").read_text())
+results = {}
+for view in report["cameras"]:
+    name = view["view"]
+    source = bpy.data.images.load(str(folder / ("known-" + name + ".png")), check_existing=False)
+    rendered = bpy.data.images.load(str(folder / case / (name + ".png")), check_existing=False)
+    center = ((rendered.size[1] // 2) * rendered.size[0] + rendered.size[0] // 2) * 4
+    results[name] = {"source": list(source.pixels[center:center+3]), "rendered": list(rendered.pixels[center:center+3])}
+(folder / (case + "-color-checks.json")).write_text(json.dumps(results))
+''', encoding="utf-8")
+        self.run_blender(inspect, None, "inspect-" + case)
+        colors = json.loads((self.work / (case + "-color-checks.json")).read_text())
+        identities = []
+        for view, color in colors.items():
+            # Review lighting deliberately differs. The six known face identities,
+            # rather than photometric equality, detect orientation/double-flip errors.
+            normalized = {}
+            for kind in ("source", "rendered"):
+                rgb = color[kind]
+                chroma = max(rgb) - min(rgb)
+                self.assertGreater(chroma, 0.08, view)
+                normalized[kind] = [(channel - min(rgb)) / chroma for channel in rgb]
+            self.assertLess(max(abs(a - b) for a, b in zip(normalized["source"], normalized["rendered"])), 0.15, view)
+            identities.append(tuple(round(channel, 0) for channel in normalized["rendered"]))
+        self.assertEqual(len(set(identities)), 6)
+
+    def test_16_flipped_polar_camera_rejected(self):
+        def mutate(value):
+            value["proofSet"]["views"][-1]["cameraToWorld"][0][0] = -1
+        job, value = self.multiview("flipped-bottom", mutate)
+        process = self.run_blender(SCRIPTS / "review.py", job, "flipped-bottom", success=False)
+        self.assertIn("cardinal/polar rig", process.stdout)
+        self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_17_stale_conditioning_hash_rejected(self):
+        def mutate(value):
+            value["proofSet"]["views"][3]["sha256"] = "0" * 64
+        job, value = self.multiview("stale-conditioning", mutate)
+        process = self.run_blender(SCRIPTS / "review.py", job, "stale-conditioning", success=False)
+        self.assertIn("image missing or changed", process.stdout)
+        self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_18_non_original_classification_evidence_rejected(self):
+        def mutate(value):
+            value["classification"]["sources"][0]["sourceId"] = "generated-right"
+        job, value = self.multiview("classification-contamination", mutate)
+        process = self.run_blender(SCRIPTS / "review.py", job, "classification-contamination", success=False)
+        self.assertIn("exact registered original", process.stdout)
+        self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_19_incomplete_six_view_coverage_rejected(self):
+        job, value = self.multiview("missing-view", lambda value: value["proofSet"]["views"].pop())
+        process = self.run_blender(SCRIPTS / "review.py", job, "missing-view", success=False)
+        self.assertIn("Exactly six ordered", process.stdout)
+        self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_20_single_view_cannot_implicitly_satisfy_production_review(self):
+        job, value = self.job("missing-diagnostic-mode", proof=(self.work / "synthetic-proof.png").relative_to(ROOT).as_posix())
+        value.pop("mode")
+        job.write_text(json.dumps(value), encoding="utf-8")
+        process = self.run_blender(SCRIPTS / "review.py", job, "missing-diagnostic-mode", success=False)
+        self.assertIn("explicit single-view-diagnostic", process.stdout)
+        self.assertFalse((ROOT / value["result"]).exists())
+
+    def test_21_corrected_proof_frame_is_not_flipped_twice(self):
+        job, value = self.multiview("six-corrected", frame="opencaw-proof-z-up")
+        self.run_blender(SCRIPTS / "review.py", job, "six-corrected")
+        result = json.loads((ROOT / value["result"]).read_text())
+        self.assertEqual(result["alignment"]["inputFrame"], "opencaw-proof-z-up")
+        self.assertEqual(result["alignment"]["engineExportToProofFrame"], [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+        for expected, actual in zip(value["proofSet"]["views"], result["cameras"]):
+            for row in range(4):
+                for column in range(4):
+                    self.assertAlmostEqual(actual["effectiveBlenderCameraToWorld"][row][column], expected["cameraToWorld"][row][column], places=5)
+        self.assert_six_camera_colors("six-corrected")
 
 
 if __name__ == "__main__":

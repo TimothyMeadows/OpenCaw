@@ -12,6 +12,7 @@ from common import (activate, bounds, digest, import_glb, inspect_glb, load_job,
 import bpy
 import bmesh
 import numpy as np  # Bundled with Blender; no separate installation.
+from mathutils import Matrix
 
 
 def validate_recipe(recipe):
@@ -177,6 +178,22 @@ def main():
     if recipe["targetFaces"] < 6 * len(highs):
         raise ValueError("targetFaces too small for semantic parts")
     stages = [{"stage": "source", "sha256": original_hash, "meshNames": names}]
+    if job.get("mode") == "multi-view":
+        if job.get("inputFrame") != "pixal3d-mv-export":
+            raise ValueError("Multi-view finishing requires the declared Pixal3D export frame")
+        scale = job.get("engineToProofScale")
+        if type(scale) not in (int, float) or not math.isfinite(scale) or scale <= 0:
+            raise ValueError("A finite positive export-to-proof scale is required")
+        mapping = Matrix.Diagonal((-scale, -scale, scale, 1.0))
+        # Imported MV GLB is Rz(pi) from the proof Z-up frame. Apply the
+        # documented mapping once, to all roots, before topology/baking.
+        for obj in bpy.context.scene.objects:
+            if obj.parent is None:
+                obj.matrix_world = mapping @ obj.matrix_world
+        bpy.context.view_layer.update()
+        stages.append({"stage": "engineExportToProofFrame", "inputFrame": "pixal3d-mv-export",
+                       "outputFrame": "opencaw-proof-z-up", "matrix": [list(row) for row in mapping],
+                       "basis": "pinned MV projection/reference-frame/glTF axis composition; no per-view fitting"})
     total_high = sum(len(o.data.polygons) for o in highs)
     exports, lows, textures, part_reports = [], [], [], []
     root_object = bpy.data.objects.new("PROOF_TO_MODEL", None)

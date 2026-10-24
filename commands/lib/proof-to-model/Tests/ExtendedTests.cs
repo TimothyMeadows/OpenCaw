@@ -10,7 +10,7 @@ static class ExtendedTests
         WriteRgba(w.Resolve("opaque.png"), [255, 255, 255]);
         check(PngAlpha.Inspect(w.Resolve("matte.png"))?.Suitable == true, "actual transparent foreground alpha recognized");
         check(PngAlpha.Inspect(w.Resolve("opaque.png"))?.Suitable == false, "opaque RGBA never treated as matte");
-        var opts = new Dictionary<string, string> { { "asset", "matte" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
+        var opts = new Dictionary<string, string> { { "mode", "single-view-diagnostic" }, { "asset", "matte" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
         await new Pipeline(w, opts, new NativeProcess(), new AlphaProcessor()).Execute("init", default);
         var manifest = ".opencaw/.cache/tasks/tests/proof-to-model/matte/v1/manifest.json";
         opts["manifest"] = manifest;

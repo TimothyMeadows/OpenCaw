@@ -15,7 +15,7 @@ static class PolicyTests
         var cfgOriginal = cfg.DeepClone();
         cfg["limits"] = new JsonObject { ["maxAttempts"] = 1, ["timeoutSeconds"] = 5 };
         w.Save("toolchain.json", cfg);
-        var opts = new Dictionary<string, string> { { "asset", "budgets" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
+        var opts = new Dictionary<string, string> { { "mode", "single-view-diagnostic" }, { "asset", "budgets" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
         await new Pipeline(w, opts, new NativeProcess(), new AlphaProcessor()).Execute("init", default);
         var manifest = ".opencaw/.cache/tasks/tests/proof-to-model/budgets/v1/manifest.json";
         opts["manifest"] = manifest;
@@ -195,7 +195,7 @@ static class PolicyTests
         }
         var styleOriginal = File.ReadAllText(w.Resolve("STYLE.md"));
         File.AppendAllText(w.Resolve("STYLE.md"), "\n## External Asset Libraries\n\n- sample: `C:/fixture-readonly-library`\n");
-        var libraryOpts = new Dictionary<string, string> { { "asset", "library-test" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
+        var libraryOpts = new Dictionary<string, string> { { "mode", "single-view-diagnostic" }, { "asset", "library-test" }, { "version", "v1" }, { "task", "tests" }, { "proof", "matte.png" }, { "rights", "rights.json" }, { "recipe", "recipe.json" }, { "toolchain", "toolchain.json" }, { "actor", "builder" } };
         await reject(() => new Pipeline(w, libraryOpts, new NativeProcess(), new AlphaProcessor()).Execute("init", default), "configured library requires explicit search evidence");
         w.Save("library-search.json", new
         {

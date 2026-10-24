@@ -89,7 +89,7 @@ Use OpenCaw to take a game concept toward a playable, reviewed result, or to imp
 
 Engine-specific workflows cover **Three.js, Babylon.js, Phaser, Unity, Unreal, and Godot**. Each project selects one in `ENGINE.md`; an unconfigured project defaults to Three.js only when existing game evidence does not conflict. Three.js supplies rendering; physics and networking require explicit project choices. Engine-agnostic design and QA skills remain reusable across engines.
 
-`STYLE.md` selects visual direction and the art pipeline. **PROOF_TO_MODEL** is the default: an approved 2D proof is reconstructed natively and finished in Blender, then reviewed before any runtime promotion. CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. The CODE pipeline is specific to Three.js.
+`STYLE.md` selects visual direction and the art pipeline. **PROOF_TO_MODEL** is the default: classify original sources, approve six consistent views, reconstruct them natively and finish in Blender, then review before runtime promotion. CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. The CODE pipeline is specific to Three.js.
 
 OpenCaw supplies guidance and executable workflows. Actual production needs the selected engine, packages, platform SDKs, art tools, and any chosen media capabilities. Dependencies, model licenses, generation budgets, and runtime asset acceptance remain explicit decisions. A structural validation pass does not establish gameplay quality or production readiness.
 
@@ -615,7 +615,7 @@ Generate a host contract with:
 
 ### Style and art-pipeline contracts
 
-Style templates live in `.styles/` and cover game interfaces, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions. Every `STYLE.md` also selects an art pipeline. `PROOF_TO_MODEL` is the default for approved 2D proofs reconstructed and finished as game-ready 3D assets. CSS/SVG interface work remains supported outside the art pipeline registry.
+Style templates live in `.styles/` and cover game interfaces, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions. Every `STYLE.md` also selects an art pipeline. `PROOF_TO_MODEL` is the default for source classification, approved six-view proofs and native reconstruction/finishing as staged game assets. CSS/SVG interface work remains supported outside the art pipeline registry.
 
 Generate and validate a style contract using the default PROOF_TO_MODEL pipeline with:
 
@@ -1175,7 +1175,7 @@ The five pipelines are:
 | --- | --- | --- |
 | `CLOUD` | Session-supported generated images/audio | Token or cost budget, staging, provenance, human review |
 | `LOCAL` | Loopback-only ComfyUI images/audio | Local GPU, pinned tools/models, licenses, checksums |
-| `PROOF_TO_MODEL` | Approved 2D proof, native Pixal3D, Blender finishing | Immutable originals, hashed ancestry, independent review and human acceptance |
+| `PROOF_TO_MODEL` | Source classification, approved six-view proofs, native Pixal3D MV, Blender finishing | Immutable originals, hashed ancestry, independent review and human acceptance |
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
 | `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
 
@@ -1214,7 +1214,7 @@ For cloud/local execution, generate the optional media contract with canonical n
 ./commands/generate-media-contract.sh CLOUD LOCAL
 ```
 
-Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. Existing-proof `PROOF_TO_MODEL`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Proof generation remains a separate authorized CLOUD/LOCAL operation.
+Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. All-original six-view `PROOF_TO_MODEL`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Proof generation remains a separate authorized CLOUD/LOCAL operation.
 
 Cloud/local media guardrails include:
 
@@ -1286,26 +1286,35 @@ The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for mo
 
 ### Native proof to model
 
-`PROOF_TO_MODEL` turns a selected 2D proof into a staged 3D asset through native reconstruction and Blender finishing. It replaces the retired CSS3 pipeline. Regenerate legacy contracts with `./commands/generate-style.sh --pipeline PROOF_TO_MODEL "<STYLE>"`, preserving selected styles and custom instructions. CSS3, CSS, vector, and css-vector pipeline aliases fail explicitly. CSS/SVG interface development and its specialist role remain supported.
+`PROOF_TO_MODEL` starts by classifying anatomy, structure, materials and occlusion in the original source images. Observations, researched inferences and unknowns stay distinct: a horse and rider remain separate subjects, and a skull-shaped metal helmet remains armor. Generated proofs cannot become evidence about the originals. One usable canonical source supplies one angle; generate the other five. An oblique or cropped source remains an anchor and may require six canonical proofs. With multiple originals, generate only missing usable angles.
 
-Use `build-proof-to-model-assets` and `./commands/proof-to-model.sh` for `init`, `doctor`, `setup`, `preprocess`, `reconstruct`, `finish`, `review`, `record`, `validate`, `status`, and `promote`. Run a subcommand with `--help` for exact arguments. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. Ordinary production never downloads tools or invokes proof generators implicitly. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling project is required.
+Use `build-proof-to-model-assets` and `./commands/proof-to-model.sh` for `init`, `doctor`, `setup`, `classify`, `prepare-proofs`, `reuse`, `preprocess`, `reconstruct`, `finish`, `review`, `record`, `validate`, `status`, and `promote`. `init --proof IMAGE` registers one original; `--sources JSON` registers several. `classify` imports source-only assistant/research findings and emits a missing-angle plan. `prepare-proofs` imports six actual images and their provenance, producing a review packet. These commands validate artifacts; they do not execute vision, generate images or authorize spending. Generation uses the selected CLOUD/LOCAL capability, MEDIA.md and explicit candidate/revision budgets. Revisions preserve other candidates and invalidate complete-set approval.
 
-State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable proofs, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
+Approve front, subject-right, back, subject-left, top and bottom together with the originals and proposed hidden structure visible. Preprocessing preserves shared framing, actual alpha, masks and camera intrinsics. Reconstruction submits six separate frames and camera matrices to pinned Pixal3D MV inference; a contact sheet or single image is insufficient. Review renders use the same cameras and an explicit engine-export coordinate transform. Arbitrary source camera assumptions are labeled nominal rather than measured.
+
+Run a subcommand with `--help` for exact arguments. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling project is required.
+
+State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable originals, classification, proof candidates, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof-set selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
+
+Fresh assets use manifest v2. Historical v1 requires explicit `--mode single-view-diagnostic`, cannot satisfy six-view production and cannot promote. Reuse requires matching source, interpretation, views, cameras, style, recipe and MV identities; it does not inherit human approval. The pinned engine accepts six inputs, while its published MV validation covers four. Structural, simulated-process and controlled Blender checks cannot certify real six-view inference, anatomy or visual quality; those require an authorized live acceptance run.
 
 The default 3D asset path keeps production and acceptance separate:
 
 ```mermaid
 flowchart TB
     accTitle: Native proof-to-model game asset production
-    accDescr: Start with an asset brief, rights and library search. Human selection approves the proof. Preprocessing is reviewed before native reconstruction and Blender finishing. Export verification and independent review precede separate human runtime acceptance and explicit promotion. Revisions invalidate dependent evidence.
+    accDescr: Classify only original sources, research hidden anatomy or structure, generate missing canonical views under authorized media budgets, and approve all six. Prepare six images and cameras for native multi-view reconstruction and Blender finishing. Matching six-camera review and independent review precede separate human runtime acceptance and explicit promotion. Revisions invalidate whole-set approval and dependent evidence.
 
-    Brief["Brief, rights, budgets,<br/>and configured library search"] --> Proof["Select proof<br/>Human approval"]
-    Proof --> Input["Preprocess and review<br/>proof-derived input"]
-    Input --> Reconstruct["Native Pixal3D<br/>reconstruction"]
+    Brief["Brief, rights, budgets,<br/>and configured library search"] --> Sources["Immutable originals<br/>Source-only classification and research"]
+    Sources --> Proofs["Generate missing angles<br/>Authorized CLOUD or LOCAL"]
+    Proofs --> Set["Review originals and all six proofs<br/>Human proof-set approval"]
+    Set --> Input["Prepare and review six inputs<br/>Alpha, shared framing and cameras"]
+    Input --> Reconstruct["Native Pixal3D MV<br/>All six separate images"]
     Reconstruct --> Finish["Blender finishing<br/>retopology, UV/bake, LODs, collision"]
-    Finish --> Review["Export verification<br/>and independent review"]
+    Finish --> Review["Matching six-camera comparisons<br/>Export checks and independent review"]
     Review --> Accept["Separate human<br/>runtime acceptance"]
     Accept --> Promote["Explicit promotion<br/>to assets/models/"]
+    Set -->|Revise selected angles| Proofs
 ```
 
 Rejected or changed inputs return to the affected stage and invalidate dependent results. Reconstruction does not establish likeness, rigging, animation, or production readiness by itself.
