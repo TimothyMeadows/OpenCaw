@@ -6,7 +6,7 @@ Selectable pipelines:
 
 - `CLOUD` - session-provided image generation with explicit cost, provenance, staging, and review controls.
 - `LOCAL` - loopback-only ComfyUI image and audio generation using reviewed local GPU tooling.
-- `CSS3` - CSS, mathematical geometry, and inline SVG/vector production without raster or WebGL dependencies.
+- `PROOF_TO_MODEL` - approved 2D proof to pinned native reconstruction, Blender finishing and reviewed runtime packages.
 - `CODE` - authored procedural Three.js models, with linked character profiles, isolated visual review, and calibrated runtime evidence for characters and creatures.
 - `BLENDER` - authored Blender 4.5 LTS scenes, assets, renders, and exports with immutable-source and review controls.
 
@@ -14,10 +14,10 @@ Pipeline contracts:
 
 - `cloud/PIPELINE.md`
 - `local/PIPELINE.md`
-- `css3/PIPELINE.md`
+- `proof-to-model/PIPELINE.md`
 - `code/PIPELINE.md`
 - `blender/PIPELINE.md`
 
 Shared generated-media provenance lives under `_shared/`. Pipeline-specific schemas, manifests, and reusable assets remain beside the pipeline that owns them.
 
-`CSS3` is the default when style generation does not name a pipeline. A current user prompt may explicitly select any registered pipeline for one task without rewriting `STYLE.md`. Never switch pipelines silently after work begins.
+`PROOF_TO_MODEL` is the default when style generation does not name a pipeline. A current user prompt may explicitly select any registered pipeline for one task without rewriting `STYLE.md`. Never switch pipelines silently after work begins.

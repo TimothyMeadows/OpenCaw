@@ -1,11 +1,11 @@
 # Skills Catalog
 
-Curated reusable skills included in OpenCaw.
+Curated reusable skills included in OpenCaw. Install the baseline at `<project-root>/.opencaw/`; durable project context belongs to its ignored `.cache/` child.
 
 ## Task And Governance
 
 - `brainstorm-flow` - Run explicit persistent pre-planning idea discovery with two independent researcher lanes, stable branches/elements, and a generated exit summary.
-- `create-host-ai-scaffold` - Ensure host-repository `.ai` scaffolding, Windows Bash guidance when applicable, and OpenCaw bootstrap wiring are in place.
+- `create-host-ai-scaffold` - Initialize durable `.opencaw/.cache` context and the root bootstrap for the fixed `.opencaw` installation, with Windows Bash guidance when applicable.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
 - `gauntlet-flow` - Run explicit builder-versus-fresh-critic loops with a frozen manifest, immutable publication checkpoints, live Git/GitHub-bound progressive PR and QA evidence, one integration branch, and human-gated promotion.
 - `goal-flow` - Manage explicitly requested automated goals across task completion, automatic PR creation, post-PR QA, branch chaining, and final human approval reporting.
@@ -47,11 +47,6 @@ Curated reusable skills included in OpenCaw.
 
 - `generate-architecture` - Generate `ARCHITECTURE.md` from selected templates.
 - `generate-style` - Generate `STYLE.md` from selected art styles plus a primary art pipeline and allowed alternatives.
-- `apim-change-review` - Review Azure API Management changes for compatibility and risk.
-- `azure-settings-checklist` - Validate required Azure app settings and environment assumptions.
-- `function-app-checklist` - Validate Function App operational and deployment expectations.
-- `servicebus-checklist` - Validate Service Bus configuration and integration assumptions.
-- `storage-checklist` - Validate storage configuration and data-safety assumptions.
 
 ## Data Platforms
 
@@ -80,15 +75,15 @@ Curated reusable skills included in OpenCaw.
 
 ## Web Experience
 
-- `design-web-experiences` - Design original responsive web systems with accessible enhancement paths.
-- `design-conversion-pages` - Design clear conversion journeys without coercive patterns or hidden mutations.
-- `build-scroll-authored-web-experiences` - Build source-backed scroll stories with one renderer, reversible native-scroll state, semantic content, and accessible fallbacks.
 - `build-accessible-motion-systems` - Define motion semantics, comfort controls, and equivalent reduced-motion states.
 - `build-interactive-web-effects` - Add bounded effects that support comprehension and degrade safely.
 - `build-webgl-experiences` - Build progressively enhanced 3D browser scenes with fallback and resource budgets.
 - `optimize-web-motion` - Diagnose and reduce animation cost using measured evidence.
 
 ## Game Development
+
+- `design-game-systems` - Define player decisions, loops, progression and balance hypotheses with playtest evidence.
+- `build-game-ui` - Build engine-agnostic screen, input, focus and HUD lifecycle contracts.
 
 - `author-game-worlds` - Define coherent playable worlds, rules, regions, encounters, and content constraints.
 - `design-action-gameplay` - Specify responsive actions, counterplay, timing, feedback, and tuning hypotheses.
@@ -107,11 +102,12 @@ Curated reusable skills included in OpenCaw.
 
 ## Art Production
 
-- `select-art-pipeline` - Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
+- `build-proof-to-model-assets` - Produce reviewed 3D assets from approved proofs through native reconstruction and Blender finishing.
+- `select-art-pipeline` - Resolve CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
 - `use-external-asset-library` - Inspect optional read-only 3D asset libraries and copy an authorized candidate into `assets/models/` before use.
-- `build-threejs-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
-- `build-threejs-code-characters` - Author source-native Three.js characters and creatures through linked profiles, six ordered gates, calibrated machine evidence, and explicit lifecycle ownership.
-- `review-threejs-code-characters` - Independently review Three.js character readability and style from answer-neutral, hash-bound evidence packets.
+- `threejs-build-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
+- `threejs-build-code-characters` - Author source-native Three.js characters and creatures through linked profiles, six ordered gates, calibrated machine evidence, and explicit lifecycle ownership.
+- `threejs-review-code-characters` - Independently review Three.js character readability and style from answer-neutral, hash-bound evidence packets.
 - `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
 - `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.
 - `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, maps, atlases, UDIMs, and packed textures.
@@ -130,3 +126,98 @@ Curated reusable skills included in OpenCaw.
 - `tcg-art-direction` - Plan original TCG/CCG card frames, board styling, tokens/minions, hand/deck/graveyard zones, VFX, and IP-safe fantasy card-game art direction.
 - `iterate-art-to-sanity` - Iterate generated art until sanity checks pass.
 - `enforce-art-language-safety` - Enforce language and visual safety constraints for generated art.
+
+## Engine Features
+
+Resolve ENGINE.md and use `resolve-skill.sh` before activation. Engine-prefixed skills require their one declared engine; shared skills declare AGNOSTIC. Tool and platform prerequisites remain separate.
+
+### THREEJS
+
+- `threejs-build-scenes` - Build scenes using THREEJS APIs, project version and lifecycle checks.
+- `threejs-build-controls` - Build controls using THREEJS APIs, project version and lifecycle checks.
+- `threejs-animate-actors` - Animate actors using THREEJS APIs, project version and lifecycle checks.
+- `threejs-build-materials` - Build materials using THREEJS APIs, project version and lifecycle checks.
+- `threejs-build-ui` - Build ui using THREEJS APIs, project version and lifecycle checks.
+- `threejs-build-code-models` - Build code models using THREEJS APIs, project version and lifecycle checks.
+- `threejs-build-code-characters` - Build code characters using THREEJS APIs, project version and lifecycle checks.
+- `threejs-review-code-characters` - Review code characters using THREEJS APIs, project version and lifecycle checks.
+
+### BABYLONJS
+
+- `babylonjs-build-scenes` - Build scenes using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-build-controls` - Build controls using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-integrate-physics` - Integrate physics using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-animate-actors` - Animate actors using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-build-materials` - Build materials using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-build-ui` - Build ui using BABYLONJS APIs, project version and lifecycle checks.
+- `babylonjs-build-audio` - Build audio using BABYLONJS APIs, project version and lifecycle checks.
+
+### PHASERJS
+
+- `phaserjs-build-scenes` - Build scenes using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-build-controls` - Build controls using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-build-physics` - Build physics using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-build-tilemaps` - Build tilemaps using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-animate-sprites` - Animate sprites using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-build-ui` - Build ui using PHASERJS APIs, project version and lifecycle checks.
+- `phaserjs-build-audio` - Build audio using PHASERJS APIs, project version and lifecycle checks.
+
+### UNITY
+
+- `unity-build-scenes` - Build scenes using UNITY APIs, project version and lifecycle checks.
+- `unity-build-controls` - Build controls using UNITY APIs, project version and lifecycle checks.
+- `unity-build-physics` - Build physics using UNITY APIs, project version and lifecycle checks.
+- `unity-animate-actors` - Animate actors using UNITY APIs, project version and lifecycle checks.
+- `unity-build-materials` - Build materials using UNITY APIs, project version and lifecycle checks.
+- `unity-build-ui` - Build ui using UNITY APIs, project version and lifecycle checks.
+- `unity-build-audio` - Build audio using UNITY APIs, project version and lifecycle checks.
+- `unity-integrate-netcode` - Integrate netcode using UNITY APIs, project version and lifecycle checks.
+- `unity-run-tooling` - Run tooling using UNITY APIs, project version and lifecycle checks.
+
+- `unity-build-2d-content`: Build stable sprites, atlases, Tilemaps and pixel-aligned Unity content.
+- `unity-localize-content`: Integrate locale, text, font and asset changes with owned asynchronous lifetimes.
+- `unity-configure-rendering`: Configure and explicitly migrate Unity pipelines, cameras, Volumes and Render Graph features.
+- `unity-build-editor-tools`: Author native inspectors, windows and version-qualified graph tools with undo and runtime separation.
+- `unity-optimize-web`: Measure and improve Unity web build delivery, startup, memory and browser performance.
+- `unity-integrate-live-services`: Integrate explicitly selected authentication, Cloud Save, Cloud Code and live configuration.
+- `unity-integrate-multiplayer-services`: Integrate selected sessions, matchmaking and connectivity independently of gameplay replication.
+- `unity-integrate-voice-chat`: Integrate explicitly selected Vivox channels, device permissions and cleanup.
+- `unity-integrate-purchases`: Integrate selected stores with validated, idempotent purchase fulfillment and restoration.
+- `unity-integrate-ads`: Integrate selected LevelPlay mediation, privacy choices and lifecycle-safe ad rewards.
+
+### UNREAL
+
+- `unreal-build-gameplay-framework` - Build gameplay framework using UNREAL APIs, project version and lifecycle checks.
+- `unreal-integrate-assets` - Integrate assets using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-controls` - Build controls using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-physics` - Build physics using UNREAL APIs, project version and lifecycle checks.
+- `unreal-animate-actors` - Animate actors using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-materials` - Build materials using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-ui` - Build ui using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-audio` - Build audio using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-multiplayer` - Build multiplayer using UNREAL APIs, project version and lifecycle checks.
+- `unreal-run-tooling` - Run tooling using UNREAL APIs, project version and lifecycle checks.
+- `unreal-build-async-systems` - Own task scheduling, thread handoffs, cancellation and teardown.
+- `unreal-build-gameplay-abilities` - Build authority-aware abilities, effects, attributes, cues and prediction.
+- `unreal-build-movement` - Build CharacterMovement and explicitly selected Mover workflows.
+- `unreal-build-game-features` - Own modular feature activation, initialization and resource unloading.
+- `unreal-build-ai` - Build behavior, StateTree, perception, navigation and Smart Object integration.
+- `unreal-build-mass-entities` - Build entity composition, processor ownership and Mass lifecycle.
+- `unreal-build-cameras` - Own camera rigs, modifiers, shakes and restoration.
+- `unreal-build-vfx` - Build Niagara parameters, pooling, events and scalable effects.
+- `unreal-build-cinematics` - Own sequence bindings, playback interruption and rendering workflows.
+- `unreal-build-worlds` - Build streaming, World Partition, data layers and HLOD workflows.
+- `unreal-build-procedural-content` - Build deterministic PCG, geometry generation and regeneration.
+- `unreal-build-save-systems` - Own save identities, serialization, migrations and transactional restore.
+
+### GODOT
+
+- `godot-build-scenes` - Build scenes using GODOT APIs, project version and lifecycle checks.
+- `godot-build-controls` - Build controls using GODOT APIs, project version and lifecycle checks.
+- `godot-build-physics` - Build physics using GODOT APIs, project version and lifecycle checks.
+- `godot-animate-actors` - Animate actors using GODOT APIs, project version and lifecycle checks.
+- `godot-build-shaders` - Build shaders using GODOT APIs, project version and lifecycle checks.
+- `godot-build-ui` - Build ui using GODOT APIs, project version and lifecycle checks.
+- `godot-build-audio` - Build audio using GODOT APIs, project version and lifecycle checks.
+- `godot-build-multiplayer` - Build multiplayer using GODOT APIs, project version and lifecycle checks.
+- `godot-run-tooling` - Run tooling using GODOT APIs, project version and lifecycle checks.

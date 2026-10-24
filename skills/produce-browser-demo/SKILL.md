@@ -1,6 +1,7 @@
 ---
 name: produce-browser-demo
 description: Create a polished, verifiable demo video from local browser captures and an explicit choreography manifest. Use when a product walkthrough, interaction proof, or visual handoff needs controlled cursor, framing, timing, and media verification without recording private desktop content.
+engines: [AGNOSTIC]
 ---
 
 # Produce Browser Demo

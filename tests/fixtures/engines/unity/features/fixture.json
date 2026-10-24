@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "engine": "UNITY",
+  "files": [
+    "Assets/Editor/OpenCawUnityFeatureDriver.cs",
+    "Assets/OpenCawUnityPresentationProbe.cs",
+    "Assets/Editor/ContentFeatureCases.cs",
+    "Assets/Editor/PresentationFeatureCases.cs",
+    "Assets/Editor/ToolingServiceFeatureCases.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "ContentFixtures.md",
+    "PresentationFixtures.md",
+    "ToolingServiceFixtures.md"
+  ],
+  "cases": [
+    {
+      "id": "SpriteIdentity",
+      "method": "OpenCawUnityContentCases.SpriteIdentity",
+      "packages": [
+        [
+          "com.unity.2d.sprite"
+        ]
+      ],
+      "symbols": [
+        "OPENCAW_UNITY_SPRITE"
+      ],
+      "settings": {},
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Native import/reimport identities; visual slicing and original-art acceptance remain separate"
+    },
+    {
+      "id": "RuleTileTopology",
+      "method": "OpenCawUnityContentCases.RuleTileTopology",
+      "packages": [
+        [
+          "com.unity.2d.tilemap"
+        ],
+        [
+          "com.unity.2d.tilemap.extras"
+        ]
+      ],
+      "symbols": [
+        "OPENCAW_UNITY_TILEMAP"
+      ],
+      "settings": {
+        "ContentRuleTile": "asset",
+        "ContentRuleIsolatedSprite": "asset",
+        "ContentRuleNeighborSprite": "asset"
+      },
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Authored east-neighbor rule behavior; full game topology and visuals need project scenarios"
+    },
+    {
+      "id": "AtlasLifecycle",
+      "method": "OpenCawUnityContentCases.AtlasLifecycle",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "ContentSpriteBundle": "file",
+        "ContentAtlasBundle": "file",
+        "ContentSpriteNames": "text",
+        "ContentAtlasTags": "text"
+      },
+      "graphics": true,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual native bundle/atlas callbacks and owned handle lifetime; Addressables/player delivery variants need separate evidence"
+    },
+    {
+      "id": "Physics3D",
+      "method": "OpenCawUnityContentCases.Physics3D",
+      "packages": [],
+      "symbols": [],
+      "settings": {},
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Native selected 3D collision/query/sleep assertions; target performance and network ownership remain separate"
+    },
+    {
+      "id": "Physics2D",
+      "method": "OpenCawUnityContentCases.Physics2D",
+      "packages": [],
+      "symbols": [],
+      "settings": {},
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Classic native 2D assertions; newer Physics Core/components require the documented selected-version procedure"
+    },
+    {
+      "id": "NavigationCancellation",
+      "method": "OpenCawUnityContentCases.NavigationCancellation",
+      "packages": [],
+      "symbols": [],
+      "settings": {},
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Owned native NavMesh/path cancellation; project navigation package, streaming and async player work remain separate"
+    },
+    {
+      "id": "ShaderCompilation",
+      "method": "OpenCawUnityContentCases.ShaderCompilation",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "ContentShader": "asset"
+      },
+      "graphics": true,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual imported shader compile status; player variant compilation and GPU appearance remain separate"
+    },
+    {
+      "id": "RenderingConfiguration",
+      "method": "OpenCawUnityContentCases.RenderingConfiguration",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "ContentExpectedPipeline": "text"
+      },
+      "graphics": true,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual current pipeline/offscreen render/readback; migration comparisons and Render Graph GPU analysis remain separate"
+    },
+    {
+      "id": "UIFocus",
+      "method": "OpenCawUnityPresentationCases.UIFocus",
+      "packages": [],
+      "symbols": [],
+      "settings": {},
+      "graphics": true,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual Editor UI Toolkit focus ownership; runtime UIDocument, native player input and visual accessibility remain separate"
+    },
+    {
+      "id": "UGUIFocus",
+      "method": "OpenCawUnityPresentationCases.UGUIFocus",
+      "packages": [
+        [
+          "com.unity.ugui"
+        ]
+      ],
+      "symbols": [
+        "OPENCAW_UNITY_UGUI"
+      ],
+      "settings": {},
+      "graphics": false,
+      "playMode": true,
+      "minimumChecks": 3,
+      "limit": "Actual play-mode selection/listener preservation with fixture domain reload disabled; physical input, modal stacks and player acceptance remain separate"
+    },
+    {
+      "id": "UIFontCoverage",
+      "method": "OpenCawUnityPresentationCases.UIFontCoverage",
+      "packages": [
+        [
+          "com.unity.textmeshpro",
+          "com.unity.ugui"
+        ]
+      ],
+      "symbols": [
+        "OPENCAW_UNITY_TMP"
+      ],
+      "settings": {
+        "tmpFontAsset": "asset",
+        "tmpRequiredCharacters": "text"
+      },
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 2,
+      "limit": "Actual required font character coverage; shaping, appearance and runtime fallback budgets remain separate"
+    },
+    {
+      "id": "LocalizationLifecycle",
+      "method": "OpenCawUnityPresentationCases.LocalizationLifecycle",
+      "packages": [
+        [
+          "com.unity.localization"
+        ]
+      ],
+      "symbols": [
+        "OPENCAW_UNITY_LOCALIZATION"
+      ],
+      "settings": {
+        "localizationLocaleA": "text",
+        "localizationLocaleB": "text",
+        "localizationTable": "text",
+        "localizationEntry": "text",
+        "localizationExpectedA": "text",
+        "localizationExpectedB": "text"
+      },
+      "graphics": false,
+      "playMode": true,
+      "minimumChecks": 3,
+      "limit": "Actual selected locale/table lifecycle and owned listeners; full translated layout, plurals and target fonts remain separate"
+    },
+    {
+      "id": "AudioLifecycle",
+      "method": "OpenCawUnityPresentationCases.AudioLifecycle",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "audioMixerAsset": "asset",
+        "audioMixerGroupName": "text"
+      },
+      "graphics": false,
+      "playMode": true,
+      "minimumChecks": 3,
+      "limit": "Actual native DSP/sample progress and stop/reuse; listening and measured target CPU/memory budgets remain separate"
+    },
+    {
+      "id": "EditorTransactions",
+      "method": "OpenCawUnityPresentationCases.EditorTransactions",
+      "packages": [],
+      "symbols": [],
+      "settings": {},
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual scoped Undo/save/reload; Graph Toolkit/imported runtime variants need the selected-version procedure"
+    },
+    {
+      "id": "WebBuild",
+      "method": "OpenCawUnityPresentationCases.WebBuild",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "webBuildScene": "asset"
+      },
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual native WebGL BuildReport/output; browser startup, delivery headers, frame/memory and devices remain separate",
+      "buildTarget": "WebGL"
+    },
+    {
+      "id": "PackageInventory",
+      "method": "OpenCawUnityToolingCases.PackageInventory",
+      "packages": [],
+      "symbols": [],
+      "settings": {
+        "RequiredPackages": "text"
+      },
+      "graphics": false,
+      "playMode": false,
+      "minimumChecks": 3,
+      "limit": "Actual offline UPM listing/completion; no install, update, registry resolution or cloud mutation",
+      "execution": "manual"
+    }
+  ],
+  "manual": [
+    {
+      "id": "LiveServices",
+      "kind": "online",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires separately authorized development/sandbox/test-ad service, selected SDK and real project integration; offline simulations do not establish SDK acceptance"
+    },
+    {
+      "id": "MultiplayerServices",
+      "kind": "online",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires separately authorized development/sandbox/test-ad service, selected SDK and real project integration; offline simulations do not establish SDK acceptance"
+    },
+    {
+      "id": "VoiceChat",
+      "kind": "online",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires separately authorized development/sandbox/test-ad service, selected SDK and real project integration; offline simulations do not establish SDK acceptance"
+    },
+    {
+      "id": "Purchases",
+      "kind": "online",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires separately authorized development/sandbox/test-ad service, selected SDK and real project integration; offline simulations do not establish SDK acceptance"
+    },
+    {
+      "id": "Ads",
+      "kind": "online",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires separately authorized development/sandbox/test-ad service, selected SDK and real project integration; offline simulations do not establish SDK acceptance"
+    },
+    {
+      "id": "ToolingCli",
+      "kind": "native-procedure",
+      "document": "ToolingServiceFixtures.md",
+      "reason": "Requires explicitly configured CLI/Pipeline, actual project/instance targeting and observed disconnect recovery"
+    },
+    {
+      "id": "GraphToolkit",
+      "kind": "native-procedure",
+      "document": "PresentationFixtures.md",
+      "reason": "Requires selected version-qualified Graph Toolkit and actual native graph/import/runtime evidence"
+    },
+    {
+      "id": "PhysicsCore",
+      "kind": "native-procedure",
+      "document": "ContentFixtures.md",
+      "reason": "Requires explicitly selected compatible Physics Core API/components; classic 2D does not cover it"
+    },
+    {
+      "id": "RenderGraphAndMigration",
+      "kind": "native-procedure",
+      "document": "ContentFixtures.md",
+      "reason": "Requires selected renderer feature, native frame/resource inspection and before/after target visual evidence"
+    },
+    {
+      "id": "PlayerPresentationAndWeb",
+      "kind": "native-procedure",
+      "document": "PresentationFixtures.md",
+      "reason": "Requires actual player/browser/device interaction, visual/audio review and measured delivery/performance evidence"
+    }
+  ]
+}

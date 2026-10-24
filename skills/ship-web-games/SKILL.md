@@ -1,6 +1,7 @@
 ---
 name: ship-web-games
 description: Prepare web games for release through source verification, builds, gameplay QA, asset and configuration checks, approval gates, production proof, and rollback planning. Use when a browser game or major gameplay update is ready for release review.
+engines: [AGNOSTIC]
 ---
 
 # Ship Web Games

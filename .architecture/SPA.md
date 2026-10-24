@@ -3,10 +3,9 @@
 This repository follows a **Single Page Application architecture** intended for modern browser applications regardless of framework.
 
 This template is appropriate for:
-- React SPAs
-- Angular SPAs
-- Vue SPAs
+- browser-game menus, HUDs, and account interfaces
 - framework-light browser applications
+- host-approved UI frameworks when separately documented by the project
 
 The goal is to keep the system:
 

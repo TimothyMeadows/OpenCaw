@@ -311,7 +311,7 @@ refresh_copied_evidence_hashes() {
   gauntlet_name="$(basename "$gauntlet_dir")"
   while IFS= read -r evidence_file; do
     [[ -n "$evidence_file" ]] || continue
-    relative_path=".ai/gauntlets/$gauntlet_name/${evidence_file#"$gauntlet_dir"/}"
+    relative_path=".opencaw/.cache/gauntlets/$gauntlet_name/${evidence_file#"$gauntlet_dir"/}"
     evidence_hash="$(sha256_file "$evidence_file")"
     case "$relative_path" in
       */rounds/*/round-*.md)
@@ -447,15 +447,15 @@ assert_safe_copied_reference() {
   local referenced_file="$project_root/$referenced"
   case "$kind" in
     opened)
-      [[ "$referenced" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ]] \
+      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ]] \
         || fail "copied round has a noncanonical opened-event reference: $referenced"
       ;;
     root|trigger)
-      [[ "$referenced" =~ ^\.ai/gauntlets/${gauntlet_name}/(rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}|pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}|promotion-events/event-[0-9]{3,})\.md$ ]] \
+      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/(rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}|pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}|promotion-events/event-[0-9]{3,})\.md$ ]] \
         || fail "copied evidence has a noncanonical remediation reference: $referenced"
       ;;
     archive)
-      [[ "$referenced" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
+      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
         || fail "copied promotion event has a noncanonical report archive: $referenced"
       ;;
     *) fail "unknown copied-reference kind: $kind" ;;
@@ -478,7 +478,7 @@ refresh_copied_checkpoint_hashes() {
   gauntlet_file="$gauntlet_dir/GAUNTLET.md"
   while IFS= read -r checkpoint; do
     [[ -n "$checkpoint" ]] || continue
-    checkpoint_relative=".ai/gauntlets/$gauntlet_name/${checkpoint#"$gauntlet_dir"/}"
+    checkpoint_relative=".opencaw/.cache/gauntlets/$gauntlet_name/${checkpoint#"$gauntlet_dir"/}"
     remediation_trigger="$(sed -nE \
       's/^- Remediation trigger: (.*)$/\1/p' "$checkpoint" | head -n 1)"
     if [[ "$remediation_trigger" != none \
@@ -500,9 +500,9 @@ refresh_copied_checkpoint_hashes() {
     remediation_root="$(sed -nE \
       's/^- Remediation root: (.*)$/\1/p' "$checkpoint" | head -n 1)"
     if [[ "$remediation_root" != none \
-      && ( "$remediation_root" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
-        || "$remediation_root" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ \
-        || "$remediation_root" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ) ]]; then
+      && ( "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+        || "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ \
+        || "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ) ]]; then
       remediation_root_file="$project_root/$remediation_root"
       if [[ -f "$remediation_root_file" && ! -L "$remediation_root_file" ]] \
         && gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -582,7 +582,7 @@ refresh_copied_report_projections() {
 
   while IFS= read -r completion; do
     [[ -n "$completion" ]] || continue
-    completion_relative=".ai/gauntlets/$gauntlet_name/${completion#"$gauntlet_dir"/}"
+    completion_relative=".opencaw/.cache/gauntlets/$gauntlet_name/${completion#"$gauntlet_dir"/}"
     report_relative=''
     archive_count=0
     while IFS= read -r promotion; do
@@ -606,8 +606,8 @@ refresh_copied_report_projections() {
       report_relative="$(gauntlet_helper_value "$project_root" \
         gauntlet_section_field "$completion" 'Completion Event Metadata' 'Report')"
     fi
-    [[ "$report_relative" == ".ai/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md" \
-      || "$report_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
+    [[ "$report_relative" == ".opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md" \
+      || "$report_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
       || fail "copied completion resolved a noncanonical report: $report_relative"
     report_file="$project_root/$report_relative"
     [[ -f "$report_file" && ! -L "$report_file" ]] \
@@ -639,7 +639,7 @@ refresh_copied_qa_body_hashes() {
       "$event" 'PR Event Metadata' 'Head SHA')"
     referenced="$(gauntlet_helper_value "$project_root" gauntlet_section_field \
       "$event" 'PR Event Metadata' 'Critic round')"
-    [[ "$referenced" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+    [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
       && -f "$project_root/$referenced" && ! -L "$project_root/$referenced" ]] \
       || fail "copied PR QA event references unsafe critic evidence: $referenced"
     gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -665,7 +665,7 @@ refresh_copied_qa_body_hashes() {
       "$event" 'Promotion QA Event Metadata' 'Affected units')"
     [[ "$action" == pass || "$action" == fail ]] \
       || fail "copied promotion event has an invalid verdict: $event"
-    [[ "$referenced" =~ ^\.ai/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ \
+    [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ \
       && -f "$project_root/$referenced" && ! -L "$project_root/$referenced" ]] \
       || fail "copied promotion QA event references unsafe completion evidence: $referenced"
     gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -834,7 +834,7 @@ fixture_issue_link() {
   # for a progress target without scanning every generated fixture contract.
   if [[ "$head_branch" == gauntlet/* ]]; then
     gauntlet_name="${head_branch#gauntlet/}"
-    candidate="$project/.ai/gauntlets/$gauntlet_name/GAUNTLET.md"
+    candidate="$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
     if [[ -f "$candidate" ]]; then
       candidate_integration="$(sed -nE \
         's/\r$//; s/^- Integration branch: (.+)$/\1/p' "$candidate" | head -n 1)"
@@ -848,7 +848,7 @@ fixture_issue_link() {
   fi
   if [[ -z "$link_keyword" && "$base_branch" == gauntlet/* ]]; then
     gauntlet_name="${base_branch#gauntlet/}"
-    candidate="$project/.ai/gauntlets/$gauntlet_name/GAUNTLET.md"
+    candidate="$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
     if [[ -f "$candidate" ]]; then
       candidate_integration="$(sed -nE \
         's/\r$//; s/^- Integration branch: (.+)$/\1/p' "$candidate" | head -n 1)"
@@ -860,7 +860,7 @@ fixture_issue_link() {
   fi
   [[ -n "$link_keyword" ]] || return 1
   issue_url="$(gauntlet_helper_value "$project" gauntlet_section_field \
-    "$project/.ai/gauntlets/$gauntlet_name/GAUNTLET.md" \
+    "$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md" \
     'Parent Task' 'Issue')"
   issue_number="$(gauntlet_helper_value "$project" \
     gauntlet_github_issue_number "$issue_url")"
@@ -1096,7 +1096,7 @@ latest_event_field() {
   local field="$4"
   local event_file
   event_file="$(gauntlet_helper_value "$project" gauntlet_latest_pr_event_file \
-    "$project/.ai/gauntlets/$gauntlet/pr-events/$item")"
+    "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events/$item")"
   [[ -n "$event_file" ]] || return 1
   sed -nE "s/^- $field: (.*)$/\\1/p" "$event_file" | head -n 1
 }
@@ -1106,7 +1106,7 @@ checkpoint_consumed() {
   local gauntlet="$2"
   local checkpoint_relative="$3"
   grep -R -Fq -- "- Publication checkpoint: $checkpoint_relative" \
-    "$project/.ai/gauntlets/$gauntlet/pr-events" 2>/dev/null
+    "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events" 2>/dev/null
 }
 
 latest_unused_publication_checkpoint() {
@@ -1121,7 +1121,7 @@ latest_unused_publication_checkpoint() {
       printf '%s\n' "$checkpoint"
       return 0
     fi
-  done < <(find "$project/.ai/gauntlets/$gauntlet/publication-checkpoints/$item" \
+  done < <(find "$project/.opencaw/.cache/gauntlets/$gauntlet/publication-checkpoints/$item" \
     -maxdepth 1 -type f -name 'checkpoint-*.md' -print 2>/dev/null \
     | LC_ALL=C sort -r)
   return 1
@@ -1138,7 +1138,7 @@ ensure_publication_marker() {
   if [[ -z "$checkpoint" ]]; then
     readiness_output="$(mktemp "$temp_root/publication-readiness.XXXXXX")"
     OPENCAW_PROJECT_ROOT="$project" \
-      OPENCAW_REPORT_DIR="$project/.ai/reports/publication-checkpoint-$gauntlet-$item" \
+      OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/publication-checkpoint-$gauntlet-$item" \
       bash commands/pr-readiness-check.sh --gauntlet-progress \
         "$gauntlet" "$item" "$project/progress-validation.md" >"$readiness_output"
     checkpoint_relative="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -1162,7 +1162,7 @@ opened_publication_marker() {
   local gauntlet="$2"
   local item="$3"
   local opened_event checkpoint_relative checkpoint_hash
-  opened_event="$(find "$project/.ai/gauntlets/$gauntlet/pr-events/$item" -maxdepth 1 \
+  opened_event="$(find "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events/$item" -maxdepth 1 \
     -type f -name 'event-*.md' -print 2>/dev/null | LC_ALL=C sort -r \
     | while IFS= read -r candidate; do
         [[ "$(sed -nE 's/^- Event: (.*)$/\1/p' "$candidate" | head -n 1)" == opened ]] \
@@ -1263,7 +1263,7 @@ prepare_observation_for_command() {
             && "$evidence_url" == "$pr_url#issuecomment-"* ]]; then
             qa_verdict="${action#qa-}"
             source_file="$(gauntlet_helper_value "$project" gauntlet_latest_round_file \
-              "$project/.ai/gauntlets/$gauntlet_name/rounds/$item")"
+              "$project/.opencaw/.cache/gauntlets/$gauntlet_name/rounds/$item")"
             [[ -n "$source_file" ]] || fail "QA fixture cannot find its critic source: $item"
             source_relative="${source_file#"$project"/}"
             set_semantic_comment_observation "$project" "$evidence_url" "$pr_url" \
@@ -1337,7 +1337,7 @@ prepare_observation_for_command() {
         qa_verdict="${positional_observation[1]}"
         source_file="$(gauntlet_helper_value "$project" \
           gauntlet_latest_completion_event_file \
-          "$project/.ai/gauntlets/$gauntlet_name/completion-events")"
+          "$project/.opencaw/.cache/gauntlets/$gauntlet_name/completion-events")"
         [[ -n "$source_file" ]] || fail 'Promotion QA fixture cannot find its completion source.'
         source_relative="${source_file#"$project"/}"
         qa_affected_units=none
@@ -1398,8 +1398,8 @@ write_parent_task() {
   local project="$1"
   local task_name="$2"
   local issue_number="$3"
-  mkdir -p "$project/.ai/tasks/$task_name"
-  cat >"$project/.ai/tasks/$task_name/TASK.md" <<EOF
+  mkdir -p "$project/.opencaw/.cache/tasks/$task_name"
+  cat >"$project/.opencaw/.cache/tasks/$task_name/TASK.md" <<EOF
 # Gauntlet parent fixture
 
 ## Goal
@@ -1454,7 +1454,7 @@ copy_gauntlet() {
       source_integration_sha="$(git -C "$project" rev-parse --verify \
         "refs/heads/$source_integration_branch" 2>/dev/null || true)"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
-        ".ai/gauntlets/$source_name/" ".ai/gauntlets/$destination_name/"
+        ".opencaw/.cache/gauntlets/$source_name/" ".opencaw/.cache/gauntlets/$destination_name/"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
         "gauntlet/$source_name/" "gauntlet/$destination_name/"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
@@ -1467,7 +1467,7 @@ copy_gauntlet() {
       while IFS= read -r copied_file; do
         [[ -n "$copied_file" ]] || continue
         replace_all_literal "$copied_file" \
-          ".ai/gauntlets/$source_name/" ".ai/gauntlets/$destination_name/"
+          ".opencaw/.cache/gauntlets/$source_name/" ".opencaw/.cache/gauntlets/$destination_name/"
         replace_all_literal "$copied_file" \
           "gauntlet/$source_name" "gauntlet/$destination_name"
         replace_all_literal "$copied_file" \
@@ -1642,7 +1642,7 @@ write_ready_gauntlet() {
 
 ## Parent Task
 - Task name: gauntlet-parent
-- Task file: `.ai/tasks/gauntlet-parent/TASK.md`
+- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`
 - Issue: https://github.com/example/opencaw-fixture/issues/101
 
 ## Objective
@@ -2196,9 +2196,9 @@ expect_failure "$temp_root/gh-wrong-fields.log" env GH_HOST=github.com \
   --json url,state --jq fixture-filter
 run_for "$project" bash commands/create-host-ai-scaffold.sh >/dev/null
 run_for "$project" bash commands/create-host-ai-scaffold.sh >/dev/null
-[[ -d "$project/.ai/gauntlets" ]] || fail 'scaffold omitted .ai/gauntlets'
-[[ -d "$project/.ai/archive/gauntlets" ]] || fail 'scaffold omitted .ai/archive/gauntlets'
-[[ ! -e "$temp_root/.ai" ]] || fail 'scaffold escaped the explicit project root'
+[[ -d "$project/.opencaw/.cache/gauntlets" ]] || fail 'scaffold omitted .opencaw/.cache/gauntlets'
+[[ -d "$project/.opencaw/.cache/archive/gauntlets" ]] || fail 'scaffold omitted .opencaw/.cache/archive/gauntlets'
+[[ ! -e "$temp_root/.opencaw/.cache" ]] || fail 'scaffold escaped the explicit project root'
 
 write_parent_task "$project" gauntlet-parent 101
 dry_run_output="$temp_root/create-dry-run.log"
@@ -2219,7 +2219,7 @@ grep -Eq '^-[[:space:]]\[[[:space:]]\] unit-1 .*\| scope: ' "$dry_run_output" \
   || fail 'create dry-run omitted the required work-unit scope field'
 grep -q -- '- Unit manifest fingerprint: pending' "$dry_run_output" \
   || fail 'create dry-run omitted the pending retained-unit manifest fingerprint'
-[[ ! -e "$project/.ai/gauntlets/dry-run-gauntlet" ]] || fail 'create dry-run changed project state'
+[[ ! -e "$project/.opencaw/.cache/gauntlets/dry-run-gauntlet" ]] || fail 'create dry-run changed project state'
 
 expect_failure "$temp_root/invalid-name.log" run_for "$project" bash commands/create-gauntlet-file.sh 'Invalid_Name' --task gauntlet-parent
 expect_failure "$temp_root/escaping-name.log" run_for "$project" bash commands/create-gauntlet-file.sh '../../escape' --task gauntlet-parent
@@ -2227,10 +2227,10 @@ expect_failure "$temp_root/missing-task.log" run_for "$project" bash commands/cr
 
 create_output="$temp_root/create.log"
 run_for "$project" bash commands/create-gauntlet-file.sh fixture-gauntlet 'Fixture Gauntlet' --task gauntlet-parent >"$create_output"
-gauntlet_dir="$project/.ai/gauntlets/fixture-gauntlet"
+gauntlet_dir="$project/.opencaw/.cache/gauntlets/fixture-gauntlet"
 gauntlet_file="$gauntlet_dir/GAUNTLET.md"
 expect_file "$gauntlet_file"
-grep -Fq '.ai/tasks/gauntlet-parent/TASK.md' "$gauntlet_file" || fail 'Gauntlet did not link its parent task'
+grep -Fq '.opencaw/.cache/tasks/gauntlet-parent/TASK.md' "$gauntlet_file" || fail 'Gauntlet did not link its parent task'
 grep -Fq 'https://github.com/example/opencaw-fixture/issues/101' "$gauntlet_file" || fail 'Gauntlet did not link its parent issue'
 expect_line '## Progress PR Ledger' "$gauntlet_file"
 expect_line '## Completion Ledger' "$gauntlet_file"
@@ -2259,21 +2259,21 @@ run_for "$project" bash commands/validate-gauntlet.sh "$gauntlet_dir" --phase re
 run_for "$project" bash commands/validate-gauntlet.sh "$gauntlet_file" --phase ready >/dev/null
 
 linked_root_project="$(new_project linked-gauntlet-root-project)"
-mkdir -p "$linked_root_project/.ai" "$temp_root/outside-gauntlet-root"
+mkdir -p "$linked_root_project/.opencaw/.cache" "$temp_root/outside-gauntlet-root"
 write_parent_task "$linked_root_project" gauntlet-parent 101
-ln -s "$temp_root/outside-gauntlet-root" "$linked_root_project/.ai/gauntlets"
+ln -s "$temp_root/outside-gauntlet-root" "$linked_root_project/.opencaw/.cache/gauntlets"
 expect_failure "$temp_root/linked-gauntlet-root.log" run_for "$linked_root_project" \
   bash commands/create-gauntlet-file.sh escaped-root-gauntlet --task gauntlet-parent
 
 outside_gauntlet_dir="$temp_root/outside-direct-gauntlet"
 copy_gauntlet "$gauntlet_dir" "$outside_gauntlet_dir"
-ln -s "$outside_gauntlet_dir" "$project/.ai/gauntlets/linked-gauntlet"
+ln -s "$outside_gauntlet_dir" "$project/.opencaw/.cache/gauntlets/linked-gauntlet"
 expect_failure "$temp_root/linked-gauntlet-dir.log" run_for "$project" \
   bash commands/validate-gauntlet.sh linked-gauntlet --phase ready
 expect_failure "$temp_root/outside-gauntlet-ref.log" run_for "$project" \
   bash commands/validate-gauntlet.sh "$outside_gauntlet_dir/GAUNTLET.md" --phase ready
 
-nested_gauntlet_dir="$project/.ai/gauntlets/nested-container/child"
+nested_gauntlet_dir="$project/.opencaw/.cache/gauntlets/nested-container/child"
 mkdir -p "$nested_gauntlet_dir"
 cp "$gauntlet_file" "$nested_gauntlet_dir/GAUNTLET.md"
 expect_failure "$temp_root/nested-gauntlet-ref.log" run_for "$project" \
@@ -2281,74 +2281,74 @@ expect_failure "$temp_root/nested-gauntlet-ref.log" run_for "$project" \
 
 outside_task_dir="$temp_root/outside-parent-task"
 mkdir -p "$outside_task_dir"
-cp "$project/.ai/tasks/gauntlet-parent/TASK.md" "$outside_task_dir/TASK.md"
-ln -s "$outside_task_dir" "$project/.ai/tasks/symlink-task-dir"
-case_dir="$project/.ai/gauntlets/symlink-task-directory"
+cp "$project/.opencaw/.cache/tasks/gauntlet-parent/TASK.md" "$outside_task_dir/TASK.md"
+ln -s "$outside_task_dir" "$project/.opencaw/.cache/tasks/symlink-task-dir"
+case_dir="$project/.opencaw/.cache/gauntlets/symlink-task-directory"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: symlink-task-dir'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.ai/tasks/gauntlet-parent/TASK.md`' '- Task file: `.ai/tasks/symlink-task-dir/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/symlink-task-dir/TASK.md`'
 expect_failure "$temp_root/symlink-task-directory.log" run_for "$project" \
   bash commands/validate-gauntlet.sh symlink-task-directory --phase ready
 
-mkdir -p "$project/.ai/tasks/symlink-task-file"
-ln -s ../gauntlet-parent/TASK.md "$project/.ai/tasks/symlink-task-file/TASK.md"
-case_dir="$project/.ai/gauntlets/symlink-task-file"
+mkdir -p "$project/.opencaw/.cache/tasks/symlink-task-file"
+ln -s ../gauntlet-parent/TASK.md "$project/.opencaw/.cache/tasks/symlink-task-file/TASK.md"
+case_dir="$project/.opencaw/.cache/gauntlets/symlink-task-file"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: symlink-task-file'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.ai/tasks/gauntlet-parent/TASK.md`' '- Task file: `.ai/tasks/symlink-task-file/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/symlink-task-file/TASK.md`'
 expect_failure "$temp_root/symlink-task-file.log" run_for "$project" \
   bash commands/validate-gauntlet.sh symlink-task-file --phase ready
 
-mkdir -p "$project/.ai/tasks/crlf-task"
-cp "$project/.ai/tasks/gauntlet-parent/TASK.md" "$project/.ai/tasks/crlf-task/TASK.md"
-convert_to_crlf "$project/.ai/tasks/crlf-task/TASK.md"
-case_dir="$project/.ai/gauntlets/crlf-gauntlet"
+mkdir -p "$project/.opencaw/.cache/tasks/crlf-task"
+cp "$project/.opencaw/.cache/tasks/gauntlet-parent/TASK.md" "$project/.opencaw/.cache/tasks/crlf-task/TASK.md"
+convert_to_crlf "$project/.opencaw/.cache/tasks/crlf-task/TASK.md"
+case_dir="$project/.opencaw/.cache/gauntlets/crlf-gauntlet"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: crlf-task'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.ai/tasks/gauntlet-parent/TASK.md`' '- Task file: `.ai/tasks/crlf-task/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/crlf-task/TASK.md`'
 convert_to_crlf "$case_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh crlf-gauntlet --phase ready >/dev/null
 
-case_dir="$project/.ai/gauntlets/missing-objective"
+case_dir="$project/.opencaw/.cache/gauntlets/missing-objective"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" 'Produce an inspectable local artifact that satisfies the approved fixture benchmark.' ''
 expect_failure "$temp_root/missing-objective.log" run_for "$project" bash commands/validate-gauntlet.sh missing-objective --phase ready
 
-case_dir="$project/.ai/gauntlets/missing-progress-pr-ledger"
+case_dir="$project/.opencaw/.cache/gauntlets/missing-progress-pr-ledger"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '## Progress PR Ledger' '## Missing Progress PR Ledger'
 expect_failure "$temp_root/missing-progress-pr-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-progress-pr-ledger --phase ready
 
-case_dir="$project/.ai/gauntlets/unapproved-bar"
+case_dir="$project/.opencaw/.cache/gauntlets/unapproved-bar"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Approval: approved' '- Approval: pending'
 expect_failure "$temp_root/unapproved-bar.log" run_for "$project" bash commands/validate-gauntlet.sh unapproved-bar --phase ready
 
-case_dir="$project/.ai/gauntlets/placeholder-bar"
+case_dir="$project/.opencaw/.cache/gauntlets/placeholder-bar"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- The artifact exists and contains the expected verified behavior.' '- TODO: Define inspectable pass criteria.'
 expect_failure "$temp_root/placeholder-bar.log" run_for "$project" bash commands/validate-gauntlet.sh placeholder-bar --phase ready
 
 write_parent_task "$project" task-without-issue 102
 awk '$0 !~ /^https:\/\/github\.com\/example\/opencaw-fixture\/issues\/102$/' \
-  "$project/.ai/tasks/task-without-issue/TASK.md" >"$project/.ai/tasks/task-without-issue/TASK.md.tmp"
-mv "$project/.ai/tasks/task-without-issue/TASK.md.tmp" "$project/.ai/tasks/task-without-issue/TASK.md"
-case_dir="$project/.ai/gauntlets/missing-issue"
+  "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md" >"$project/.opencaw/.cache/tasks/task-without-issue/TASK.md.tmp"
+mv "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md.tmp" "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md"
+case_dir="$project/.opencaw/.cache/gauntlets/missing-issue"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: task-without-issue'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.ai/tasks/gauntlet-parent/TASK.md`' '- Task file: `.ai/tasks/task-without-issue/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/task-without-issue/TASK.md`'
 replace_line "$case_dir/GAUNTLET.md" '- Issue: https://github.com/example/opencaw-fixture/issues/101' '- Issue:'
 expect_failure "$temp_root/missing-issue.log" run_for "$project" bash commands/validate-gauntlet.sh missing-issue --phase ready
 
-case_dir="$project/.ai/gauntlets/invalid-unit"
+case_dir="$project/.opencaw/.cache/gauntlets/invalid-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
   '- [ ] unit-1 | status: invented | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
 expect_failure "$temp_root/invalid-unit.log" run_for "$project" bash commands/validate-gauntlet.sh invalid-unit --phase ready
 
-case_dir="$project/.ai/gauntlets/missing-unit-scope"
+case_dir="$project/.opencaw/.cache/gauntlets/missing-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2356,7 +2356,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/missing-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-unit-scope --phase ready
 
-case_dir="$project/.ai/gauntlets/placeholder-unit-scope"
+case_dir="$project/.opencaw/.cache/gauntlets/placeholder-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2364,7 +2364,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/placeholder-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh placeholder-unit-scope --phase ready
 
-case_dir="$project/.ai/gauntlets/pipe-ambiguous-unit-scope"
+case_dir="$project/.opencaw/.cache/gauntlets/pipe-ambiguous-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2372,7 +2372,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/pipe-ambiguous-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pipe-ambiguous-unit-scope --phase ready
 
-case_dir="$project/.ai/gauntlets/reserved-integration-unit"
+case_dir="$project/.opencaw/.cache/gauntlets/reserved-integration-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2380,7 +2380,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/reserved-integration-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh reserved-integration-unit --phase ready
 
-case_dir="$project/.ai/gauntlets/reserved-none-unit"
+case_dir="$project/.opencaw/.cache/gauntlets/reserved-none-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2434,51 +2434,51 @@ replace_line "$manifest_normalization_fixture" \
     "$project" "$manifest_normalization_fixture")" ]] \
   || fail 'superseded membership failed to change only active scope while retaining manifest identity'
 
-case_dir="$project/.ai/gauntlets/forbidden-pr-setting"
+case_dir="$project/.opencaw/.cache/gauntlets/forbidden-pr-setting"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Auto-merge: disabled' '- Auto-merge: enabled'
 expect_failure "$temp_root/forbidden-pr.log" run_for "$project" bash commands/validate-gauntlet.sh forbidden-pr-setting --phase ready
 
-case_dir="$project/.ai/gauntlets/missing-base-branch"
+case_dir="$project/.opencaw/.cache/gauntlets/missing-base-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Base branch: main' '- Base branch:'
 expect_failure "$temp_root/missing-base-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-base-branch --phase ready
 
-case_dir="$project/.ai/gauntlets/pending-base-branch"
+case_dir="$project/.opencaw/.cache/gauntlets/pending-base-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Base branch: main' '- Base branch: pending'
 expect_failure "$temp_root/pending-base-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pending-base-branch --phase ready
 
-case_dir="$project/.ai/gauntlets/pending-base-commit"
+case_dir="$project/.opencaw/.cache/gauntlets/pending-base-commit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   '- Base commit SHA: pending'
 expect_failure "$temp_root/pending-base-commit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pending-base-commit --phase ready
 
-case_dir="$project/.ai/gauntlets/nonexistent-base-commit"
+case_dir="$project/.opencaw/.cache/gauntlets/nonexistent-base-commit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   '- Base commit SHA: 0000000000000000000000000000000000000000'
 expect_failure "$temp_root/nonexistent-base-commit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh nonexistent-base-commit --phase ready
 
-case_dir="$project/.ai/gauntlets/base-branch-before-creation-point"
+case_dir="$project/.opencaw/.cache/gauntlets/base-branch-before-creation-point"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   "- Base commit SHA: $head_sha_1"
 expect_failure "$temp_root/base-branch-before-creation-point.log" run_for "$project" \
   bash commands/validate-gauntlet.sh base-branch-before-creation-point --phase ready
 
-case_dir="$project/.ai/gauntlets/prefreeze-integration-ahead"
+case_dir="$project/.opencaw/.cache/gauntlets/prefreeze-integration-ahead"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 set_local_ref "$project" gauntlet/prefreeze-integration-ahead "$head_sha_1"
 expect_failure "$temp_root/prefreeze-integration-ahead.log" run_for "$project" \
   bash commands/validate-gauntlet.sh prefreeze-integration-ahead --phase ready
 
-case_dir="$project/.ai/gauntlets/integration-unrelated-to-base"
+case_dir="$project/.opencaw/.cache/gauntlets/integration-unrelated-to-base"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 set_local_ref "$project" main "$head_sha_1"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
@@ -2488,7 +2488,7 @@ expect_failure "$temp_root/integration-unrelated-to-base.log" run_for "$project"
   bash commands/validate-gauntlet.sh integration-unrelated-to-base --phase ready
 set_local_ref "$project" main "$base_commit_sha"
 
-case_dir="$project/.ai/gauntlets/wrong-integration-branch"
+case_dir="$project/.opencaw/.cache/gauntlets/wrong-integration-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- Integration branch: gauntlet/wrong-integration-branch' \
@@ -2496,13 +2496,13 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/wrong-integration-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh wrong-integration-branch --phase ready
 
-case_dir="$project/.ai/gauntlets/forbidden-progress-merge"
+case_dir="$project/.opencaw/.cache/gauntlets/forbidden-progress-merge"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Progress PR merge: human only' '- Progress PR merge: automatic'
 expect_failure "$temp_root/forbidden-progress-merge.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forbidden-progress-merge --phase ready
 
-case_dir="$project/.ai/gauntlets/forbidden-promotion-gate"
+case_dir="$project/.opencaw/.cache/gauntlets/forbidden-promotion-gate"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- Promotion PR readiness confirmation: human required' \
@@ -2510,7 +2510,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/forbidden-promotion-gate.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forbidden-promotion-gate --phase ready
 
-case_dir="$project/.ai/gauntlets/premature-pr-eligibility"
+case_dir="$project/.opencaw/.cache/gauntlets/premature-pr-eligibility"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- PR eligible: no' '- PR eligible: yes'
 expect_failure "$temp_root/premature-pr-eligibility.log" run_for "$project" \
@@ -2519,7 +2519,7 @@ expect_failure "$temp_root/premature-pr-eligibility.log" run_for "$project" \
 echo '[3/8] enforcing progressive PR publication, ownership, ordering, and path safety'
 ready_snapshot="$temp_root/ready-snapshot"
 copy_gauntlet "$gauntlet_dir" "$ready_snapshot"
-nested_base_fixture_dir="$project/.ai/gauntlets/nested-base-fixture"
+nested_base_fixture_dir="$project/.opencaw/.cache/gauntlets/nested-base-fixture"
 copy_gauntlet "$ready_snapshot" "$nested_base_fixture_dir"
 replace_line "$nested_base_fixture_dir/GAUNTLET.md" \
   '- Base branch: main' '- Base branch: gauntlet/release'
@@ -2538,7 +2538,7 @@ printf '# Progress validation\n\nThe unit branch is locally verified and ready f
 expect_line '- Execution contract fingerprint: pending' "$gauntlet_file"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$(git -C "$project" rev-parse HEAD)"
 set_local_ref "$project" gauntlet-work/fixture-gauntlet/unit-1 "$head_sha_1"
-progress_readiness_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/progress" run_for "$project" \
+progress_readiness_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/progress" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress fixture-gauntlet unit-1 "$project/progress-validation.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=NO$' <<<"$progress_readiness_output" \
   || fail 'approved Gauntlet progress publication unexpectedly required another confirmation'
@@ -2567,7 +2567,7 @@ progress_checkpoint_sha256="$(sed -nE \
 progress_publication_marker="$(sed -nE 's/^PUBLICATION_MARKER=(.+)$/\1/p' \
   <<<"$progress_readiness_output")"
 [[ "$progress_checkpoint_relative" \
-    == '.ai/gauntlets/fixture-gauntlet/publication-checkpoints/unit-1/checkpoint-001.md' \
+    == '.opencaw/.cache/gauntlets/fixture-gauntlet/publication-checkpoints/unit-1/checkpoint-001.md' \
   && -n "$progress_checkpoint_sha256" \
   && "$progress_publication_marker" \
     == "<!-- opencaw-gauntlet-publication:v1 checkpoint=$progress_checkpoint_relative checkpoint-sha256=$progress_checkpoint_sha256 -->" ]] \
@@ -2596,13 +2596,13 @@ expect_line '- Remote work SHA: absent' "$progress_checkpoint"
 
 prepare_checkpoint_fixture() {
   local fixture_name="$1"
-  checkpoint_case_dir="$project/.ai/gauntlets/$fixture_name"
+  checkpoint_case_dir="$project/.opencaw/.cache/gauntlets/$fixture_name"
   checkpoint_case_head="gauntlet-work/$fixture_name/unit-1"
   checkpoint_case_url="https://github.com/example/opencaw-fixture/pull/$2"
   copy_gauntlet "$ready_snapshot" "$checkpoint_case_dir"
   set_local_ref "$project" "$checkpoint_case_head" "$head_sha_1"
   set_remote_ref "$project" "$checkpoint_case_head" absent
-  checkpoint_case_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/$fixture_name" \
+  checkpoint_case_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/$fixture_name" \
     run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
       "$fixture_name" unit-1 "$project/progress-validation.md")"
   checkpoint_case_relative="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -2631,7 +2631,7 @@ grep -Fq \
   "$temp_root/remediation-trigger-path-escape.log" \
   || fail 'checkpoint validation did not reject remediation traversal before hashing its target'
 
-baseline_quality_control_dir="$project/.ai/gauntlets/baseline-quality-checkpoint-control"
+baseline_quality_control_dir="$project/.opencaw/.cache/gauntlets/baseline-quality-checkpoint-control"
 copy_gauntlet "$ready_snapshot" "$baseline_quality_control_dir"
 baseline_quality_head='gauntlet-work/baseline-quality-checkpoint-control/unit-1'
 baseline_quality_url='https://github.com/example/opencaw-fixture/pull/302'
@@ -2691,7 +2691,7 @@ set_pr_observation "$baseline_quality_url" "$baseline_quality_head" "$head_sha_1
   2026-08-01T12:00:02Z none "$baseline_quality_marker"
 unset FAKE_DATE_ISO
 
-future_baseline_quality_dir="$project/.ai/gauntlets/future-baseline-quality-checkpoint"
+future_baseline_quality_dir="$project/.opencaw/.cache/gauntlets/future-baseline-quality-checkpoint"
 copy_gauntlet "$baseline_quality_control_dir" "$future_baseline_quality_dir"
 future_baseline_quality_approval='2026-08-01T12:00:03Z'
 future_baseline_quality_event_time='2026-08-01T12:00:04Z'
@@ -2723,7 +2723,7 @@ replace_matching_line "$future_baseline_quality_event" '^- Recorded at:' \
   "- Recorded at: $future_baseline_quality_event_time"
 future_baseline_quality_ledger="$(select_ledger_line "$project" \
   "$future_baseline_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
+  '.opencaw/.cache/gauntlets/future-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
 replace_line "$future_baseline_quality_dir/GAUNTLET.md" \
   "$future_baseline_quality_ledger" \
   "${future_baseline_quality_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $future_baseline_quality_event_time}"
@@ -2747,7 +2747,7 @@ grep -Fq 'Publication checkpoint uses a quality generation not active at its Rec
   "$temp_root/future-baseline-quality-checkpoint.log" \
   || fail 'future baseline quality checkpoint did not reach the generation-authorization gate'
 
-backdated_baseline_quality_dir="$project/.ai/gauntlets/backdated-baseline-quality-checkpoint"
+backdated_baseline_quality_dir="$project/.opencaw/.cache/gauntlets/backdated-baseline-quality-checkpoint"
 copy_gauntlet "$baseline_quality_control_dir" "$backdated_baseline_quality_dir"
 backdated_baseline_quality_approval='2026-08-01T12:00:01Z'
 backdated_baseline_quality_event_time='2026-08-01T12:00:04Z'
@@ -2765,7 +2765,7 @@ replace_matching_line "$backdated_baseline_quality_event" '^- Recorded at:' \
   "- Recorded at: $backdated_baseline_quality_event_time"
 backdated_baseline_quality_ledger="$(select_ledger_line "$project" \
   "$backdated_baseline_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/backdated-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
+  '.opencaw/.cache/gauntlets/backdated-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
 replace_line "$backdated_baseline_quality_dir/GAUNTLET.md" \
   "$backdated_baseline_quality_ledger" \
   "${backdated_baseline_quality_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $backdated_baseline_quality_event_time}"
@@ -2967,7 +2967,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
     bash commands/record-gauntlet-pr-event.sh checkpoint-forged-work-ref unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
-checkpoint_cas_dir="$project/.ai/gauntlets/checkpoint-cas"
+checkpoint_cas_dir="$project/.opencaw/.cache/gauntlets/checkpoint-cas"
 copy_gauntlet "$ready_snapshot" "$checkpoint_cas_dir"
 set_local_ref "$project" gauntlet-work/checkpoint-cas/unit-1 "$head_sha_1"
 set_remote_ref "$project" gauntlet-work/checkpoint-cas/unit-1 absent
@@ -2977,7 +2977,7 @@ checkpoint_cas_output="$temp_root/checkpoint-cas-output.log"
 set +e
 FAKE_GIT_PAUSE_READY="$checkpoint_cas_ready" \
   FAKE_GIT_PAUSE_RELEASE="$checkpoint_cas_release" \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-cas" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-cas" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-cas unit-1 \
     "$project/progress-validation.md" >"$checkpoint_cas_output" 2>&1 &
 checkpoint_cas_pid=$!
@@ -2996,7 +2996,7 @@ set -e
   | wc -l | tr -d ' ')" == 0 ]] \
   || fail 'publication readiness CAS failure installed an orphan checkpoint'
 
-checkpoint_symlink_root_dir="$project/.ai/gauntlets/checkpoint-symlink-root"
+checkpoint_symlink_root_dir="$project/.opencaw/.cache/gauntlets/checkpoint-symlink-root"
 copy_gauntlet "$ready_snapshot" "$checkpoint_symlink_root_dir"
 mkdir -p "$temp_root/outside-publication-checkpoints"
 rmdir "$checkpoint_symlink_root_dir/publication-checkpoints"
@@ -3007,7 +3007,7 @@ expect_failure "$temp_root/checkpoint-symlink-root.log" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-symlink-root unit-1 \
   "$project/progress-validation.md"
 
-checkpoint_symlink_item_dir="$project/.ai/gauntlets/checkpoint-symlink-item"
+checkpoint_symlink_item_dir="$project/.opencaw/.cache/gauntlets/checkpoint-symlink-item"
 copy_gauntlet "$ready_snapshot" "$checkpoint_symlink_item_dir"
 mkdir -p "$temp_root/outside-publication-checkpoint-item"
 ln -s "$temp_root/outside-publication-checkpoint-item" \
@@ -3033,7 +3033,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
 
 prepare_checkpoint_fixture checkpoint-sequence-gap 284
 checkpoint_gap_original="$project/$checkpoint_case_relative"
-checkpoint_gap_relative='.ai/gauntlets/checkpoint-sequence-gap/publication-checkpoints/unit-1/checkpoint-003.md'
+checkpoint_gap_relative='.opencaw/.cache/gauntlets/checkpoint-sequence-gap/publication-checkpoints/unit-1/checkpoint-003.md'
 mv "$checkpoint_gap_original" "$project/$checkpoint_gap_relative"
 replace_line "$project/$checkpoint_gap_relative" \
   '# Gauntlet Publication Checkpoint: unit-1 / 001' \
@@ -3061,12 +3061,12 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
     bash commands/record-gauntlet-pr-event.sh checkpoint-noncanonical-extra unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
-checkpoint_stale_dir="$project/.ai/gauntlets/checkpoint-stale-replay"
+checkpoint_stale_dir="$project/.opencaw/.cache/gauntlets/checkpoint-stale-replay"
 copy_gauntlet "$ready_snapshot" "$checkpoint_stale_dir"
 checkpoint_stale_head='gauntlet-work/checkpoint-stale-replay/unit-1'
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_1"
 set_remote_ref "$project" "$checkpoint_stale_head" absent
-checkpoint_stale_output_1="$(OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-stale-1" \
+checkpoint_stale_output_1="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-1" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_1="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3074,7 +3074,7 @@ checkpoint_stale_relative_1="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
 checkpoint_stale_hash_1="$(sha256_file "$project/$checkpoint_stale_relative_1")"
 checkpoint_stale_marker_1="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_stale_relative_1 checkpoint-sha256=$checkpoint_stale_hash_1 -->"
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_2"
-checkpoint_stale_output_2="$(OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-stale-2" \
+checkpoint_stale_output_2="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-2" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3096,7 +3096,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
     "$checkpoint_stale_url" "$checkpoint_stale_head" none --head-sha "$head_sha_1"
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_3"
 set_remote_ref "$project" "$checkpoint_stale_head" absent
-checkpoint_stale_output_3="$(OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-stale-3" \
+checkpoint_stale_output_3="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-3" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_3="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3105,7 +3105,7 @@ checkpoint_stale_relative_3="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   && -f "$project/$checkpoint_stale_relative_2" ]] \
   || fail 'aborted newest checkpoint was not retained before contiguous next issuance'
 
-checkpoint_parallel_dir="$project/.ai/gauntlets/checkpoint-parallel"
+checkpoint_parallel_dir="$project/.opencaw/.cache/gauntlets/checkpoint-parallel"
 copy_gauntlet "$ready_snapshot" "$checkpoint_parallel_dir"
 set_local_ref "$project" gauntlet-work/checkpoint-parallel/unit-1 "$head_sha_1"
 set_remote_ref "$project" gauntlet-work/checkpoint-parallel/unit-1 absent
@@ -3114,7 +3114,7 @@ checkpoint_parallel_output_2="$temp_root/checkpoint-parallel-2.log"
 checkpoint_parallel_pause_ready="$temp_root/checkpoint-parallel-pause-ready"
 checkpoint_parallel_pause_release="$temp_root/checkpoint-parallel-pause-release"
 OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-parallel-1" \
+  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-1" \
   FAKE_GIT_PAUSE_READY="$checkpoint_parallel_pause_ready" \
   FAKE_GIT_PAUSE_RELEASE="$checkpoint_parallel_pause_release" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
@@ -3122,7 +3122,7 @@ OPENCAW_PROJECT_ROOT="$project" \
 checkpoint_parallel_pid_1=$!
 wait_for_path "$checkpoint_parallel_pause_ready"
 set +e
-OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-parallel-2" \
+OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-2" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
     "$project/progress-validation.md" >"$checkpoint_parallel_output_2" 2>&1
 checkpoint_parallel_status_2=$?
@@ -3138,7 +3138,7 @@ grep -Fq 'Gauntlet is locked' "$checkpoint_parallel_output_2" \
   || fail 'parallel readiness loser did not report the durable lock blocker'
 checkpoint_parallel_relative_1="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   "$checkpoint_parallel_output_1")"
-OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/checkpoint-parallel-retry" \
+OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-retry" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
     "$project/progress-validation.md" >"$checkpoint_parallel_output_2" 2>&1
 checkpoint_parallel_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3190,7 +3190,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
     'https://github.com/example/opencaw-fixture/pull/279' \
     gauntlet-work/checkpoint-parallel/unit-1 none --head-sha "$head_sha_1"
 expect_failure "$temp_root/progress-readiness-unknown-unit.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/unknown-progress" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/unknown-progress" \
   bash commands/pr-readiness-check.sh --gauntlet-progress \
   fixture-gauntlet absent-unit "$project/progress-validation.md"
 
@@ -3213,7 +3213,7 @@ expect_failure "$temp_root/pr-event-malformed-head-sha.log" \
   "$fixture_pr_url" "$fixture_head" none --head-sha deadbeef
 
 nonexistent_sha='0000000000000000000000000000000000000000'
-nonexistent_sha_dir="$project/.ai/gauntlets/nonexistent-sha"
+nonexistent_sha_dir="$project/.opencaw/.cache/gauntlets/nonexistent-sha"
 copy_gauntlet "$ready_snapshot" "$nonexistent_sha_dir"
 expect_failure "$temp_root/pr-event-nonexistent-sha.log" \
   run_for_without_observation "$project" \
@@ -3223,7 +3223,7 @@ expect_failure "$temp_root/pr-event-nonexistent-sha.log" \
 [[ "$(pr_event_file_count "$nonexistent_sha_dir")" == 0 ]] \
   || fail 'a nonexistent commit object produced progress-PR evidence'
 
-origin_binding_dir="$project/.ai/gauntlets/origin-binding"
+origin_binding_dir="$project/.opencaw/.cache/gauntlets/origin-binding"
 copy_gauntlet "$ready_snapshot" "$origin_binding_dir"
 git -C "$project" remote remove origin
 expect_failure "$temp_root/pr-event-missing-origin.log" \
@@ -3251,7 +3251,7 @@ git -C "$project" remote set-url origin git@github.com:example/opencaw-fixture.g
 [[ "$(pr_event_file_count "$origin_binding_dir")" == 0 ]] \
   || fail 'a missing, mismatched, or plaintext origin produced progress-PR evidence'
 
-push_target_dir="$project/.ai/gauntlets/push-target-binding"
+push_target_dir="$project/.opencaw/.cache/gauntlets/push-target-binding"
 copy_gauntlet "$ready_snapshot" "$push_target_dir"
 push_target_head='gauntlet-work/push-target-binding/unit-1'
 push_target_url='https://github.com/example/opencaw-fixture/pull/226'
@@ -3288,7 +3288,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh push-target-binding
 expect_file "$push_target_dir/pr-events/unit-1/event-001.md"
 git -C "$project" config --unset-all remote.origin.pushurl
 
-stale_ref_dir="$project/.ai/gauntlets/stale-local-ref"
+stale_ref_dir="$project/.opencaw/.cache/gauntlets/stale-local-ref"
 copy_gauntlet "$ready_snapshot" "$stale_ref_dir"
 set_local_ref "$project" gauntlet/stale-local-ref "$head_sha_1"
 set_local_ref "$project" gauntlet-work/stale-local-ref/unit-1 "$head_sha_1"
@@ -3302,7 +3302,7 @@ expect_failure "$temp_root/pr-event-stale-local-ref.log" env OPENCAW_TEST_SKIP_O
 [[ "$(pr_event_file_count "$stale_ref_dir")" == 0 ]] \
   || fail 'a stale local progress ref produced progress-PR evidence'
 
-first_target_drift_dir="$project/.ai/gauntlets/first-target-drift"
+first_target_drift_dir="$project/.opencaw/.cache/gauntlets/first-target-drift"
 copy_gauntlet "$ready_snapshot" "$first_target_drift_dir"
 first_target_url='https://github.com/example/opencaw-fixture/pull/227'
 first_target_head='gauntlet-work/first-target-drift/unit-1'
@@ -3342,7 +3342,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh first-target-drift 
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1" >/dev/null
 expect_file "$first_target_drift_dir/pr-events/unit-1/event-001.md"
 
-absent_artifact_dir="$project/.ai/gauntlets/artifact-absent-at-commit"
+absent_artifact_dir="$project/.opencaw/.cache/gauntlets/artifact-absent-at-commit"
 copy_gauntlet "$ready_snapshot" "$absent_artifact_dir"
 absent_artifact_url='https://github.com/example/opencaw-fixture/pull/214'
 absent_artifact_head='gauntlet-work/artifact-absent-at-commit/unit-1'
@@ -3385,7 +3385,7 @@ expect_failure "$temp_root/qa-before-open.log" \
   "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-1' \
   --head-sha "$head_sha_1"
 
-linked_pr_events_dir="$project/.ai/gauntlets/linked-pr-events"
+linked_pr_events_dir="$project/.opencaw/.cache/gauntlets/linked-pr-events"
 copy_gauntlet "$ready_snapshot" "$linked_pr_events_dir"
 mkdir -p "$temp_root/outside-pr-events"
 rmdir "$linked_pr_events_dir/pr-events"
@@ -3472,11 +3472,11 @@ grep -Eq '^- Scope fingerprint: [0-9a-f]{64}$' "$event_one" \
   || fail 'opened progress PR omitted the frozen unit-scope fingerprint'
 event_one_hash="$(git hash-object "$event_one")"
 event_one_sha256="$(sha256_file "$event_one")"
-grep -Fq '.ai/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' "$gauntlet_file" \
+grep -Fq '.opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' "$gauntlet_file" \
   || fail 'opened progress PR was not linked from the durable ledger'
 progress_open_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Progress PR Ledger' record \
-  '.ai/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md')"
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md')"
 [[ "$progress_open_ledger" == *"| checkpoint: $progress_checkpoint_relative | checkpoint-sha256: $progress_checkpoint_sha256 |"* ]] \
   || fail 'opened progress ledger omitted its publication checkpoint binding'
 
@@ -3494,7 +3494,7 @@ replace_line "$gauntlet_file" \
   '- Benchmark: Local artifact quality contract version 1.'
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
-first_open_quality_reset_dir="$project/.ai/gauntlets/first-open-quality-reset"
+first_open_quality_reset_dir="$project/.opencaw/.cache/gauntlets/first-open-quality-reset"
 copy_gauntlet "$gauntlet_dir" "$first_open_quality_reset_dir"
 replace_line "$first_open_quality_reset_dir/GAUNTLET.md" \
   '- Benchmark: Local artifact quality contract version 1.' \
@@ -3508,14 +3508,14 @@ expect_failure "$temp_root/first-open-quality-reset-round.log" run_for "$project
   first-open-reset-builder first-open-reset-critic fresh-session "$valid_fail_report" \
   --head-sha "$head_sha_1" --builder-strategy "$builder_strategy_1"
 
-deleted_frozen_unit_dir="$project/.ai/gauntlets/deleted-frozen-unit"
+deleted_frozen_unit_dir="$project/.opencaw/.cache/gauntlets/deleted-frozen-unit"
 copy_gauntlet "$gauntlet_dir" "$deleted_frozen_unit_dir"
 replace_matching_line "$deleted_frozen_unit_dir/GAUNTLET.md" \
   '^- \[[ xX]\] unit-1 \| status:' ''
 expect_failure "$temp_root/deleted-frozen-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh deleted-frozen-unit --phase ready
 
-renamed_frozen_unit_dir="$project/.ai/gauntlets/renamed-frozen-unit"
+renamed_frozen_unit_dir="$project/.opencaw/.cache/gauntlets/renamed-frozen-unit"
 copy_gauntlet "$gauntlet_dir" "$renamed_frozen_unit_dir"
 replace_matching_line "$renamed_frozen_unit_dir/GAUNTLET.md" \
   '^- \[[ xX]\] unit-1 \| status:' \
@@ -3525,7 +3525,7 @@ set_gauntlet_field "$project" "$renamed_frozen_unit_dir/GAUNTLET.md" \
 expect_failure "$temp_root/renamed-frozen-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh renamed-frozen-unit --phase ready
 
-first_open_revision_dir="$project/.ai/gauntlets/first-open-quality-revision"
+first_open_revision_dir="$project/.opencaw/.cache/gauntlets/first-open-quality-revision"
 copy_gauntlet "$gauntlet_dir" "$first_open_revision_dir"
 first_open_revision_old_url='https://github.com/example/opencaw-fixture/pull/201'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
@@ -3563,7 +3563,7 @@ first_open_revision_readiness="$(run_for "$project" bash commands/pr-readiness-c
 first_open_revision_checkpoint="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   <<<"$first_open_revision_readiness")"
 first_open_revision_trigger='quality-revision:precritic-v2'
-first_open_revision_root='.ai/gauntlets/first-open-quality-revision/pr-events/unit-1/event-002.md'
+first_open_revision_root='.opencaw/.cache/gauntlets/first-open-quality-revision/pr-events/unit-1/event-002.md'
 first_open_revision_trigger_sha256="$(sha256_text "$first_open_revision_marker"$'\n')"
 first_open_revision_root_sha256="$(sha256_file "$project/$first_open_revision_root")"
 expect_line "- Remediation trigger: $first_open_revision_trigger" \
@@ -3586,7 +3586,7 @@ expect_line "- Quality bar fingerprint: $first_open_quality_v2" \
   "$first_open_revision_dir/pr-events/unit-1/event-003.md"
 unset FAKE_DATE_ISO
 
-post_revision_close_dir="$project/.ai/gauntlets/post-revision-close"
+post_revision_close_dir="$project/.opencaw/.cache/gauntlets/post-revision-close"
 copy_gauntlet "$first_open_revision_dir" "$post_revision_close_dir"
 post_revision_close_url="$first_open_revision_url"
 post_revision_close_head='gauntlet-work/post-revision-close/unit-1-remediation-1'
@@ -3617,7 +3617,7 @@ for revision_timing_case in pre equal; do
   revision_timing_approval='2026-08-01T12:00:01Z'
   revision_timing_open='2026-08-01T12:00:03Z'
   revision_timing_name="$revision_timing_case-close-quality-revision"
-  revision_timing_dir="$project/.ai/gauntlets/$revision_timing_name"
+  revision_timing_dir="$project/.opencaw/.cache/gauntlets/$revision_timing_name"
   copy_gauntlet "$first_open_revision_dir" "$revision_timing_dir"
   revision_timing_event="$revision_timing_dir/pr-events/unit-1/event-003.md"
   revision_timing_close_event="$revision_timing_dir/pr-events/unit-1/event-002.md"
@@ -3627,7 +3627,7 @@ for revision_timing_case in pre equal; do
     "- Recorded at: $revision_timing_close"
   revision_timing_close_ledger="$(select_ledger_line "$project" \
     "$revision_timing_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-    ".ai/gauntlets/$revision_timing_name/pr-events/unit-1/event-002.md")"
+    ".opencaw/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-002.md")"
   replace_line "$revision_timing_dir/GAUNTLET.md" \
     "$revision_timing_close_ledger" \
     "${revision_timing_close_ledger//pr-closed: 2026-08-01T12:00:00Z/pr-closed: $revision_timing_close}"
@@ -3637,7 +3637,7 @@ for revision_timing_case in pre equal; do
     "- Recorded at: $revision_timing_open"
   revision_timing_open_ledger="$(select_ledger_line "$project" \
     "$revision_timing_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-    ".ai/gauntlets/$revision_timing_name/pr-events/unit-1/event-003.md")"
+    ".opencaw/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-003.md")"
   replace_line "$revision_timing_dir/GAUNTLET.md" \
     "$revision_timing_open_ledger" \
     "${revision_timing_open_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $revision_timing_open}"
@@ -3684,7 +3684,7 @@ for revision_timing_case in pre equal; do
     || fail "$revision_timing_case-close quality revision did not reach the closed-root authorization gate"
 done
 
-same_unit_quality_reuse_dir="$project/.ai/gauntlets/same-unit-quality-reuse"
+same_unit_quality_reuse_dir="$project/.opencaw/.cache/gauntlets/same-unit-quality-reuse"
 copy_gauntlet "$post_revision_close_dir" "$same_unit_quality_reuse_dir"
 set_gauntlet_field "$project" "$same_unit_quality_reuse_dir/GAUNTLET.md" \
   'Current State' 'Quality bar fingerprint' pending
@@ -3707,7 +3707,7 @@ grep -Fq \
   || fail 'rejected same-unit quality revision reuse created a publication checkpoint'
 unset FAKE_DATE_ISO
 
-future_quality_dir="$project/.ai/gauntlets/future-quality-checkpoint"
+future_quality_dir="$project/.opencaw/.cache/gauntlets/future-quality-checkpoint"
 copy_gauntlet "$first_open_revision_dir" "$future_quality_dir"
 future_quality_approval_time='2026-08-01T12:00:03Z'
 future_quality_event_time='2026-08-01T12:00:04Z'
@@ -3748,7 +3748,7 @@ replace_matching_line "$future_quality_event" '^- Recorded at:' \
   "- Recorded at: $future_quality_event_time"
 future_quality_event_ledger="$(select_ledger_line "$project" \
   "$future_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-quality-checkpoint/pr-events/unit-1/event-003.md')"
+  '.opencaw/.cache/gauntlets/future-quality-checkpoint/pr-events/unit-1/event-003.md')"
 replace_line "$future_quality_dir/GAUNTLET.md" "$future_quality_event_ledger" \
   "${future_quality_event_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $future_quality_event_time}"
 refresh_copied_evidence_hashes "$future_quality_dir"
@@ -3767,7 +3767,7 @@ grep -Fq 'Publication checkpoint remediation trigger was not active at its Recor
   "$temp_root/future-quality-checkpoint.log" \
   || fail 'future quality checkpoint did not reach the trigger-authorization gate'
 
-equal_quality_dir="$project/.ai/gauntlets/equal-quality-checkpoint"
+equal_quality_dir="$project/.opencaw/.cache/gauntlets/equal-quality-checkpoint"
 copy_gauntlet "$future_quality_dir" "$equal_quality_dir"
 equal_quality_revision_marker="${future_quality_revision_marker/approved at: $future_quality_approval_time/approved at: 2026-08-01T12:00:02Z}"
 replace_line "$equal_quality_dir/GAUNTLET.md" \
@@ -3807,7 +3807,7 @@ replace_matching_line "$equal_quality_event" '^- Recorded at:' \
   '- Recorded at: 2026-08-01T12:00:02Z'
 equal_quality_event_ledger="$(select_ledger_line "$project" \
   "$equal_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/equal-quality-checkpoint/pr-events/unit-1/event-003.md')"
+  '.opencaw/.cache/gauntlets/equal-quality-checkpoint/pr-events/unit-1/event-003.md')"
 replace_line "$equal_quality_dir/GAUNTLET.md" "$equal_quality_event_ledger" \
   "${equal_quality_event_ledger//pr-created: $future_quality_event_time/pr-created: 2026-08-01T12:00:02Z}"
 refresh_copied_evidence_hashes "$equal_quality_dir"
@@ -3825,7 +3825,7 @@ expect_line '- Recorded at: 2026-08-01T12:00:02Z' "$equal_quality_event"
 run_for "$project" bash commands/validate-gauntlet.sh \
   equal-quality-checkpoint --phase ready >/dev/null
 
-reverse_revision_dir="$project/.ai/gauntlets/reverse-lexical-quality-consumer"
+reverse_revision_dir="$project/.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer"
 copy_gauntlet "$gauntlet_dir" "$reverse_revision_dir"
 reverse_baseline_event="$reverse_revision_dir/pr-events/unit-1/event-001.md"
 reverse_baseline_checkpoint_relative="$(gauntlet_helper_value "$project" \
@@ -3927,10 +3927,10 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   reverse-lexical-quality-consumer --phase ready >/dev/null
 reverse_z_ledger="$(select_ledger_line "$project" \
   "$reverse_revision_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-z/event-001.md')"
+  '.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-z/event-001.md')"
 reverse_a_ledger="$(select_ledger_line "$project" \
   "$reverse_revision_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-a/event-001.md')"
+  '.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-a/event-001.md')"
 replace_line "$reverse_revision_dir/GAUNTLET.md" "$reverse_z_ledger" \
   '__REVERSE_Z_LEDGER__'
 replace_line "$reverse_revision_dir/GAUNTLET.md" "$reverse_a_ledger" \
@@ -3949,7 +3949,7 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   reverse-lexical-quality-consumer --phase ready >/dev/null
 unset FAKE_DATE_ISO
 
-objective_drift_dir="$project/.ai/gauntlets/execution-objective-drift"
+objective_drift_dir="$project/.opencaw/.cache/gauntlets/execution-objective-drift"
 copy_gauntlet "$gauntlet_dir" "$objective_drift_dir"
 replace_line "$objective_drift_dir/GAUNTLET.md" \
   'Produce an inspectable local artifact that satisfies the approved fixture benchmark.' \
@@ -3957,7 +3957,7 @@ replace_line "$objective_drift_dir/GAUNTLET.md" \
 expect_failure "$temp_root/execution-objective-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-objective-drift --phase ready
 
-constraints_drift_dir="$project/.ai/gauntlets/execution-constraints-drift"
+constraints_drift_dir="$project/.opencaw/.cache/gauntlets/execution-constraints-drift"
 copy_gauntlet "$gauntlet_dir" "$constraints_drift_dir"
 replace_line "$constraints_drift_dir/GAUNTLET.md" \
   '- Do not use network services or credentials.' \
@@ -3965,14 +3965,14 @@ replace_line "$constraints_drift_dir/GAUNTLET.md" \
 expect_failure "$temp_root/execution-constraints-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-constraints-drift --phase ready
 
-policy_drift_dir="$project/.ai/gauntlets/execution-policy-drift"
+policy_drift_dir="$project/.opencaw/.cache/gauntlets/execution-policy-drift"
 copy_gauntlet "$gauntlet_dir" "$policy_drift_dir"
 replace_line "$policy_drift_dir/GAUNTLET.md" \
   '- Post-promotion QA: required' '- Post-promotion QA: optional'
 expect_failure "$temp_root/execution-policy-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-policy-drift --phase ready
 
-base_drift_dir="$project/.ai/gauntlets/execution-base-drift"
+base_drift_dir="$project/.opencaw/.cache/gauntlets/execution-base-drift"
 copy_gauntlet "$gauntlet_dir" "$base_drift_dir"
 set_local_ref "$project" release "$base_commit_sha"
 replace_line "$base_drift_dir/GAUNTLET.md" '- Base branch: main' '- Base branch: release'
@@ -3997,7 +3997,7 @@ expect_failure "$temp_root/execution-base-drift-pr-event.log" run_for "$project"
   && "$(round_file_count "$base_drift_dir")" == 0 ]] \
   || fail 'execution-contract drift recorder/readiness probes mutated durable evidence'
 
-base_sha_drift_dir="$project/.ai/gauntlets/execution-base-sha-drift"
+base_sha_drift_dir="$project/.opencaw/.cache/gauntlets/execution-base-sha-drift"
 copy_gauntlet "$gauntlet_dir" "$base_sha_drift_dir"
 set_local_ref "$project" main "$head_sha_1"
 set_local_ref "$project" gauntlet/execution-base-sha-drift "$head_sha_1"
@@ -4007,7 +4007,7 @@ expect_failure "$temp_root/execution-base-sha-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-base-sha-drift --phase ready
 set_local_ref "$project" main "$base_commit_sha"
 
-contract_evidence_tamper_dir="$project/.ai/gauntlets/contract-evidence-tamper"
+contract_evidence_tamper_dir="$project/.opencaw/.cache/gauntlets/contract-evidence-tamper"
 copy_gauntlet "$gauntlet_dir" "$contract_evidence_tamper_dir"
 replace_matching_line "$contract_evidence_tamper_dir/pr-events/unit-1/event-001.md" \
   '^- Execution contract fingerprint:' \
@@ -4016,11 +4016,11 @@ refresh_copied_evidence_hashes "$contract_evidence_tamper_dir"
 expect_failure "$temp_root/contract-evidence-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh contract-evidence-tamper --phase ready
 
-contract_ledger_tamper_dir="$project/.ai/gauntlets/contract-ledger-tamper"
+contract_ledger_tamper_dir="$project/.opencaw/.cache/gauntlets/contract-ledger-tamper"
 copy_gauntlet "$gauntlet_dir" "$contract_ledger_tamper_dir"
 contract_ledger_line="$(select_ledger_line "$project" \
   "$contract_ledger_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/contract-ledger-tamper/pr-events/unit-1/event-001.md')"
+  '.opencaw/.cache/gauntlets/contract-ledger-tamper/pr-events/unit-1/event-001.md')"
 contract_ledger_fingerprint="$(sed -nE \
   's/^- Execution contract fingerprint: ([0-9a-f]{64})$/\1/p' \
   "$contract_ledger_tamper_dir/GAUNTLET.md" | head -n 1)"
@@ -4029,34 +4029,34 @@ replace_line "$contract_ledger_tamper_dir/GAUNTLET.md" "$contract_ledger_line" \
 expect_failure "$temp_root/contract-ledger-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh contract-ledger-tamper --phase ready
 
-tampered_event_dir="$project/.ai/gauntlets/tampered-pr-event"
+tampered_event_dir="$project/.opencaw/.cache/gauntlets/tampered-pr-event"
 copy_gauntlet "$gauntlet_dir" "$tampered_event_dir"
 run_for "$project" bash commands/validate-gauntlet.sh tampered-pr-event --phase ready >/dev/null
 replace_line "$tampered_event_dir/pr-events/unit-1/event-001.md" '- Event: opened' '- Event: qa-pass'
 expect_failure "$temp_root/tampered-pr-event.log" run_for "$project" \
   bash commands/validate-gauntlet.sh tampered-pr-event --phase ready
 
-noncontiguous_event_dir="$project/.ai/gauntlets/noncontiguous-pr-event"
+noncontiguous_event_dir="$project/.opencaw/.cache/gauntlets/noncontiguous-pr-event"
 copy_gauntlet "$gauntlet_dir" "$noncontiguous_event_dir"
 cp "$noncontiguous_event_dir/pr-events/unit-1/event-001.md" \
   "$noncontiguous_event_dir/pr-events/unit-1/event-003.md"
 expect_failure "$temp_root/noncontiguous-pr-event.log" run_for "$project" \
   bash commands/validate-gauntlet.sh noncontiguous-pr-event --phase ready
 
-stray_event_root_dir="$project/.ai/gauntlets/stray-pr-event-root"
+stray_event_root_dir="$project/.opencaw/.cache/gauntlets/stray-pr-event-root"
 copy_gauntlet "$gauntlet_dir" "$stray_event_root_dir"
 printf 'unexpected top-level event artifact\n' >"$stray_event_root_dir/pr-events/stray.md"
 expect_failure "$temp_root/stray-pr-event-root.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stray-pr-event-root --phase ready
 
-unexpected_event_file_dir="$project/.ai/gauntlets/unexpected-pr-event-file"
+unexpected_event_file_dir="$project/.opencaw/.cache/gauntlets/unexpected-pr-event-file"
 copy_gauntlet "$gauntlet_dir" "$unexpected_event_file_dir"
 printf 'unexpected item event artifact\n' \
   >"$unexpected_event_file_dir/pr-events/unit-1/notes.md"
 expect_failure "$temp_root/unexpected-pr-event-file.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unexpected-pr-event-file --phase ready
 
-noncanonical_event_file_dir="$project/.ai/gauntlets/noncanonical-pr-event-file"
+noncanonical_event_file_dir="$project/.opencaw/.cache/gauntlets/noncanonical-pr-event-file"
 copy_gauntlet "$gauntlet_dir" "$noncanonical_event_file_dir"
 cp "$noncanonical_event_file_dir/pr-events/unit-1/event-001.md" \
   "$noncanonical_event_file_dir/pr-events/unit-1/event-1.md"
@@ -4074,7 +4074,7 @@ expect_failure "$temp_root/qa-before-round.log" \
   "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-2' \
   --head-sha "$head_sha_1"
 
-ownership_dir="$project/.ai/gauntlets/pr-ownership"
+ownership_dir="$project/.opencaw/.cache/gauntlets/pr-ownership"
 copy_gauntlet "$ready_snapshot" "$ownership_dir"
 insert_after_matching_line "$ownership_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Independently owned fixture unit | scope: independent ownership fixture'
@@ -4092,7 +4092,7 @@ expect_failure "$temp_root/cross-unit-pr-ownership.log" run_for "$project" \
   'https://github.com/example/opencaw-fixture/pull/204' \
   'gauntlet-work/pr-ownership/unit-2' none --head-sha "$head_sha_1"
 
-alias_dir="$project/.ai/gauntlets/pr-url-alias"
+alias_dir="$project/.opencaw/.cache/gauntlets/pr-url-alias"
 copy_gauntlet "$ready_snapshot" "$alias_dir"
 alias_pr_url='https://github.com/example/opencaw-fixture/pull/211'
 alias_head='gauntlet-work/pr-url-alias/unit-1'
@@ -4128,13 +4128,13 @@ alias_replacement_head='gauntlet-work/pr-url-alias/unit-1-remediation-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh pr-url-alias unit-1 opened \
   "$alias_replacement_url" "$alias_replacement_head" none --head-sha "$head_sha_2" >/dev/null
 expect_file "$alias_dir/pr-events/unit-1/event-003.md"
-expect_line '- Publication checkpoint: .ai/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-001.md' \
+expect_line '- Publication checkpoint: .opencaw/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-001.md' \
   "$alias_dir/pr-events/unit-1/event-001.md"
-expect_line '- Publication checkpoint: .ai/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-002.md' \
+expect_line '- Publication checkpoint: .opencaw/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-002.md' \
   "$alias_dir/pr-events/unit-1/event-003.md"
 run_for "$project" bash commands/validate-gauntlet.sh pr-url-alias --phase ready >/dev/null
 
-concurrent_dir="$project/.ai/gauntlets/concurrent-recorders"
+concurrent_dir="$project/.opencaw/.cache/gauntlets/concurrent-recorders"
 copy_gauntlet "$ready_snapshot" "$concurrent_dir"
 insert_after_matching_line "$concurrent_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Independently recordable fixture unit | scope: independent second fixture artifact'
@@ -4191,7 +4191,7 @@ expect_file "$concurrent_dir/pr-events/unit-1/event-001.md"
 expect_file "$concurrent_dir/pr-events/unit-2/event-001.md"
 run_for "$project" bash commands/validate-gauntlet.sh concurrent-recorders --phase ready >/dev/null
 
-same_unit_concurrent_dir="$project/.ai/gauntlets/same-unit-concurrent"
+same_unit_concurrent_dir="$project/.opencaw/.cache/gauntlets/same-unit-concurrent"
 copy_gauntlet "$ready_snapshot" "$same_unit_concurrent_dir"
 set_local_ref "$project" gauntlet/same-unit-concurrent "$base_commit_sha"
 set_local_ref "$project" gauntlet-work/same-unit-concurrent/unit-1 "$head_sha_1"
@@ -4248,7 +4248,7 @@ convert_to_crlf "$crlf_report"
 run_for "$project" bash commands/record-gauntlet-round.sh crlf-gauntlet unit-1 fail \
   crlf-builder crlf-critic fresh-session "$crlf_report" \
   --head-sha "$head_sha_1" --builder-strategy "$builder_strategy_1" --dry-run >/dev/null
-[[ "$(round_file_count "$project/.ai/gauntlets/crlf-gauntlet")" == 0 ]] \
+[[ "$(round_file_count "$project/.opencaw/.cache/gauntlets/crlf-gauntlet")" == 0 ]] \
   || fail 'CRLF record dry-run created evidence'
 
 expect_failure "$temp_root/unknown-unit.log" run_for_without_observation "$project" \
@@ -4383,7 +4383,7 @@ expect_line "- Progress PR: $fixture_pr_url" "$round_one"
 expect_line "- Head branch: $fixture_head" "$round_one"
 expect_line "- Head SHA: $head_sha_1" "$round_one"
 expect_line "- Builder strategy: $builder_strategy_1" "$round_one"
-expect_line '- Opened event: .ai/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' \
+expect_line '- Opened event: .opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' \
   "$round_one"
 expect_line "- Opened event sha256: $event_one_sha256" "$round_one"
 expect_line '- Remediation root: none' "$round_one"
@@ -4425,12 +4425,12 @@ run_for "$project" bash commands/comment-pr-qa-results.sh \
   'https://github.com/example/opencaw-fixture/pull/241' \
   "$project/qa-helper-summary.md" \
   --gauntlet-verdict fail --head-sha "$head_sha_1" \
-  --gauntlet-source '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
+  --gauntlet-source '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
   --gauntlet-affected-units none \
   >"$temp_root/gauntlet-qa-helper.log"
 round_one_sha256="$(sha256_file "$round_one")"
 expect_line "GAUNTLET_SOURCE_SHA256=$round_one_sha256" "$temp_root/gauntlet-qa-helper.log"
-grep -Fq -- "<!-- opencaw-gauntlet-qa:v1 verdict=fail head-sha=$head_sha_1 source=.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md source-sha256=$round_one_sha256 affected-units=none -->" \
+grep -Fq -- "<!-- opencaw-gauntlet-qa:v1 verdict=fail head-sha=$head_sha_1 source=.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md source-sha256=$round_one_sha256 affected-units=none -->" \
   "$fake_gh_comment_bodies" \
   || fail 'Gauntlet QA helper omitted or changed the exact semantic marker'
 expect_failure "$temp_root/incomplete-gauntlet-qa-helper-flags.log" run_for "$project" \
@@ -4440,10 +4440,10 @@ expect_failure "$temp_root/incomplete-gauntlet-qa-helper-flags.log" run_for "$pr
 
 outside_qa_source_root="$temp_root/outside-qa-source"
 mkdir -p "$outside_qa_source_root/unit-1" \
-  "$project/.ai/gauntlets/qa-source-symlink"
+  "$project/.opencaw/.cache/gauntlets/qa-source-symlink"
 cp "$round_one" "$outside_qa_source_root/unit-1/round-001.md"
 ln -s "$outside_qa_source_root" \
-  "$project/.ai/gauntlets/qa-source-symlink/rounds"
+  "$project/.opencaw/.cache/gauntlets/qa-source-symlink/rounds"
 : >"$fake_gh_comment_bodies"
 expect_failure "$temp_root/qa-helper-intermediate-symlink.log" run_for "$project" \
   bash commands/comment-pr-qa-results.sh \
@@ -4451,9 +4451,9 @@ expect_failure "$temp_root/qa-helper-intermediate-symlink.log" run_for "$project
   "$project/qa-helper-summary.md" \
   --gauntlet-verdict fail --head-sha "$head_sha_1" \
   --gauntlet-source \
-    '.ai/gauntlets/qa-source-symlink/rounds/unit-1/round-001.md' \
+    '.opencaw/.cache/gauntlets/qa-source-symlink/rounds/unit-1/round-001.md' \
   --gauntlet-affected-units none
-grep -Fq 'Gauntlet QA source evidence resolves outside the project .ai directory' \
+grep -Fq 'Gauntlet QA source evidence resolves outside the project .opencaw/.cache directory' \
   "$temp_root/qa-helper-intermediate-symlink.log" \
   || fail 'Gauntlet QA helper did not reject an intermediate source-directory symlink'
 [[ ! -s "$fake_gh_comment_bodies" ]] \
@@ -4482,7 +4482,7 @@ expect_failure "$temp_root/qa-different-pr-comment.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" \
   'https://github.com/example/opencaw-fixture/pull/999#issuecomment-10' --head-sha "$head_sha_1"
-semantic_source='.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
+semantic_source='.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
 wrong_verdict_comment="$fixture_pr_url#issuecomment-9100"
 wrong_verdict_body="$(semantic_comment_body "$project" pass "$head_sha_1" "$semantic_source")"
 set_comment_observation "$wrong_verdict_comment" "$fixture_pr_url" "$wrong_verdict_body"
@@ -4497,8 +4497,8 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-wrong-head.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$wrong_head_comment" --head-sha "$head_sha_1"
-unrelated_comment_source='.ai/gauntlets/unrelated-comment-source/rounds/unit-1/round-001.md'
-mkdir -p "$project/.ai/gauntlets/unrelated-comment-source/rounds/unit-1"
+unrelated_comment_source='.opencaw/.cache/gauntlets/unrelated-comment-source/rounds/unit-1/round-001.md'
+mkdir -p "$project/.opencaw/.cache/gauntlets/unrelated-comment-source/rounds/unit-1"
 cp "$round_one" "$project/$unrelated_comment_source"
 unrelated_source_comment="$fixture_pr_url#issuecomment-9102"
 unrelated_source_body="$(semantic_comment_body "$project" fail "$head_sha_1" \
@@ -4552,7 +4552,7 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 qa_fail_wrong_pr_comment="$fixture_pr_url#issuecomment-9002"
 set_semantic_comment_observation "$project" "$qa_fail_wrong_pr_comment" \
   'https://github.com/example/opencaw-fixture/pull/999' fail "$head_sha_1" \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-fail-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
@@ -4565,7 +4565,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet un
   "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-11' \
   --head-sha "$head_sha_1" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-002.md"
-expect_line '- Critic round: .ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
+expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
   "$gauntlet_dir/pr-events/unit-1/event-002.md"
 expect_line '- Critic verdict: fail' "$gauntlet_dir/pr-events/unit-1/event-002.md"
 expect_line "- Head SHA: $head_sha_1" "$gauntlet_dir/pr-events/unit-1/event-002.md"
@@ -4581,7 +4581,7 @@ grep -Eq '^- QA comment body sha256: [0-9a-f]{64}$' \
   || fail 'QA event omitted the exact live semantic comment-body hash'
 qa_fail_evidence="$fixture_pr_url#issuecomment-11"
 valid_qa_fail_body="$(semantic_comment_body "$project" fail "$head_sha_1" \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
 : >"$fake_gh_api_marker"
 FAKE_GH_AUTH_LOGIN='different-current-user' run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
@@ -4610,17 +4610,17 @@ event_scope_fingerprint="$(sed -nE 's/^- Scope fingerprint: ([0-9a-f]{64})$/\1/p
 [[ -n "$round_scope_fingerprint" && "$round_scope_fingerprint" == "$event_scope_fingerprint" ]] \
   || fail 'round and QA evidence did not retain the same frozen scope fingerprint'
 
-qa_critic_path_dir="$project/.ai/gauntlets/qa-critic-path-traversal"
+qa_critic_path_dir="$project/.opencaw/.cache/gauntlets/qa-critic-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$qa_critic_path_dir"
 run_for "$project" bash commands/validate-gauntlet.sh qa-critic-path-traversal --phase ready >/dev/null
 replace_line "$qa_critic_path_dir/pr-events/unit-1/event-002.md" \
-  '- Critic round: .ai/gauntlets/qa-critic-path-traversal/rounds/unit-1/round-001.md' \
-  '- Critic round: .ai/gauntlets/qa-critic-path-traversal/rounds/unit-1/../unit-1/round-001.md'
+  '- Critic round: .opencaw/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/round-001.md' \
+  '- Critic round: .opencaw/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/../unit-1/round-001.md'
 refresh_copied_evidence_hashes "$qa_critic_path_dir"
 expect_failure "$temp_root/qa-critic-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh qa-critic-path-traversal --phase ready
 
-round_opened_symlink_dir="$project/.ai/gauntlets/round-opened-symlink"
+round_opened_symlink_dir="$project/.opencaw/.cache/gauntlets/round-opened-symlink"
 copy_gauntlet "$gauntlet_dir" "$round_opened_symlink_dir"
 outside_round_opened_events="$temp_root/outside-round-opened-events"
 mv "$round_opened_symlink_dir/pr-events" "$outside_round_opened_events"
@@ -4632,44 +4632,44 @@ grep -Fq \
   "$temp_root/round-opened-symlink.log" \
   || fail 'round replay did not preflight its opened-event tree before cross-reading it'
 
-round_ledger_path_dir="$project/.ai/gauntlets/round-ledger-path-traversal"
+round_ledger_path_dir="$project/.opencaw/.cache/gauntlets/round-ledger-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$round_ledger_path_dir"
 replace_all_literal "$round_ledger_path_dir/GAUNTLET.md" \
-  '.ai/gauntlets/round-ledger-path-traversal/rounds/unit-1/round-001.md' \
-  '.ai/gauntlets/round-ledger-path-traversal/rounds/unit-1/../unit-1/round-001.md'
+  '.opencaw/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/round-001.md' \
+  '.opencaw/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/../unit-1/round-001.md'
 expect_failure "$temp_root/round-ledger-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh round-ledger-path-traversal --phase ready
 
-progress_ledger_path_dir="$project/.ai/gauntlets/progress-ledger-path-traversal"
+progress_ledger_path_dir="$project/.opencaw/.cache/gauntlets/progress-ledger-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$progress_ledger_path_dir"
 replace_all_literal "$progress_ledger_path_dir/GAUNTLET.md" \
-  '.ai/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/event-002.md' \
-  '.ai/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/../unit-1/event-002.md'
+  '.opencaw/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/event-002.md' \
+  '.opencaw/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/../unit-1/event-002.md'
 expect_failure "$temp_root/progress-ledger-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh progress-ledger-path-traversal --phase ready
 
-wrong_section_hash_dir="$project/.ai/gauntlets/wrong-section-ledger-hash"
+wrong_section_hash_dir="$project/.opencaw/.cache/gauntlets/wrong-section-ledger-hash"
 copy_gauntlet "$gauntlet_dir" "$wrong_section_hash_dir"
 wrong_section_round_line="$(select_ledger_line "$project" \
   "$wrong_section_hash_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/wrong-section-ledger-hash/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/wrong-section-ledger-hash/rounds/unit-1/round-001.md')"
 replace_line "$wrong_section_hash_dir/GAUNTLET.md" "$wrong_section_round_line" ''
 insert_after_matching_line "$wrong_section_hash_dir/GAUNTLET.md" '^## Review Notes$' \
   "$wrong_section_round_line"
 expect_failure "$temp_root/wrong-section-ledger-hash.log" run_for "$project" \
   bash commands/validate-gauntlet.sh wrong-section-ledger-hash --phase ready
 
-stale_ledger_hash_dir="$project/.ai/gauntlets/stale-ledger-hash"
+stale_ledger_hash_dir="$project/.opencaw/.cache/gauntlets/stale-ledger-hash"
 copy_gauntlet "$gauntlet_dir" "$stale_ledger_hash_dir"
 stale_round_line="$(select_ledger_line "$project" \
   "$stale_ledger_hash_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/stale-ledger-hash/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/stale-ledger-hash/rounds/unit-1/round-001.md')"
 replace_line "$stale_ledger_hash_dir/GAUNTLET.md" "$stale_round_line" \
   "${stale_round_line%sha256:*}sha256: 0000000000000000000000000000000000000000000000000000000000000000"
 expect_failure "$temp_root/stale-ledger-hash.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-ledger-hash --phase ready
 
-duplicate_round_metadata_dir="$project/.ai/gauntlets/duplicate-round-metadata"
+duplicate_round_metadata_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-metadata"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_metadata_dir"
 duplicate_round_metadata_file="$duplicate_round_metadata_dir/rounds/unit-1/round-001.md"
 insert_after_matching_line "$duplicate_round_metadata_file" '^- Item: unit-1$' \
@@ -4681,7 +4681,7 @@ grep -Fq "Round requires exactly one 'Item' field" \
   "$temp_root/duplicate-round-metadata.log" \
   || fail 'round replay accepted duplicate authoritative Item metadata'
 
-duplicate_round_heading_dir="$project/.ai/gauntlets/duplicate-round-heading"
+duplicate_round_heading_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-heading"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_heading_dir"
 duplicate_round_heading_file="$duplicate_round_heading_dir/rounds/unit-1/round-001.md"
 printf '\n## Round Metadata\n' >>"$duplicate_round_heading_file"
@@ -4692,36 +4692,36 @@ grep -Fq 'Round requires exactly one metadata heading' \
   "$temp_root/duplicate-round-heading.log" \
   || fail 'round replay accepted a duplicate metadata section'
 
-duplicate_round_ledger_dir="$project/.ai/gauntlets/duplicate-round-ledger"
+duplicate_round_ledger_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-ledger"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_ledger_dir"
 duplicate_round_line="$(select_ledger_line "$project" \
   "$duplicate_round_ledger_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/duplicate-round-ledger/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/duplicate-round-ledger/rounds/unit-1/round-001.md')"
 insert_after_section_line "$duplicate_round_ledger_dir/GAUNTLET.md" \
   'Round Ledger' "$duplicate_round_line" "$duplicate_round_line"
 expect_failure "$temp_root/duplicate-round-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-round-ledger --phase ready
 
-duplicate_progress_ledger_dir="$project/.ai/gauntlets/duplicate-progress-ledger"
+duplicate_progress_ledger_dir="$project/.opencaw/.cache/gauntlets/duplicate-progress-ledger"
 copy_gauntlet "$gauntlet_dir" "$duplicate_progress_ledger_dir"
 duplicate_progress_line="$(select_ledger_line "$project" \
   "$duplicate_progress_ledger_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/duplicate-progress-ledger/pr-events/unit-1/event-002.md')"
+  '.opencaw/.cache/gauntlets/duplicate-progress-ledger/pr-events/unit-1/event-002.md')"
 insert_after_section_line "$duplicate_progress_ledger_dir/GAUNTLET.md" \
   'Progress PR Ledger' "$duplicate_progress_line" "$duplicate_progress_line"
 expect_failure "$temp_root/duplicate-progress-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-progress-ledger --phase ready
 
-unledgered_evidence_dir="$project/.ai/gauntlets/unledgered-round-evidence"
+unledgered_evidence_dir="$project/.opencaw/.cache/gauntlets/unledgered-round-evidence"
 copy_gauntlet "$gauntlet_dir" "$unledgered_evidence_dir"
 unledgered_round_line="$(select_ledger_line "$project" \
   "$unledgered_evidence_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/unledgered-round-evidence/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/unledgered-round-evidence/rounds/unit-1/round-001.md')"
 replace_line "$unledgered_evidence_dir/GAUNTLET.md" "$unledgered_round_line" ''
 expect_failure "$temp_root/unledgered-round-evidence.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unledgered-round-evidence --phase ready
 
-builder_fingerprint_dir="$project/.ai/gauntlets/builder-fingerprint-tamper"
+builder_fingerprint_dir="$project/.opencaw/.cache/gauntlets/builder-fingerprint-tamper"
 copy_gauntlet "$gauntlet_dir" "$builder_fingerprint_dir"
 replace_matching_line "$builder_fingerprint_dir/rounds/unit-1/round-001.md" \
   '^- Builder strategy fingerprint:' \
@@ -4781,7 +4781,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh fixture-gauntlet unit-
   --head-sha "$head_sha_2" --builder-strategy "$builder_strategy_2" >/dev/null
 round_two="$gauntlet_dir/rounds/unit-1/round-002.md"
 expect_file "$round_two"
-expect_line '- Remediation root: .ai/gauntlets/fixture-gauntlet/pr-events/unit-1/event-002.md' \
+expect_line '- Remediation root: .opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-002.md' \
   "$round_two"
 round_two_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   "$round_two" | head -n 1)"
@@ -4792,10 +4792,10 @@ qa_one_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   || fail 'same-second round replay fixture did not retain its intended timestamp tie'
 round_one_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Round Ledger' evidence \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
 round_two_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Round Ledger' evidence \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-002.md')"
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-002.md')"
 replace_line "$gauntlet_file" "$round_one_ledger" '__ROUND_ONE_LEDGER__'
 replace_line "$gauntlet_file" "$round_two_ledger" "$round_one_ledger"
 replace_line "$gauntlet_file" '__ROUND_ONE_LEDGER__' "$round_two_ledger"
@@ -4806,12 +4806,12 @@ replace_line "$gauntlet_file" "$round_two_ledger" "$round_one_ledger"
 replace_line "$gauntlet_file" '__ROUND_TWO_LEDGER__' "$round_two_ledger"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
-strict_quality_root_dir="$project/.ai/gauntlets/strict-quality-root-tie"
+strict_quality_root_dir="$project/.opencaw/.cache/gauntlets/strict-quality-root-tie"
 copy_gauntlet "$ready_snapshot" "$strict_quality_root_dir"
 mkdir -p "$strict_quality_root_dir/rounds/unit-1"
 cp "$round_two" "$strict_quality_root_dir/rounds/unit-1/round-002.md"
 replace_all_literal "$strict_quality_root_dir/rounds/unit-1/round-002.md" \
-  '.ai/gauntlets/fixture-gauntlet/' '.ai/gauntlets/strict-quality-root-tie/'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/strict-quality-root-tie/'
 strict_quality_time='2026-08-02T00:00:01Z'
 replace_matching_line "$strict_quality_root_dir/rounds/unit-1/round-002.md" \
   '^- Recorded at:' "- Recorded at: $strict_quality_time"
@@ -4830,7 +4830,7 @@ strict_quality_root="$(gauntlet_helper_value "$project" \
   gauntlet_remediation_root_for_trigger "$strict_quality_root_dir/GAUNTLET.md" \
   unit-1 quality-revision:strict-tie-v2)"
 [[ "$strict_quality_root" \
-    == '.ai/gauntlets/strict-quality-root-tie/rounds/unit-1/round-002.md' ]] \
+    == '.opencaw/.cache/gauntlets/strict-quality-root-tie/rounds/unit-1/round-002.md' ]] \
   || fail 'strictly earlier non-PR failure was not retained as a quality revision root'
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/reused-live-comment-for-later-round-qa.log" run_for "$project" \
@@ -4867,7 +4867,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh fixture-gauntlet unit-
   --head-sha "$head_sha_3" --builder-strategy "$builder_strategy_3" >/dev/null
 round_three="$gauntlet_dir/rounds/unit-1/round-003.md"
 expect_file "$round_three"
-nonadjacent_strategy_replay_dir="$project/.ai/gauntlets/nonadjacent-strategy-replay"
+nonadjacent_strategy_replay_dir="$project/.opencaw/.cache/gauntlets/nonadjacent-strategy-replay"
 copy_gauntlet "$gauntlet_dir" "$nonadjacent_strategy_replay_dir"
 builder_strategy_1_fingerprint="$(gauntlet_helper_value "$project" \
   gauntlet_strategy_fingerprint "$builder_strategy_1")"
@@ -4889,7 +4889,7 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 qa_pass_wrong_pr_comment="$fixture_pr_url#issuecomment-9004"
 set_semantic_comment_observation "$project" "$qa_pass_wrong_pr_comment" \
   'https://github.com/example/opencaw-fixture/pull/998' pass "$head_sha_3" \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md'
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-pass-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
@@ -4898,7 +4898,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet un
   "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-14' \
   --head-sha "$head_sha_3" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-004.md"
-expect_line '- Critic round: .ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md' \
+expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md' \
   "$gauntlet_dir/pr-events/unit-1/event-004.md"
 expect_line '- Critic verdict: pass' "$gauntlet_dir/pr-events/unit-1/event-004.md"
 grep -Eq '^- \[[ x]\] unit-1 \| status: critic-failed \|' "$gauntlet_file" \
@@ -5069,14 +5069,14 @@ set_pr_merge_automation_observation "$fixture_pr_url" none
   || fail 'failed invocations consumed round numbers or valid rounds were lost'
 grep -Eq '^- \[[ x]\] unit-1 \| status: passed \|' "$gauntlet_file" || fail 'passing verdict did not mark the work unit passed'
 
-scope_mutation_dir="$project/.ai/gauntlets/scope-mutation"
+scope_mutation_dir="$project/.opencaw/.cache/gauntlets/scope-mutation"
 copy_gauntlet "$gauntlet_dir" "$scope_mutation_dir"
 replace_matching_line "$scope_mutation_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: changed artifact boundary that was never re-reviewed'
 expect_failure "$temp_root/scope-mutation-invalidates-evidence.log" run_for "$project" \
   bash commands/validate-gauntlet.sh scope-mutation --phase ready
 
-bot_merge_tamper_dir="$project/.ai/gauntlets/bot-merge-tamper"
+bot_merge_tamper_dir="$project/.opencaw/.cache/gauntlets/bot-merge-tamper"
 copy_gauntlet "$gauntlet_dir" "$bot_merge_tamper_dir"
 replace_line "$bot_merge_tamper_dir/pr-events/unit-1/event-006.md" \
   '- Merged by bot: false' '- Merged by bot: true'
@@ -5084,7 +5084,7 @@ refresh_copied_evidence_hashes "$bot_merge_tamper_dir"
 expect_failure "$temp_root/bot-merge-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh bot-merge-tamper --phase ready
 
-actor_type_tamper_dir="$project/.ai/gauntlets/actor-type-tamper"
+actor_type_tamper_dir="$project/.opencaw/.cache/gauntlets/actor-type-tamper"
 copy_gauntlet "$gauntlet_dir" "$actor_type_tamper_dir"
 replace_line "$actor_type_tamper_dir/pr-events/unit-1/event-006.md" \
   '- Merged by type: User' '- Merged by type: App'
@@ -5092,7 +5092,7 @@ refresh_copied_evidence_hashes "$actor_type_tamper_dir"
 expect_failure "$temp_root/actor-type-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh actor-type-tamper --phase ready
 
-target_base_tamper_dir="$project/.ai/gauntlets/target-base-tamper"
+target_base_tamper_dir="$project/.opencaw/.cache/gauntlets/target-base-tamper"
 copy_gauntlet "$gauntlet_dir" "$target_base_tamper_dir"
 replace_line "$target_base_tamper_dir/pr-events/unit-1/event-006.md" \
   "- Target base SHA: $base_commit_sha" "- Target base SHA: $head_sha_1"
@@ -5100,7 +5100,7 @@ refresh_copied_evidence_hashes "$target_base_tamper_dir"
 expect_failure "$temp_root/target-base-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh target-base-tamper --phase ready
 
-reapproval_dir="$project/.ai/gauntlets/reapproved-bar"
+reapproval_dir="$project/.opencaw/.cache/gauntlets/reapproved-bar"
 copy_gauntlet "$gauntlet_dir" "$reapproval_dir"
 reapproval_execution_contract="$(sed -nE \
   's/^- Execution contract fingerprint: ([0-9a-f]{64})$/\1/p' \
@@ -5108,7 +5108,7 @@ reapproval_execution_contract="$(sed -nE \
 export FAKE_DATE_ISO='2026-08-01T12:00:01Z'
 revision_timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 replace_all_literal "$reapproval_dir/GAUNTLET.md" \
-  '.ai/gauntlets/fixture-gauntlet/' '.ai/gauntlets/reapproved-bar/'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/reapproved-bar/'
 replace_line "$reapproval_dir/GAUNTLET.md" \
   '- Benchmark: Local artifact quality contract version 1.' \
   '- Benchmark: Local artifact quality contract version 2 with explicit recovery behavior.'
@@ -5141,7 +5141,7 @@ reapproval_head='gauntlet-work/reapproved-bar/unit-1-remediation-1'
 set_local_ref "$project" "$reapproval_head" "$head_sha_5"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   reapproved-bar unit-1 "$project/progress-validation.md" >/dev/null
-malformed_quality_trigger_dir="$project/.ai/gauntlets/malformed-quality-trigger"
+malformed_quality_trigger_dir="$project/.opencaw/.cache/gauntlets/malformed-quality-trigger"
 copy_gauntlet "$reapproval_dir" "$malformed_quality_trigger_dir"
 malformed_quality_checkpoint="$(find \
   "$malformed_quality_trigger_dir/publication-checkpoints/unit-1" \
@@ -5210,7 +5210,7 @@ expect_line "- Execution contract fingerprint: $reapproval_execution_contract" \
 quality_bar_v2="$(sed -nE \
   's/^- Quality bar fingerprint: ([0-9a-f]{64})$/\1/p' \
   "$reapproval_dir/GAUNTLET.md" | head -n 1)"
-quality_v3_dir="$project/.ai/gauntlets/quality-v3-chain"
+quality_v3_dir="$project/.opencaw/.cache/gauntlets/quality-v3-chain"
 copy_gauntlet "$reapproval_dir" "$quality_v3_dir"
 export FAKE_DATE_ISO='2026-08-01T12:00:03Z'
 replace_line "$quality_v3_dir/GAUNTLET.md" \
@@ -5243,14 +5243,14 @@ quality_v2_consumer_time="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
 [[ "$quality_v2_consumer_time" < '2026-08-01T12:00:03Z' ]] \
   || fail 'later quality revision was not strictly chronological after its prior consumer'
 
-quality_v3_skipped_parent_dir="$project/.ai/gauntlets/quality-v3-skipped-parent"
+quality_v3_skipped_parent_dir="$project/.opencaw/.cache/gauntlets/quality-v3-skipped-parent"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_skipped_parent_dir"
 replace_all_literal "$quality_v3_skipped_parent_dir/GAUNTLET.md" \
   "supersedes: $quality_bar_v2" "supersedes: $quality_bar_v1"
 expect_failure "$temp_root/quality-v3-skipped-parent.log" run_for "$project" \
   bash commands/validate-gauntlet.sh quality-v3-skipped-parent --phase ready
 
-quality_v3_equal_approval_dir="$project/.ai/gauntlets/quality-v3-equal-approval"
+quality_v3_equal_approval_dir="$project/.opencaw/.cache/gauntlets/quality-v3-equal-approval"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_equal_approval_dir"
 replace_all_literal "$quality_v3_equal_approval_dir/GAUNTLET.md" \
   'approved at: 2026-08-01T12:00:03Z' \
@@ -5258,7 +5258,7 @@ replace_all_literal "$quality_v3_equal_approval_dir/GAUNTLET.md" \
 expect_failure "$temp_root/quality-v3-equal-approval.log" run_for "$project" \
   bash commands/validate-gauntlet.sh quality-v3-equal-approval --phase ready
 
-quality_v3_misordered_dir="$project/.ai/gauntlets/quality-v3-misordered"
+quality_v3_misordered_dir="$project/.opencaw/.cache/gauntlets/quality-v3-misordered"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_misordered_dir"
 quality_v2_revision_line="$(grep -F -- '- Quality bar revision: recovery-v2 ' \
   "$quality_v3_misordered_dir/GAUNTLET.md")"
@@ -5288,14 +5288,14 @@ grep -Eq '^- Remediation trigger sha256: [0-9a-f]{64}$' \
   || fail 'latest quality revision checkpoint omitted its hash-bound trigger'
 unset FAKE_DATE_ISO
 
-topology_order_dir="$project/.ai/gauntlets/topology-ledger-order"
+topology_order_dir="$project/.opencaw/.cache/gauntlets/topology-ledger-order"
 copy_gauntlet "$reapproval_dir" "$topology_order_dir"
 topology_first_merge_line="$(select_ledger_line "$project" \
   "$topology_order_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/topology-ledger-order/pr-events/unit-1/event-006.md')"
+  '.opencaw/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-006.md')"
 topology_second_merge_line="$(select_ledger_line "$project" \
   "$topology_order_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/topology-ledger-order/pr-events/unit-1/event-009.md')"
+  '.opencaw/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-009.md')"
 replace_line "$topology_order_dir/GAUNTLET.md" "$topology_first_merge_line" \
   '__TOPOLOGY_FIRST_MERGE__'
 replace_line "$topology_order_dir/GAUNTLET.md" "$topology_second_merge_line" \
@@ -5304,7 +5304,7 @@ replace_line "$topology_order_dir/GAUNTLET.md" '__TOPOLOGY_FIRST_MERGE__' \
   "$topology_second_merge_line"
 run_for "$project" bash commands/validate-gauntlet.sh topology-ledger-order --phase ready >/dev/null
 
-unconsumed_close_dir="$project/.ai/gauntlets/unconsumed-close"
+unconsumed_close_dir="$project/.opencaw/.cache/gauntlets/unconsumed-close"
 copy_gauntlet "$ready_snapshot" "$unconsumed_close_dir"
 unconsumed_close_url='https://github.com/example/opencaw-fixture/pull/215'
 unconsumed_close_head='gauntlet-work/unconsumed-close/unit-1'
@@ -5399,7 +5399,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh unconsumed-close un
   'https://github.com/example/opencaw-fixture/pull/215#issuecomment-33' --head-sha "$head_sha_1" >/dev/null
 expect_file "$unconsumed_close_dir/pr-events/unit-1/event-003.md"
 
-closed_dir="$project/.ai/gauntlets/closed-unmerged"
+closed_dir="$project/.opencaw/.cache/gauntlets/closed-unmerged"
 copy_gauntlet "$ready_snapshot" "$closed_dir"
 closed_pr_url='https://github.com/example/opencaw-fixture/pull/207'
 closed_head='gauntlet-work/closed-unmerged/unit-1'
@@ -5452,7 +5452,7 @@ grep -Fq 'Gauntlet integration review Head SHA must not be empty.' \
   "$temp_root/premature-complete.log" \
   || fail 'premature completion hit the wrong rejection guard'
 
-stopped_dir="$project/.ai/gauntlets/stopped-gauntlet"
+stopped_dir="$project/.opencaw/.cache/gauntlets/stopped-gauntlet"
 copy_gauntlet "$ready_snapshot" "$stopped_dir"
 stopped_hash="$(git hash-object "$stopped_dir/GAUNTLET.md")"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh stopped-gauntlet --status stopped --dry-run \
@@ -5467,7 +5467,7 @@ grep -Eiq 'PR eligible[^[:alnum:]]+no|not PR[- ]eligible|PR-ineligible' "$stoppe
   || fail 'stopped report was not explicitly PR-ineligible'
 expect_failure "$temp_root/stopped-complete-validation.log" run_for "$project" bash commands/validate-gauntlet.sh stopped-gauntlet --phase complete
 
-blocked_dir="$project/.ai/gauntlets/blocked-gauntlet"
+blocked_dir="$project/.opencaw/.cache/gauntlets/blocked-gauntlet"
 copy_gauntlet "$ready_snapshot" "$blocked_dir"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh blocked-gauntlet --status blocked >/dev/null
 expect_file "$blocked_dir/GAUNTLET_REPORT.md"
@@ -5570,7 +5570,7 @@ grep -q -- '- Verdict: fail' "$gauntlet_file" || fail 'later integration failure
 expect_failure "$temp_root/stale-integration-pass.log" run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 
-forged_integration_reopen_dir="$project/.ai/gauntlets/integration-fail-forged-pass"
+forged_integration_reopen_dir="$project/.opencaw/.cache/gauntlets/integration-fail-forged-pass"
 copy_gauntlet "$gauntlet_dir" "$forged_integration_reopen_dir"
 replace_matching_line "$forged_integration_reopen_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -5594,13 +5594,13 @@ expect_failure "$temp_root/integration-fail-forged-pass-complete.log" run_for "$
   && ! -f "$forged_integration_reopen_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'manual post-integration-failure pass created mutable evidence or completion output'
 
-integration_affected_tamper_dir="$project/.ai/gauntlets/integration-affected-tamper"
+integration_affected_tamper_dir="$project/.opencaw/.cache/gauntlets/integration-affected-tamper"
 copy_gauntlet "$gauntlet_dir" "$integration_affected_tamper_dir"
 replace_line "$integration_affected_tamper_dir/rounds/integration/round-002.md" \
   '- Affected units: unit-1' '- Affected units: none'
 integration_affected_ledger="$(select_ledger_line "$project" \
   "$integration_affected_tamper_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/integration-affected-tamper/rounds/integration/round-002.md')"
+  '.opencaw/.cache/gauntlets/integration-affected-tamper/rounds/integration/round-002.md')"
 replace_line "$integration_affected_tamper_dir/GAUNTLET.md" \
   "$integration_affected_ledger" \
   "${integration_affected_ledger/affected-units: unit-1/affected-units: none}"
@@ -5613,7 +5613,7 @@ grep -Fq 'Integration failure/block requires canonical frozen affected-unit IDs'
     fail 'integration affected-unit tamper hit the wrong rejection guard'
   }
 
-pretip_work_dir="$project/.ai/gauntlets/work-head-before-chain-tip"
+pretip_work_dir="$project/.opencaw/.cache/gauntlets/work-head-before-chain-tip"
 copy_gauntlet "$gauntlet_dir" "$pretip_work_dir"
 pretip_work_head='gauntlet-work/work-head-before-chain-tip/unit-1-remediation-1'
 set_local_ref "$project" "$pretip_work_head" "$head_sha_2"
@@ -5654,18 +5654,18 @@ expect_failure "$temp_root/work-head-before-chain-tip.log" run_for "$project" \
     == "$(pr_event_file_count "$gauntlet_dir")" ]] \
   || fail 'work head based before the current chain tip created immutable PR evidence'
 
-transitive_retry_dir="$project/.ai/gauntlets/transitive-retry"
+transitive_retry_dir="$project/.opencaw/.cache/gauntlets/transitive-retry"
 copy_gauntlet "$gauntlet_dir" "$transitive_retry_dir"
 transitive_first_url='https://github.com/example/opencaw-fixture/pull/224'
 transitive_first_head='gauntlet-work/transitive-retry/unit-1-remediation-1'
 set_local_ref "$project" "$transitive_first_head" "$head_sha_7"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 opened \
   "$transitive_first_url" "$transitive_first_head" none --head-sha "$head_sha_7" >/dev/null
-expect_line '- Remediation trigger: .ai/gauntlets/transitive-retry/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md' \
   "$transitive_retry_dir/pr-events/unit-1/event-007.md"
-transitive_root_relative='.ai/gauntlets/transitive-retry/rounds/integration/round-002.md'
+transitive_root_relative='.opencaw/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md'
 transitive_root_sha256="$(sha256_file "$project/$transitive_root_relative")"
-transitive_first_open_relative='.ai/gauntlets/transitive-retry/pr-events/unit-1/event-007.md'
+transitive_first_open_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-007.md'
 transitive_first_open_sha256="$(sha256_file "$project/$transitive_first_open_relative")"
 transitive_fail_report="$critic_dir/transitive-remediation-fail.md"
 write_critic_report "$transitive_fail_report" fail artifact.txt "$head_sha_7" \
@@ -5687,7 +5687,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry un
   "$transitive_first_url" "$transitive_first_head" \
   'https://github.com/example/opencaw-fixture/pull/224#issuecomment-60' \
   --head-sha "$head_sha_7" >/dev/null
-transitive_first_qa_relative='.ai/gauntlets/transitive-retry/pr-events/unit-1/event-008.md'
+transitive_first_qa_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-008.md'
 expect_file "$project/$transitive_first_qa_relative"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 closed \
   "$transitive_first_url" "$transitive_first_head" \
@@ -5716,7 +5716,7 @@ transitive_quality_root="$(gauntlet_helper_value "$project" \
   gauntlet_remediation_root_for_trigger "$transitive_retry_dir/GAUNTLET.md" \
   unit-1 quality-revision:transitive-v2 '2026-08-01T12:00:02Z')"
 [[ "$transitive_quality_root" \
-    == '.ai/gauntlets/transitive-retry/pr-events/unit-1/event-009.md' ]] \
+    == '.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-009.md' ]] \
   || fail 'transitive quality revision did not resolve its immediately previous close'
 
 export FAKE_DATE_ISO='2026-08-01T12:00:02Z'
@@ -5725,7 +5725,7 @@ transitive_second_head='gauntlet-work/transitive-retry/unit-1-remediation-2'
 set_local_ref "$project" "$transitive_second_head" "$head_sha_8"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 opened \
   "$transitive_second_url" "$transitive_second_head" none --head-sha "$head_sha_8" >/dev/null
-transitive_second_open_relative='.ai/gauntlets/transitive-retry/pr-events/unit-1/event-010.md'
+transitive_second_open_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-010.md'
 transitive_second_open="$project/$transitive_second_open_relative"
 expect_line '- Remediation trigger: quality-revision:transitive-v2' \
   "$transitive_second_open"
@@ -5754,13 +5754,13 @@ gauntlet_helper_value "$project" gauntlet_trace_remediation_trigger \
   "$transitive_root_relative" >/dev/null \
   || fail 'transitive quality-revision close root did not trace to the original integration failure'
 
-containment_tamper_dir="$project/.ai/gauntlets/closed-cycle-containment-tamper"
+containment_tamper_dir="$project/.opencaw/.cache/gauntlets/closed-cycle-containment-tamper"
 copy_gauntlet "$transitive_retry_dir" "$containment_tamper_dir"
 containment_tamper_open="$containment_tamper_dir/pr-events/unit-1/event-010.md"
 containment_tamper_qa="$containment_tamper_dir/pr-events/unit-1/event-008.md"
 containment_tamper_round="$containment_tamper_dir/rounds/unit-1/$(basename "$transitive_first_round")"
-containment_tamper_round_relative=".ai/gauntlets/closed-cycle-containment-tamper/rounds/unit-1/$(basename "$transitive_first_round")"
-containment_tamper_qa_relative='.ai/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-008.md'
+containment_tamper_round_relative=".opencaw/.cache/gauntlets/closed-cycle-containment-tamper/rounds/unit-1/$(basename "$transitive_first_round")"
+containment_tamper_qa_relative='.opencaw/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-008.md'
 gauntlet_helper_value "$project" gauntlet_trace_remediation_trigger \
   "$containment_tamper_dir/GAUNTLET.md" unit-1 "$containment_tamper_open" \
   "$containment_tamper_round_relative" >/dev/null \
@@ -5806,7 +5806,7 @@ replace_line "$containment_tamper_round" \
 containment_qa_ledger="$(select_ledger_line "$project" \
   "$containment_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$containment_tamper_qa_relative")"
-containment_close_relative='.ai/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-009.md'
+containment_close_relative='.opencaw/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-009.md'
 containment_close_ledger="$(select_ledger_line "$project" \
   "$containment_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$containment_close_relative")"
@@ -5895,17 +5895,17 @@ set_pr_observation "$transitive_first_url" "$transitive_first_head" "$head_sha_7
   gauntlet/transitive-retry CLOSED false none none none none "$head_sha_4"
 run_for "$project" bash commands/validate-gauntlet.sh transitive-retry --phase ready >/dev/null
 
-transitive_trigger_rewrite_dir="$project/.ai/gauntlets/transitive-trigger-rewrite"
+transitive_trigger_rewrite_dir="$project/.opencaw/.cache/gauntlets/transitive-trigger-rewrite"
 copy_gauntlet "$transitive_retry_dir" "$transitive_trigger_rewrite_dir"
 replace_line "$transitive_trigger_rewrite_dir/pr-events/unit-1/event-010.md" \
   '- Remediation trigger: quality-revision:transitive-v2' \
-  '- Remediation trigger: .ai/gauntlets/transitive-trigger-rewrite/rounds/integration/round-002.md'
+  '- Remediation trigger: .opencaw/.cache/gauntlets/transitive-trigger-rewrite/rounds/integration/round-002.md'
 refresh_copied_cross_evidence_hashes "$transitive_trigger_rewrite_dir"
 refresh_copied_evidence_hashes "$transitive_trigger_rewrite_dir"
 expect_failure "$temp_root/transitive-trigger-rewrite.log" run_for "$project" \
   bash commands/validate-gauntlet.sh transitive-trigger-rewrite --phase ready
 
-transitive_root_hash_tamper_dir="$project/.ai/gauntlets/transitive-root-hash-tamper"
+transitive_root_hash_tamper_dir="$project/.opencaw/.cache/gauntlets/transitive-root-hash-tamper"
 copy_gauntlet "$transitive_retry_dir" "$transitive_root_hash_tamper_dir"
 replace_matching_line \
   "$transitive_root_hash_tamper_dir/rounds/unit-1/round-006.md" \
@@ -5915,42 +5915,42 @@ refresh_copied_evidence_hashes "$transitive_root_hash_tamper_dir"
 expect_failure "$temp_root/transitive-root-hash-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh transitive-root-hash-tamper --phase ready
 
-unrelated_close_dir="$project/.ai/gauntlets/unrelated-close-trigger"
+unrelated_close_dir="$project/.opencaw/.cache/gauntlets/unrelated-close-trigger"
 copy_gauntlet "$transitive_retry_dir" "$unrelated_close_dir"
 replace_line "$unrelated_close_dir/pr-events/unit-1/event-010.md" \
   '- Remediation trigger: quality-revision:transitive-v2' \
-  '- Remediation trigger: .ai/gauntlets/closed-unmerged/pr-events/unit-1/event-004.md'
+  '- Remediation trigger: .opencaw/.cache/gauntlets/closed-unmerged/pr-events/unit-1/event-004.md'
 refresh_copied_evidence_hashes "$unrelated_close_dir"
 expect_failure "$temp_root/unrelated-close-trigger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unrelated-close-trigger --phase ready
 
-stale_reference_dir="$project/.ai/gauntlets/stale-integration-reference"
+stale_reference_dir="$project/.opencaw/.cache/gauntlets/stale-integration-reference"
 copy_gauntlet "$gauntlet_dir" "$stale_reference_dir"
 replace_all_literal "$stale_reference_dir/GAUNTLET.md" \
-  '.ai/gauntlets/fixture-gauntlet/' '.ai/gauntlets/stale-integration-reference/'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/stale-integration-reference/'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Status: running' '- Status: passed'
 replace_matching_line "$stale_reference_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Verdict: fail' '- Verdict: pass'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Critic ID: integration-critic-2' '- Critic ID: integration-critic-1'
 replace_line "$stale_reference_dir/GAUNTLET.md" \
-  '- Evidence: `.ai/gauntlets/stale-integration-reference/rounds/integration/round-002.md`' \
-  '- Evidence: `.ai/gauntlets/stale-integration-reference/rounds/integration/round-001.md`'
+  '- Evidence: `.opencaw/.cache/gauntlets/stale-integration-reference/rounds/integration/round-002.md`' \
+  '- Evidence: `.opencaw/.cache/gauntlets/stale-integration-reference/rounds/integration/round-001.md`'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- PR eligible: no' '- PR eligible: yes'
 expect_failure "$temp_root/stale-integration-reference.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-integration-reference --phase complete
 
-orphan_dir="$project/.ai/gauntlets/orphan-history"
+orphan_dir="$project/.opencaw/.cache/gauntlets/orphan-history"
 copy_gauntlet "$gauntlet_dir" "$orphan_dir"
 replace_all_literal "$orphan_dir/GAUNTLET.md" \
-  '.ai/gauntlets/fixture-gauntlet/' '.ai/gauntlets/orphan-history/'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/orphan-history/'
 replace_matching_line "$orphan_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Replacement unit that erased prior history | scope: replacement artifact boundary'
 replace_matching_line "$orphan_dir/GAUNTLET.md" '^- Active work unit:' '- Active work unit: unit-2'
 expect_failure "$temp_root/orphan-history.log" run_for "$project" \
   bash commands/validate-gauntlet.sh orphan-history --phase ready
 
-later_unrelated_dir="$project/.ai/gauntlets/later-unrelated-unit"
+later_unrelated_dir="$project/.opencaw/.cache/gauntlets/later-unrelated-unit"
 copy_gauntlet "$gauntlet_dir" "$later_unrelated_dir"
 insert_after_matching_line "$later_unrelated_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -5970,7 +5970,7 @@ export FAKE_DATE_ISO=2026-08-02T00:00:02Z
 later_unrelated_head='gauntlet-work/later-unrelated-unit/unit-2'
 later_unrelated_pr='https://github.com/example/opencaw-fixture/pull/290'
 set_local_ref "$project" "$later_unrelated_head" "$head_sha_7"
-later_unrelated_readiness="$(OPENCAW_REPORT_DIR="$project/.ai/reports/later-unrelated" \
+later_unrelated_readiness="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/later-unrelated" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   later-unrelated-unit unit-2 "$project/progress-validation.md")"
 later_unrelated_checkpoint="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -6000,7 +6000,7 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   later-unrelated-unit --phase ready >/dev/null
 unset FAKE_DATE_ISO
 
-future_unit_membership_dir="$project/.ai/gauntlets/future-unit-membership"
+future_unit_membership_dir="$project/.opencaw/.cache/gauntlets/future-unit-membership"
 copy_gauntlet "$later_unrelated_dir" "$future_unit_membership_dir"
 future_unit_membership_revision="${later_unrelated_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
 replace_line "$future_unit_membership_dir/GAUNTLET.md" \
@@ -6025,7 +6025,7 @@ done
 replace_all_literal "$future_unit_membership_dir/GAUNTLET.md" \
   "manifest: $later_unrelated_manifest" "manifest: $unit_manifest_opened"
 refresh_copied_cross_evidence_hashes "$future_unit_membership_dir"
-future_unit_membership_round_relative='.ai/gauntlets/future-unit-membership/rounds/unit-2/round-001.md'
+future_unit_membership_round_relative='.opencaw/.cache/gauntlets/future-unit-membership/rounds/unit-2/round-001.md'
 future_unit_membership_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
   "$future_unit_membership_round_relative")"
 replace_matching_line \
@@ -6045,7 +6045,7 @@ grep -Fq \
   "$temp_root/future-unit-membership.log" \
   || fail 'future unit evidence did not reach the manifest-membership gate'
 
-topology_binding_control_dir="$project/.ai/gauntlets/topology-binding-control"
+topology_binding_control_dir="$project/.opencaw/.cache/gauntlets/topology-binding-control"
 copy_gauntlet "$ready_snapshot" "$topology_binding_control_dir"
 insert_after_matching_line "$topology_binding_control_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -6076,7 +6076,7 @@ reset_integration_review "$project" "$topology_binding_control_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh \
   topology-binding-control --phase ready >/dev/null
 
-topology_binding_backdated_dir="$project/.ai/gauntlets/topology-binding-backdated"
+topology_binding_backdated_dir="$project/.opencaw/.cache/gauntlets/topology-binding-backdated"
 copy_gauntlet "$topology_binding_control_dir" "$topology_binding_backdated_dir"
 topology_binding_backdated_edge="${topology_binding_edge/approved at: 2026-08-02T00:00:03Z/approved at: 2026-08-02T00:00:01Z}"
 replace_line "$topology_binding_backdated_dir/GAUNTLET.md" \
@@ -6088,7 +6088,7 @@ grep -Fq \
   "$temp_root/topology-binding-backdated.log" \
   || fail 'backdated topology edge did not reach the manifest-delta binding gate'
 
-scope_activation_dir="$project/.ai/gauntlets/scope-activation-control"
+scope_activation_dir="$project/.opencaw/.cache/gauntlets/scope-activation-control"
 copy_gauntlet "$gauntlet_dir" "$scope_activation_dir"
 scope_activation_v1="$(unit_scope_fingerprint \
   "$project" "$scope_activation_dir/GAUNTLET.md" unit-1)"
@@ -6146,7 +6146,7 @@ expect_line "- Scope fingerprint: $scope_activation_v2" \
   "$scope_activation_dir/pr-events/unit-1/event-007.md"
 unset FAKE_DATE_ISO
 
-future_scope_activation_dir="$project/.ai/gauntlets/future-scope-activation"
+future_scope_activation_dir="$project/.opencaw/.cache/gauntlets/future-scope-activation"
 copy_gauntlet "$scope_activation_dir" "$future_scope_activation_dir"
 future_scope_manifest_revision="${scope_activation_manifest_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
 future_scope_revision="${scope_activation_scope_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
@@ -6178,7 +6178,7 @@ done
 replace_all_literal "$future_scope_activation_dir/GAUNTLET.md" \
   "manifest: $scope_activation_manifest" "manifest: $unit_manifest_opened"
 refresh_copied_cross_evidence_hashes "$future_scope_activation_dir"
-future_scope_round_relative='.ai/gauntlets/future-scope-activation/rounds/unit-1/round-005.md'
+future_scope_round_relative='.opencaw/.cache/gauntlets/future-scope-activation/rounds/unit-1/round-005.md'
 future_scope_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
   "$future_scope_round_relative")"
 replace_matching_line "$future_scope_qa" '^- QA comment body sha256:' \
@@ -6195,7 +6195,7 @@ grep -Fq \
   "$temp_root/future-scope-activation.log" \
   || fail 'future scope evidence did not reach the manifest-scope gate'
 
-scope_binding_backdated_dir="$project/.ai/gauntlets/scope-binding-backdated"
+scope_binding_backdated_dir="$project/.opencaw/.cache/gauntlets/scope-binding-backdated"
 copy_gauntlet "$scope_activation_dir" "$scope_binding_backdated_dir"
 scope_binding_backdated_revision="${scope_activation_scope_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-01T12:00:00Z}"
 replace_line "$scope_binding_backdated_dir/GAUNTLET.md" \
@@ -6207,7 +6207,7 @@ grep -Fq \
   "$temp_root/scope-binding-backdated.log" \
   || fail 'backdated scope revision did not reach the manifest-delta binding gate'
 
-superseded_dir="$project/.ai/gauntlets/superseded-history"
+superseded_dir="$project/.opencaw/.cache/gauntlets/superseded-history"
 copy_gauntlet "$gauntlet_dir" "$superseded_dir"
 replace_matching_line "$superseded_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: superseded | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
@@ -6232,7 +6232,7 @@ set_gauntlet_field "$project" "$superseded_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$superseded_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh superseded-history --phase ready >/dev/null
 
-supersession_authorization_control_dir="$project/.ai/gauntlets/supersession-authorization-control"
+supersession_authorization_control_dir="$project/.opencaw/.cache/gauntlets/supersession-authorization-control"
 copy_gauntlet "$superseded_dir" "$supersession_authorization_control_dir"
 supersession_authorization_pr='https://github.com/example/opencaw-fixture/pull/300'
 supersession_authorization_head='gauntlet-work/supersession-authorization-control/unit-2-remediation-1'
@@ -6251,7 +6251,7 @@ expect_line "- Created at: $supersession_authorization_time" \
   "$supersession_authorization_open"
 expect_line "- Recorded at: $supersession_authorization_time" \
   "$supersession_authorization_open"
-expect_line '- Remediation trigger: .ai/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
   "$supersession_authorization_open"
 supersession_authorization_report="$critic_dir/supersession-authorization-unit-pass.md"
 write_critic_report "$supersession_authorization_report" pass artifact.txt "$head_sha_7" \
@@ -6265,7 +6265,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh \
   >/dev/null
 expect_line "- Recorded at: $supersession_authorization_time" \
   "$supersession_authorization_control_dir/rounds/unit-2/round-001.md"
-expect_line '- Remediation root: .ai/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
+expect_line '- Remediation root: .opencaw/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
   "$supersession_authorization_control_dir/rounds/unit-2/round-001.md"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   supersession-authorization-control unit-2 qa-pass "$supersession_authorization_pr" \
@@ -6299,7 +6299,7 @@ run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   supersession-authorization-control --status complete --dry-run >/dev/null
 unset FAKE_DATE_ISO
 
-backdated_manifest_dir="$project/.ai/gauntlets/backdated-manifest-checkpoint"
+backdated_manifest_dir="$project/.opencaw/.cache/gauntlets/backdated-manifest-checkpoint"
 copy_gauntlet "$supersession_authorization_control_dir" "$backdated_manifest_dir"
 backdated_manifest_approval='2026-08-01T12:00:01Z'
 backdated_manifest_marker="${supersession_marker/approved at: 2026-08-02T00:00:01Z/approved at: $backdated_manifest_approval}"
@@ -6317,7 +6317,7 @@ grep -Fq 'Publication checkpoint uses a Unit manifest not active at its Recorded
   "$temp_root/backdated-manifest-checkpoint.log" \
   || fail 'backdated manifest checkpoint did not reach the generation-authorization gate'
 
-future_supersession_dir="$project/.ai/gauntlets/future-supersession-checkpoint"
+future_supersession_dir="$project/.opencaw/.cache/gauntlets/future-supersession-checkpoint"
 copy_gauntlet "$supersession_authorization_control_dir" "$future_supersession_dir"
 future_supersession_approval_time='2026-08-02T00:00:03Z'
 future_supersession_evidence_time='2026-08-02T00:00:04Z'
@@ -6363,29 +6363,29 @@ replace_matching_line "$future_supersession_merge" '^- Closed at:' \
 replace_matching_line "$future_supersession_merge" '^- Merged at:' \
   "- Merged at: $future_supersession_evidence_time"
 refresh_copied_cross_evidence_hashes "$future_supersession_dir"
-future_supersession_round_relative='.ai/gauntlets/future-supersession-checkpoint/rounds/unit-2/round-001.md'
+future_supersession_round_relative='.opencaw/.cache/gauntlets/future-supersession-checkpoint/rounds/unit-2/round-001.md'
 future_supersession_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
   "$future_supersession_round_relative")"
 replace_matching_line "$future_supersession_qa" '^- QA comment body sha256:' \
   "- QA comment body sha256: $(sha256_text "$future_supersession_comment_body")"
 future_supersession_qa_ledger="$(select_ledger_line "$project" \
   "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
+  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
 replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_qa_ledger" \
   "${future_supersession_qa_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
 future_supersession_qa_ledger="$(select_ledger_line "$project" \
   "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
+  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
 replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_qa_ledger" \
   "${future_supersession_qa_ledger//qa-created: $supersession_authorization_time/qa-created: $future_supersession_evidence_time}"
 future_supersession_open_ledger="$(select_ledger_line "$project" \
   "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-001.md')"
+  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-001.md')"
 replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_open_ledger" \
   "${future_supersession_open_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
 future_supersession_merge_ledger="$(select_ledger_line "$project" \
   "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.ai/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-003.md')"
+  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-003.md')"
 future_supersession_merge_ledger_updated="${future_supersession_merge_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
 future_supersession_merge_ledger_updated="${future_supersession_merge_ledger_updated//pr-closed: $supersession_authorization_time/pr-closed: $future_supersession_evidence_time}"
 replace_line "$future_supersession_dir/GAUNTLET.md" \
@@ -6412,7 +6412,7 @@ expect_failure "$temp_root/future-supersession-checkpoint-complete.log" run_for 
 [[ ! -f "$future_supersession_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'future supersession checkpoint created a completion report'
 
-future_trigger_dir="$project/.ai/gauntlets/future-trigger-checkpoint"
+future_trigger_dir="$project/.opencaw/.cache/gauntlets/future-trigger-checkpoint"
 copy_gauntlet "$future_supersession_dir" "$future_trigger_dir"
 replace_line "$future_trigger_dir/GAUNTLET.md" \
   "$future_supersession_marker" "$supersession_marker"
@@ -6436,7 +6436,7 @@ replace_matching_line "$future_trigger_checkpoint" \
 refresh_copied_checkpoint_hashes "$future_trigger_dir"
 refresh_copied_cross_evidence_hashes "$future_trigger_dir"
 future_trigger_qa="$future_trigger_dir/pr-events/unit-2/event-002.md"
-future_trigger_round_relative='.ai/gauntlets/future-trigger-checkpoint/rounds/unit-2/round-001.md'
+future_trigger_round_relative='.opencaw/.cache/gauntlets/future-trigger-checkpoint/rounds/unit-2/round-001.md'
 future_trigger_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
   "$future_trigger_round_relative")"
 replace_matching_line "$future_trigger_qa" '^- QA comment body sha256:' \
@@ -6459,7 +6459,7 @@ expect_failure "$temp_root/future-trigger-checkpoint-complete.log" run_for "$pro
 [[ ! -f "$future_trigger_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'future trigger checkpoint created a completion report'
 
-missing_supersession_dir="$project/.ai/gauntlets/missing-supersession-marker"
+missing_supersession_dir="$project/.opencaw/.cache/gauntlets/missing-supersession-marker"
 copy_gauntlet "$superseded_dir" "$missing_supersession_dir"
 replace_line "$missing_supersession_dir/GAUNTLET.md" \
   "${supersession_marker/superseded-history/missing-supersession-marker}" \
@@ -6467,7 +6467,7 @@ replace_line "$missing_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/missing-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-supersession-marker --phase ready
 
-stale_supersession_scope_dir="$project/.ai/gauntlets/stale-supersession-scope"
+stale_supersession_scope_dir="$project/.opencaw/.cache/gauntlets/stale-supersession-scope"
 copy_gauntlet "$superseded_dir" "$stale_supersession_scope_dir"
 stale_supersession_marker="${supersession_marker/scope: $superseded_scope_fingerprint/scope: 0000000000000000000000000000000000000000000000000000000000000000}"
 replace_line "$stale_supersession_scope_dir/GAUNTLET.md" \
@@ -6475,21 +6475,21 @@ replace_line "$stale_supersession_scope_dir/GAUNTLET.md" \
 expect_failure "$temp_root/stale-supersession-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-supersession-scope --phase ready
 
-missing_supersession_replacement_dir="$project/.ai/gauntlets/missing-supersession-replacement"
+missing_supersession_replacement_dir="$project/.opencaw/.cache/gauntlets/missing-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$missing_supersession_replacement_dir"
 replace_all_literal "$missing_supersession_replacement_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: absent-unit'
 expect_failure "$temp_root/missing-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-supersession-replacement --phase ready
 
-self_supersession_replacement_dir="$project/.ai/gauntlets/self-supersession-replacement"
+self_supersession_replacement_dir="$project/.opencaw/.cache/gauntlets/self-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$self_supersession_replacement_dir"
 replace_all_literal "$self_supersession_replacement_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: unit-1'
 expect_failure "$temp_root/self-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh self-supersession-replacement --phase ready
 
-nonactive_supersession_dir="$project/.ai/gauntlets/nonactive-supersession-replacement"
+nonactive_supersession_dir="$project/.opencaw/.cache/gauntlets/nonactive-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$nonactive_supersession_dir"
 insert_after_matching_line "$nonactive_supersession_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
@@ -6507,7 +6507,7 @@ insert_after_matching_line "$nonactive_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/nonactive-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh nonactive-supersession-replacement --phase ready
 
-duplicate_supersession_dir="$project/.ai/gauntlets/duplicate-supersession-marker"
+duplicate_supersession_dir="$project/.opencaw/.cache/gauntlets/duplicate-supersession-marker"
 copy_gauntlet "$superseded_dir" "$duplicate_supersession_dir"
 duplicate_supersession_marker="$(grep -F -- '- Unit supersession: unit-1 ' \
   "$duplicate_supersession_dir/GAUNTLET.md")"
@@ -6516,14 +6516,14 @@ insert_after_matching_line "$duplicate_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/duplicate-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-supersession-marker --phase ready
 
-early_supersession_dir="$project/.ai/gauntlets/early-supersession-marker"
+early_supersession_dir="$project/.opencaw/.cache/gauntlets/early-supersession-marker"
 copy_gauntlet "$superseded_dir" "$early_supersession_dir"
 replace_all_literal "$early_supersession_dir/GAUNTLET.md" \
   'approved at: 2026-08-02T00:00:01Z' 'approved at: 2000-01-01T00:00:00Z'
 expect_failure "$temp_root/early-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh early-supersession-marker --phase ready
 
-superseded_report_dir="$project/.ai/gauntlets/superseded-report-history"
+superseded_report_dir="$project/.opencaw/.cache/gauntlets/superseded-report-history"
 copy_gauntlet "$superseded_dir" "$superseded_report_dir"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   superseded-report-history --status stopped >/dev/null
@@ -6532,7 +6532,7 @@ expect_line "${supersession_marker/superseded-history/superseded-report-history}
 grep -Fq -- '- Unit supersession: unit-1 ' "$superseded_report_dir/GAUNTLET_REPORT.md" \
   || fail 'stopped report omitted the canonical retained supersession history'
 
-supersession_chain_dir="$project/.ai/gauntlets/supersession-chain"
+supersession_chain_dir="$project/.opencaw/.cache/gauntlets/supersession-chain"
 copy_gauntlet "$superseded_dir" "$supersession_chain_dir"
 replace_matching_line "$supersession_chain_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
@@ -6557,7 +6557,7 @@ set_gauntlet_field "$project" "$supersession_chain_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$supersession_chain_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh supersession-chain --phase ready >/dev/null
 
-supersession_cycle_dir="$project/.ai/gauntlets/supersession-cycle"
+supersession_cycle_dir="$project/.opencaw/.cache/gauntlets/supersession-cycle"
 copy_gauntlet "$supersession_chain_dir" "$supersession_cycle_dir"
 replace_all_literal "$supersession_cycle_dir/GAUNTLET.md" \
   'replacements: unit-3' 'replacements: unit-1'
@@ -6573,7 +6573,7 @@ export FAKE_DATE_ISO=2026-08-02T00:00:02Z
 supersession_chain_pr='https://github.com/example/opencaw-fixture/pull/291'
 supersession_chain_head='gauntlet-work/supersession-chain/unit-3-remediation-1'
 set_local_ref "$project" "$supersession_chain_head" "$head_sha_7"
-supersession_chain_readiness="$(OPENCAW_REPORT_DIR="$project/.ai/reports/supersession-chain" \
+supersession_chain_readiness="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/supersession-chain" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   supersession-chain unit-3 "$project/progress-validation.md")"
 grep -q "^UNIT_MANIFEST_FINGERPRINT=$supersession_chain_manifest$" \
@@ -6583,7 +6583,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-chain 
   unit-3 opened "$supersession_chain_pr" "$supersession_chain_head" none \
   --head-sha "$head_sha_7" >/dev/null
 supersession_chain_open="$supersession_chain_dir/pr-events/unit-3/event-001.md"
-supersession_chain_root='.ai/gauntlets/supersession-chain/rounds/integration/round-002.md'
+supersession_chain_root='.opencaw/.cache/gauntlets/supersession-chain/rounds/integration/round-002.md'
 expect_line "- Remediation trigger: $supersession_chain_root" \
   "$supersession_chain_open"
 expect_line "- Unit manifest fingerprint: $supersession_chain_manifest" \
@@ -6630,7 +6630,7 @@ run_for "$project" bash commands/validate-gauntlet.sh supersession-chain \
   --phase complete >/dev/null
 unset FAKE_DATE_ISO
 
-supersession_edge_rewrite_dir="$project/.ai/gauntlets/supersession-edge-rewrite"
+supersession_edge_rewrite_dir="$project/.opencaw/.cache/gauntlets/supersession-edge-rewrite"
 copy_gauntlet "$supersession_chain_dir" "$supersession_edge_rewrite_dir"
 replace_all_literal "$supersession_edge_rewrite_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: unit-3'
@@ -6638,7 +6638,7 @@ refresh_copied_evidence_hashes "$supersession_edge_rewrite_dir"
 expect_failure "$temp_root/supersession-edge-rewrite.log" run_for "$project" \
   bash commands/validate-gauntlet.sh supersession-edge-rewrite --phase complete
 
-supersession_split_dir="$project/.ai/gauntlets/supersession-split"
+supersession_split_dir="$project/.opencaw/.cache/gauntlets/supersession-split"
 copy_gauntlet "$superseded_dir" "$supersession_split_dir"
 insert_after_matching_line "$supersession_split_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
@@ -6663,7 +6663,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-split \
   unit-2 opened "$supersession_split_pr_two" "$supersession_split_head_two" none \
   --head-sha "$head_sha_7" >/dev/null
-expect_line '- Remediation trigger: .ai/gauntlets/supersession-split/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
   "$supersession_split_dir/pr-events/unit-2/event-001.md"
 supersession_split_report_two="$critic_dir/supersession-split-unit-two.md"
 write_critic_report "$supersession_split_report_two" pass artifact.txt "$head_sha_7" \
@@ -6698,7 +6698,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-split \
   unit-3 opened "$supersession_split_pr_three" "$supersession_split_head_three" none \
   --head-sha "$head_sha_8" >/dev/null
-expect_line '- Remediation trigger: .ai/gauntlets/supersession-split/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
   "$supersession_split_dir/pr-events/unit-3/event-001.md"
 supersession_split_report_three="$critic_dir/supersession-split-unit-three.md"
 write_critic_report "$supersession_split_report_three" pass artifact.txt "$head_sha_8" \
@@ -6732,7 +6732,7 @@ run_for "$project" bash commands/validate-gauntlet.sh supersession-split \
   --phase complete >/dev/null
 unset FAKE_DATE_ISO
 
-critic_failure_supersession_dir="$project/.ai/gauntlets/critic-failure-supersession"
+critic_failure_supersession_dir="$project/.opencaw/.cache/gauntlets/critic-failure-supersession"
 copy_gauntlet "$unconsumed_close_dir" "$critic_failure_supersession_dir"
 replace_matching_line "$critic_failure_supersession_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -6764,7 +6764,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   critic-failure-supersession unit-2 opened "$critic_failure_descendant_pr" \
   "$critic_failure_descendant_head" none --head-sha "$head_sha_2" >/dev/null
-expect_line '- Remediation trigger: .ai/gauntlets/critic-failure-supersession/pr-events/unit-1/event-003.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/critic-failure-supersession/pr-events/unit-1/event-003.md' \
   "$critic_failure_supersession_dir/pr-events/unit-2/event-001.md"
 critic_failure_descendant_report="$critic_dir/critic-failure-descendant.md"
 write_critic_report "$critic_failure_descendant_report" pass artifact.txt "$head_sha_2" \
@@ -6776,11 +6776,11 @@ run_for "$project" bash commands/record-gauntlet-round.sh \
   --head-sha "$head_sha_2" \
   --builder-strategy 'Replace the critic-failed ancestor with a distinct verified descendant.' \
   >/dev/null
-expect_line '- Remediation root: .ai/gauntlets/critic-failure-supersession/rounds/unit-1/round-001.md' \
+expect_line '- Remediation root: .opencaw/.cache/gauntlets/critic-failure-supersession/rounds/unit-1/round-001.md' \
   "$critic_failure_supersession_dir/rounds/unit-2/round-001.md"
 unset FAKE_DATE_ISO
 
-qa_failure_supersession_dir="$project/.ai/gauntlets/qa-failure-supersession"
+qa_failure_supersession_dir="$project/.opencaw/.cache/gauntlets/qa-failure-supersession"
 copy_gauntlet "$ready_snapshot" "$qa_failure_supersession_dir"
 qa_failure_ancestor_pr='https://github.com/example/opencaw-fixture/pull/295'
 qa_failure_ancestor_head='gauntlet-work/qa-failure-supersession/unit-1'
@@ -6829,7 +6829,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   qa-failure-supersession unit-2 opened "$qa_failure_descendant_pr" \
   "$qa_failure_descendant_head" none --head-sha "$head_sha_4" >/dev/null
-expect_line '- Remediation trigger: .ai/gauntlets/qa-failure-supersession/pr-events/unit-1/event-003.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-003.md' \
   "$qa_failure_supersession_dir/pr-events/unit-2/event-001.md"
 qa_failure_descendant_report="$critic_dir/qa-failure-descendant.md"
 write_critic_report "$qa_failure_descendant_report" pass artifact.txt "$head_sha_4" \
@@ -6840,10 +6840,10 @@ run_for "$project" bash commands/record-gauntlet-round.sh qa-failure-supersessio
   fresh-session "$qa_failure_descendant_report" --head-sha "$head_sha_4" \
   --builder-strategy 'Replace the QA-failed ancestor with an independently verified descendant.' \
   >/dev/null
-expect_line '- Remediation root: .ai/gauntlets/qa-failure-supersession/pr-events/unit-1/event-002.md' \
+expect_line '- Remediation root: .opencaw/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-002.md' \
   "$qa_failure_supersession_dir/rounds/unit-2/round-001.md"
 
-later_ancestor_dir="$project/.ai/gauntlets/later-same-second-ancestor-failure"
+later_ancestor_dir="$project/.opencaw/.cache/gauntlets/later-same-second-ancestor-failure"
 copy_gauntlet "$qa_failure_supersession_dir" "$later_ancestor_dir"
 later_ancestor_qa="$later_ancestor_dir/pr-events/unit-1/event-002.md"
 later_ancestor_close="$later_ancestor_dir/pr-events/unit-1/event-003.md"
@@ -6856,8 +6856,8 @@ replace_matching_line "$later_ancestor_close" '^- Closed at:' \
   "- Closed at: $later_ancestor_time"
 replace_matching_line "$later_ancestor_close" '^- Recorded at:' \
   "- Recorded at: $later_ancestor_time"
-later_ancestor_close_relative='.ai/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-003.md'
-later_ancestor_qa_relative='.ai/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-002.md'
+later_ancestor_close_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-003.md'
+later_ancestor_qa_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-002.md'
 replace_line "$earlier_descendant_open" \
   "- Remediation trigger: $later_ancestor_close_relative" \
   '- Remediation trigger: none'
@@ -6898,7 +6898,7 @@ later_ancestor_qa_ledger="$(select_ledger_line "$project" \
 later_ancestor_close_ledger="$(select_ledger_line "$project" \
   "$later_ancestor_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$later_ancestor_close_relative")"
-earlier_descendant_relative='.ai/gauntlets/later-same-second-ancestor-failure/pr-events/unit-2/event-001.md'
+earlier_descendant_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-2/event-001.md'
 earlier_descendant_ledger="$(select_ledger_line "$project" \
   "$later_ancestor_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$earlier_descendant_relative")"
@@ -6960,7 +6960,7 @@ grep -Fq 'Work-unit rounds require a live progress PR: unit-1' \
 remediation_pr_url='https://github.com/example/opencaw-fixture/pull/208'
 remediation_head='gauntlet-work/fixture-gauntlet/unit-1-remediation-1'
 set_local_ref "$project" "$remediation_head" "$head_sha_7"
-remediation_readiness_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/remediation" run_for "$project" \
+remediation_readiness_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/remediation" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress \
   fixture-gauntlet unit-1 "$project/progress-validation.md")"
 grep -q '^TARGET_BRANCH=gauntlet/fixture-gauntlet$' <<<"$remediation_readiness_output" \
@@ -6975,7 +6975,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
   "$remediation_pr_url" "$remediation_head" none --head-sha "$head_sha_7" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-007.md"
-expect_line '- Remediation trigger: .ai/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
   "$gauntlet_dir/pr-events/unit-1/event-007.md"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
@@ -6994,7 +6994,7 @@ expect_file "$gauntlet_dir/rounds/unit-1/round-005.md"
 remediation_stale_pass_comment="$remediation_pr_url#issuecomment-9020"
 set_semantic_comment_observation "$project" "$remediation_stale_pass_comment" \
   "$remediation_pr_url" pass "$head_sha_7" \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha"
 OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
@@ -7005,7 +7005,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
 remediation_stale_fail_comment="$remediation_pr_url#issuecomment-9021"
 set_semantic_comment_observation "$project" "$remediation_stale_fail_comment" \
   "$remediation_pr_url" fail "$head_sha_7" \
-  '.ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
+  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$head_sha_4"
@@ -7038,9 +7038,9 @@ for same_second_evidence in \
       "$same_second_evidence" | head -n 1)" == "$same_second_chain_time" ]] \
     || fail "explicit remediation chain lost its same-second replay tie: $same_second_evidence"
 done
-expect_line '- Remediation root: .ai/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
+expect_line '- Remediation root: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
   "$gauntlet_dir/rounds/unit-1/round-005.md"
-expect_line '- Critic round: .ai/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md' \
+expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md' \
   "$gauntlet_dir/pr-events/unit-1/event-008.md"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
@@ -7112,19 +7112,19 @@ run_for "$project" bash commands/create-gauntlet-completion-report.sh fixture-ga
 expect_file "$gauntlet_dir/GAUNTLET_REPORT.md"
 assert_no_completion_staging "$gauntlet_dir"
 completion_event="$gauntlet_dir/completion-events/event-001.md"
-completion_event_relative='.ai/gauntlets/fixture-gauntlet/completion-events/event-001.md'
+completion_event_relative='.opencaw/.cache/gauntlets/fixture-gauntlet/completion-events/event-001.md'
 expect_file "$completion_event"
 expect_line '# Gauntlet Completion Event: 001' "$completion_event"
 expect_line '- Sequence: 001' "$completion_event"
 expect_line '- Outcome: complete' "$completion_event"
-expect_line '- Integration round: .ai/gauntlets/fixture-gauntlet/rounds/integration/round-004.md' \
+expect_line '- Integration round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-004.md' \
   "$completion_event"
 expect_line "- Head SHA: $head_sha_7" "$completion_event"
 expect_line "- Quality bar fingerprint: $quality_bar_v1" "$completion_event"
 expect_line "- Unit manifest fingerprint: $unit_manifest_opened" "$completion_event"
 expect_line "- Execution contract fingerprint: $execution_contract_v1" "$completion_event"
 expect_line "- Base commit SHA: $base_commit_sha" "$completion_event"
-expect_line '- Report: .ai/gauntlets/fixture-gauntlet/GAUNTLET_REPORT.md' "$completion_event"
+expect_line '- Report: .opencaw/.cache/gauntlets/fixture-gauntlet/GAUNTLET_REPORT.md' "$completion_event"
 completion_report_projection="$(OPENCAW_PROJECT_ROOT="$project" bash -c '
   set -euo pipefail
   source commands/lib/gauntlet-common.sh
@@ -7172,7 +7172,7 @@ for remote_topology_case in ahead divergent rewound absent; do
     run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
   expect_failure "$temp_root/final-readiness-remote-$remote_topology_case.log" env \
     OPENCAW_PROJECT_ROOT="$project" \
-    OPENCAW_REPORT_DIR="$project/.ai/reports/final-remote-$remote_topology_case" \
+    OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/final-remote-$remote_topology_case" \
     bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
     "$project/progress-validation.md"
   [[ "$terminal_remote_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7209,7 +7209,7 @@ expect_failure "$temp_root/tampered-report-regeneration.log" run_for "$project" 
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 assert_no_completion_staging "$gauntlet_dir"
 expect_failure "$temp_root/tampered-report-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/tampered-report" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/tampered-report" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$tampered_report_hash" == "$(git hash-object "$gauntlet_dir/GAUNTLET_REPORT.md")" \
@@ -7248,7 +7248,7 @@ set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
 expect_failure "$temp_root/merged-requery-state-mismatch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 expect_failure "$temp_root/merged-requery-state-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/merged-state" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/merged-state" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
@@ -7277,7 +7277,7 @@ expect_failure "$temp_root/merged-requery-publication-body-removed.log" \
   run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 expect_failure "$temp_root/merged-requery-publication-body-readiness.log" env \
   OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.ai/reports/merged-publication-body" \
+  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/merged-publication-body" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 restore_fixture_first_merge_observation
@@ -7305,7 +7305,7 @@ expect_failure "$temp_root/direct-complete-validation.log" run_for "$project" \
 expect_failure "$temp_root/direct-completion-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/direct-final-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/direct-final" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/direct-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7321,7 +7321,7 @@ expect_failure "$temp_root/complete-origin-drift-validation.log" run_for "$proje
 expect_failure "$temp_root/complete-origin-drift-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/complete-origin-drift-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/origin-drift-final" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/origin-drift-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7332,7 +7332,7 @@ git -C "$project" remote set-url origin git@github.com:example/opencaw-fixture.g
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   fixture-gauntlet --status complete >/dev/null
-OPENCAW_REPORT_DIR="$project/.ai/reports/restored-origin-final" run_for "$project" \
+OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/restored-origin-final" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md" >/dev/null
 
@@ -7343,7 +7343,7 @@ expect_failure "$temp_root/complete-push-target-validation.log" run_for "$projec
 expect_failure "$temp_root/complete-push-target-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/complete-push-target-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.ai/reports/push-target-final" \
+  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/push-target-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7356,7 +7356,7 @@ git -C "$project" remote set-url --add --push origin \
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   fixture-gauntlet --status complete >/dev/null
-OPENCAW_REPORT_DIR="$project/.ai/reports/restored-push-target-final" run_for "$project" \
+OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/restored-push-target-final" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md" >/dev/null
 git -C "$project" config --unset-all remote.origin.pushurl
@@ -7382,7 +7382,7 @@ write_critic_report "$terminal_demotion_report" pass artifact.txt "$head_sha_8" 
   'Consume the active completion through immutable promotion-failure evidence first.'
 terminal_pr_number=230
 for terminal_variant in terminal-demotion-with-report terminal-demotion-without-report; do
-  terminal_variant_dir="$project/.ai/gauntlets/$terminal_variant"
+  terminal_variant_dir="$project/.opencaw/.cache/gauntlets/$terminal_variant"
   copy_gauntlet "$gauntlet_dir" "$terminal_variant_dir"
   run_for "$project" bash commands/validate-gauntlet.sh "$terminal_variant" --phase complete >/dev/null
   replace_line "$terminal_variant_dir/GAUNTLET.md" '- Status: passed' '- Status: running'
@@ -7483,7 +7483,7 @@ sync_gauntlet_live_observations "$project" "$gauntlet_dir"
 expect_line '- Status: passed' "$gauntlet_file"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 
-forged_later_round_dir="$project/.ai/gauntlets/forged-later-round"
+forged_later_round_dir="$project/.opencaw/.cache/gauntlets/forged-later-round"
 copy_gauntlet "$gauntlet_dir" "$forged_later_round_dir"
 forged_round="$forged_later_round_dir/rounds/integration/round-005.md"
 cp "$forged_later_round_dir/rounds/integration/round-004.md" "$forged_round"
@@ -7493,7 +7493,7 @@ replace_line "$forged_round" '- Round: 004' '- Round: 005'
 forged_round_hash="$(sha256_file "$forged_round")"
 final_round_ledger_line="$(select_ledger_line "$project" \
   "$forged_later_round_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.ai/gauntlets/forged-later-round/rounds/integration/round-004.md')"
+  '.opencaw/.cache/gauntlets/forged-later-round/rounds/integration/round-004.md')"
 forged_round_ledger_line="${final_round_ledger_line/round: 004/round: 005}"
 forged_round_ledger_line="${forged_round_ledger_line/round-004.md/round-005.md}"
 forged_round_ledger_line="${forged_round_ledger_line%sha256:*}sha256: $forged_round_hash"
@@ -7502,22 +7502,22 @@ insert_after_section_line "$forged_later_round_dir/GAUNTLET.md" \
 expect_failure "$temp_root/forged-later-round.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forged-later-round --phase complete
 
-completed_scope_mutation_dir="$project/.ai/gauntlets/completed-scope-mutation"
+completed_scope_mutation_dir="$project/.opencaw/.cache/gauntlets/completed-scope-mutation"
 copy_gauntlet "$gauntlet_dir" "$completed_scope_mutation_dir"
 replace_matching_line "$completed_scope_mutation_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: expanded completion scope without new critic evidence'
 expect_failure "$temp_root/completed-scope-mutation.log" run_for "$project" \
   bash commands/validate-gauntlet.sh completed-scope-mutation --phase complete
 
-integration_path_dir="$project/.ai/gauntlets/integration-path-traversal"
+integration_path_dir="$project/.opencaw/.cache/gauntlets/integration-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$integration_path_dir"
 replace_line "$integration_path_dir/GAUNTLET.md" \
-  '- Evidence: `.ai/gauntlets/integration-path-traversal/rounds/integration/round-004.md`' \
-  '- Evidence: `.ai/gauntlets/integration-path-traversal/rounds/integration/../integration/round-004.md`'
+  '- Evidence: `.opencaw/.cache/gauntlets/integration-path-traversal/rounds/integration/round-004.md`' \
+  '- Evidence: `.opencaw/.cache/gauntlets/integration-path-traversal/rounds/integration/../integration/round-004.md`'
 expect_failure "$temp_root/integration-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh integration-path-traversal --phase complete
 
-post_pr_reopen_dir="$project/.ai/gauntlets/post-pr-reopen"
+post_pr_reopen_dir="$project/.opencaw/.cache/gauntlets/post-pr-reopen"
 copy_gauntlet "$gauntlet_dir" "$post_pr_reopen_dir"
 post_promotion_report="$critic_dir/post-promotion-remediation.md"
 write_critic_report "$post_promotion_report" pass artifact.txt "$head_sha_9" \
@@ -7537,7 +7537,7 @@ expect_failure "$temp_root/passed-open-without-promotion-failure.log" \
   bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 opened \
   "$post_pr_remediation_url" "$post_pr_remediation_head" none --head-sha "$head_sha_9"
 
-manual_reopen_dir="$project/.ai/gauntlets/manual-passed-state-reopen"
+manual_reopen_dir="$project/.opencaw/.cache/gauntlets/manual-passed-state-reopen"
 copy_gauntlet "$gauntlet_dir" "$manual_reopen_dir"
 replace_line "$manual_reopen_dir/GAUNTLET.md" '- Status: passed' '- Status: running'
 replace_matching_line "$manual_reopen_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
@@ -7552,7 +7552,7 @@ expect_failure "$temp_root/manual-passed-state-remediation.log" \
   'https://github.com/example/opencaw-fixture/pull/222' \
   gauntlet-work/manual-passed-state-reopen/unit-1-remediation-2 none --head-sha "$head_sha_9"
 
-promotion_pass_dir="$project/.ai/gauntlets/promotion-qa-pass"
+promotion_pass_dir="$project/.opencaw/.cache/gauntlets/promotion-qa-pass"
 copy_gauntlet "$gauntlet_dir" "$promotion_pass_dir"
 promotion_completion_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   "$promotion_pass_dir/completion-events/event-001.md" | head -n 1)"
@@ -7564,7 +7564,7 @@ set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7
   main OPEN false none none none none "$orphan_sha"
 set_semantic_comment_observation "$project" "$promotion_pass_evidence" \
   "$promotion_pass_url" pass "$head_sha_7" \
-  '.ai/gauntlets/promotion-qa-pass/completion-events/event-001.md'
+  '.opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
 export FAKE_GH_DEFAULT_BRANCH='release'
 expect_failure "$temp_root/promotion-pass-nondefault-target.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
@@ -7643,7 +7643,7 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 promotion_pass_wrong_pr_comment="$promotion_pass_url#issuecomment-9011"
 set_semantic_comment_observation "$project" "$promotion_pass_wrong_pr_comment" \
   'https://github.com/example/opencaw-fixture/pull/997' pass "$head_sha_7" \
-  '.ai/gauntlets/promotion-qa-pass/completion-events/event-001.md'
+  '.opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
@@ -7687,7 +7687,7 @@ expect_line "- QA comment updated at: $promotion_completion_recorded_at" \
 grep -Eq '^- QA comment body sha256: [0-9a-f]{64}$' \
   "$promotion_pass_dir/promotion-events/event-001.md" \
   || fail 'promotion event omitted the exact semantic comment-body hash'
-expect_line '- Completion event: .ai/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
+expect_line '- Completion event: .opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
   "$promotion_pass_dir/promotion-events/event-001.md"
 expect_line '- Status: passed' "$promotion_pass_dir/GAUNTLET.md"
 expect_file "$promotion_pass_dir/GAUNTLET_REPORT.md"
@@ -7705,7 +7705,7 @@ grep -Fq 'Gauntlet PR must never enable auto-merge or enter a merge queue' \
   "$(git hash-object "$promotion_pass_dir/promotion-events/event-001.md")" ]] \
   || fail 'promotion validator replay rejection mutated immutable evidence'
 set_pr_merge_automation_observation "$promotion_pass_url" none
-promotion_completion_symlink_dir="$project/.ai/gauntlets/promotion-completion-symlink"
+promotion_completion_symlink_dir="$project/.opencaw/.cache/gauntlets/promotion-completion-symlink"
 copy_gauntlet "$promotion_pass_dir" "$promotion_completion_symlink_dir"
 outside_promotion_completion_events="$temp_root/outside-promotion-completion-events"
 mv "$promotion_completion_symlink_dir/completion-events" \
@@ -7800,11 +7800,11 @@ grep -Fq 'QA comment evidence has already been consumed by a promotion event' \
   | wc -l | tr -d ' ')" == 1 ]] \
   || fail 'reused promotion comment evidence created another immutable event'
 
-promotion_duplicate_ledger_dir="$project/.ai/gauntlets/promotion-duplicate-ledger"
+promotion_duplicate_ledger_dir="$project/.opencaw/.cache/gauntlets/promotion-duplicate-ledger"
 copy_gauntlet "$promotion_pass_dir" "$promotion_duplicate_ledger_dir"
 promotion_duplicate_line="$(select_ledger_line "$project" \
   "$promotion_duplicate_ledger_dir/GAUNTLET.md" 'Promotion QA Ledger' record \
-  '.ai/gauntlets/promotion-duplicate-ledger/promotion-events/event-001.md')"
+  '.opencaw/.cache/gauntlets/promotion-duplicate-ledger/promotion-events/event-001.md')"
 insert_after_section_line "$promotion_duplicate_ledger_dir/GAUNTLET.md" \
   'Promotion QA Ledger' "$promotion_duplicate_line" "$promotion_duplicate_line"
 expect_failure "$temp_root/promotion-duplicate-ledger.log" run_for "$project" \
@@ -7815,7 +7815,7 @@ promotion_repeat_pass_evidence="$promotion_pass_url#issuecomment-42"
 expect_failure "$temp_root/promotion-pass-repeat-same-completion.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_repeat_pass_evidence" --head-sha "$head_sha_7"
-promotion_reversed_order_dir="$project/.ai/gauntlets/promotion-reversed-comment-order"
+promotion_reversed_order_dir="$project/.opencaw/.cache/gauntlets/promotion-reversed-comment-order"
 copy_gauntlet "$promotion_pass_dir" "$promotion_reversed_order_dir"
 promotion_reversed_evidence="$promotion_pass_url#issuecomment-39"
 expect_failure "$temp_root/promotion-pass-to-fail-reversed-comment-order.log" \
@@ -7833,18 +7833,18 @@ run_for "$project" bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pa
 expect_file "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- Verdict: fail' "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- QA comment ID: 43' "$promotion_pass_dir/promotion-events/event-002.md"
-expect_line '- Completion event: .ai/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
+expect_line '- Completion event: .opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
   "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- Status: running' "$promotion_pass_dir/GAUNTLET.md"
 [[ ! -f "$promotion_pass_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'allowed pass-to-fail promotion transition did not consume the completion report'
-promotion_order_token_dir="$project/.ai/gauntlets/promotion-order-token-tamper"
+promotion_order_token_dir="$project/.opencaw/.cache/gauntlets/promotion-order-token-tamper"
 copy_gauntlet "$promotion_pass_dir" "$promotion_order_token_dir"
 replace_line "$promotion_order_token_dir/promotion-events/event-002.md" \
   '- QA comment ID: 43' '- QA comment ID: 39'
 promotion_order_ledger_line="$(select_ledger_line "$project" \
   "$promotion_order_token_dir/GAUNTLET.md" 'Promotion QA Ledger' record \
-  '.ai/gauntlets/promotion-order-token-tamper/promotion-events/event-002.md')"
+  '.opencaw/.cache/gauntlets/promotion-order-token-tamper/promotion-events/event-002.md')"
 replace_line "$promotion_order_token_dir/GAUNTLET.md" "$promotion_order_ledger_line" \
   "${promotion_order_ledger_line/qa-comment-id: 43/qa-comment-id: 39}"
 refresh_copied_evidence_hashes "$promotion_order_token_dir"
@@ -7861,7 +7861,7 @@ expect_failure "$temp_root/promotion-fail-to-pass-same-completion.log" run_for "
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_fail_to_pass_evidence" --head-sha "$head_sha_7"
 
-promotion_forged_pass_dir="$project/.ai/gauntlets/promotion-fail-forged-pass"
+promotion_forged_pass_dir="$project/.opencaw/.cache/gauntlets/promotion-fail-forged-pass"
 copy_gauntlet "$post_pr_reopen_dir" "$promotion_forged_pass_dir"
 promotion_forged_url='https://github.com/example/opencaw-fixture/pull/243'
 promotion_forged_evidence="$promotion_forged_url#issuecomment-46"
@@ -7894,7 +7894,7 @@ set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_7" \
   main OPEN false none none none none "$orphan_sha"
 set_semantic_comment_observation "$project" "$promotion_fail_evidence" \
   "$promotion_fail_url" fail "$head_sha_7" \
-  '.ai/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
+  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
 promotion_fail_lineage_hash="$(git hash-object "$post_pr_reopen_dir/GAUNTLET.md")"
 OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-unrelated-target-base.log" run_for "$project" \
@@ -7914,7 +7914,7 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 promotion_fail_wrong_pr_comment="$promotion_fail_url#issuecomment-9013"
 set_semantic_comment_observation "$project" "$promotion_fail_wrong_pr_comment" \
   'https://github.com/example/opencaw-fixture/pull/996' fail "$head_sha_7" \
-  '.ai/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
+  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
@@ -7923,7 +7923,7 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 promotion_fail_wrong_affected_comment="$promotion_fail_url#issuecomment-9014"
 set_semantic_comment_observation "$project" "$promotion_fail_wrong_affected_comment" \
   "$promotion_fail_url" fail "$head_sha_7" \
-  '.ai/gauntlets/post-pr-reopen/completion-events/event-001.md' none
+  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' none
 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-wrong-comment-affected-units.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
@@ -7952,7 +7952,7 @@ expect_file "$promotion_fail_archive"
 expect_line '- Verdict: fail' "$promotion_fail_event"
 expect_line '- Affected units: unit-1' "$promotion_fail_event"
 expect_line "- Target base SHA: $head_sha_1" "$promotion_fail_event"
-expect_line '- Completion event: .ai/gauntlets/post-pr-reopen/completion-events/event-001.md' \
+expect_line '- Completion event: .opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' \
   "$promotion_fail_event"
 expect_line '- Status: running' "$post_pr_reopen_dir/GAUNTLET.md"
 expect_line '- PR eligible: no' "$post_pr_reopen_dir/GAUNTLET.md"
@@ -7974,7 +7974,7 @@ post_pr_manifest_v1="$(gauntlet_helper_value "$project" gauntlet_section_field \
 [[ "$post_pr_manifest_v1" == "$unit_manifest_opened" ]] \
   || fail 'consumed completion C1 did not retain its original M1 manifest generation'
 
-post_pr_unapproved_scope_dir="$project/.ai/gauntlets/post-pr-unapproved-scope"
+post_pr_unapproved_scope_dir="$project/.opencaw/.cache/gauntlets/post-pr-unapproved-scope"
 copy_gauntlet "$post_pr_reopen_dir" "$post_pr_unapproved_scope_dir"
 replace_matching_line "$post_pr_unapproved_scope_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -8000,7 +8000,7 @@ set_gauntlet_field "$project" "$post_pr_reopen_dir/GAUNTLET.md" \
   'Current State' 'Unit manifest fingerprint' pending
 reset_integration_review "$project" "$post_pr_reopen_dir/GAUNTLET.md"
 
-post_pr_misordered_manifest_dir="$project/.ai/gauntlets/post-pr-misordered-manifest"
+post_pr_misordered_manifest_dir="$project/.opencaw/.cache/gauntlets/post-pr-misordered-manifest"
 copy_gauntlet "$post_pr_reopen_dir" "$post_pr_misordered_manifest_dir"
 replace_all_literal "$post_pr_misordered_manifest_dir/GAUNTLET.md" \
   'approved at: 2026-08-01T12:00:01Z' 'approved at: 2026-08-01T12:00:00Z'
@@ -8019,7 +8019,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 opened \
   "$post_pr_remediation_url" "$post_pr_remediation_head" none --head-sha "$head_sha_9" >/dev/null
 expect_file "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
-expect_line '- Remediation trigger: .ai/gauntlets/post-pr-reopen/promotion-events/event-001.md' \
+expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/post-pr-reopen/promotion-events/event-001.md' \
   "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
 expect_line "- Unit manifest fingerprint: $post_pr_manifest_v2" \
   "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
@@ -8080,7 +8080,7 @@ replacement_completion="$post_pr_reopen_dir/completion-events/event-002.md"
 expect_file "$replacement_completion"
 expect_line '# Gauntlet Completion Event: 002' "$replacement_completion"
 expect_line '- Sequence: 002' "$replacement_completion"
-expect_line '- Integration round: .ai/gauntlets/post-pr-reopen/rounds/integration/round-005.md' \
+expect_line '- Integration round: .opencaw/.cache/gauntlets/post-pr-reopen/rounds/integration/round-005.md' \
   "$replacement_completion"
 expect_line "- Head SHA: $head_sha_9" "$replacement_completion"
 expect_line "- Unit manifest fingerprint: $post_pr_manifest_v2" \
@@ -8197,7 +8197,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 run_for "$project" \
 post_pr_promotion_pass_event="$post_pr_reopen_dir/promotion-events/event-002.md"
 expect_file "$post_pr_promotion_pass_event"
 expect_line '- Verdict: pass' "$post_pr_promotion_pass_event"
-expect_line '- Completion event: .ai/gauntlets/post-pr-reopen/completion-events/event-002.md' \
+expect_line '- Completion event: .opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-002.md' \
   "$post_pr_promotion_pass_event"
 expect_line "- Head SHA: $head_sha_9" "$post_pr_promotion_pass_event"
 expect_line "- Created at: $post_pr_promotion_created_at" \
@@ -8219,18 +8219,18 @@ numeric_latest="$(OPENCAW_PROJECT_ROOT="$project" bash -c \
 
 echo '[7/8] preserving task, goal, progress, and promotion PR-readiness behavior'
 printf '# Validation Summary\n\nAll local Gauntlet fixture checks passed.\n' >"$project/validation-summary.md"
-task_pr_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/task" run_for "$project" \
+task_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/task" run_for "$project" \
   bash commands/pr-readiness-check.sh gauntlet-parent "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=YES$' <<<"$task_pr_output" || fail 'task readiness lost its human confirmation gate'
 grep -q '^GOAL_FLOW_AUTOMATION=NO$' <<<"$task_pr_output" || fail 'task readiness enabled goal automation'
 
-goal_pr_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/goal" run_for "$project" \
+goal_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/goal" run_for "$project" \
   bash commands/pr-readiness-check.sh --goal gauntlet-parent "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=NO$' <<<"$goal_pr_output" || fail 'goal readiness lost its automatic PR exception'
 grep -q '^GOAL_FLOW_AUTOMATION=YES$' <<<"$goal_pr_output" || fail 'goal readiness did not identify goal automation'
 
 sync_gauntlet_live_observations "$project" "$gauntlet_dir"
-gauntlet_pr_output="$(OPENCAW_REPORT_DIR="$project/.ai/reports/gauntlet" run_for "$project" \
+gauntlet_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/gauntlet" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=YES$' <<<"$gauntlet_pr_output" || fail 'Gauntlet readiness bypassed human confirmation'
 grep -q '^GOAL_FLOW_AUTOMATION=NO$' <<<"$gauntlet_pr_output" || fail 'Gauntlet readiness enabled goal automation'
@@ -8247,14 +8247,14 @@ grep -q "^UNIT_MANIFEST_FINGERPRINT=$unit_manifest_opened$" \
 
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_6"
 expect_failure "$temp_root/stale-promotion-source-ref.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.ai/reports/stale-promotion-source" \
+  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/stale-promotion-source" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet "$project/validation-summary.md"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_7"
 
 expect_failure "$temp_root/stopped-pr-readiness.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.ai/reports/stopped" bash commands/pr-readiness-check.sh --gauntlet stopped-gauntlet "$project/validation-summary.md"
+  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/stopped" bash commands/pr-readiness-check.sh --gauntlet stopped-gauntlet "$project/validation-summary.md"
 expect_failure "$temp_root/blocked-pr-readiness.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.ai/reports/blocked" bash commands/pr-readiness-check.sh --gauntlet blocked-gauntlet "$project/validation-summary.md"
+  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/blocked" bash commands/pr-readiness-check.sh --gauntlet blocked-gauntlet "$project/validation-summary.md"
 
 echo '[8/8] checking owned shell syntax and offline isolation'
 bash -n tests/test-gauntlet-flow.sh commands/validate-opencaw.sh \

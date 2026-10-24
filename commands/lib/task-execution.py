@@ -69,7 +69,7 @@ def safe_path(root, relative, required=False):
 def task_dir(root, task, create=False):
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,119}", task):
         raise TaskError("Task name must be a single filesystem-safe identifier.")
-    path = safe_path(root, f".ai/tasks/{task}")
+    path = safe_path(root, f".opencaw/.cache/tasks/{task}")
     if create:
         path.mkdir(parents=True, exist_ok=True)
     return path
@@ -107,9 +107,9 @@ def atomic_write(root, path, data):
 @contextlib.contextmanager
 def task_lock(root):
     # Also serializes OPEN_ISSUES.md read/modify/write across different tasks.
-    parent = safe_path(root, ".ai/tasks")
+    parent = safe_path(root, ".opencaw/.cache/tasks")
     parent.mkdir(parents=True, exist_ok=True)
-    lock = safe_path(root, ".ai/tasks/.execution-lock")
+    lock = safe_path(root, ".opencaw/.cache/tasks/.execution-lock")
     try:
         lock.mkdir()
     except FileExistsError as exc:
@@ -245,7 +245,7 @@ def find_operation(root, repo, marker):
 
 def persist_issue(root, task, issue):
     task_dir(root, task)
-    path = safe_path(root, f".ai/tasks/{task}/TASK.md", required=True)
+    path = safe_path(root, f".opencaw/.cache/tasks/{task}/TASK.md", required=True)
     text = path.read_text(encoding="utf-8")
     url = issue["html_url"]
     bounds = section(text, "Issue")
@@ -259,7 +259,7 @@ def persist_issue(root, task, issue):
         else:
             text = text.rstrip() + "\n\n## Issue\n\n" + url + "\n"
         atomic_write(root, path, text.encode("utf-8"))
-    tracking = safe_path(root, ".ai/tasks/OPEN_ISSUES.md")
+    tracking = safe_path(root, ".opencaw/.cache/tasks/OPEN_ISSUES.md")
     lines = tracking.read_text(encoding="utf-8").splitlines() if tracking.exists() else []
     lines = [line for line in lines if line.lower() != url.lower()]
     if issue["state"] == "open":
@@ -270,7 +270,7 @@ def persist_issue(root, task, issue):
 
 def create_issue(root, task, title=None, body_file=None, reconcile_only=False, retry_reason=None):
     task_dir(root, task)
-    task_path = safe_path(root, f".ai/tasks/{task}/TASK.md", required=True)
+    task_path = safe_path(root, f".opencaw/.cache/tasks/{task}/TASK.md", required=True)
     title = single_line(title or f"Task: {task}", "Issue title")
     if retry_reason:
         single_line(retry_reason, "Explicit retry authorization reason")
@@ -289,7 +289,7 @@ def create_issue(root, task, title=None, body_file=None, reconcile_only=False, r
         repo, repo_id = repository(root)
         operation = digest(f"opencaw:task-issue:v1\0{repo_id}\0{task}".encode())
         marker = f"<!-- opencaw-task-issue:v1 operation={operation} -->"
-        journal = safe_path(root, f".ai/tasks/{task}/operations/create-issue.json")
+        journal = safe_path(root, f".opencaw/.cache/tasks/{task}/operations/create-issue.json")
         state = load_json(root, journal) if journal.exists() else None
         if state is not None and (not isinstance(state, dict) or state.get("version") != 1 or
                 state.get("operation") != operation or state.get("repository_id") != repo_id or
@@ -317,7 +317,7 @@ def create_issue(root, task, title=None, body_file=None, reconcile_only=False, r
             if body is None:
                 bounds = section(text, "Issue")
                 clean = text[:bounds[0]] + text[bounds[1]:] if bounds else text
-                body = f"OpenCaw task issue for `{task}`.\n\nTask file: `.ai/tasks/{task}/TASK.md`\n\n{clean}"
+                body = f"OpenCaw task issue for `{task}`.\n\nTask file: `.opencaw/.cache/tasks/{task}/TASK.md`\n\n{clean}"
             if "<!-- opencaw-task-issue:" in body:
                 raise TaskError("Issue body must not supply an operation marker.")
             body = body.rstrip() + "\n\n" + marker + "\n"
@@ -343,7 +343,7 @@ def create_task(root, task, title, no_issue=False):
     single_line(title or task, "Task title")
     with task_lock(root):
         task_dir(root, task, create=True)
-        target = safe_path(root, f".ai/tasks/{task}/TASK.md")
+        target = safe_path(root, f".opencaw/.cache/tasks/{task}/TASK.md")
         if not target.exists():
             baseline = Path(__file__).resolve().parents[2]
             template = baseline / "skills/create-task-file/references/task-template.md"
@@ -442,7 +442,7 @@ def window_exhausted(window):
 
 
 def operation_states(root, task):
-    directory = safe_path(root, f".ai/tasks/{task}/operations")
+    directory = safe_path(root, f".opencaw/.cache/tasks/{task}/operations")
     result = {}
     if directory.exists():
         for path in sorted(directory.glob("*.json")):
@@ -454,7 +454,7 @@ def operation_states(root, task):
 
 
 def checkpoint_paths(root, task):
-    directory = safe_path(root, f".ai/tasks/{task}/checkpoints")
+    directory = safe_path(root, f".opencaw/.cache/tasks/{task}/checkpoints")
     if not directory.exists():
         return []
     paths = sorted(directory.glob("checkpoint-*.json"))
@@ -468,7 +468,7 @@ def checkpoint_paths(root, task):
 def record_checkpoint(root, args):
     task_dir(root, args.task)
     single_line(args.next_action, "Next action")
-    contract = f".ai/tasks/{args.task}/TASK.md"
+    contract = f".opencaw/.cache/tasks/{args.task}/TASK.md"
     acceptance = args.acceptance or contract
     with task_lock(root):
         history = checkpoint_paths(root, args.task)
@@ -499,7 +499,7 @@ def record_checkpoint(root, args):
         acceptance_rows(safe_path(root, acceptance, required=True).read_text(encoding="utf-8"))
         operations = operation_states(root, args.task)
         paths = sorted(set([contract, acceptance] + args.artifact + args.evidence + list(operations)))
-        prefix = f".ai/tasks/{args.task}/checkpoints/"
+        prefix = f".opencaw/.cache/tasks/{args.task}/checkpoints/"
         if any(str(p).startswith(prefix) for p in paths):
             raise TaskError("Checkpoint records cannot be their own candidate or evidence.")
         head = git_head(root)
@@ -512,7 +512,7 @@ def record_checkpoint(root, args):
                   "evidence": sorted(set(args.evidence)), "files": files, "operations": operations,
                   "status": state, "next_action": args.next_action, "window": window,
                   "window_reauthorization": args.reauthorize_window}
-        directory = safe_path(root, f".ai/tasks/{args.task}/checkpoints")
+        directory = safe_path(root, f".opencaw/.cache/tasks/{args.task}/checkpoints")
         directory.mkdir(parents=True, exist_ok=True)
         target = directory / f"checkpoint-{len(history) + 1:06d}.json"
         atomic_write(root, target, encoded(record))
@@ -525,7 +525,7 @@ def validate_checkpoint(root, task, phase):
     if not history:
         raise TaskError("No checkpoint exists. Inspect the workspace and evidence before recording one.")
     record = load_json(root, history[-1])
-    contract = f".ai/tasks/{task}/TASK.md"
+    contract = f".opencaw/.cache/tasks/{task}/TASK.md"
     if (not isinstance(record, dict) or record.get("version") != 1 or record.get("task") != task or
             record.get("contract") != contract or not isinstance(record.get("files"), dict) or
             not isinstance(record.get("artifacts"), list) or not record["artifacts"] or

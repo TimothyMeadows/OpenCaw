@@ -1,6 +1,7 @@
 ---
 name: light-and-frame-blender-scenes
 description: Design Blender 4.5 cameras, lenses, exposure, lighting rigs, composition, and render framing. Use for scene readability, shot design, product or environment lighting, camera matching, exposure control, and representative final-view review.
+engines: [AGNOSTIC]
 ---
 
 # Light and Frame Blender Scenes

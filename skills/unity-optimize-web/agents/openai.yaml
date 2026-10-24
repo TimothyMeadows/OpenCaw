@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Optimize Web"
+  short_description: "Measure Unity web delivery and runtime budgets"
+  default_prompt: "Use $unity-optimize-web to improve a Unity web build using comparable build, HTTP, browser, memory, and startup evidence."

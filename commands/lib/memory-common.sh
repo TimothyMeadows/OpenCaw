@@ -19,51 +19,79 @@ opencaw_canonical_dir() {
   (cd "$path" && pwd -P)
 }
 
-opencaw_resolve_paths() {
-  local project_root=''
-  local parent_root mount_name parent_git_root root_git_root
+opencaw_assert_project_path() {
+  local target="$1" kind="${2:-file}" relative current part
+  [[ "$target" == "$OPENCAW_PROJECT_ROOT_RESOLVED"/* ]] || { opencaw_fail 'Storage target must stay inside the resolved project.'; return 1; }
+  relative="${target#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+  local -a components
+  IFS='/' read -r -a components <<< "$relative"
+  current="$OPENCAW_PROJECT_ROOT_RESOLVED"
+  for part in "${components[@]}"; do
+    [[ -n "$part" && "$part" != '.' && "$part" != '..' ]] || { opencaw_fail 'Storage paths cannot contain traversal components.'; return 1; }
+    current="$current/$part"
+    [[ ! -L "$current" ]] || { opencaw_fail 'Project storage paths must not traverse symbolic links.'; return 1; }
+    if [[ "$current" != "$target" && -e "$current" && ! -d "$current" ]]; then
+      opencaw_fail 'Project storage parent collides with a file.'
+      return 1
+    fi
+  done
+  if [[ -e "$target" ]]; then
+    if [[ "$kind" == 'dir' && ! -d "$target" ]] || [[ "$kind" == 'file' && ! -f "$target" ]]; then
+      opencaw_fail 'Project storage target has an incompatible file type.'
+      return 1
+    fi
+  fi
+}
 
+opencaw_resolve_paths() {
+  local project_root='' requested_root=''
+  local parent_root mount_name parent_git_root root_git_root
   parent_root="$(cd "$OPENCAW_ROOT/.." && pwd -P)"
   mount_name="$(basename "$OPENCAW_ROOT")"
+  [[ -z "${OPENCAW_PROJECT_ROOT:-}" ]] || requested_root="$(opencaw_canonical_dir "$OPENCAW_PROJECT_ROOT")"
 
-  if [[ -n "${OPENCAW_PROJECT_ROOT:-}" ]]; then
-    project_root="$(opencaw_canonical_dir "$OPENCAW_PROJECT_ROOT")"
+  if [[ "$mount_name" == '.opencaw' ]]; then
+    [[ ! -L "$OPENCAW_ROOT" ]] || { opencaw_fail 'The .opencaw installation must be a real project-local directory, not a symbolic link.'; return 1; }
+    project_root="$parent_root"
+    if [[ -n "$requested_root" && "$requested_root" != "$project_root" ]]; then
+      opencaw_fail 'OPENCAW_PROJECT_ROOT must match the direct parent of the .opencaw installation.'
+      return 1
+    fi
   else
-    case "${mount_name,,}" in
-      .codex|.cursor|.claude)
-        project_root="$parent_root"
-        ;;
-      opencaw)
-        parent_git_root="$(git -C "$parent_root" rev-parse --show-toplevel 2>/dev/null || true)"
-        root_git_root="$(git -C "$OPENCAW_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
-
-        if [[ -n "$parent_git_root" && "$parent_git_root" != "$OPENCAW_ROOT" ]]; then
-          project_root="$(opencaw_canonical_dir "$parent_git_root")"
-        elif [[ -n "$root_git_root" ]]; then
-          project_root="$(opencaw_canonical_dir "$root_git_root")"
-        fi
-        ;;
-      *)
-        root_git_root="$(git -C "$OPENCAW_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
-        if [[ -n "$root_git_root" ]]; then
-          project_root="$(opencaw_canonical_dir "$root_git_root")"
-        fi
-        ;;
-    esac
-  fi
-
-  if [[ -z "$project_root" ]]; then
-    opencaw_fail 'Unable to resolve a safe project root. Set OPENCAW_PROJECT_ROOT to the intended repository root.'
-    return 1
+    # A standalone maintainer checkout can test explicit fixture projects. It is
+    # not a second host installation convention, and cannot select a workspace parent.
+    parent_git_root="$(git -C "$parent_root" rev-parse --show-toplevel 2>/dev/null || true)"
+    root_git_root="$(git -C "$OPENCAW_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
+    [[ -z "$root_git_root" ]] || root_git_root="$(opencaw_canonical_dir "$root_git_root")"
+    if [[ "$mount_name" == .* || "$root_git_root" != "$OPENCAW_ROOT" || -n "$parent_git_root" ]]; then
+      opencaw_fail 'Unable to resolve a safe project root. Fresh host installations must be located directly at <project-root>/.opencaw; other install folders are unsupported.'
+      return 1
+    fi
+    project_root="${requested_root:-$OPENCAW_ROOT}"
   fi
 
   OPENCAW_PROJECT_ROOT_RESOLVED="$project_root"
-  OPENCAW_PROJECT_AI_DIR="$project_root/.ai"
-  OPENCAW_SYSTEM_MEMORY_FILE="$OPENCAW_PROJECT_AI_DIR/SYSTEM_MEMORY.md"
-  OPENCAW_PROJECT_MEMORY_FILE="$OPENCAW_PROJECT_AI_DIR/MEMORY.md"
-  OPENCAW_REPO_MAP_FILE="$OPENCAW_PROJECT_AI_DIR/REPO_MAP.md"
-  OPENCAW_RULES_FILE="$OPENCAW_PROJECT_AI_DIR/RULES.md"
-  OPENCAW_DEBUG_FILE="$OPENCAW_PROJECT_AI_DIR/DEBUG.md"
+  OPENCAW_INSTALL_DIR="$project_root/.opencaw"
+  OPENCAW_PROJECT_CACHE_DIR="$OPENCAW_INSTALL_DIR/.cache"
+  local cache_component
+  for cache_component in "$OPENCAW_INSTALL_DIR" "$OPENCAW_PROJECT_CACHE_DIR"; do
+    if [[ -L "$cache_component" || ( -e "$cache_component" && ! -d "$cache_component" ) ]]; then
+      opencaw_fail 'The fixed .opencaw/.cache path must use real directories without symbolic links or file collisions.'
+      return 1
+    fi
+  done
+  OPENCAW_SYSTEM_MEMORY_FILE="$OPENCAW_PROJECT_CACHE_DIR/SYSTEM_MEMORY.md"
+  OPENCAW_PROJECT_MEMORY_FILE="$OPENCAW_PROJECT_CACHE_DIR/MEMORY.md"
+  OPENCAW_REPO_MAP_FILE="$OPENCAW_PROJECT_CACHE_DIR/REPO_MAP.md"
+  OPENCAW_RULES_FILE="$OPENCAW_PROJECT_CACHE_DIR/RULES.md"
+  OPENCAW_DEBUG_FILE="$OPENCAW_PROJECT_CACHE_DIR/DEBUG.md"
+  local cache_relative
+  for cache_relative in tasks goals gauntlets reports migrations archive archive/tasks archive/goals archive/gauntlets archive/context-snapshots archive/memory archive/memory-v1 FRAGMENTS LEARNINGS; do
+    opencaw_assert_project_path "$OPENCAW_PROJECT_CACHE_DIR/$cache_relative" dir || return 1
+  done
+  for cache_relative in SYSTEM_MEMORY.md MEMORY.md REPO_MAP.md RULES.md DEBUG.md CONTEXT_SUMMARY.md WINDOWS_BASH.md tasks/TODO.md tasks/OPEN_ISSUES.md; do
+    opencaw_assert_project_path "$OPENCAW_PROJECT_CACHE_DIR/$cache_relative" file || return 1
+  done
 }
 
 opencaw_system_defaults() {
@@ -91,7 +119,7 @@ opencaw_ensure_system_memory() {
 }
 
 opencaw_ensure_project_files() {
-  mkdir -p "$OPENCAW_PROJECT_AI_DIR"
+  mkdir -p "$OPENCAW_PROJECT_CACHE_DIR"
   [[ -f "$OPENCAW_PROJECT_MEMORY_FILE" ]] || printf '# Project Memory\n\n' > "$OPENCAW_PROJECT_MEMORY_FILE"
   [[ -f "$OPENCAW_REPO_MAP_FILE" ]] || printf '# Repository Map\n\n<!-- OPENCAW_REPO_MAP_FINGERPRINT: pending -->\n' > "$OPENCAW_REPO_MAP_FILE"
   [[ -f "$OPENCAW_RULES_FILE" ]] || printf '# Rules\n\n' > "$OPENCAW_RULES_FILE"
@@ -229,6 +257,8 @@ opencaw_archive_file() {
   local archive_root="$3"
   local timestamp base archive_file suffix=0
 
+  opencaw_assert_project_path "$file" file
+  opencaw_assert_project_path "$archive_root" dir
   [[ -f "$file" ]] || return 0
   timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
   base="$(basename "$file" .md)"
@@ -238,6 +268,7 @@ opencaw_archive_file() {
     suffix=$((suffix + 1))
     archive_file="$archive_root/${base}-${reason}-${timestamp}-$suffix.md"
   done
+  opencaw_assert_project_path "$archive_file" file
   cp "$file" "$archive_file"
   OPENCAW_LAST_ARCHIVE_FILE="$archive_file"
 }
@@ -248,6 +279,7 @@ opencaw_append_tagged_entry() {
   local entry="$3"
   local line
 
+  opencaw_assert_project_path "$target" file
   opencaw_validate_single_line "$entry" 'Memory entry'
   opencaw_reject_sensitive_text "$entry" project
   opencaw_normalize_tags "$tags"
@@ -277,7 +309,7 @@ opencaw_compute_repo_fingerprint() {
 
   git -C "$project_root" -c core.quotepath=false ls-files --cached --others --exclude-standard \
     | awk -v mount="$mount_relative" '
-        $0 ~ /^\.ai\// { next }
+        $0 ~ /^\.opencaw\// { next }
         mount != "" && ($0 == mount || index($0, mount "/") == 1) { next }
         { print }
       ' \

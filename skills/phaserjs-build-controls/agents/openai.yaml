@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build Controls"
+  short_description: "Implement Phaser player and modal input routing"
+  default_prompt: "Use $phaserjs-build-controls to implement player controls with correct camera coordinates, scene ownership and cancellation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Materials"
+  short_description: "Build renderer-compatible Three.js materials"
+  default_prompt: "Use $threejs-build-materials to implement materials with explicit renderer compatibility, color conventions and measured cost."

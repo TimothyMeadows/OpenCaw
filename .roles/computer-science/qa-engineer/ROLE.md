@@ -43,3 +43,15 @@ Establish trustworthy evidence that important behaviors work, failures are under
 - Partner with `security-engineer` on adversarial fixtures and safe test isolation.
 - Partner with `game-designer` and `gameplay-engineer` on playable-game review evidence.
 - Partner with `project-manager` on readiness gates, issue evidence, and unresolved risk.
+
+## Engine and gameplay production
+
+Resolve ENGINE.md before engine-owned work and use filtered role capabilities. Select compatible feature skills explicitly; shared gameplay design, UI state, accessibility and QA methods remain engine-agnostic. Follow the selected engine's compiler/runtime for game code and independent architecture contracts for services. Record design hypotheses and player evidence, UI focus/modal ownership and HUD lifecycle, and bounded gameplay feedback with explicit clocks and cancellation. Haptic feedback is tactile output owned by the local player/device; unsupported devices, intensity settings, failures and disconnect/reconnect must not determine authoritative gameplay. Browser checks can assess a web build, while native UI and physical vibration need their actual target evidence.
+
+## Unreal specialist handoff
+
+Verify Unreal feature families through native tooling and actual target scenarios, including async teardown, repeated ability grants, authority, movement correction, AI cancellation, feature unload, world/PCG lifecycle, save migrations and interrupted presentation. Keep missing plugins, assets, SDKs and devices blocked/not-run; do not broaden authoring claims from a headless or simulated pass.
+
+## Unity specialist handoff
+
+Verify Unity content, localization, physics/navigation, rendering, UI/audio, Editor/web and selected service scenarios through native tooling plus explicitly labeled offline contracts. Missing Editor, SDK, account, device or approved sandbox blocks the corresponding acceptance claim; no empty or stale report establishes success.

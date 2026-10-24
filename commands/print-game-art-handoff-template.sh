@@ -2,7 +2,12 @@
 set -euo pipefail
 
 asset_type="${1:-game-art-asset}"
-engine="${2:-runtime-engine}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/engine-common.sh"
+resolve_args=()
+[[ -z "${2:-}" ]] || resolve_args+=(--assert-engine "$2")
+selection="$(engine_run resolve "${resolve_args[@]}")"
+engine="$(printf '%s' "$selection" | sed -n 's/.*"effectiveEngine": "\([A-Z]*\)".*/\1/p')"
 
 cat <<EOF
 # Game Art Handoff: ${asset_type}

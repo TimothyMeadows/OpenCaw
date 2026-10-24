@@ -1,6 +1,7 @@
 ---
 name: design-ui-from-constraints
 description: Turn product goals and explicit constraints into a coherent UI direction and variant plan. Use when a user needs layout, hierarchy, typography, color, interaction, responsive, and accessibility decisions before implementation or visual generation.
+engines: [AGNOSTIC]
 ---
 
 # Design Ui From Constraints
@@ -19,6 +20,8 @@ description: Turn product goals and explicit constraints into a coherent UI dire
 4. Produce controlled variants that change one or two major dimensions at a time.
 5. Select a direction using task clarity, originality, feasibility, responsive behavior, and accessibility.
 6. Translate the choice into implementation and validation criteria.
+
+For game interfaces, compose `build-game-ui` to specify safe areas, localization and text-scale variations, screen/modal input ownership, focus restoration, binding-aware prompts, and HUD lifecycle. Resolve the selected engine's UI skill with `resolve-skill.sh` before implementation. Browser examples apply only to an actual browser surface; a native game interface requires its own runtime evidence.
 
 ## Output
 

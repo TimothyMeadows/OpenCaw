@@ -1,6 +1,7 @@
 ---
 name: extract-interaction-patterns
 description: Analyze HTML or a live interface and express its interactions as reusable, framework-neutral behavior contracts. Use when hover, focus, scroll, drag, reveal, navigation, canvas, or state transitions must be documented before implementation or testing.
+engines: [AGNOSTIC]
 ---
 
 # Extract Interaction Patterns

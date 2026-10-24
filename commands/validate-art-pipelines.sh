@@ -10,11 +10,11 @@ root=".styles/.pipelines"
 declare -A paths=(
   [CLOUD]="cloud/PIPELINE.md"
   [LOCAL]="local/PIPELINE.md"
-  [CSS3]="css3/PIPELINE.md"
+  [PROOF_TO_MODEL]="proof-to-model/PIPELINE.md"
   [CODE]="code/PIPELINE.md"
   [BLENDER]="blender/PIPELINE.md"
 )
-for pipeline in CLOUD LOCAL CSS3 CODE BLENDER; do
+for pipeline in CLOUD LOCAL PROOF_TO_MODEL CODE BLENDER; do
   file="$root/${paths[$pipeline]}"
   [[ -f "$file" ]] || { echo "Missing art pipeline contract: $file" >&2; exit 1; }
   heading="$(head -n 1 "$file" | tr -d '\r')"
@@ -30,7 +30,7 @@ grep -Fq 'Blender 4.5 LTS' "$root/blender/PIPELINE.md" || { echo "BLENDER contra
 grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks immutable-source protection." >&2; exit 1; }
 grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
-for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json css3/art-tokens.css code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
+for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json proof-to-model/manifest.schema.json proof-to-model/toolchain.json proof-to-model/recipes/static-prop.json code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
   [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }
 done
 
@@ -47,6 +47,7 @@ const files = [
   '.styles/.pipelines/code/code-character-observation.schema.json',
   '.styles/.pipelines/code/code-character-evidence-report.schema.json'
 ];
+files.push('.styles/.pipelines/proof-to-model/manifest.schema.json', '.styles/.pipelines/proof-to-model/toolchain.json', '.styles/.pipelines/proof-to-model/recipes/static-prop.json');
 for (const file of files) JSON.parse(fs.readFileSync(file, 'utf8'));
 const code = JSON.parse(fs.readFileSync(files[3], 'utf8'));
 const required = ['schemaVersion','modelId','intent','pipelineSelection','inputs','target','renderer','runtime','budgets','reviewPolicy','passes'];
@@ -59,9 +60,6 @@ const observation = JSON.parse(fs.readFileSync(files[5], 'utf8'));
 if (observation.properties.schemaVersion.const !== 'opencaw-code-character-observation/v1') throw new Error('Code character observation schema version is invalid.');
 const evidence = JSON.parse(fs.readFileSync(files[6], 'utf8'));
 if (evidence.properties.schemaVersion.const !== 'opencaw-code-character-evidence/v1') throw new Error('Code character evidence schema version is invalid.');
-const css = fs.readFileSync('.styles/.pipelines/css3/art-tokens.css', 'utf8');
-if (!css.includes(':root') || !css.includes('--art-')) throw new Error('CSS3 token asset is incomplete.');
-if (/url\s*\(|canvas|webgl|data:image/i.test(css)) throw new Error('CSS3 token asset contains a prohibited raster or rendering dependency.');
 NODE
 
 bash commands/validate-media-templates.sh

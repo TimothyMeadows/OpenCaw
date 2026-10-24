@@ -1,6 +1,7 @@
 ---
 name: use-comfyui-local-generation
 description: Provision and run pinned ComfyUI image or audio workflows through official tooling with license checks, loopback isolation, staged outputs, and receipts. Use when the user selects local GPU generation.
+engines: [AGNOSTIC]
 ---
 
 # Use ComfyUI Local Generation

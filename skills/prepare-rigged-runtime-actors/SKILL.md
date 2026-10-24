@@ -1,6 +1,7 @@
 ---
 name: prepare-rigged-runtime-actors
 description: Prepare, integrate, and verify rigged GLB or FBX characters and creatures as production runtime actors. Use when defining skeleton, animation, attachment, collider, asset-budget, provenance, loading, disposal, or gameplay-proof contracts for a skinned 3D actor.
+engines: [AGNOSTIC]
 ---
 
 # Prepare Rigged Runtime Actors

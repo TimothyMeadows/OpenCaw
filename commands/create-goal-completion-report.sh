@@ -42,34 +42,14 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/workflow-path-common.sh"
 opencaw_resolve_paths
 
-resolve_goal_file() {
-  local ref="$1"
-
-  if [[ -f "$ref" ]]; then
-    printf '%s\n' "$ref"
-    return
-  fi
-
-  if [[ -d "$ref" && -f "$ref/GOAL.md" ]]; then
-    printf '%s\n' "$ref/GOAL.md"
-    return
-  fi
-
-  if [[ -f "$OPENCAW_PROJECT_AI_DIR/goals/$ref/GOAL.md" ]]; then
-    printf '%s\n' "$OPENCAW_PROJECT_AI_DIR/goals/$ref/GOAL.md"
-    return
-  fi
-
-  echo "Goal file not found for: $ref" >&2
-  exit 1
-}
-
-goal_file="$(resolve_goal_file "$goal_ref")"
+goal_file="$(opencaw_workflow_file "$goal_ref" goals GOAL.md)"
 goal_dir="$(cd "$(dirname "$goal_file")" && pwd)"
 goal_name="$(basename "$goal_dir")"
 report_file="$goal_dir/GOAL_REPORT.md"
+[[ ! -L "$report_file" ]] || { echo "Goal report must not be a symbolic link: $report_file" >&2; exit 1; }
 
 extract_section() {
   local heading="$1"

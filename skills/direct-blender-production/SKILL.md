@@ -1,6 +1,7 @@
 ---
 name: direct-blender-production
 description: Direct the BLENDER art pipeline through safe Blender 4.5 LTS production from a repository-confined brief to staged, reviewed handoff. Use when starting, resuming, coordinating, or choosing a backend for Blender modeling, texturing, procedural work, rigging, simulation, lighting, rendering, or export.
+engines: [AGNOSTIC]
 ---
 
 # Direct Blender Production
@@ -8,6 +9,8 @@ description: Direct the BLENDER art pipeline through safe Blender 4.5 LTS produc
 ## When to use
 
 Use when a Blender production request spans multiple art stages, needs backend selection or resumption, or requires checkpoint, staging, inspection, and handoff ownership.
+
+For resolved PROOF_TO_MODEL work, route to `build-proof-to-model-assets` and its fixed audited batch scripts. Do not switch pipelines. The connected-authoring rules below govern standalone BLENDER production.
 
 ## Workflow
 

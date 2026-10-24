@@ -175,3 +175,7 @@ Validation may be enforced with:
 - `./commands/validate-style-contract.sh`
 - `./commands/validate-cloud-preferences.sh`
 - `./commands/validate-opencaw.sh`
+
+## Engine-aware entry points
+
+Engine-bearing commands consume `commands/resolve-engine.sh` or the shared `commands/lib/engine-contract.cjs` contract. Guard producers before writes and native/browser launches. Keep read-only historical artifact validation available. Engine selection, art pipeline selection, platform applicability and installed tool prerequisites are separate checks. Resolvers return deterministic JSON and incompatibility reasons with nonzero status. Native tooling guidance never claims execution when a prerequisite is unavailable.

@@ -11,7 +11,7 @@ gauntlet_lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$gauntlet_lib_dir/memory-common.sh"
 opencaw_resolve_paths
 
-OPENCAW_GAUNTLETS_DIR="$OPENCAW_PROJECT_AI_DIR/gauntlets"
+OPENCAW_GAUNTLETS_DIR="$OPENCAW_PROJECT_CACHE_DIR/gauntlets"
 
 gauntlet_fail() {
   echo "$*" >&2
@@ -842,7 +842,7 @@ gauntlet_assert_live_pr_comment() {
     }
   fi
   gauntlet_validate_head_sha "$expected_head_sha" 'QA comment reviewed Head SHA' || return 1
-  [[ "$expected_source" =~ ^\.ai/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
+  [[ "$expected_source" =~ ^\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
     gauntlet_fail "QA comment source is not canonical immutable Gauntlet evidence: $expected_source"
     return 1
   }
@@ -1540,12 +1540,12 @@ gauntlet_assert_safe_ai_path() {
   local project_root parent_canonical
 
   project_root="$(cd "$OPENCAW_PROJECT_ROOT_RESOLVED" && pwd -P)"
-  [[ ! -L "$OPENCAW_PROJECT_AI_DIR" ]] || {
-    gauntlet_fail "The project .ai directory must not be a symbolic link."
+  [[ ! -L "$OPENCAW_PROJECT_CACHE_DIR" ]] || {
+    gauntlet_fail "The project .opencaw/.cache directory must not be a symbolic link."
     return 1
   }
-  [[ "$path" == "$OPENCAW_PROJECT_AI_DIR" || "$path" == "$OPENCAW_PROJECT_AI_DIR"/* ]] || {
-    gauntlet_fail "$label is outside the resolved project .ai directory: $path"
+  [[ "$path" == "$OPENCAW_PROJECT_CACHE_DIR" || "$path" == "$OPENCAW_PROJECT_CACHE_DIR"/* ]] || {
+    gauntlet_fail "$label is outside the resolved project .opencaw/.cache directory: $path"
     return 1
   }
   if [[ -L "$path" ]]; then
@@ -1553,8 +1553,8 @@ gauntlet_assert_safe_ai_path() {
     return 1
   fi
   parent_canonical="$(cd "$(dirname "$path")" && pwd -P)"
-  if [[ "$parent_canonical" != "$project_root/.ai" && "$parent_canonical" != "$project_root/.ai"/* ]]; then
-    gauntlet_fail "$label resolves outside the project .ai directory: $path"
+  if [[ "$parent_canonical" != "$project_root/.opencaw/.cache" && "$parent_canonical" != "$project_root/.opencaw/.cache"/* ]]; then
+    gauntlet_fail "$label resolves outside the project .opencaw/.cache directory: $path"
     return 1
   fi
 }
@@ -1593,7 +1593,7 @@ gauntlet_resolve_file() {
 
   project_root="$(cd "$OPENCAW_PROJECT_ROOT_RESOLVED" && pwd -P)"
   gauntlets_root="$(cd "$OPENCAW_GAUNTLETS_DIR" && pwd -P)"
-  [[ "$gauntlets_root" == "$project_root/.ai/gauntlets" ]] || {
+  [[ "$gauntlets_root" == "$project_root/.opencaw/.cache/gauntlets" ]] || {
     gauntlet_fail "Gauntlet root resolves outside the canonical project path: $OPENCAW_GAUNTLETS_DIR"
     return 1
   }
@@ -2077,27 +2077,27 @@ gauntlet_equal_time_failure_precedes() {
   earlier_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$earlier_path"
   later_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$later_path"
 
-  if [[ "$earlier_path" == .ai/gauntlets/*/pr-events/*/event-*.md \
-    && "$later_path" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$later_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
     gauntlet_progress_pr_event_precedes "$gauntlet_file" "$earlier_path" "$later_path"
     return
   fi
-  if [[ "$earlier_path" == .ai/gauntlets/*/rounds/*/round-*.md \
-    && "$later_path" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md \
+    && "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     gauntlet_round_event_precedes "$gauntlet_file" "$earlier_path" "$later_path"
     return
   fi
 
-  if [[ "$later_path" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     later_root="$(gauntlet_section_field "$later_file" 'Round Metadata' 'Remediation root')"
     [[ "$later_root" == "$earlier_path" ]]
     return
   fi
-  if [[ "$later_path" == .ai/gauntlets/*/pr-events/*/event-*.md \
-    && "$earlier_path" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$later_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$earlier_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     later_round="$(gauntlet_section_field "$later_file" 'PR Event Metadata' 'Critic round')"
     [[ "$later_round" == "$earlier_path" ]] && return 0
-    if [[ "$later_round" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+    if [[ "$later_round" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
       gauntlet_round_event_precedes "$gauntlet_file" "$earlier_path" "$later_round"
       return
     fi
@@ -2105,8 +2105,8 @@ gauntlet_equal_time_failure_precedes() {
 
   # A QA failure explicitly consumes its critic round. This reverse lookup is
   # useful when the failure candidates happen to be visited in the other order.
-  if [[ "$earlier_path" == .ai/gauntlets/*/pr-events/*/event-*.md \
-    && "$later_path" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     earlier_round="$(gauntlet_section_field "$earlier_file" 'PR Event Metadata' 'Critic round')"
     [[ "$earlier_round" == "$later_path" ]] && return 1
   fi
@@ -2138,7 +2138,7 @@ gauntlet_parse_publication_checkpoint_marker() {
   local body="$1"
   local marker marker_count publication_count
 
-  marker="$(printf '%s\n' "$body" | grep -Eo '<!-- opencaw-gauntlet-publication:v1 checkpoint=\.ai/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md checkpoint-sha256=[0-9a-f]{64} -->' || true)"
+  marker="$(printf '%s\n' "$body" | grep -Eo '<!-- opencaw-gauntlet-publication:v1 checkpoint=\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md checkpoint-sha256=[0-9a-f]{64} -->' || true)"
   marker_count="$(printf '%s\n' "$marker" | sed '/^$/d' | wc -l | tr -d '[:space:]')"
   publication_count="$(printf '%s\n' "$body" | grep -Fo '<!-- opencaw-gauntlet-publication:' | wc -l | tr -d '[:space:]')"
   [[ "$marker_count" -eq 1 && "$publication_count" -eq 1 ]] || {
@@ -2202,9 +2202,9 @@ gauntlet_resolve_remediation_trigger_file() {
   }
   gauntlet_name="$(basename "$gauntlet_dir")"
   [[ "$gauntlet_name" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ \
-    && ( "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
-      || "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ \
-      || "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ) ]] || {
+    && ( "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+      || "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ \
+      || "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ) ]] || {
     gauntlet_fail "Remediation trigger is not canonical immutable evidence for $gauntlet_name: $trigger"
     return 1
   }
@@ -2319,7 +2319,7 @@ gauntlet_remediation_root_for_trigger() {
   esac
   trigger_file="$(gauntlet_resolve_remediation_trigger_file \
     "$gauntlet_file" "$trigger")" || return 1
-  if [[ "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
+  if [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
     trigger_item="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Item')"
     trigger_event="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Verdict')"
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Recorded at')"
@@ -2350,7 +2350,7 @@ gauntlet_remediation_root_for_trigger() {
     printf '%s\n' "$trigger"
     return 0
   fi
-  if [[ "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
+  if [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
     affected="$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Affected units')"
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Recorded at')"
     if [[ -n "$consumer_cutoff" \
@@ -2379,7 +2379,7 @@ gauntlet_remediation_root_for_trigger() {
     printf '%s\n' "$trigger"
     return 0
   fi
-  [[ "$trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]] || {
+  [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]] || {
     gauntlet_fail "Remediation trigger cannot resolve a canonical root: $trigger"
     return 1
   }
@@ -2427,7 +2427,7 @@ gauntlet_resolve_remediation_root() {
   trigger="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Remediation trigger')"
   checkpoint="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Publication checkpoint')"
   checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$checkpoint"
-  [[ "$checkpoint" =~ ^\.ai/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ ]] || {
+  [[ "$checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ ]] || {
     gauntlet_fail "Opened remediation evidence lacks a safe publication checkpoint cutoff: ${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
     return 1
   }
@@ -2580,7 +2580,7 @@ gauntlet_closed_cycle_contains_failure() {
 
   gauntlet_dir="$(cd "$(dirname "$gauntlet_file")" && pwd -P)"
   gauntlet_name="$(basename "$gauntlet_dir")"
-  [[ "$closed_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]] || return 1
+  [[ "$closed_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]] || return 1
   closed_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$closed_relative"
   [[ -f "$closed_file" && ! -L "$closed_file" \
     && "$(gauntlet_section_field "$closed_file" 'PR Event Metadata' 'Event')" == 'closed' \
@@ -2591,7 +2591,7 @@ gauntlet_closed_cycle_contains_failure() {
 
   opened_file="$(gauntlet_opened_event_for_pr "$gauntlet_dir" "$item_id" "$closed_pr")" || return 1
   opened_relative="${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
-  [[ "$opened_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+  [[ "$opened_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
     && -f "$opened_file" && ! -L "$opened_file" \
     && "$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Event')" == 'opened' \
     && "$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2601,10 +2601,10 @@ gauntlet_closed_cycle_contains_failure() {
   gauntlet_progress_pr_event_precedes \
     "$gauntlet_file" "$opened_relative" "$closed_relative" || return 1
 
-  if [[ "$failure_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]]; then
+  if [[ "$failure_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]]; then
     round_failure=1
     round_relative="$failure_relative"
-  elif [[ "$failure_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]]; then
+  elif [[ "$failure_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]]; then
     qa_relative="$failure_relative"
     qa_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$qa_relative"
   else
@@ -2626,7 +2626,7 @@ gauntlet_closed_cycle_contains_failure() {
     [[ "$qa_count" -eq 1 ]] || return 1
   fi
 
-  [[ "$qa_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+  [[ "$qa_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
     && -f "$qa_file" && ! -L "$qa_file" \
     && "$(gauntlet_section_field "$qa_file" 'PR Event Metadata' 'Event')" == 'qa-fail' \
     && "$(gauntlet_section_field "$qa_file" 'PR Event Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2640,7 +2640,7 @@ gauntlet_closed_cycle_contains_failure() {
     round_relative="$qa_round"
   fi
 
-  [[ "$round_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]] || return 1
+  [[ "$round_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]] || return 1
   round_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$round_relative"
   [[ -f "$round_file" && ! -L "$round_file" \
     && "$(gauntlet_section_field "$round_file" 'Round Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2681,7 +2681,7 @@ gauntlet_trace_remediation_trigger() {
     [[ "$resolved_root" != "$expected_failure" ]] || return 0
     trigger="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Remediation trigger')"
     trace_record="$resolved_root"
-    [[ "$trace_record" =~ ^\.ai/gauntlets/[^/]+/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+    [[ "$trace_record" =~ ^\.opencaw/\.cache/gauntlets/[^/]+/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
       && "$seen" != *"|$trace_record|"* ]] || {
       gauntlet_fail "Remediation trigger chain does not reach the latest applicable failure for $item_id: $trigger (resolved root: $trace_record)"
       return 1
@@ -2730,11 +2730,11 @@ gauntlet_failure_has_merged_remediation() {
 
   gauntlet_dir="$(cd "$(dirname "$gauntlet_file")" && pwd -P)"
   failure_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$failure_relative"
-  if [[ "$failure_relative" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     failure_heading='Round Metadata'
     failure_item="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Item')"
     [[ "$failure_item" == 'integration' ]] || failure_pr="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Progress PR')"
-  elif [[ "$failure_relative" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+  elif [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
     failure_heading='PR Event Metadata'
     failure_item="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Item')"
     failure_event="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Event')"
@@ -2799,13 +2799,13 @@ gauntlet_failure_has_merged_remediation() {
       if [[ "$failure_time" < "$round_time" ]]; then
         failure_precedes_round=1
       elif [[ "$failure_time" == "$round_time" ]]; then
-        if [[ "$failure_relative" == .ai/gauntlets/*/rounds/*/round-*.md ]]; then
+        if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
           gauntlet_round_event_precedes \
             "$gauntlet_file" "$failure_relative" "$critic_round" \
             && failure_precedes_round=1
-        elif [[ "$failure_relative" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+        elif [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
           failure_critic_round="$(gauntlet_section_field "$failure_file" 'PR Event Metadata' 'Critic round')"
-          if [[ "$failure_critic_round" == .ai/gauntlets/*/rounds/*/round-*.md ]] \
+          if [[ "$failure_critic_round" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]] \
             && gauntlet_round_event_precedes \
               "$gauntlet_file" "$failure_critic_round" "$critic_round" \
             && gauntlet_progress_pr_event_precedes \
@@ -2822,7 +2822,7 @@ gauntlet_failure_has_merged_remediation() {
       if [[ "$failure_time" < "$opened_time" ]]; then
         failure_precedes_opened=1
       elif [[ "$failure_time" == "$opened_time" ]]; then
-        if [[ "$failure_relative" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+        if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
           gauntlet_progress_pr_event_precedes \
             "$gauntlet_file" "$failure_relative" "$opened_relative" \
             && failure_precedes_opened=1

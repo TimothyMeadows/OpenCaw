@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Animate Actors"
+  short_description: "Integrate Three.js actor clips and transitions"
+  default_prompt: "Use $threejs-animate-actors to integrate actor animation with explicit clock, movement and resource ownership."

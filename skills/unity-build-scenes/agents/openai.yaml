@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Build Scenes"
+  short_description: "Build Scenes for Unity projects"
+  default_prompt: "Use $unity-build-scenes for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

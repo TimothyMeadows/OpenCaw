@@ -55,6 +55,12 @@ for (const skillDir of skillDirs) {
   const declaredName = nameMatch ? nameMatch[1].trim() : '';
   if (declaredName !== expectedName) error(skillDir, `frontmatter name '${declaredName}' does not match folder '${expectedName}'`);
 
+  try { require(path.resolve('commands/lib/engine-contract.cjs')).classify(expectedName); }
+  catch (e) {
+    // Imported standalone fixtures are audited for safety without activation metadata.
+    if (path.dirname(skillDir) === path.resolve('skills')) error(skillDir, e.message);
+  }
+
   const agentsFile = path.join(skillDir, 'agents', 'openai.yaml');
   if (!fs.existsSync(agentsFile)) {
     error(skillDir, 'missing required agents/openai.yaml interface metadata');

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Integrate Multiplayer Services"
+  short_description: "Own Unity sessions, matchmaking and reconnect"
+  default_prompt: "Use $unity-integrate-multiplayer-services to implement the selected session workflow with explicit transport and cancellation ownership."

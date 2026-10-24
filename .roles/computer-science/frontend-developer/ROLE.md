@@ -40,8 +40,16 @@ Build maintainable web interfaces that preserve design intent across devices, in
 
 # Collaboration
 
-- Partner with `web-experience-designer` on hierarchy, interaction, motion, and responsive intent.
+- Partner with `game-designer` and game-art roles on interface hierarchy, interaction, motion, and responsive intent.
 - Partner with `qa-engineer` on browser coverage, accessibility checks, and repeatable evidence.
 - Partner with `security-engineer` on untrusted content, browser boundaries, and dependency risk.
 - Partner with `technical-writer` on component guidance and user-facing behavior.
 
+
+## Engine and gameplay production
+
+Resolve ENGINE.md before engine-owned work and use filtered role capabilities. Select compatible feature skills explicitly; shared gameplay design, UI state, accessibility and QA methods remain engine-agnostic. Follow the selected engine's compiler/runtime for game code and independent architecture contracts for services. Record design hypotheses and player evidence, UI focus/modal ownership and HUD lifecycle, and bounded gameplay feedback with explicit clocks and cancellation. Haptic feedback is tactile output owned by the local player/device; unsupported devices, intensity settings, failures and disconnect/reconnect must not determine authoritative gameplay. Browser checks can assess a web build, while native UI and physical vibration need their actual target evidence.
+
+## Unity specialist handoff
+
+Compose Unity UI with localized content, sprite assets, native Editor UI tooling and web optimization as required. Retain selected uGUI/UI Toolkit, local-player focus and HUD lifetimes; Editor windows and browser evidence do not certify a native game interface.

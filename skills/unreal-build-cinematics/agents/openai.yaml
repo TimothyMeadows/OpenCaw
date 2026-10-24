@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Cinematics"
+  short_description: "Own Sequencer playback and restoration"
+  default_prompt: "Use $unreal-build-cinematics to integrate selected Unreal sequences with validated bindings, explicit clocks and interruption-safe state restoration."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Build UI"
+  short_description: "Build accessible Babylon GUI game interfaces"
+  default_prompt: "Use $babylonjs-build-ui to implement GUI screens with synchronized state, accessible equivalents and isolated input."

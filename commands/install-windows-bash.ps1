@@ -147,13 +147,44 @@ function Resolve-Provider {
 function Resolve-ProjectRoot {
     param([string]$RequestedRoot)
 
-    if (-not $RequestedRoot) {
-        return $null
+    $baselineRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+    $baselineName = Split-Path -Leaf $baselineRoot
+    $baselineParent = Split-Path -Parent $baselineRoot
+    $requested = if ($RequestedRoot) {
+        if (-not (Test-Path -LiteralPath $RequestedRoot -PathType Container)) {
+            throw "Project root does not exist: $RequestedRoot"
+        }
+        (Resolve-Path -LiteralPath $RequestedRoot).Path
+    } else { $null }
+
+    if ($baselineName -ceq '.opencaw') {
+        if ($requested -and -not $requested.Equals($baselineParent, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw 'ProjectRoot must match the direct parent of the .opencaw installation.'
+        }
+        $resolved = $baselineParent
+    } else {
+        # Source checkouts support maintainer verification; hosts install only .opencaw.
+        if ($baselineName.StartsWith('.') -or -not (Test-Path -LiteralPath (Join-Path $baselineRoot '.git'))) {
+            throw 'Fresh host installations must be located directly at <project-root>/.opencaw.'
+        }
+        $ancestor = $baselineParent
+        while ($ancestor) {
+            if (Test-Path -LiteralPath (Join-Path $ancestor '.git')) {
+                throw 'Nested OpenCaw installations must use <project-root>/.opencaw.'
+            }
+            $nextAncestor = Split-Path -Parent $ancestor
+            if ($nextAncestor -eq $ancestor) { break }
+            $ancestor = $nextAncestor
+        }
+        $resolved = if ($requested) { $requested } else { $baselineRoot }
     }
-    if (-not (Test-Path -LiteralPath $RequestedRoot -PathType Container)) {
-        throw "Project root does not exist: $RequestedRoot"
+    foreach ($component in @((Join-Path $resolved '.opencaw'), (Join-Path $resolved '.opencaw/.cache'))) {
+        $item = Get-Item -LiteralPath $component -Force -ErrorAction SilentlyContinue
+        if ($item -and ((($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or -not $item.PSIsContainer)) {
+            throw 'The fixed .opencaw/.cache path requires real directories without links or file collisions.'
+        }
     }
-    return (Resolve-Path -LiteralPath $RequestedRoot).Path
+    return $resolved
 }
 
 function Invoke-OpenCawScaffold {
@@ -217,6 +248,8 @@ if (-not (Test-OpenCawWindows)) {
     exit 0
 }
 
+$resolvedRoot = if ($RunScaffold) { Resolve-ProjectRoot -RequestedRoot $ProjectRoot } else { $null }
+
 $selected = Resolve-Provider -RequestedProvider $Provider
 if (-not $selected -and $Install) {
     $installProvider = if ($Provider -eq 'Auto') { 'GitBash' } else { $Provider }
@@ -251,7 +284,6 @@ Write-Output "WINDOWS_BASH_COMMAND=$($selected.Command)"
 Write-Output 'WINDOWS_BASH_INSTALL_REQUIRED=false'
 
 if ($RunScaffold) {
-    $resolvedRoot = Resolve-ProjectRoot -RequestedRoot $ProjectRoot
     Invoke-OpenCawScaffold -SelectedProvider $selected -ResolvedProjectRoot $resolvedRoot
     if ($WhatIfPreference) {
         Write-Output 'OPENCAW_SCAFFOLD_RUN=planned'

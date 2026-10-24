@@ -3,32 +3,17 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/workflow-path-common.sh"
 opencaw_resolve_paths
 
 task_ref="${1:-}"
 
 if [[ -z "$task_ref" ]]; then
-  echo 'Usage: ./commands/archive-task-context.sh "<task-name|.ai/tasks/<task-name>/TASK.md>"' >&2
+  echo 'Usage: ./commands/archive-task-context.sh "<task-name|.opencaw/.cache/tasks/<task-name>/TASK.md>"' >&2
   exit 1
 fi
 
-if [[ "$task_ref" == */TASK.md ]]; then
-  task_file="$task_ref"
-elif [[ "$task_ref" == *.md ]]; then
-  task_file="$task_ref"
-else
-  task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_ref/TASK.md"
-fi
-
-if [[ "$task_file" != "$OPENCAW_PROJECT_AI_DIR"/tasks/*/TASK.md && "$task_file" != */.ai/tasks/*/TASK.md ]]; then
-  echo "Task file must be under .ai/tasks: $task_file" >&2
-  exit 1
-fi
-
-if [[ ! -f "$task_file" ]]; then
-  echo "Task file not found: $task_file" >&2
-  exit 1
-fi
+task_file="$(opencaw_workflow_file "$task_ref" tasks TASK.md)"
 
 task_name="$(basename "$(dirname "$task_file")")"
 
@@ -39,11 +24,15 @@ if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
   exit 0
 fi
 
-archive_dir="$OPENCAW_PROJECT_AI_DIR/archive/tasks"
+archive_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/tasks"
+for path in "$OPENCAW_PROJECT_CACHE_DIR/archive" "$archive_dir"; do
+  [[ ! -L "$path" ]] || { echo "Archive path must not be a symbolic link: $path" >&2; exit 1; }
+done
 mkdir -p "$archive_dir"
 
 timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
 archive_file="$archive_dir/${task_name}-${timestamp}.md"
+[[ ! -L "$archive_file" ]] || { echo "Archive file must not be a symbolic link: $archive_file" >&2; exit 1; }
 cp "$task_file" "$archive_file"
 
 extract_first_line_in_section() {

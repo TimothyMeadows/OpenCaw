@@ -1,6 +1,7 @@
 ---
 name: select-art-pipeline
-description: Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER for a visual task from a task-local prompt override or STYLE.md, record selection evidence, and stop on failure instead of switching pipelines. Use for visual implementation, generated imagery, CSS/SVG art, authored Three.js models, or Blender production.
+description: Resolve CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER for a visual task from a task-local prompt override or STYLE.md, record selection evidence, and stop on failure instead of switching pipelines. Use for 2D-to-3D assets, generated imagery, authored Three.js models, or Blender production. CSS/SVG interface work uses the style contract without selecting a retired pipeline.
+engines: [AGNOSTIC]
 ---
 
 # Select Art Pipeline
@@ -8,17 +9,18 @@ description: Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER for a visual task from
 ## When to use
 
 - Starting any visual or art-production request governed by `STYLE.md`.
-- A prompt explicitly requests image generation, local ComfyUI, CSS/vector art, code-first Three.js models, or Blender production.
+- A prompt explicitly requests proof-to-model assets, image generation, local ComfyUI, code-first Three.js models, or Blender production.
+- CSS/SVG interface-only work follows style guidance independently; do not start reconstruction or resolve a retired vector pipeline.
 - Explaining which pipeline is active without changing the repository contract.
 
 ## Workflow
 
 1. Read and validate `STYLE.md` with `./commands/validate-style-contract.sh`.
-2. Normalize explicit prompt language to `CLOUD`, `LOCAL`, `CSS3`, `CODE`, or `BLENDER`. A prompt override may select any registered pipeline, including one outside the contract's allowed alternatives.
+2. Normalize explicit prompt language to `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, or `BLENDER`. A prompt override may select any registered pipeline, including one outside the contract's allowed alternatives.
 3. Resolve the prompt override before the primary pipeline with `./commands/resolve-art-pipeline.sh`. If no override exists, use the primary pipeline in `STYLE.md`.
-4. For an override, write the resolver evidence below the active `.ai/tasks/<task>/` folder. Preserve `selectionSource: prompt` and the active style-contract hash.
+4. For an override, write the resolver evidence below the active `.opencaw/.cache/tasks/<task>/` folder. Preserve `selectionSource: prompt` and the active style-contract hash.
 5. Read the resolved pipeline contract under `.styles/.pipelines/` and follow it together with the selected art-style template.
-6. For `CLOUD` or `LOCAL` image generation, also read `MEDIA.md`. `CSS3`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it for Blender only when cloud/local generated inputs are also in scope.
+6. For `CLOUD` or `LOCAL` image generation, also read `MEDIA.md`. Existing-proof `PROOF_TO_MODEL`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Route PROOF_TO_MODEL to `build-proof-to-model-assets`; never implicitly invoke a generator.
 7. If the selected capability is unavailable or fails, stop and report the failure.
 
 ## Output
@@ -32,10 +34,10 @@ description: Resolve CLOUD, LOCAL, CSS3, CODE, or BLENDER for a visual task from
 
 - Do not rewrite `STYLE.md` for a task-local prompt override.
 - Do not silently switch or fall back between pipelines.
-- Do not require `MEDIA.md` for `CSS3`, `CODE`, or ordinary `BLENDER` work.
-- Keep selection evidence below `.ai/tasks/` and never persist credentials.
+- Do not require `MEDIA.md` for existing-proof `PROOF_TO_MODEL`, `CODE`, or ordinary `BLENDER` work. Reject retired CSS3/CSS/vector/css-vector pipeline aliases and explain migration.
+- Keep selection evidence below `.opencaw/.cache/tasks/` and never persist credentials.
 
 ## Commands
 
-- `./commands/resolve-art-pipeline.sh [--style STYLE.md] [--override PIPELINE] [--json] [--evidence .ai/tasks/<task>/pipeline-selection.json]`
+- `./commands/resolve-art-pipeline.sh [--style STYLE.md] [--override PIPELINE] [--json] [--evidence .opencaw/.cache/tasks/<task>/pipeline-selection.json]`
 - `./commands/validate-style-contract.sh [STYLE.md]`

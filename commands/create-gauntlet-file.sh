@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/create-gauntlet-file.sh "<name>" ["Title"] --task "<task-name>" [--dry-run]
 
-Creates <project-root>/.ai/gauntlets/<name>/GAUNTLET.md linked to an existing
+Creates <project-root>/.opencaw/.cache/gauntlets/<name>/GAUNTLET.md linked to an existing
 parent task. The command copies the task's GitHub issue URL when one is present.
 EOF
 }
@@ -69,9 +69,9 @@ if [[ $dry_run -eq 0 ]]; then
   brainstorm_require_delivery_creation_allowed 'Gauntlet creation'
 fi
 
-task_file="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/TASK.md"
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_AI_DIR/tasks" 'Task root'
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_AI_DIR/tasks/$task_name" 'Parent task directory'
+task_file="$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name/TASK.md"
+gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks" 'Task root'
+gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name" 'Parent task directory'
 [[ -f "$task_file" && ! -L "$task_file" ]] || {
   echo "Parent task file not found: $task_file" >&2
   exit 1
@@ -115,7 +115,7 @@ write_gauntlet() {
 
 ## Parent Task
 - Task name: $task_name
-- Task file: \`.ai/tasks/$task_name/TASK.md\`
+- Task file: \`.opencaw/.cache/tasks/$task_name/TASK.md\`
 - Issue: $issue_url
 
 ## Objective

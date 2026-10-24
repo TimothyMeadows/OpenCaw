@@ -1,6 +1,7 @@
 ---
 name: upgrade-dotnet-runtime
 description: Execute and verify .NET runtime/framework upgrades with minimal behavioral drift.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

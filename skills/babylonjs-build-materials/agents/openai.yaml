@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Build Materials"
+  short_description: "Author Babylon PBR and shader materials"
+  default_prompt: "Use $babylonjs-build-materials to create reproducible materials with correct texture channels and renderer evidence."

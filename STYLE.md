@@ -6,10 +6,10 @@ Generated from OpenCaw style templates:
 - CEL_SHADED_COMIC
 
 Primary OpenCaw art pipeline:
-- CSS3
+- PROOF_TO_MODEL
 
 Allowed OpenCaw art pipelines:
-- CSS3
+- PROOF_TO_MODEL
 - CLOUD
 - LOCAL
 - CODE
@@ -19,7 +19,7 @@ Allowed OpenCaw art pipelines:
 
 ## Art Pipeline Policy
 
-- Use CSS3 unless the current user prompt explicitly selects another registered art pipeline.
+- Use PROOF_TO_MODEL unless the current user prompt explicitly selects another registered art pipeline.
 - A prompt override applies only to that task and does not rewrite this STYLE.md.
 - Stop if the selected pipeline is unavailable or fails. Never switch or fall back to another pipeline silently.
 
@@ -31,7 +31,7 @@ Read `./.styles/CEL_SHADED_COMIC.md` instructions
 
 ## Read Art Pipeline Instructions
 
-Read `./.styles/.pipelines/css3/PIPELINE.md` instructions
+Read `./.styles/.pipelines/proof-to-model/PIPELINE.md` instructions
 Read `./.styles/.pipelines/cloud/PIPELINE.md` instructions
 Read `./.styles/.pipelines/local/PIPELINE.md` instructions
 Read `./.styles/.pipelines/code/PIPELINE.md` instructions

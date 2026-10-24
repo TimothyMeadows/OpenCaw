@@ -1,6 +1,7 @@
 ---
 name: rig-and-animate-blender-actors
 description: Rig, skin, constrain, and animate Blender 4.5 characters and creatures for verified handoff. Use for armatures, weights, IK/FK, constraints, actions, NLA, root motion, sockets, deformation review, and preparation for runtime actor delivery.
+engines: [AGNOSTIC]
 ---
 
 # Rig and Animate Blender Actors

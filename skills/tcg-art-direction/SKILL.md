@@ -1,6 +1,7 @@
 ---
 name: tcg-art-direction
 description: Plan original trading card game and card-battler visual direction for TCG/CCG card frames, card illustrations, board styling, tokens/minions, hand/deck/graveyard zones, VFX, and Hearthstone-like fantasy tabletop polish while keeping references IP-safe.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

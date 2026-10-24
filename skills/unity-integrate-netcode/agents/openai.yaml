@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Integrate Netcode"
+  short_description: "Integrate Netcode for Unity projects"
+  default_prompt: "Use $unity-integrate-netcode for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

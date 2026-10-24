@@ -1,6 +1,7 @@
 ---
 name: comment-issue-test-results
 description: Post QA and Playwright verification evidence to the linked task issue, including result summary and screenshot references.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

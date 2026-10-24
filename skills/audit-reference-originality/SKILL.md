@@ -1,6 +1,7 @@
 ---
 name: audit-reference-originality
 description: Compare a design or digital experience with supplied references and identify evidence-backed originality risk across copy, branding, assets, layout, motion, and implementation. Use when work was inspired by references and must preserve common design grammar without retaining distinctive expression.
+engines: [AGNOSTIC]
 ---
 
 # Audit Reference Originality

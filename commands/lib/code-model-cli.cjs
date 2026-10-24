@@ -36,6 +36,22 @@ function relativeInside(root, value, label, mustExist = false) {
     fail(`${label} must stay inside the project root.`);
   }
 
+  // Validate each existing component, including the mount and private cache.
+  // Realpath containment alone would allow a link to another project directory.
+  let current = root;
+  for (const segment of relative.split(path.sep)) {
+    current = path.join(current, segment);
+    let stat;
+    try { stat = fs.lstatSync(current); }
+    catch (error) {
+      if (['EACCES', 'EPERM', 'ELOOP'].includes(error.code)) {
+        fail(`${label} must not be a symbolic link or traverse symbolic links. Cannot inspect a path component (${error.code}); a symbolic link or permission boundary may prevent inspection. Use an accessible regular project path.`);
+      }
+      if (error.code !== 'ENOENT') throw error;
+    }
+    if (stat?.isSymbolicLink()) fail(`${label} must not be a symbolic link or traverse symbolic links.`);
+  }
+
   if (mustExist) {
     if (!fs.existsSync(candidate)) fail(`${label} does not exist: ${value}`);
     const real = fs.realpathSync(candidate);
@@ -300,9 +316,9 @@ function create(root, values) {
   const modelId = options._[0];
   if (!MODEL_ID_PATTERN.test(modelId)) fail('Model id must use lowercase kebab-case.');
   requireString(options.brief, '--brief');
-  const outputValue = options.output ?? `.ai/tasks/${modelId}/code-model.json`;
+  const outputValue = options.output ?? `.opencaw/.cache/tasks/${modelId}/code-model.json`;
   const output = relativeInside(root, outputValue, 'Manifest output');
-  if (!output.relative.startsWith('.ai/tasks/')) fail('Manifest output must stay below .ai/tasks.');
+  if (!output.relative.startsWith('.opencaw/.cache/tasks/')) fail('Manifest output must stay below .opencaw/.cache/tasks.');
   const sourceValue = options.source ?? `src/models/${modelId}.ts`;
   const source = relativeInside(root, sourceValue, 'Target source path');
   if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(source.relative)) fail('Target source path must be a TypeScript or JavaScript file.');
@@ -475,9 +491,10 @@ function record(root, values) {
 }
 
 function main() {
-  const [operation, rootArg, ...values] = process.argv.slice(2);
+  let [operation, rootArg, ...values] = process.argv.slice(2);
   if (!operation || !rootArg) fail('Internal invocation requires an operation and project root.');
   const root = rootPath(rootArg);
+  if (['create', 'record', 'next'].includes(operation)) values = require('./engine-contract.cjs').codeProduction(root, 'model', operation, values);
   if (operation === 'create') return create(root, values);
   if (operation === 'validate') return validate(root, values);
   if (operation === 'next') return next(root, values);

@@ -1,6 +1,7 @@
 ---
 name: build-procedural-blender-scenes
 description: Build deterministic Blender 4.5 Geometry Nodes systems, modular kits, instanced assemblies, and procedural set dressing. Use for reproducible scene generation, seed policy, instance ownership, realization decisions, modular placement, and procedural export handoff.
+engines: [AGNOSTIC]
 ---
 
 # Build Procedural Blender Scenes

@@ -6,7 +6,8 @@ usage() {
 Usage: ./commands/resolve-art-pipeline.sh [--style STYLE.md] [--override PIPELINE] [--json] [--evidence FILE]
 
 Resolves an explicit task prompt override before the primary pipeline in STYLE.md.
-An evidence file must be stored below the resolved project .ai/tasks directory.
+An evidence file must be stored below the resolved project .opencaw/.cache/tasks directory.
+For an isolated CODE prototype, pass --engine-evidence FILE --engine-output SOURCE.
 EOF
 }
 
@@ -14,8 +15,12 @@ style_file=''
 override=''
 json=0
 evidence=''
+engine_evidence=''
+engine_output=''
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --engine-evidence) [[ $# -ge 2 ]] || exit 1; engine_evidence="$2"; shift 2 ;;
+    --engine-output) [[ $# -ge 2 ]] || exit 1; engine_output="$2"; shift 2 ;;
     --style) [[ $# -ge 2 ]] || { echo "--style requires a path" >&2; exit 1; }; style_file="$2"; shift 2 ;;
     --override) [[ $# -ge 2 ]] || { echo "--override requires a pipeline" >&2; exit 1; }; override="$2"; shift 2 ;;
     --json) json=1; shift ;;
@@ -41,6 +46,16 @@ else
   pipeline="$(awk '/^Primary OpenCaw art pipeline:/ { read=1; next } /^Allowed OpenCaw art pipelines:/ { read=0 } read && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print; exit }' "$style_file")"
   [[ -n "$pipeline" ]] || { echo "STYLE.md has no primary art pipeline." >&2; exit 1; }
   selection_source='style'
+fi
+
+# CODE is a Three.js producer contract; engine choice never reinterprets it.
+if [[ "$pipeline" == 'CODE' ]]; then
+  engine_args=(--require-engine THREEJS)
+  if [[ -n "$engine_evidence" ]]; then
+    [[ -n "$engine_output" ]] || { echo "An engine override requires --engine-output." >&2; exit 1; }
+    engine_args+=(--evidence "$engine_evidence" --output "$engine_output")
+  fi
+  bash "$script_dir/resolve-engine.sh" "${engine_args[@]}" >/dev/null
 fi
 
 style_sha256="$(art_pipeline_sha256_file "$style_file")"
@@ -78,10 +93,10 @@ const fs = require('fs');
 const path = require('path');
 const [rootArg, outputArg, serialized] = process.argv.slice(2);
 const root = fs.realpathSync(rootArg);
-const tasks = fs.realpathSync(path.join(root, '.ai', 'tasks'));
+const tasks = fs.realpathSync(path.join(root, '.opencaw/.cache', 'tasks'));
 const output = path.resolve(outputArg);
 const rel = path.relative(tasks, output);
-if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) throw new Error('Evidence output must stay below .ai/tasks.');
+if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) throw new Error('Evidence output must stay below .opencaw/.cache/tasks.');
 const parent = path.dirname(output);
 let ancestor = parent;
 while (!fs.existsSync(ancestor)) {
@@ -90,10 +105,10 @@ while (!fs.existsSync(ancestor)) {
   ancestor = next;
 }
 const realAncestor = fs.realpathSync(ancestor);
-if (realAncestor !== tasks && !realAncestor.startsWith(tasks + path.sep)) throw new Error('Evidence parent escapes .ai/tasks.');
+if (realAncestor !== tasks && !realAncestor.startsWith(tasks + path.sep)) throw new Error('Evidence parent escapes .opencaw/.cache/tasks.');
 fs.mkdirSync(parent, { recursive: true });
 const realParent = fs.realpathSync(parent);
-if (realParent !== tasks && !realParent.startsWith(tasks + path.sep)) throw new Error('Evidence parent escapes .ai/tasks.');
+if (realParent !== tasks && !realParent.startsWith(tasks + path.sep)) throw new Error('Evidence parent escapes .opencaw/.cache/tasks.');
 if (fs.existsSync(output) && fs.lstatSync(output).isSymbolicLink()) throw new Error('Evidence output must not be a symbolic link.');
 fs.writeFileSync(output, serialized, { encoding: 'utf8', flag: 'w' });
 NODE

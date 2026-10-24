@@ -1,6 +1,7 @@
 ---
 name: post-pr-qa
 description: Run mode-aware QA immediately after a confirmed task, Goal, or Gauntlet PR is available, then post pass/fail evidence to the PR with inline screenshot references.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

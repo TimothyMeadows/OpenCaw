@@ -1,6 +1,7 @@
 ---
 name: build-webgl-experiences
 description: Design and implement purposeful WebGL features with clear ownership, bounded rendering cost, responsive lifecycle, accessible fallback, and deterministic validation. Use for interactive 3D, particles, data scenes, immersive backgrounds, or shader effects that materially improve a web experience.
+engines: [AGNOSTIC]
 ---
 
 # Build Webgl Experiences

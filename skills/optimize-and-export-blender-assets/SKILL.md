@@ -1,6 +1,7 @@
 ---
 name: optimize-and-export-blender-assets
 description: Measure, optimize, package, and export Blender 4.5 assets to GLB, FBX, USD, or Alembic with engine-neutral verification. Use for budgets, LODs, collision proxies, transforms, dependencies, format selection, export staging, and runtime handoff.
+engines: [AGNOSTIC]
 ---
 
 # Optimize and Export Blender Assets

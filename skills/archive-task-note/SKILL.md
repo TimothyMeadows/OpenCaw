@@ -1,6 +1,7 @@
 ---
 name: archive-task-note
-description: Archive a host repository task note into `.ai/archive/tasks` for traceability.
+description: Archive a host repository task note into `.opencaw/.cache/archive/tasks` for traceability.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

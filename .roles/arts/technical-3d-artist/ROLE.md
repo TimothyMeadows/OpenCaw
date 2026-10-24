@@ -44,3 +44,15 @@ Turn authored 3D characters and creatures into coherent, performant, traceable r
 - Partner with `game-designer` on anticipation, contact, recovery, root motion, and gameplay readability.
 - Partner with `game-vfx-artist` and audio roles on stable effect and feedback events.
 - Partner with `qa-engineer` on deterministic compatibility, lifecycle, performance, and playthrough evidence.
+
+## Engine and gameplay production
+
+Resolve ENGINE.md before engine-owned work and use filtered role capabilities. Select compatible feature skills explicitly; shared gameplay design, UI state, accessibility and QA methods remain engine-agnostic. Follow the selected engine's compiler/runtime for game code and independent architecture contracts for services. Record design hypotheses and player evidence, UI focus/modal ownership and HUD lifecycle, and bounded gameplay feedback with explicit clocks and cancellation. Haptic feedback is tactile output owned by the local player/device; unsupported devices, intensity settings, failures and disconnect/reconnect must not determine authoritative gameplay. Browser checks can assess a web build, while native UI and physical vibration need their actual target evidence.
+
+## Unreal specialist handoff
+
+For Unreal, use compatible procedural-content and cinematic feature owners for generated runtime geometry and sequence-bound asset motion. Preserve native package identities, original source ancestry, stable bindings and measurable runtime handoff evidence.
+
+## Unity specialist handoff
+
+Use Unity rendering, content, Editor-tool and web owners for import identity, graph/inspector tooling, runtime export integration and measured asset delivery. Preserve native asset authoring, undo/save boundaries and actual target rendering review.

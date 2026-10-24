@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Movement"
+  short_description: "Build Unreal locomotion and movement correction"
+  default_prompt: "Use $unreal-build-movement for the selected Unreal project with one locomotion authority, bounded prediction and scoped native evidence."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Build Shaders"
+  short_description: "Build Shaders for Godot projects"
+  default_prompt: "Use $godot-build-shaders for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

@@ -1,6 +1,7 @@
 ---
 name: optimize-web-games
 description: Measure and improve web-game CPU, GPU, memory, loading, input, rendering, and mobile behavior using repeatable scenes and explicit budgets. Use for frame drops, thermal cost, long-session degradation, oversized assets, touch issues, or release performance gates.
+engines: [AGNOSTIC]
 ---
 
 # Optimize Web Games
@@ -31,3 +32,7 @@ description: Measure and improve web-game CPU, GPU, memory, loading, input, rend
 - Do not reduce gameplay readability to meet a frame target without design review.
 - Do not compare different scenes or device states as if they were equivalent.
 - Do not hide leaks behind periodic scene reloads.
+
+## Engine and feedback budgets
+
+Resolve ENGINE.md and compatible feature skills before engine APIs. Declare target device, build, frame/CPU/GPU/memory/loading budgets and measurement windows; do not impose universal 60 FPS. Measure representative UI layout, HUD lifecycle, overlapping effects and shader/audio/haptic requests, including disabled accessibility settings and interruption. Browser profiling requires a browser build; native engines need native tooling. Feedback cannot determine authoritative outcomes and physical haptics require hardware evidence.

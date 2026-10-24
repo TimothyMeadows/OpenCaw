@@ -14,6 +14,9 @@ Options:
   --reviewer-type VALUE        agent or human
   --reviewer-packet FILE       Required for reviewer gates and repeated as reviewer-packet evidence
   --observed-answer TEXT       Reviewer's answer to the frozen gate question
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 

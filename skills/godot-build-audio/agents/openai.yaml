@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Build Audio"
+  short_description: "Build Audio for Godot projects"
+  default_prompt: "Use $godot-build-audio for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unreal Build Multiplayer"
+  short_description: "Build Multiplayer for Unreal projects"
+  default_prompt: "Use $unreal-build-multiplayer for the selected Unreal project with explicit engine compatibility, native ownership, and verification evidence."
+

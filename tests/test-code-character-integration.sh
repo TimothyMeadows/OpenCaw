@@ -19,8 +19,8 @@ for file in \
   .styles/.pipelines/code/code-character-evidence-report.schema.json \
   commands/measure-code-character-evidence.sh \
   commands/record-code-character-calibration.sh \
-  skills/build-threejs-code-characters/SKILL.md \
-  skills/review-threejs-code-characters/SKILL.md; do
+  skills/threejs-build-code-characters/SKILL.md \
+  skills/threejs-review-code-characters/SKILL.md; do
   [[ -f "$file" && ! -L "$file" ]] || fail "missing public character capability: $file"
 done
 require_text README.md 'measure-code-character-evidence.sh analyze'
@@ -37,16 +37,16 @@ const map = JSON.parse(fs.readFileSync('.roles/ROLE_SKILL_MAP.json', 'utf8'));
 const builders = ['arts/technical-3d-artist', 'computer-science/frontend-developer', 'computer-science/gameplay-engineer'];
 const reviewers = ['arts/technical-3d-artist', 'computer-science/qa-engineer', 'computer-science/game-designer'];
 for (const role of builders) {
-  if (!map[role].skills.includes('build-threejs-code-characters')) throw new Error(`Builder skill missing from ${role}.`);
+  if (!map[role].skills.includes('threejs-build-code-characters')) throw new Error(`Builder skill missing from ${role}.`);
   if (!map[role].commands.includes('commands/measure-code-character-evidence.sh')) throw new Error(`Evidence command missing from ${role}.`);
   if (!map[role].commands.includes('commands/record-code-character-calibration.sh')) throw new Error(`Calibration command missing from ${role}.`);
 }
-for (const role of reviewers) if (!map[role].skills.includes('review-threejs-code-characters')) throw new Error(`Reviewer skill missing from ${role}.`);
+for (const role of reviewers) if (!map[role].skills.includes('threejs-review-code-characters')) throw new Error(`Reviewer skill missing from ${role}.`);
 for (const role of ['computer-science/frontend-developer', 'computer-science/gameplay-engineer']) {
-  if (map[role].skills.includes('review-threejs-code-characters')) throw new Error(`Builder-only role also owns reviewer skill: ${role}.`);
+  if (map[role].skills.includes('threejs-review-code-characters')) throw new Error(`Builder-only role also owns reviewer skill: ${role}.`);
 }
 for (const role of ['computer-science/qa-engineer', 'computer-science/game-designer']) {
-  if (map[role].skills.includes('build-threejs-code-characters')) throw new Error(`Reviewer-only role also owns builder skill: ${role}.`);
+  if (map[role].skills.includes('threejs-build-code-characters')) throw new Error(`Reviewer-only role also owns builder skill: ${role}.`);
 }
 NODE
 

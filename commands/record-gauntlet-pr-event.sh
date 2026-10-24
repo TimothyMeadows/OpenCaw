@@ -208,7 +208,7 @@ gauntlet_parse_publication_checkpoint_marker "$GAUNTLET_GH_BODY"
 publication_checkpoint="$GAUNTLET_PUBLICATION_CHECKPOINT"
 publication_checkpoint_hash="$GAUNTLET_PUBLICATION_CHECKPOINT_SHA256"
 publication_checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$publication_checkpoint"
-[[ "$publication_checkpoint" =~ ^\.ai/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ \
+[[ "$publication_checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ \
   && -f "$publication_checkpoint_file" && ! -L "$publication_checkpoint_file" \
   && "$publication_checkpoint_hash" == "$(gauntlet_hash_file "$publication_checkpoint_file")" ]] || {
   echo 'Progress PR publication marker does not bind canonical immutable checkpoint evidence.' >&2
@@ -555,7 +555,7 @@ if [[ -d "$event_dir" ]]; then
 fi
 next_event=$((max_event + 1))
 printf -v event_label '%03d' "$next_event"
-event_relative=".ai/gauntlets/$gauntlet_name/pr-events/$item_id/event-$event_label.md"
+event_relative=".opencaw/.cache/gauntlets/$gauntlet_name/pr-events/$item_id/event-$event_label.md"
 event_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$event_relative"
 [[ ! -e "$event_target" && ! -L "$event_target" ]] || { echo "PR event evidence already exists: $event_relative" >&2; exit 1; }
 

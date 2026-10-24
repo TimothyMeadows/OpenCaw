@@ -21,24 +21,24 @@ if WSL_INTEROP='' opencaw_is_windows_host 'Darwin' 'Darwin kernel'; then fail 'm
 
 echo '[2/4] generating Windows-only scaffold guidance'
 fixture="$temp_root/project"
-mkdir -p "$fixture/.codex/commands/lib"
-cp commands/create-host-ai-scaffold.sh "$fixture/.codex/commands/create-host-ai-scaffold.sh"
-cp commands/install-windows-bash.ps1 "$fixture/.codex/commands/install-windows-bash.ps1"
-cp commands/lib/memory-common.sh "$fixture/.codex/commands/lib/memory-common.sh"
-cp commands/lib/platform-common.sh "$fixture/.codex/commands/lib/platform-common.sh"
-chmod +x "$fixture/.codex/commands/create-host-ai-scaffold.sh"
+mkdir -p "$fixture/.opencaw/commands/lib"
+cp commands/create-host-ai-scaffold.sh "$fixture/.opencaw/commands/create-host-ai-scaffold.sh"
+cp commands/install-windows-bash.ps1 "$fixture/.opencaw/commands/install-windows-bash.ps1"
+cp commands/lib/memory-common.sh "$fixture/.opencaw/commands/lib/memory-common.sh"
+cp commands/lib/platform-common.sh "$fixture/.opencaw/commands/lib/platform-common.sh"
+chmod +x "$fixture/.opencaw/commands/create-host-ai-scaffold.sh"
 
-WSL_INTEROP='fixture' bash "$fixture/.codex/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-first.log"
-guidance="$fixture/.ai/WINDOWS_BASH.md"
+WSL_INTEROP='fixture' bash "$fixture/.opencaw/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-first.log"
+guidance="$fixture/.opencaw/.cache/WINDOWS_BASH.md"
 [[ -f "$guidance" ]] || fail 'Windows scaffold guidance was not created'
-grep -Fq './.codex/commands/install-windows-bash.ps1' "$guidance" || fail 'mounted installer path is incorrect'
+grep -Fq './.opencaw/commands/install-windows-bash.ps1' "$guidance" || fail 'mounted installer path is incorrect'
 grep -Fq -- '-Provider GitBash -Install' "$guidance" || fail 'native Git Bash install guidance is missing'
 grep -Fq -- '-Provider WSL -Install' "$guidance" || fail 'WSL install guidance is missing'
 grep -Fq 'never installs software automatically' "$guidance" || fail 'explicit-install safety guidance is missing'
 
 echo '[3/4] preserving scaffold idempotence'
 guidance_fingerprint="$(sha256sum "$guidance" | awk '{print $1}')"
-WSL_INTEROP='fixture' bash "$fixture/.codex/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-second.log"
+WSL_INTEROP='fixture' bash "$fixture/.opencaw/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-second.log"
 [[ "$(sha256sum "$guidance" | awk '{print $1}')" == "$guidance_fingerprint" ]] || fail 'Windows guidance changed on an idempotent scaffold run'
 [[ "$(grep -c '^# Windows Bash Setup$' "$guidance")" -eq 1 ]] || fail 'Windows guidance was duplicated'
 

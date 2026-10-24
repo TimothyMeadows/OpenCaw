@@ -6,7 +6,7 @@ cd "$repo_root"
 runtime_dir="$(mktemp -d "$repo_root/tests/.external-assets-runtime-XXXXXX")"
 project="$runtime_dir/project"
 library="$runtime_dir/External Library"
-mkdir -p "$project/.ai/tasks/library-test" "$library/characters/Hero Rig/textures" "$library/props" "$library/bad-bundle"
+mkdir -p "$project/.opencaw/.cache/tasks/library-test" "$library/characters/Hero Rig/textures" "$library/props" "$library/bad-bundle"
 
 cleanup() {
   local resolved
@@ -60,7 +60,7 @@ list_json="$(project_command bash commands/list-external-asset-libraries.sh --js
 grep -Fq '"id": "studio"' <<< "$list_json" || fail 'JSON list omitted studio'
 grep -Fq '"readOnly": true' <<< "$list_json" || fail 'JSON list omitted read-only state'
 
-project_command bash commands/generate-style.sh --pipeline CSS3 CEL_SHADED_COMIC >/dev/null
+project_command bash commands/generate-style.sh --pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
 contains_exact_line "- studio: \`$library\`" "$project/STYLE.md" || fail 'style regeneration did not preserve studio'
 contains_exact_line '- windows: `C:\Shared Assets\Models`' "$project/STYLE.md" || fail 'style regeneration did not preserve windows'
 contains_exact_line '- unc: `\\server\share\models`' "$project/STYLE.md" || fail 'style regeneration did not preserve UNC path'
@@ -106,20 +106,20 @@ expect_failure "$runtime_dir/missing-root.log" bash commands/inspect-external-as
 
 echo '[4/7] copying a single asset with hash-bound task evidence'
 project_command bash commands/generate-style.sh --asset-library "studio=$library" CEL_SHADED_COMIC >/dev/null
-copy_result="$(project_command bash commands/copy-external-asset.sh studio props/crate.glb --evidence .ai/tasks/library-test/crate-copy.json)"
+copy_result="$(project_command bash commands/copy-external-asset.sh studio props/crate.glb --evidence .opencaw/.cache/tasks/library-test/crate-copy.json)"
 crate_copy="$project/assets/models/studio/props/crate.glb"
 [[ -f "$crate_copy" ]] || fail 'single asset was not copied to its deterministic destination'
 [[ "$(hash_file "$crate_copy")" == "$source_hash_before" ]] || fail 'copied asset hash differs from source'
 grep -Fq '"sourceReadOnly": true' <<< "$copy_result" || fail 'copy output omitted source read-only state'
-grep -Fq '"destination": "assets/models/studio/props/crate.glb"' "$project/.ai/tasks/library-test/crate-copy.json" || fail 'copy evidence destination is wrong'
-grep -Fq "$source_hash_before" "$project/.ai/tasks/library-test/crate-copy.json" || fail 'copy evidence omitted hash'
-! grep -Fq "$library" "$project/.ai/tasks/library-test/crate-copy.json" || fail 'copy evidence duplicated the absolute library root'
+grep -Fq '"destination": "assets/models/studio/props/crate.glb"' "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence destination is wrong'
+grep -Fq "$source_hash_before" "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence omitted hash'
+! grep -Fq "$library" "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence duplicated the absolute library root'
 [[ "$(hash_file "$library/props/crate.glb")" == "$source_hash_before" ]] || fail 'copy mutated source bytes'
 [[ "$(stat -c '%Y:%s' "$library/props/crate.glb")" == "$source_stat_before" ]] || fail 'copy mutated source metadata'
 expect_failure "$runtime_dir/overwrite.log" bash commands/copy-external-asset.sh studio props/crate.glb
 
 echo '[5/7] copying complete bundles and rejecting unsafe sources'
-project_command bash commands/copy-external-asset.sh studio 'characters/Hero Rig' --evidence .ai/tasks/library-test/hero-copy.json >/dev/null
+project_command bash commands/copy-external-asset.sh studio 'characters/Hero Rig' --evidence .opencaw/.cache/tasks/library-test/hero-copy.json >/dev/null
 hero_copy="$project/assets/models/studio/characters/Hero Rig"
 [[ -f "$hero_copy/hero.blend" && -f "$hero_copy/walk.bvh" && -f "$hero_copy/textures/hero.png" ]] || fail 'complete asset bundle was not copied'
 [[ -w "$hero_copy/hero.blend" ]] || fail 'project-local template copy is not writable'

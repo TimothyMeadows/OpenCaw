@@ -11,6 +11,9 @@ Options:
   --evidence VIEW=FILE    Repeatable; passing non-planar reviews require front and two orbit views
   --character-profile FILE
                           Require current character gates for PASS before accepting a pass decision
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 

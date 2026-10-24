@@ -1,6 +1,7 @@
 ---
 name: clean-context
 description: Clean and compress host-repository context by compacting completed task files, deduplicating memory/rules/debug notes, and refreshing a high-signal context summary. Use after finishing tasks, before handoff, or when context artifacts become noisy.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -26,3 +27,4 @@ Use when active context has grown noisy and you need to keep only high-signal ar
 - Prefer summarization over destruction.
 - Keep system memory flat and project memory tagged, concise, and high-value.
 - Preserve traceability through the resolved project archive and report directories.
+- All context lives under `<project-root>/.opencaw/.cache/`. This ignored directory holds durable project state; its name never authorizes deleting it as a disposable tool cache.

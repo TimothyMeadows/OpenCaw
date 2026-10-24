@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Proof to Model Assets"
+  short_description: "Finish approved 2D proofs as reviewed 3D assets"
+  default_prompt: "Use $build-proof-to-model-assets to run the native proof-to-3D workflow with hashed lineage and review gates."

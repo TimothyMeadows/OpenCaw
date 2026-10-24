@@ -1,6 +1,7 @@
 ---
 name: plan-hybrid-game-assets
 description: Plan a traceable game asset pipeline across procedural, imported, generated, sprite, UI, audio, VFX, and fallback media. Use when choosing how an asset should be created, licensed, optimized, integrated, reviewed, and handed off to a runtime.
+engines: [AGNOSTIC]
 ---
 
 # Plan Hybrid Game Assets

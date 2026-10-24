@@ -1,6 +1,7 @@
 ---
 name: model-blender-assets
 description: Model, sculpt, retopologize, and clean production Blender 4.5 assets. Use for blockouts, hard-surface or organic meshes, topology repair, silhouette refinement, deformation topology, and game-ready modeling checkpoints.
+engines: [AGNOSTIC]
 ---
 
 # Model Blender Assets

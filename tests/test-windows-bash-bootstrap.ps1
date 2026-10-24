@@ -43,6 +43,29 @@ try {
     Assert-True ($discoveryOutput -contains "WINDOWS_BASH_COMMAND=$fakeBash") 'resolved Git Bash path was not reported'
     Assert-True ($discoveryOutput -contains 'OPENCAW_SCAFFOLD_RUN=false') 'discovery unexpectedly ran the scaffold'
 
+    $hostFixture = Join-Path $tempRoot 'fresh-host'
+    $installedCommands = Join-Path $hostFixture '.opencaw/commands'
+    New-Item -ItemType Directory -Path $installedCommands -Force | Out-Null
+    $installedScript = Join-Path $installedCommands 'install-windows-bash.ps1'
+    Copy-Item -LiteralPath $installer -Destination $installedScript
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'commands/create-host-ai-scaffold.sh') -Destination $installedCommands
+    $fixedOutput = @(& $installedScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $hostFixture -WhatIf)
+    Assert-True ($fixedOutput -contains 'OPENCAW_SCAFFOLD_RUN=planned') 'fixed .opencaw install was not accepted'
+    $mismatchRejected = $false
+    try { & $installedScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $tempRoot -WhatIf | Out-Null }
+    catch { $mismatchRejected = $_.Exception.Message -match 'direct parent' }
+    Assert-True $mismatchRejected 'PowerShell accepted an unrelated project root'
+    foreach ($folder in @('.codex', '.claude', '.cursor', 'arbitrary-install')) {
+        $invalidCommands = Join-Path $hostFixture "$folder/commands"
+        New-Item -ItemType Directory -Path $invalidCommands -Force | Out-Null
+        $invalidScript = Join-Path $invalidCommands 'install-windows-bash.ps1'
+        Copy-Item -LiteralPath $installer -Destination $invalidScript
+        $rejected = $false
+        try { & $invalidScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $hostFixture -WhatIf | Out-Null }
+        catch { $rejected = $_.Exception.Message -match '\.opencaw' }
+        Assert-True $rejected "PowerShell accepted invalid installation folder $folder"
+    }
+
     $plannedOutput = @(& $installer -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $repoRoot -WhatIf)
     Assert-True ($plannedOutput -contains 'OPENCAW_SCAFFOLD_RUN=planned') 'WhatIf did not report a planned scaffold run'
 

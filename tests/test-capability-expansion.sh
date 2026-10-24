@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+validation_args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --exclude-gauntlet) validation_args+=(--exclude-gauntlet); shift ;;
+    -h|--help)
+      echo 'Usage: ./tests/test-capability-expansion.sh [--exclude-gauntlet]'
+      echo 'Passes --exclude-gauntlet to the integrated validator; all other capability checks still run.'
+      exit 0 ;;
+    *) echo "Unknown argument: $1" >&2; exit 1 ;;
+  esac
+done
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
@@ -55,12 +67,12 @@ new_skills=(
   audit-untrusted-agent-source adapt-external-agent-skills verify-and-explain audit-reference-originality
   capture-ui-reference-pack derive-visual-spec-from-video extract-interaction-patterns develop-original-brand-directions
   prototype-from-reference-pack capture-full-page-evidence produce-browser-demo profile-application-performance
-  source-licensed-visual-assets design-ui-from-constraints design-web-experiences design-conversion-pages
+  source-licensed-visual-assets design-ui-from-constraints
   build-accessible-motion-systems build-interactive-web-effects build-webgl-experiences optimize-web-motion
   author-game-worlds design-action-gameplay build-gameplay-runtime build-game-production-tools plan-hybrid-game-assets
   create-game-vfx optimize-web-games test-playable-games ship-web-games
 )
-[[ ${#new_skills[@]} -eq 29 ]] || fail "new skill list does not contain 29 entries"
+[[ ${#new_skills[@]} -eq 27 ]] || fail "new skill list does not contain 27 entries"
 for skill in "${new_skills[@]}"; do
   file="skills/$skill/SKILL.md"
   [[ -f "$file" ]] || fail "missing $file"
@@ -84,7 +96,20 @@ grep -Eq 'symbolic|cross-runtime' "$temp_root/unsafe-symlink.log" || fail "skill
 
 echo "[3/9] validating roles, mappings, and styles"
 bash commands/resolve-role.sh gameplay-engineer >/dev/null
-bash commands/resolve-role.sh web-experience-designer >/dev/null
+bash commands/resolve-role.sh game-designer >/dev/null
+# Retired capabilities must stay absent from the game-production baseline.
+for skill in apim-change-review azure-settings-checklist function-app-checklist servicebus-checklist storage-checklist design-conversion-pages design-web-experiences build-scroll-authored-web-experiences; do
+  [[ ! -e "skills/$skill" ]] || fail "retired skill remains: $skill"
+done
+for role in computer-science/ai-data-remediation-engineer computer-science/data-engineer computer-science/incident-response-commander computer-science/threat-detection-engineer computer-science/embedded-firmware-engineer computer-science/solidity-smart-contract-engineer arts/web-experience-designer; do
+  [[ ! -e ".roles/$role" ]] || fail "retired role remains: $role"
+  expect_failure "$temp_root/retired-role.log" bash commands/resolve-role.sh "$role"
+  grep -q 'RESOLUTION=not_found' "$temp_root/retired-role.log" || fail "retired role did not resolve as absent: $role"
+done
+[[ ! -e commands/print-web-experience-brief.sh ]] || fail "retired web brief remains"
+for role in project-manager researcher frontend-developer backend-architect security-engineer devops-automator database-optimizer mobile-app-builder; do
+  bash commands/resolve-role.sh "$role" >/dev/null
+done
 bash commands/validate-roles.sh
 bash commands/validate-role-skill-map.sh
 bash commands/validate-styles.sh
@@ -202,7 +227,7 @@ else
 fi
 
 echo "[9/9] validating integrated OpenCaw structure"
-bash commands/validate-opencaw.sh
+bash commands/validate-opencaw.sh "${validation_args[@]}"
 git_check_bin="$(command -v git.exe 2>/dev/null || command -v git)"
 "$git_check_bin" diff --check
 echo "Capability expansion tests passed."

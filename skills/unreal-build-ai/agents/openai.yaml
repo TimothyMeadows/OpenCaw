@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build AI"
+  short_description: "Build cancellable Unreal AI and navigation"
+  default_prompt: "Use $unreal-build-ai for the selected Unreal project with explicit decision ownership, bounded queries and native cancellation evidence."

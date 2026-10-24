@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Worlds"
+  short_description: "Author streaming worlds with verified lifetimes"
+  default_prompt: "Use $unreal-build-worlds to author streaming, data layers and build evidence for the selected Unreal world within the resolved engine scope."

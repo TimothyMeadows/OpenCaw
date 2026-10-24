@@ -6,7 +6,7 @@ usage() {
 Usage: ./commands/generate-style.sh [--inline] [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] [--asset-library ID=ABSOLUTE_PATH ... | --clear-asset-libraries] "<STYLE1>" ["STYLE2" ...]
 
 Defaults to concise link-based output in ../STYLE.md.
-CSS3 is the default primary art pipeline when --pipeline is omitted.
+PROOF_TO_MODEL is the default primary art pipeline when --pipeline is omitted.
 Existing external asset libraries are preserved unless explicitly replaced or cleared.
 Use --inline to embed full style template contents.
 EOF
@@ -137,8 +137,8 @@ for name in "${styles[@]}"; do
   selected+=("$upper_name")
 done
 
-primary_pipeline="$(art_pipeline_normalize "${primary_pipeline:-CSS3}")" || {
-  echo "Unknown art pipeline: ${primary_pipeline:-CSS3}" >&2
+primary_pipeline="$(art_pipeline_normalize "${primary_pipeline:-PROOF_TO_MODEL}")" || {
+  echo "Unknown art pipeline: ${primary_pipeline:-PROOF_TO_MODEL}" >&2
   exit 1
 }
 

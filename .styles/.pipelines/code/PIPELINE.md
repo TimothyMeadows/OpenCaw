@@ -16,7 +16,7 @@ Author procedural Three.js models as reviewable TypeScript or JavaScript instead
 - Build geometry, materials, semantic parts, pivots, anchors, and optional animation behavior in source code.
 - Keep procedural variation deterministic through explicit seeds.
 - Work through `blockout`, `structure`, `form`, `materials`, `interaction`, and `optimization` passes in order.
-- Route embodied characters, creatures, and runtime actors through `build-threejs-code-characters`; keep props and environments in the generic `build-threejs-code-models` workflow.
+- Route embodied characters, creatures, and runtime actors through `threejs-build-code-characters`; keep props and environments in the generic `threejs-build-code-models` workflow.
 - Pass each linked character gate before its generic CODE pass. Keep blockout, form, and material/style acceptance with an independent reviewer; machine evidence owns only structure, interaction/runtime, and optimization/budget facts.
 - Preserve model state outside the Three.js scene graph and expose cleanup for every owned GPU resource.
 - Treat references as review evidence rather than runtime dependencies.
@@ -44,4 +44,4 @@ Author procedural Three.js models as reviewable TypeScript or JavaScript instead
 
 ## Role Fit
 
-Use generic model production with `technical-3d-artist`, `frontend-developer`, `web-experience-designer`, `senior-developer`, and Three.js-capable game roles. Character building belongs to technical-3D, frontend, and gameplay roles; concrete-cycle visual review belongs to a distinct technical-3D, QA, or game-design identity.
+Use generic model production with `technical-3d-artist`, `frontend-developer`, `senior-developer`, and Three.js-capable game roles. Character building belongs to technical-3D, frontend, and gameplay roles; concrete-cycle visual review belongs to a distinct technical-3D, QA, or game-design identity.

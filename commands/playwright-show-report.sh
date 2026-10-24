@@ -2,9 +2,12 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-host_root="${OPENCAW_HOST_ROOT:-$(pwd)}"
+source "$script_dir/lib/memory-common.sh"
+OPENCAW_PROJECT_ROOT="${OPENCAW_HOST_ROOT:-${OPENCAW_PROJECT_ROOT:-}}"
+opencaw_resolve_paths
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 report_dir="${1:-playwright-report}"
-output_dir="${2:-.ai/reports}"
+output_dir="${2:-.opencaw/.cache/reports}"
 
 cd "$host_root"
 mkdir -p "$output_dir"

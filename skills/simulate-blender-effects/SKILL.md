@@ -1,6 +1,7 @@
 ---
 name: simulate-blender-effects
 description: Author deterministic Blender 4.5 cloth, hair, rigid-body, particle, fluid, smoke, and volume effects with controlled caches. Use for simulation setup, collision ownership, bake policy, reproducibility, cache verification, and rendered or game-VFX handoff.
+engines: [AGNOSTIC]
 ---
 
 # Simulate Blender Effects

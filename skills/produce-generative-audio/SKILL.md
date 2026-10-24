@@ -1,6 +1,7 @@
 ---
 name: produce-generative-audio
 description: Produce reviewed generative music, sound effects, or voice candidates with rights, consent, loudness, duration, looping, provenance, and runtime constraints. Use when planning or generating audio media.
+engines: [AGNOSTIC]
 ---
 
 # Produce Generative Audio

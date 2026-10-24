@@ -1,6 +1,7 @@
 ---
 name: verify-and-explain
 description: Audit a claim or implementation, prove what can be proven with concrete evidence, and explain the result in clear audience-appropriate language. Use for reviews, validation summaries, change explanations, test reports, and technical findings that must distinguish fact from inference.
+engines: [AGNOSTIC]
 ---
 
 # Verify And Explain
@@ -20,7 +21,7 @@ description: Audit a claim or implementation, prove what can be proven with conc
 5. Explain the outcome from impact to cause to proof to next action.
 6. Match vocabulary and depth to the named audience without removing material risk.
 7. For multi-condition claims, use the [acceptance and evidence matrix](references/acceptance-evidence-matrix.md) to make coverage, freshness, contradictions, and unknowns explicit.
-8. For checkpointed ordinary tasks, follow the [execution contract](../create-task-file/references/execution-contract.md). Run `commands/validate-task-checkpoint.sh <task> --phase resume` before trusting a handoff and `--phase complete` before completion/readiness. Inspect external observations again when their freshness matters.
+8. For checkpointed ordinary tasks, follow the execution contract at `skills/create-task-file/references/execution-contract.md`. Run `commands/validate-task-checkpoint.sh <task> --phase resume` before trusting a handoff and `--phase complete` before completion/readiness. Inspect external observations again when their freshness matters.
 
 ## Output
 

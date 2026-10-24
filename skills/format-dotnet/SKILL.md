@@ -1,6 +1,7 @@
 ---
 name: format-dotnet
 description: Run dotnet format against the host repository.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

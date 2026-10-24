@@ -1,6 +1,7 @@
 ---
 name: pr-readiness-gate
 description: Record mode-aware PR readiness, requiring human confirmation for normal task and Gauntlet promotion PRs while preserving the scoped Goal and approved Gauntlet-progress publication paths.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

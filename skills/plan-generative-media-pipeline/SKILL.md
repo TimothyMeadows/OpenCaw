@@ -1,6 +1,7 @@
 ---
 name: plan-generative-media-pipeline
 description: Plan reproducible CLOUD or LOCAL media execution with explicit pipeline selection, budgets, provenance, staging, review, and promotion gates. Use when configuring image, music, sound-effect, or voice generation.
+engines: [AGNOSTIC]
 ---
 
 # Plan Generative Media Pipeline
@@ -30,6 +31,6 @@ description: Plan reproducible CLOUD or LOCAL media execution with explicit pipe
 
 - Never persist API keys, access tokens, credential-bearing URLs, or vendor account data.
 - Never switch between `CLOUD` and `LOCAL` silently.
-- Do not require `MEDIA.md` for `CSS3`, `CODE`, or ordinary `BLENDER` work; use it for Blender only when cloud/local generated inputs are in scope.
+- Do not require `MEDIA.md` for existing-proof `PROOF_TO_MODEL`, `CODE`, or ordinary `BLENDER` work; read it whenever cloud/local generated inputs are in scope.
 - Do not treat generated candidates as approved runtime assets.
 - Do not proceed when input rights or required identity and voice consent are unclear.

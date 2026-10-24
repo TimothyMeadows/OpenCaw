@@ -1,6 +1,7 @@
 ---
 name: build-game-production-tools
 description: Build reversible game-content tools that derive from authoritative source, isolate drafts, validate imports and exports, and require reviewed integration. Use for map editors, encounter editors, changelog tooling, review modes, content inspectors, and local production utilities.
+engines: [AGNOSTIC]
 ---
 
 # Build Game Production Tools

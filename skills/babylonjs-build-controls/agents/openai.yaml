@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Build Controls"
+  short_description: "Implement Babylon picking and camera input"
+  default_prompt: "Use $babylonjs-build-controls to implement player actions and camera input with explicit device and modal ownership."

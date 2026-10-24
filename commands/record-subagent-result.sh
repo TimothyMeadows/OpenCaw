@@ -3,13 +3,14 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/workflow-path-common.sh"
 opencaw_resolve_paths
 
 usage() {
   cat <<'EOF'
 Usage: ./commands/record-subagent-result.sh "<task_name>" "<lane_id>" "<status>" "<summary_file>" [--dry-run]
 
-Appends lane result evidence to <project-root>/.ai/tasks/<task_name>/SUBAGENTS.md.
+Appends lane result evidence to <project-root>/.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md.
 EOF
 }
 
@@ -67,7 +68,9 @@ if [[ ! -f "$summary_file" ]]; then
   exit 1
 fi
 
-target="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name/SUBAGENTS.md"
+task_dir="$(opencaw_workflow_directory tasks "$task_name")"
+target="$task_dir/SUBAGENTS.md"
+[[ ! -L "$target" ]] || { echo "Subagent plan must not be a symbolic link: $target" >&2; exit 1; }
 if [[ ! -f "$target" && $dry_run -eq 0 ]]; then
   echo "Missing subagent plan: $target" >&2
   exit 1

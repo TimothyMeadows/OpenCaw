@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build Tilemaps"
+  short_description: "Integrate Phaser layers, tilesets and level data"
+  default_prompt: "Use $phaserjs-build-tilemaps to integrate validated map layers, object data and solver-compatible collisions."

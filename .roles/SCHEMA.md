@@ -159,12 +159,12 @@ Baseline policy:
 
 1. Prefer `.NET / C#` first where feasible
 2. Then prefer `Node.js / TypeScript / JavaScript`
-3. Use another language only when a matching template exists in `./.architecture/`
+3. Use another language when a matching template exists in `./.architecture/` or the selected engine definition in `./.engine/`
 
 If a role cannot realistically use `.NET` or `Node` for its core implementation domain:
 
 - the role may prefer another language
-- that language must be covered by an architecture template
+- that language must be covered by an architecture template or selected engine definition
 - adding a new architecture template is allowed only for this case
 
 Security-focused roles must prefer:
@@ -207,3 +207,5 @@ Rules:
 - roles must not conflict in constraints
 - stricter rule wins if conflict exists
 - first role = primary bias
+
+Engine-owned code follows ENGINE.md language/runtime restrictions before generic language preferences. Canonical role mappings include all engines; `resolve-role-capabilities.sh` filters effective skills and commands without selecting an engine. Browser testing remains available for real web builds of native engines, while native UI requires native evidence.

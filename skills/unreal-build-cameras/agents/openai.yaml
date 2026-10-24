@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Cameras"
+  short_description: "Own Unreal cameras, blends and interruption"
+  default_prompt: "Use $unreal-build-cameras to integrate the selected Unreal camera workflow with explicit player ownership, cancellation and native verification."

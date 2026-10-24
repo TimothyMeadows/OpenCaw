@@ -1,0 +1,188 @@
+[
+  {
+    "id": "CA-048",
+    "topic": "Unreal project context",
+    "owner": ".engine/UNREAL.md",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-049",
+    "topic": "Reflection and core C++ ownership",
+    "owner": "unreal-build-gameplay-framework",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-050",
+    "topic": "Actor and component lifecycle",
+    "owner": "unreal-build-gameplay-framework",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-051",
+    "topic": "C++ and Blueprint extension interfaces",
+    "owner": "unreal-build-gameplay-framework",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-052",
+    "topic": "Gameplay framework responsibilities",
+    "owner": "unreal-build-gameplay-framework",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-053",
+    "topic": "Gameplay tags and selected messaging",
+    "owner": "unreal-build-gameplay-framework",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-054",
+    "topic": "Modules and build targets",
+    "owner": "unreal-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-055",
+    "topic": "Native Editor extensions",
+    "owner": "unreal-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-056",
+    "topic": "Automation and profiling",
+    "owner": "unreal-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-057",
+    "topic": "Authored data and Asset Manager loading",
+    "owner": "unreal-integrate-assets",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-058",
+    "topic": "Animation execution and interruption",
+    "owner": "unreal-animate-actors",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-059",
+    "topic": "Audio routing and clocks",
+    "owner": "unreal-build-audio",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-060",
+    "topic": "Input contexts and rebinding",
+    "owner": "unreal-build-controls",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-061",
+    "topic": "Material and render-path integration",
+    "owner": "unreal-build-materials",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-062",
+    "topic": "Replication and network authority",
+    "owner": "unreal-build-multiplayer",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-063",
+    "topic": "Collision and rigid-body physics",
+    "owner": "unreal-build-physics",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-064",
+    "topic": "Native game interfaces",
+    "owner": "unreal-build-ui",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-065",
+    "topic": "Async execution and cancellation",
+    "owner": "unreal-build-async-systems",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-066",
+    "topic": "Gameplay abilities and effects",
+    "owner": "unreal-build-gameplay-abilities",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-067",
+    "topic": "Character movement and prediction",
+    "owner": "unreal-build-movement",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-068",
+    "topic": "Explicit Mover integration",
+    "owner": "unreal-build-movement",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-069",
+    "topic": "Modular feature lifetime",
+    "owner": "unreal-build-game-features",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-070",
+    "topic": "Navigation and behavior authoring",
+    "owner": "unreal-build-ai",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-071",
+    "topic": "StateTree state and callback lifetime",
+    "owner": "unreal-build-ai",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-072",
+    "topic": "Mass entities and processors",
+    "owner": "unreal-build-mass-entities",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-073",
+    "topic": "Gameplay camera ownership",
+    "owner": "unreal-build-cameras",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-074",
+    "topic": "Niagara runtime effects",
+    "owner": "unreal-build-vfx",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-075",
+    "topic": "Sequence playback and bindings",
+    "owner": "unreal-build-cinematics",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-076",
+    "topic": "World streaming and partitioning",
+    "owner": "unreal-build-worlds",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-077",
+    "topic": "Procedural content and regeneration",
+    "owner": "unreal-build-procedural-content",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-078",
+    "topic": "Save state and migration",
+    "owner": "unreal-build-save-systems",
+    "disposition": "create"
+  }
+]

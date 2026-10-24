@@ -1,6 +1,7 @@
 ---
 name: render-and-composite-blender-output
 description: Render and composite Blender 4.5 stills, animation, passes, alpha, and pre-rendered 2D or 2.5D output. Use for render-engine choice, color management, pass design, compositing, frame delivery, staged media, and renderer-specific verification.
+engines: [AGNOSTIC]
 ---
 
 # Render and Composite Blender Output

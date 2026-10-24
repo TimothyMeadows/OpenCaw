@@ -1,6 +1,7 @@
 ---
 name: profile-application-performance
 description: Plan and execute evidence-driven performance profiling using tools supported by the host architecture. Use for slow startup, CPU spikes, memory growth, hangs, jank, high I/O, thermal cost, battery impact, or regressions that require measured diagnosis.
+engines: [AGNOSTIC]
 ---
 
 # Profile Application Performance
@@ -31,3 +32,7 @@ description: Plan and execute evidence-driven performance profiling using tools 
 - Do not optimize from intuition alone.
 - Do not compare runs with materially different workloads or environments.
 - Do not add production telemetry that captures secrets or personal data.
+
+## Engine and feedback budgets
+
+Resolve ENGINE.md and compatible feature skills before engine APIs. Declare target device, build, frame/CPU/GPU/memory/loading budgets and measurement windows; do not impose universal 60 FPS. Measure representative UI layout, HUD lifecycle, overlapping effects and shader/audio/haptic requests, including disabled accessibility settings and interruption. Browser profiling requires a browser build; native engines need native tooling. Feedback cannot determine authoritative outcomes and physical haptics require hardware evidence.

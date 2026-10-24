@@ -46,7 +46,7 @@ source "$script_dir/lib/brainstorm-common.sh"
 brainstorm_require_delivery_creation_allowed 'Task import'
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-host_tasks_dir="$host_root/.ai/tasks"
+host_tasks_dir="$OPENCAW_PROJECT_CACHE_DIR/tasks"
 open_issues_file="$host_tasks_dir/OPEN_ISSUES.md"
 
 detect_repo_root() {

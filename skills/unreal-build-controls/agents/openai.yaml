@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unreal Build Controls"
+  short_description: "Build Controls for Unreal projects"
+  default_prompt: "Use $unreal-build-controls for the selected Unreal project with explicit engine compatibility, native ownership, and verification evidence."
+

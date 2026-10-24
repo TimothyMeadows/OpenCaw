@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Build Materials"
+  short_description: "Build Materials for Unity projects"
+  default_prompt: "Use $unity-build-materials for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

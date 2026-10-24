@@ -1,6 +1,7 @@
 ---
 name: review-blender-deliverables
 description: Review Blender 4.5 scenes, reports, required views, and staged outputs for production readiness. Use for severity-ranked defect review, reference-safe comparison, profile completeness, dependency audits, visual evidence, and explicit ship or block verdicts.
+engines: [AGNOSTIC]
 ---
 
 # Review Blender Deliverables
@@ -8,6 +9,8 @@ description: Review Blender 4.5 scenes, reports, required views, and staged outp
 ## When to use
 
 Use when a Blender scene or staged output needs a machine report, required-view audit, severity-ranked defects, or a ship/block verdict.
+
+For PROOF_TO_MODEL exports, also inspect its independent re-import report and proof-versus-export views, then bind independent review to current manifest/artifact hashes through `build-proof-to-model-assets`. This technical verdict is separate from human runtime acceptance.
 
 ## Workflow
 

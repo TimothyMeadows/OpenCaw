@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .ai/tasks/<task>/FILE.json]
+Usage: ./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .opencaw/.cache/tasks/<task>/FILE.json]
 
 Copies a configured read-only external asset file or bundle into:
   <project-root>/assets/models/<library-id>/<relative-asset-path>

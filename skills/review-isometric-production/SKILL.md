@@ -1,6 +1,7 @@
 ---
 name: review-isometric-production
 description: Review isometric and 2.5D game art for projection, tile metrics, anchors, elevation, depth sorting, occlusion, lighting, walkability, and gameplay readability. Use for isometric sprites, tiles, props, environments, VFX, maps, atlas handoffs, or style reviews.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

@@ -3,12 +3,13 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/brainstorm-common.sh"
+source "$script_dir/lib/workflow-path-common.sh"
 
 usage() {
   cat <<'EOF'
 Usage: ./commands/create-goal-file.sh "<goal_name>" ["Goal Title"] [--dry-run]
 
-Creates <project-root>/.ai/goals/<goal_name>/GOAL.md when it does not already exist.
+Creates <project-root>/.opencaw/.cache/goals/<goal_name>/GOAL.md when it does not already exist.
 Use --dry-run to print the goal scaffold without writing files.
 EOF
 }
@@ -59,8 +60,9 @@ if [[ $dry_run -eq 0 ]]; then
   brainstorm_require_delivery_creation_allowed 'Goal creation'
 fi
 
-goal_dir="$OPENCAW_PROJECT_AI_DIR/goals/$goal_name"
+goal_dir="$(opencaw_workflow_directory goals "$goal_name")"
 target="$goal_dir/GOAL.md"
+[[ ! -L "$target" ]] || { echo "Goal file must not be a symbolic link: $target" >&2; exit 1; }
 
 write_goal() {
   cat <<EOF
@@ -81,7 +83,7 @@ write_goal() {
 ## Constraints
 
 ## Task Queue
-1. [ ] TODO task name (\`.ai/tasks/<task-name>/TASK.md\`)
+1. [ ] TODO task name (\`.opencaw/.cache/tasks/<task-name>/TASK.md\`)
 
 ## Current Task
 

@@ -1,0 +1,7 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "",
+  "Category": "OpenCaw native verification",
+  "Description": "Source-only isolated lifecycle and state fixture",
+  "Modules": [{"Name": "OpenCawNativeFixture", "Type": "Runtime", "LoadingPhase": "Default"}]
+}

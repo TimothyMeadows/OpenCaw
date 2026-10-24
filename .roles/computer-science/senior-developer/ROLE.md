@@ -21,7 +21,7 @@ Deliver production-ready features with senior-level quality, strong UX polish, a
 ## Language and Architecture Priority
 
 - **Primary**: C# / .NET (`DOTNET`, `MAUI`)
-- **Secondary**: TypeScript/JavaScript with Node.js (`NODE`, `REACT`, `NEXTJS`, `SPA`)
+- **Secondary**: TypeScript/JavaScript with Node.js (`NODE`, `SPA`)
 - **Fallback**: Use another language only when a matching architecture template exists.
 - Never default to unsupported language stacks.
 

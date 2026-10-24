@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Build Scenes"
+  short_description: "Build Scenes for Godot projects"
+  default_prompt: "Use $godot-build-scenes for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

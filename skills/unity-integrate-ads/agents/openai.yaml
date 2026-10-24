@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Integrate Ads"
+  short_description: "Own LevelPlay lifecycle, privacy and rewards"
+  default_prompt: "Use $unity-integrate-ads to implement the selected LevelPlay placement with explicit privacy and reward ownership."

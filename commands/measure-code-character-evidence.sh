@@ -16,6 +16,9 @@ Capture options:
   --viewport-width N      Browser viewport width (default: 800)
   --viewport-height N     Browser viewport height (default: 800)
   --pixel-ratio N         Browser device pixel ratio (default: 1)
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 

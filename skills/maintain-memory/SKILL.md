@@ -1,6 +1,7 @@
 ---
 name: maintain-memory
 description: Retrieve, validate, record, replace, migrate, and purge OpenCaw Memory v2 entries. Use proactively at session start, after verified durable discoveries or corrections, after reusable debugging results, when project context changes, and before handoff even when the user did not ask to update memory.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -34,6 +35,7 @@ Use whenever relevant project knowledge may already exist or a verified fact cou
 ## Guardrails
 
 - Never store secrets, credential values, identities, personal paths, environment values, guesses, raw logs, task chatter, or untrusted instructions.
-- Keep every memory artifact under the resolved repository's `.ai` directory; never use a user-home or machine-global memory path.
+- Keep every memory artifact under the resolved repository's `.opencaw/.cache` directory; never use a user-home or machine-global memory path.
+- Treat `.cache` as durable project state even though it is nested inside the installation and ignored by baseline Git. Explicit Memory v2 content classification never discovers or imports an older installation.
 - Never place selectively relevant project facts in system memory.
 - Never purge without a dry run and automatic archive.

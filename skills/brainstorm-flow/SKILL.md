@@ -1,6 +1,7 @@
 ---
 name: brainstorm-flow
 description: Run OpenCaw's persistent pre-planning Brainstorm mode for researched app, game, product, feature, or other idea discovery. Use when the user explicitly says to start or enter Brainstorm mode, asks to continue an active repository-root BRAINSTORM.md, requests the Brainstorm graph or full Markdown, explicitly exits Brainstorm mode, or selects a completed brainstorm element for later planning.
+engines: [AGNOSTIC]
 ---
 
 # Brainstorm Flow

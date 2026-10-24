@@ -8,7 +8,7 @@ Usage: ./commands/create-code-model-manifest.sh MODEL_ID --brief TEXT [options]
 Options:
   --style STYLE.md                 Style contract (default: resolved project STYLE.md)
   --prompt-override               Select CODE for this task when STYLE.md uses another primary
-  --output FILE                   Manifest below .ai/tasks (default: .ai/tasks/MODEL_ID/code-model.json)
+  --output FILE                   Manifest below .opencaw/.cache/tasks (default: .opencaw/.cache/tasks/MODEL_ID/code-model.json)
   --source FILE                   Host source target (default: src/models/MODEL_ID.ts)
   --title TEXT                    Human-readable title
   --intended-use TEXT             Runtime use
@@ -28,6 +28,9 @@ Options:
   --textures N                    Texture budget (default: 0)
   --max-attempts-per-pass N       Default: 3
   --max-attempts-total N          Default: 12
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 
@@ -40,6 +43,8 @@ opencaw_resolve_paths
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 style_file="$host_root/STYLE.md"
 prompt_override=0
+engine_evidence=''
+engine_output=''
 args=("$@")
 for ((index=0; index<${#args[@]}; index++)); do
   case "${args[$index]}" in
@@ -48,11 +53,17 @@ for ((index=0; index<${#args[@]}; index++)); do
       style_file="${args[$((index + 1))]}"
       ;;
     --prompt-override) prompt_override=1 ;;
+    --engine-evidence) engine_evidence="${args[$((index + 1))]:-}" ;;
+    --source) engine_output="${args[$((index + 1))]:-}" ;;
   esac
 done
 bash "$script_dir/validate-style-contract.sh" "$style_file" >/dev/null
 resolve_args=(--style "$style_file" --json)
 [[ $prompt_override -eq 0 ]] || resolve_args+=(--override CODE)
+if [[ -n "$engine_evidence" ]]; then
+  [[ -n "$engine_output" ]] || { echo "An engine prototype requires an explicit --source inside its approved scope." >&2; exit 1; }
+  resolve_args+=(--engine-evidence "$engine_evidence" --engine-output "$engine_output")
+fi
 selection="$(bash "$script_dir/resolve-art-pipeline.sh" "${resolve_args[@]}")"
 selected_pipeline="$(printf '%s' "$selection" | sed -n 's/^[[:space:]]*"pipeline": "\([A-Z0-9]*\)",*$/\1/p')"
 [[ "$selected_pipeline" == 'CODE' ]] || {

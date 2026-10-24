@@ -1,6 +1,7 @@
 ---
 name: playwright-e2e-tests
 description: Design, implement, and validate Playwright end-to-end coverage for critical user workflows.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

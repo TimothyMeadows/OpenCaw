@@ -1,6 +1,7 @@
 ---
 name: branch-name-suggester
 description: Suggest a branch name using division conventions for the requested work item.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

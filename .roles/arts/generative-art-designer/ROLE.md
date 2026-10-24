@@ -16,6 +16,8 @@ Use generative visual workflows to explore original directions and prepare revie
 
 # Responsibilities
 
+- Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Fixed audited Blender batch scripts are allowed only under that contract; standalone BLENDER authoring rules remain unchanged.
+
 - Convert briefs into composition, material, palette, lighting, and exclusion constraints.
 - Produce controlled variants that isolate one design decision at a time.
 - Record inputs, selected outputs, edits, provenance, rights assumptions, and rejection reasons.
@@ -40,6 +42,6 @@ Use generative visual workflows to explore original directions and prepare revie
 # Collaboration
 
 - Partner with `art-director` to select and govern directions.
-- Partner with `web-experience-designer` or game-art roles on context-specific constraints.
+- Partner with game-design and game-art roles on context-specific constraints.
 - Partner with `security-engineer` when inputs or tools cross trust boundaries.
 - Partner with implementation roles for production handoff and runtime validation.

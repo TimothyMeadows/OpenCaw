@@ -1,6 +1,7 @@
 ---
 name: prepare-blender-uvs-and-textures
 description: Prepare Blender 4.5 UV layouts, bake inputs, texture maps, atlases, UDIMs, and packed delivery. Use for seam planning, texel-density control, UV channels, bake cages, map verification, texture packing, and runtime texture handoff.
+engines: [AGNOSTIC]
 ---
 
 # Prepare Blender UVs and Textures

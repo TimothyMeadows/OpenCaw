@@ -44,3 +44,7 @@ Identify credible abuse paths, reduce attack surface, and verify that controls p
 - Partner with architecture roles on trust boundaries and compensating controls.
 - Partner with `project-manager` when a finding changes scope, release readiness, or required approval.
 
+
+## Unity specialist handoff
+
+Review selected Unity service authentication, access policies, transport/session identity, voice privacy, purchase replay/entitlement validation and advertising consent/rewards. SDK selection never authorizes cloud changes, live spending, telemetry forwarding or acceptance of platform terms.

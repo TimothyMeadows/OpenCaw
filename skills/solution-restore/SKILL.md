@@ -1,6 +1,7 @@
 ---
 name: solution-restore
 description: Restore NuGet packages for the host .NET solution or project.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

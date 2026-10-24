@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Build Audio"
+  short_description: "Integrate Babylon audio buses and spatial sound"
+  default_prompt: "Use $babylonjs-build-audio to integrate the selected audio API with bounded voices, browser activation and explicit ownership."

@@ -1,6 +1,7 @@
 ---
 name: audit-untrusted-agent-source
 description: Statically inspect agent-facing source for unsafe instructions, executable content, secrets, path escapes, hidden side effects, and supply-chain risk. Use before trusting or adapting a public or third-party role, skill, command, prompt pack, or automation bundle.
+engines: [AGNOSTIC]
 ---
 
 # Audit Untrusted Agent Source

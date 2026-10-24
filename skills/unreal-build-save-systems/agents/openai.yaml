@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Save Systems"
+  short_description: "Persist and migrate validated Unreal game state"
+  default_prompt: "Use $unreal-build-save-systems to implement versioned Unreal save data, safe migration and restoration with explicit storage and lifecycle evidence."

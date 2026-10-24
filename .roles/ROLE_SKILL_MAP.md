@@ -37,6 +37,12 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 - `commands/link-pr-to-task-issue.sh`
 - `commands/comment-pr-qa-results.sh`
 - `commands/update-todo-checklist.sh`
+- `commands/generate-engine.sh`
+- `commands/validate-engine-contract.sh`
+- `commands/validate-engines.sh`
+- `commands/resolve-engine.sh`
+- `commands/resolve-skill.sh`
+- `commands/resolve-role-capabilities.sh`
 
 ## Role Mappings
 
@@ -63,6 +69,33 @@ Skills:
 - `review-blender-deliverables`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
+- `build-proof-to-model-assets`
+- `build-game-ui`
+- `threejs-animate-actors`
+- `threejs-build-materials`
+- `threejs-build-ui`
+- `babylonjs-animate-actors`
+- `babylonjs-build-materials`
+- `babylonjs-build-ui`
+- `phaserjs-build-ui`
+- `unity-animate-actors`
+- `unity-build-materials`
+- `unity-build-ui`
+- `unreal-integrate-assets`
+- `unreal-animate-actors`
+- `unreal-build-materials`
+- `unreal-build-ui`
+- `godot-animate-actors`
+- `godot-build-shaders`
+- `godot-build-ui`
+- `unreal-build-cameras`
+- `unreal-build-vfx`
+- `unreal-build-cinematics`
+- `unreal-build-worlds`
+- `unreal-build-procedural-content`
+- `unity-build-2d-content`
+- `unity-localize-content`
+- `unity-configure-rendering`
 
 Commands:
 
@@ -81,10 +114,10 @@ Commands:
 - `commands/inspect-blender-scene.sh`
 - `commands/validate-blender-scene-report.sh`
 - `commands/build-originality-evidence.sh`
-- `commands/print-web-experience-brief.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
+- `commands/proof-to-model.sh`
 
 ### arts/blender-production-artist
 
@@ -108,6 +141,7 @@ Skills:
 - `prepare-game-art-handoff`
 - `prepare-rigged-runtime-actors`
 - `create-game-vfx`
+- `build-proof-to-model-assets`
 
 Commands:
 
@@ -122,6 +156,7 @@ Commands:
 - `commands/validate-style-contract.sh`
 - `commands/validate-rigged-actor-manifest.sh`
 - `commands/print-game-art-handoff-template.sh`
+- `commands/proof-to-model.sh`
 
 ### arts/board-ui-artist
 
@@ -170,7 +205,6 @@ Commands:
 
 - `commands/resolve-art-pipeline.sh`
 - `commands/validate-style-contract.sh`
-- `commands/print-css-art-token-template.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/validate-svg-assets.sh`
 
@@ -225,6 +259,29 @@ Skills:
 - `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
+- `build-game-ui`
+- `threejs-animate-actors`
+- `threejs-build-materials`
+- `threejs-build-ui`
+- `babylonjs-animate-actors`
+- `babylonjs-build-materials`
+- `babylonjs-build-ui`
+- `phaserjs-build-ui`
+- `unity-animate-actors`
+- `unity-build-materials`
+- `unity-build-ui`
+- `unreal-integrate-assets`
+- `unreal-animate-actors`
+- `unreal-build-materials`
+- `unreal-build-ui`
+- `godot-animate-actors`
+- `godot-build-shaders`
+- `godot-build-ui`
+- `unreal-build-vfx`
+- `unreal-build-cameras`
+- `unreal-build-cinematics`
+- `unity-build-2d-content`
+- `unity-configure-rendering`
 
 Commands:
 
@@ -254,6 +311,7 @@ Skills:
 - `prepare-game-art-handoff`
 - `iterate-art-to-sanity`
 - `enforce-art-language-safety`
+- `build-proof-to-model-assets`
 
 Commands:
 
@@ -268,6 +326,7 @@ Commands:
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
+- `commands/proof-to-model.sh`
 
 ### arts/illustrative-2d-artist
 
@@ -439,9 +498,9 @@ Skills:
 
 - `select-art-pipeline`
 - `use-external-asset-library`
-- `build-threejs-code-models`
-- `build-threejs-code-characters`
-- `review-threejs-code-characters`
+- `threejs-build-code-models`
+- `threejs-build-code-characters`
+- `threejs-review-code-characters`
 - `prepare-rigged-runtime-actors`
 - `model-blender-assets`
 - `rig-and-animate-blender-actors`
@@ -452,6 +511,31 @@ Skills:
 - `build-gameplay-runtime`
 - `maintain-art-style-contract`
 - `iterate-art-to-sanity`
+- `build-proof-to-model-assets`
+- `build-game-ui`
+- `threejs-animate-actors`
+- `threejs-build-materials`
+- `threejs-build-ui`
+- `babylonjs-animate-actors`
+- `babylonjs-build-materials`
+- `babylonjs-build-ui`
+- `phaserjs-build-ui`
+- `unity-animate-actors`
+- `unity-build-materials`
+- `unity-build-ui`
+- `unreal-integrate-assets`
+- `unreal-animate-actors`
+- `unreal-build-materials`
+- `unreal-build-ui`
+- `godot-animate-actors`
+- `godot-build-shaders`
+- `godot-build-ui`
+- `unreal-build-procedural-content`
+- `unreal-build-cinematics`
+- `unity-build-2d-content`
+- `unity-configure-rendering`
+- `unity-build-editor-tools`
+- `unity-optimize-web`
 
 Commands:
 
@@ -475,6 +559,7 @@ Commands:
 - `commands/validate-style-contract.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
+- `commands/proof-to-model.sh`
 
 ### arts/tile-set-artist
 
@@ -511,61 +596,6 @@ Commands:
 - `commands/print-gameplay-system-brief.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
-
-### arts/web-experience-designer
-
-Skills:
-
-- `select-art-pipeline`
-- `use-external-asset-library`
-- `build-threejs-code-models`
-- `design-web-experiences`
-- `design-conversion-pages`
-- `design-ui-from-constraints`
-- `develop-original-brand-directions`
-- `build-scroll-authored-web-experiences`
-- `build-accessible-motion-systems`
-- `build-interactive-web-effects`
-- `build-webgl-experiences`
-- `optimize-web-motion`
-- `capture-ui-reference-pack`
-- `extract-interaction-patterns`
-- `prototype-from-reference-pack`
-- `source-licensed-visual-assets`
-- `audit-reference-originality`
-
-Commands:
-
-- `commands/resolve-art-pipeline.sh`
-- `commands/list-external-asset-libraries.sh`
-- `commands/inspect-external-asset-library.sh`
-- `commands/copy-external-asset.sh`
-- `commands/create-code-model-manifest.sh`
-- `commands/validate-code-model-manifest.sh`
-- `commands/next-code-model-pass.sh`
-- `commands/record-code-model-review.sh`
-- `commands/print-web-experience-brief.sh`
-- `commands/validate-style-contract.sh`
-- `commands/playwright-capture-page.sh`
-- `commands/render-browser-demo.sh`
-- `commands/web-performance-report.sh`
-- `commands/build-originality-evidence.sh`
-
-### computer-science/ai-data-remediation-engineer
-
-Skills:
-
-- `audit-untrusted-agent-source`
-- `adapt-external-agent-skills`
-- `verify-and-explain`
-- `repo-map-dotnet`
-
-Commands:
-
-- `commands/audit-agent-source.sh`
-- `commands/validate-skill-safety.sh`
-- `commands/dotnet-build.sh`
-- `commands/dotnet-test.sh`
 
 ### computer-science/ai-engineer
 
@@ -613,10 +643,14 @@ Commands:
 Skills:
 
 - `generate-architecture`
-- `apim-change-review`
 - `verify-and-explain`
 - `solution-build`
 - `test-dotnet`
+- `unity-integrate-live-services`
+- `unity-integrate-multiplayer-services`
+- `unity-integrate-voice-chat`
+- `unity-integrate-purchases`
+- `unity-integrate-ads`
 
 Commands:
 
@@ -661,21 +695,6 @@ Commands:
 - `commands/dependency-check.sh`
 - `commands/validate-opencaw.sh`
 
-### computer-science/data-engineer
-
-Skills:
-
-- `install-database-cli-tools`
-- `database-cli-query`
-- `generate-architecture`
-- `verify-and-explain`
-
-Commands:
-
-- `commands/install-database-cli-tools.sh`
-- `commands/database-cli-query.sh`
-- `commands/generate-architecture.sh`
-
 ### computer-science/database-optimizer
 
 Skills:
@@ -699,6 +718,10 @@ Skills:
 - `create-host-ai-scaffold`
 - `audit-untrusted-agent-source`
 - `verify-and-explain`
+- `unity-run-tooling`
+- `unity-optimize-web`
+- `unity-integrate-live-services`
+- `unity-integrate-multiplayer-services`
 
 Commands:
 
@@ -707,29 +730,15 @@ Commands:
 - `commands/audit-agent-source.sh`
 - `commands/validate-opencaw.sh`
 
-### computer-science/embedded-firmware-engineer
-
-Skills:
-
-- `generate-architecture`
-- `verify-and-explain`
-
-Commands:
-
-- `commands/generate-architecture.sh`
-- `commands/validate-opencaw.sh`
-
 ### computer-science/frontend-developer
 
 Skills:
 
 - `select-art-pipeline`
 - `use-external-asset-library`
-- `build-threejs-code-models`
-- `build-threejs-code-characters`
-- `design-web-experiences`
+- `threejs-build-code-models`
+- `threejs-build-code-characters`
 - `design-ui-from-constraints`
-- `build-scroll-authored-web-experiences`
 - `build-accessible-motion-systems`
 - `build-interactive-web-effects`
 - `build-webgl-experiences`
@@ -739,6 +748,39 @@ Skills:
 - `profile-application-performance`
 - `maintain-art-style-contract`
 - `prepare-game-art-handoff`
+- `threejs-build-scenes`
+- `threejs-build-controls`
+- `threejs-animate-actors`
+- `threejs-build-materials`
+- `threejs-build-ui`
+- `babylonjs-build-scenes`
+- `babylonjs-build-controls`
+- `babylonjs-integrate-physics`
+- `babylonjs-animate-actors`
+- `babylonjs-build-materials`
+- `babylonjs-build-ui`
+- `babylonjs-build-audio`
+- `phaserjs-build-scenes`
+- `phaserjs-build-controls`
+- `phaserjs-build-physics`
+- `phaserjs-build-tilemaps`
+- `phaserjs-animate-sprites`
+- `phaserjs-build-ui`
+- `phaserjs-build-audio`
+- `unity-build-controls`
+- `unity-build-ui`
+- `unity-run-tooling`
+- `unreal-build-controls`
+- `unreal-build-ui`
+- `unreal-run-tooling`
+- `godot-build-controls`
+- `godot-build-ui`
+- `godot-run-tooling`
+- `build-game-ui`
+- `unity-build-2d-content`
+- `unity-localize-content`
+- `unity-build-editor-tools`
+- `unity-optimize-web`
 
 Commands:
 
@@ -755,7 +797,6 @@ Commands:
 - `commands/record-code-character-calibration.sh`
 - `commands/record-code-character-gate.sh`
 - `commands/measure-code-character-evidence.sh`
-- `commands/print-web-experience-brief.sh`
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
 - `commands/web-performance-report.sh`
@@ -767,7 +808,6 @@ Commands:
 Skills:
 
 - `generate-architecture`
-- `design-web-experiences`
 - `capture-full-page-evidence`
 - `profile-application-performance`
 - `solution-build`
@@ -789,9 +829,11 @@ Skills:
 - `author-game-worlds`
 - `design-action-gameplay`
 - `test-playable-games`
-- `review-threejs-code-characters`
+- `threejs-review-code-characters`
 - `maintain-art-style-contract`
 - `review-isometric-production`
+- `design-game-systems`
+- `build-game-ui`
 
 Commands:
 
@@ -807,7 +849,7 @@ Commands:
 Skills:
 
 - `use-external-asset-library`
-- `build-threejs-code-characters`
+- `threejs-build-code-characters`
 - `build-gameplay-runtime`
 - `build-game-production-tools`
 - `design-action-gameplay`
@@ -818,6 +860,78 @@ Skills:
 - `test-playable-games`
 - `ship-web-games`
 - `verify-and-explain`
+- `threejs-build-scenes`
+- `threejs-build-controls`
+- `threejs-animate-actors`
+- `threejs-build-materials`
+- `threejs-build-ui`
+- `threejs-build-code-models`
+- `babylonjs-build-scenes`
+- `babylonjs-build-controls`
+- `babylonjs-integrate-physics`
+- `babylonjs-animate-actors`
+- `babylonjs-build-materials`
+- `babylonjs-build-ui`
+- `babylonjs-build-audio`
+- `phaserjs-build-scenes`
+- `phaserjs-build-controls`
+- `phaserjs-build-physics`
+- `phaserjs-build-tilemaps`
+- `phaserjs-animate-sprites`
+- `phaserjs-build-ui`
+- `phaserjs-build-audio`
+- `unity-build-scenes`
+- `unity-build-controls`
+- `unity-build-physics`
+- `unity-animate-actors`
+- `unity-build-materials`
+- `unity-build-ui`
+- `unity-build-audio`
+- `unity-integrate-netcode`
+- `unity-run-tooling`
+- `unreal-build-gameplay-framework`
+- `unreal-integrate-assets`
+- `unreal-build-controls`
+- `unreal-build-physics`
+- `unreal-animate-actors`
+- `unreal-build-materials`
+- `unreal-build-ui`
+- `unreal-build-audio`
+- `unreal-build-multiplayer`
+- `unreal-run-tooling`
+- `godot-build-scenes`
+- `godot-build-controls`
+- `godot-build-physics`
+- `godot-animate-actors`
+- `godot-build-shaders`
+- `godot-build-ui`
+- `godot-build-audio`
+- `godot-build-multiplayer`
+- `godot-run-tooling`
+- `design-game-systems`
+- `build-game-ui`
+- `unreal-build-async-systems`
+- `unreal-build-gameplay-abilities`
+- `unreal-build-movement`
+- `unreal-build-game-features`
+- `unreal-build-ai`
+- `unreal-build-mass-entities`
+- `unreal-build-cameras`
+- `unreal-build-vfx`
+- `unreal-build-cinematics`
+- `unreal-build-worlds`
+- `unreal-build-procedural-content`
+- `unreal-build-save-systems`
+- `unity-build-2d-content`
+- `unity-localize-content`
+- `unity-configure-rendering`
+- `unity-build-editor-tools`
+- `unity-optimize-web`
+- `unity-integrate-live-services`
+- `unity-integrate-multiplayer-services`
+- `unity-integrate-voice-chat`
+- `unity-integrate-purchases`
+- `unity-integrate-ads`
 
 Commands:
 
@@ -847,6 +961,7 @@ Skills:
 - `validate-generated-media`
 - `audit-untrusted-agent-source`
 - `verify-and-explain`
+- `build-proof-to-model-assets`
 
 Commands:
 
@@ -859,6 +974,7 @@ Commands:
 - `commands/run-comfyui-workflow.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/validate-media-templates.sh`
+- `commands/proof-to-model.sh`
 
 ### computer-science/git-workflow-master
 
@@ -876,22 +992,6 @@ Commands:
 - `commands/link-pr-to-task-issue.sh`
 - `commands/pr-readiness-check.sh`
 
-### computer-science/incident-response-commander
-
-Skills:
-
-- `record-debug-resolution`
-- `verify-and-explain`
-- `audit-untrusted-agent-source`
-- `manage-task-issues`
-
-Commands:
-
-- `commands/audit-agent-source.sh`
-- `commands/security-scan.sh`
-- `commands/create-task-issue.sh`
-- `commands/append-debug.sh`
-
 ### computer-science/mobile-app-builder
 
 Skills:
@@ -905,7 +1005,6 @@ Skills:
 Commands:
 
 - `commands/generate-architecture.sh`
-- `commands/print-web-experience-brief.sh`
 - `commands/web-performance-report.sh`
 
 ### computer-science/project-manager
@@ -952,7 +1051,7 @@ Commands:
 Skills:
 
 - `verify-and-explain`
-- `review-threejs-code-characters`
+- `threejs-review-code-characters`
 - `review-blender-deliverables`
 - `capture-full-page-evidence`
 - `produce-browser-demo`
@@ -966,6 +1065,11 @@ Skills:
 - `post-pr-qa`
 - `comment-issue-test-results`
 - `test-dotnet`
+- `design-game-systems`
+- `build-game-ui`
+- `unity-run-tooling`
+- `unreal-run-tooling`
+- `godot-run-tooling`
 
 Commands:
 
@@ -992,14 +1096,11 @@ Skills:
 
 - `prototype-from-reference-pack`
 - `design-ui-from-constraints`
-- `design-web-experiences`
-- `build-scroll-authored-web-experiences`
 - `build-gameplay-runtime`
 - `verify-and-explain`
 
 Commands:
 
-- `commands/print-web-experience-brief.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/playwright-capture-page.sh`
 
@@ -1023,7 +1124,11 @@ Skills:
 - `adapt-external-agent-skills`
 - `audit-reference-originality`
 - `verify-and-explain`
-- `apim-change-review`
+- `unity-integrate-live-services`
+- `unity-integrate-multiplayer-services`
+- `unity-integrate-voice-chat`
+- `unity-integrate-purchases`
+- `unity-integrate-ads`
 
 Commands:
 
@@ -1041,7 +1146,7 @@ Commands:
 Skills:
 
 - `select-art-pipeline`
-- `build-threejs-code-models`
+- `threejs-build-code-models`
 - `solution-restore`
 - `solution-build`
 - `test-dotnet`
@@ -1078,20 +1183,6 @@ Commands:
 - `commands/web-performance-report.sh`
 - `commands/validate-opencaw.sh`
 
-### computer-science/solidity-smart-contract-engineer
-
-Skills:
-
-- `audit-untrusted-agent-source`
-- `verify-and-explain`
-- `dependency-audit-dotnet`
-
-Commands:
-
-- `commands/audit-agent-source.sh`
-- `commands/security-scan.sh`
-- `commands/dependency-check.sh`
-
 ### computer-science/sre
 
 Skills:
@@ -1120,22 +1211,5 @@ Skills:
 
 Commands:
 
-- `commands/print-web-experience-brief.sh`
 - `commands/print-gameplay-system-brief.sh`
 - `commands/build-originality-evidence.sh`
-
-### computer-science/threat-detection-engineer
-
-Skills:
-
-- `audit-untrusted-agent-source`
-- `verify-and-explain`
-- `apim-change-review`
-
-Commands:
-
-- `commands/audit-agent-source.sh`
-- `commands/veracode-scan.sh`
-- `commands/snyk-scan.sh`
-- `commands/stackhawk-scan.sh`
-- `commands/security-scan.sh`

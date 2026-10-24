@@ -1,0 +1,206 @@
+[
+  {
+    "id": "CA-080",
+    "topic": "Pixel-aligned 2D rendering",
+    "owner": "unity-build-2d-content",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-081",
+    "topic": "Industrial CAD and point-cloud transformation",
+    "owner": null,
+    "disposition": "defer"
+  },
+  {
+    "id": "CA-082",
+    "topic": "Audio mixer routing",
+    "owner": "unity-build-audio",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-083",
+    "topic": "Native Editor graph authoring",
+    "owner": "unity-build-editor-tools",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-084",
+    "topic": "Selected live-game service integration",
+    "owner": "unity-integrate-live-services",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-085",
+    "topic": "Explicit 2D physics systems",
+    "owner": "unity-build-physics",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-086",
+    "topic": "Tile palettes and explicit neighbor topology",
+    "owner": "unity-build-2d-content",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-087",
+    "topic": "Native asset and scene search",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-088",
+    "topic": "Validated purchase fulfillment and restoration",
+    "owner": "unity-integrate-purchases",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-089",
+    "topic": "Navigation bake, path and movement ownership",
+    "owner": "unity-build-scenes",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-090",
+    "topic": "Selected advertising mediation and rewards",
+    "owner": "unity-integrate-ads",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-091",
+    "topic": "Locale, font and localized asset lifetimes",
+    "owner": "unity-localize-content",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-092",
+    "topic": "Atlas delivery and asynchronous handle ownership",
+    "owner": "unity-build-2d-content",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-093",
+    "topic": "Explicit render-pipeline migration",
+    "owner": "unity-configure-rendering",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-094",
+    "topic": "Selected project creation and first-scene validation",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-095",
+    "topic": "Measured audio loading and playback budgets",
+    "owner": "unity-build-audio",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-096",
+    "topic": "Text, font atlas and material budgets",
+    "owner": "unity-build-ui",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-097",
+    "topic": "Measured web delivery and runtime optimization",
+    "owner": "unity-optimize-web",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-098",
+    "topic": "Rigid-body collision, queries and sleep diagnosis",
+    "owner": "unity-build-physics",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-099",
+    "topic": "Scoped project analysis and remediation",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-100",
+    "topic": "Selected multiplayer session orchestration",
+    "owner": "unity-integrate-multiplayer-services",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-101",
+    "topic": "Selected voice and text channel integration",
+    "owner": "unity-integrate-voice-chat",
+    "disposition": "create"
+  },
+  {
+    "id": "CA-102",
+    "topic": "Version-qualified Shader Graph and HLSL nodes",
+    "owner": "unity-build-materials",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-103",
+    "topic": "Stable sprite import and slicing identities",
+    "owner": "unity-build-2d-content",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-104",
+    "topic": "Bounded sprite analysis with reviewed assumptions",
+    "owner": "unity-build-2d-content",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-105",
+    "topic": "Native IMGUI Editor tooling",
+    "owner": "unity-build-editor-tools",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-106",
+    "topic": "Canvas layout, rebuild and input ownership",
+    "owner": "unity-build-ui",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-107",
+    "topic": "Runtime UI Toolkit hierarchy and lifecycle",
+    "owner": "unity-build-ui",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-108",
+    "topic": "Explicit runtime UI framework routing",
+    "owner": "unity-build-ui",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-109",
+    "topic": "Optional version-bound CLI and Editor targeting",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-110",
+    "topic": "Approved asynchronous package lifecycle",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-111",
+    "topic": "Optional live Editor command execution",
+    "owner": "unity-run-tooling",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-112",
+    "topic": "Camera and Volume configuration",
+    "owner": "unity-configure-rendering",
+    "disposition": "enhance"
+  },
+  {
+    "id": "CA-113",
+    "topic": "Render Graph resource and pass verification",
+    "owner": "unity-configure-rendering",
+    "disposition": "enhance"
+  }
+]

@@ -39,6 +39,14 @@ if [[ ! -f "./.architecture/LANGUAGE_SUPPORT.md" ]]; then
   status=1
 fi
 
+# Engine language exceptions are backed by their registered definitions.
+for engine in THREEJS BABYLONJS PHASERJS UNITY UNREAL GODOT; do
+  if [[ ! -f "./.engine/$engine.md" ]] || ! grep -Fq "| $engine |" .architecture/LANGUAGE_SUPPORT.md; then
+    echo "Missing engine language support: $engine" >&2
+    status=1
+  fi
+done
+
 # Languages explicitly disallowed until a matching architecture template is added.
 disallowed_regex='(\bswift\b|\bkotlin\b|\bflutter\b|\bphp\b|\blaravel\b|\blivewire\b|\bjulia\b)'
 if search_exists "$disallowed_regex" "$roles_dir"; then
@@ -47,26 +55,8 @@ if search_exists "$disallowed_regex" "$roles_dir"; then
   status=1
 fi
 
-# Solidity role requires SOLIDITY architecture support.
-if search_exists '\bsolidity\b' "$roles_dir/solidity-smart-contract-engineer/ROLE.md"; then
-  if [[ ! -f "./.architecture/SOLIDITY.md" ]]; then
-    echo "Missing required architecture template for Solidity role: ./.architecture/SOLIDITY.md" >&2
-    status=1
-  fi
-fi
-
-# Embedded role requires embedded firmware architecture support.
-if search_exists '^```c$' "$roles_dir/embedded-firmware-engineer/ROLE.md"; then
-  if [[ ! -f "./.architecture/EMBEDDED_FIRMWARE.md" ]]; then
-    echo "Missing required architecture template for embedded C role: ./.architecture/EMBEDDED_FIRMWARE.md" >&2
-    status=1
-  fi
-fi
-
 # Security roles must prioritize Veracode, Snyk, StackHawk.
-for role_file in \
-  "$roles_dir/security-engineer/ROLE.md" \
-  "$roles_dir/threat-detection-engineer/ROLE.md"; do
+for role_file in "$roles_dir/security-engineer/ROLE.md"; do
   for tool in veracode snyk stackhawk; do
     if ! search_exists "\\b${tool}\\b" "$role_file"; then
       echo "Missing required security tool preference '${tool}' in $role_file" >&2

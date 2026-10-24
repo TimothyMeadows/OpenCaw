@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host_root="${OPENCAW_HOST_ROOT:-$(pwd)}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+OPENCAW_PROJECT_ROOT="${OPENCAW_HOST_ROOT:-${OPENCAW_PROJECT_ROOT:-}}"
+opencaw_resolve_paths
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 cd "$host_root"
 
 if ! command -v node >/dev/null 2>&1; then

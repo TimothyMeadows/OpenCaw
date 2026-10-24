@@ -1,6 +1,7 @@
 ---
 name: record-correction-pattern
 description: Record a user correction as both a memory pattern and a preventive rule in the host repository.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Integrate Voice Chat"
+  short_description: "Integrate Vivox identity, channels and devices"
+  default_prompt: "Use $unity-integrate-voice-chat for the selected Vivox integration with explicit permission, channel and teardown ownership."

@@ -272,14 +272,14 @@ if [[ -d "$promotion_dir" ]]; then
 fi
 next_event=$((max_event + 1))
 printf -v event_label '%03d' "$next_event"
-event_relative=".ai/gauntlets/$gauntlet_name/promotion-events/event-$event_label.md"
+event_relative=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/event-$event_label.md"
 event_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$event_relative"
 archive_relative='none'
 archive_target=''
 archive_hash='none'
 archive_stage=''
 if [[ "$verdict" == 'fail' ]]; then
-  archive_relative=".ai/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$event_label.md"
+  archive_relative=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$event_label.md"
   archive_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$archive_relative"
   [[ ! -e "$archive_target" && ! -L "$archive_target" ]] || {
     echo "Archived completion report evidence already exists: $archive_relative" >&2

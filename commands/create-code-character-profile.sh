@@ -8,7 +8,7 @@ Usage: ./commands/create-code-character-profile.sh CHARACTER_ID --manifest FILE 
 Creates a task-local opencaw-code-character/v1 profile linked to an existing CODE manifest.
 
 Options:
-  --output FILE                 Profile below .ai/tasks (default: .ai/tasks/CHARACTER_ID/code-character.json)
+  --output FILE                 Profile below .opencaw/.cache/tasks (default: .opencaw/.cache/tasks/CHARACTER_ID/code-character.json)
   --title TEXT                  Human-readable title
   --kind VALUE                  character or creature (default: character)
   --presentation-distance VALUE close, mid, far, or mixed (default: mixed)
@@ -29,6 +29,9 @@ Options:
   --lifecycle-cycles N          Repeated ownership cycles (default: 3)
   --max-gate-attempts N         Maximum attempts per character gate (default: 3)
   --repeated-failure-limit N     Escalation threshold for one failure class (default: 2)
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 

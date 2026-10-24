@@ -1,6 +1,7 @@
 ---
 name: install-database-cli-tools
 description: Install or preview installation commands for database CLI tooling across MSSQL, MySQL, Cosmos DB, Azure Storage Tables, SQLite, PostgreSQL, and Databricks.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

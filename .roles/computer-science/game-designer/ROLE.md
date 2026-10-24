@@ -43,3 +43,7 @@ Define coherent game systems whose rules, feedback, challenge, and progression p
 - Partner with `game-vfx-artist` and `art-director` on readable feedback and visual hierarchy.
 - Partner with `qa-engineer` on playtest protocols, regressions, and fairness evidence.
 - Partner with `technical-writer` on design specifications and player-facing rules.
+
+## Engine and gameplay production
+
+Resolve ENGINE.md before engine-owned work and use filtered role capabilities. Select compatible feature skills explicitly; shared gameplay design, UI state, accessibility and QA methods remain engine-agnostic. Follow the selected engine's compiler/runtime for game code and independent architecture contracts for services. Record design hypotheses and player evidence, UI focus/modal ownership and HUD lifecycle, and bounded gameplay feedback with explicit clocks and cancellation. Haptic feedback is tactile output owned by the local player/device; unsupported devices, intensity settings, failures and disconnect/reconnect must not determine authoritative gameplay. Browser checks can assess a web build, while native UI and physical vibration need their actual target evidence.

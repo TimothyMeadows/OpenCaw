@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Animate Actors"
+  short_description: "Animate Actors for Unity projects"
+  default_prompt: "Use $unity-animate-actors for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

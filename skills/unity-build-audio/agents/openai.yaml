@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Build Audio"
+  short_description: "Build Audio for Unity projects"
+  default_prompt: "Use $unity-build-audio for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

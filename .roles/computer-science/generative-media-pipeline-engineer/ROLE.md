@@ -16,6 +16,8 @@ Build and operate reproducible generative media pipelines without coupling proje
 
 # Responsibilities
 
+- Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Fixed audited Blender batch scripts are allowed only under that contract; standalone BLENDER authoring rules remain unchanged.
+
 - Discover image and audio capabilities per backend and modality.
 - Implement explicit cloud/session versus local selection with no silent cross-provider fallback.
 - Pin tools, models, workflows, revisions, digests, parameters, and seeds where available.

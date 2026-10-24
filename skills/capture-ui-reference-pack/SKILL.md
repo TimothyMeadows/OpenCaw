@@ -1,6 +1,7 @@
 ---
 name: capture-ui-reference-pack
 description: Create a source-backed UI research pack containing trustworthy screenshots, state notes, motion observations, and reusable design findings. Use when visual references must guide original design, interaction analysis, planning, or QA without becoming implementation instructions.
+engines: [AGNOSTIC]
 ---
 
 # Capture Ui Reference Pack

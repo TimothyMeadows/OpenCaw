@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unreal Integrate Assets"
+  short_description: "Integrate Assets for Unreal projects"
+  default_prompt: "Use $unreal-integrate-assets for the selected Unreal project with explicit engine compatibility, native ownership, and verification evidence."
+

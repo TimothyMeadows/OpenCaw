@@ -1,6 +1,7 @@
 ---
 name: playwright-browser-discovery
 description: Discover live web UI structure with Playwright or playwright-cli before authoring browser tests or page objects.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -34,4 +35,4 @@ Produce a concise discovery record:
 - On Windows, do not invent unsupported CLI flags. Use the locally installed `playwright-cli` or `npx playwright-cli` with the flags supported by that version.
 - Store generated discovery artifacts in host scratch locations such as `.playwright-cli/`; do not promote them into OpenCaw unless they are reusable templates or references.
 - Reference docs bundled with OpenCaw live under `assets/playwright-cli/references/`.
-- When the user needs a non-interactive handoff, run `commands/playwright-discovery-report.sh` to summarize snapshots, screenshots, traces, and videos into `.ai/reports/`.
+- When the user needs a non-interactive handoff, run `commands/playwright-discovery-report.sh` to summarize snapshots, screenshots, traces, and videos into `.opencaw/.cache/reports/`.

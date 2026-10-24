@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "targetFaces": 1500,
+  "textureSize": 512,
+  "cageExtrusion": 0.01,
+  "maxRayDistance": 0.05,
+  "uvMargin": 0.02,
+  "lodRatios": [
+    0.5,
+    0.25
+  ],
+  "colliderMaxFaces": 128,
+  "maxTriangles": 12000,
+  "maxMaterials": 8,
+  "maxTextureBytes": 16777216,
+  "parts": [],
+  "riggingRequired": false,
+  "animationRequired": false
+}

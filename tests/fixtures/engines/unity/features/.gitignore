@@ -1,0 +1,10 @@
+/Library/
+/Logs/
+/Temp/
+/Obj/
+/UserSettings/
+/Assets/OpenCawFixtureGenerated/
+/Assets/OpenCawFixtureGenerated.meta
+/outputs/
+/reports/
+/local-config.json

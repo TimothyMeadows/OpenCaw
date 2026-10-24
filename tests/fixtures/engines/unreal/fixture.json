@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "engine": "UNREAL",
+  "fixture": "opencaw-native-unreal",
+  "testName": "OpenCaw.Fixtures.LifecycleState",
+  "minimumChecks": 5,
+  "files": [
+    "OpenCawNativeFixture.uproject",
+    "Source/OpenCawNativeFixture.Target.cs",
+    "Source/OpenCawNativeFixtureEditor.Target.cs",
+    "Source/OpenCawNativeFixture/OpenCawNativeFixture.Build.cs",
+    "Source/OpenCawNativeFixture/OpenCawNativeFixture.cpp",
+    "Source/OpenCawNativeFixture/OpenCawFixtureTests.cpp"
+  ]
+}

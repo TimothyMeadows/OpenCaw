@@ -13,9 +13,17 @@ if [[ -z "$src" ]]; then
   exit 1
 fi
 
-mkdir -p "$OPENCAW_PROJECT_AI_DIR/archive/tasks"
 if [[ -z "$name" ]]; then
   name="$(basename "$src")"
 fi
+if [[ "$name" == */* || "$name" == *\\* || "$name" == . || "$name" == .. ]]; then
+  echo 'Archive name must be one filename within .opencaw/.cache/archive/tasks.' >&2
+  exit 1
+fi
+archive_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/tasks"
+for path in "$OPENCAW_PROJECT_CACHE_DIR/archive" "$archive_dir" "$archive_dir/$name"; do
+  [[ ! -L "$path" ]] || { echo "Archive path must not be a symbolic link: $path" >&2; exit 1; }
+done
+mkdir -p "$archive_dir"
 
-cp "$src" "$OPENCAW_PROJECT_AI_DIR/archive/tasks/$name"
+cp "$src" "$archive_dir/$name"

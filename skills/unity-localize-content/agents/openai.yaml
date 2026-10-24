@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Localize Content"
+  short_description: "Localize Unity text and assets with owned lifetimes"
+  default_prompt: "Use $unity-localize-content to localize the selected Unity project while preserving table identities, existing bindings, and asynchronous ownership."

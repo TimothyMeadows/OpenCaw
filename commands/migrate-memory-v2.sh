@@ -52,7 +52,7 @@ opencaw_resolve_paths
 opencaw_ensure_system_memory
 opencaw_ensure_project_files
 
-migrations_dir="$OPENCAW_PROJECT_AI_DIR/migrations"
+migrations_dir="$OPENCAW_PROJECT_CACHE_DIR/migrations"
 mkdir -p "$migrations_dir"
 if [[ -z "$manifest_file" ]]; then
   manifest_file="$migrations_dir/memory-v2-candidates.tsv"
@@ -63,15 +63,15 @@ prepare_manifest() {
   local -a sources=()
 
   timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-  archive_dir="$OPENCAW_PROJECT_AI_DIR/archive/memory-v1/$timestamp"
+  archive_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/$timestamp"
   mkdir -p "$archive_dir" "$(dirname "$manifest_file")"
 
   sources+=("$OPENCAW_PROJECT_MEMORY_FILE")
-  if [[ -d "$OPENCAW_PROJECT_AI_DIR/FRAGMENTS" ]]; then
-    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_AI_DIR/FRAGMENTS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
+  if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/FRAGMENTS" ]]; then
+    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_CACHE_DIR/FRAGMENTS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
   fi
-  if [[ -d "$OPENCAW_PROJECT_AI_DIR/LEARNINGS" ]]; then
-    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_AI_DIR/LEARNINGS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
+  if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/LEARNINGS" ]]; then
+    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_CACHE_DIR/LEARNINGS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
   fi
 
   printf '# id\tsource\tentry\n' > "$manifest_file"
@@ -79,7 +79,7 @@ prepare_manifest() {
 
   for source in "${sources[@]}"; do
     [[ -f "$source" ]] || continue
-    source_label="${source#"$OPENCAW_PROJECT_AI_DIR"/}"
+    source_label="${source#"$OPENCAW_PROJECT_CACHE_DIR"/}"
     mkdir -p "$archive_dir/$(dirname "$source_label")"
     cp "$source" "$archive_dir/$source_label"
 
@@ -183,19 +183,19 @@ apply_classification() {
   done < "$normalized_file"
 
   timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-  retired_dir="$OPENCAW_PROJECT_AI_DIR/archive/memory-v1/retired-$timestamp"
+  retired_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/retired-$timestamp"
   mkdir -p "$retired_dir"
   for source in FRAGMENTS LEARNINGS; do
-    if [[ -d "$OPENCAW_PROJECT_AI_DIR/$source" ]]; then
-      mv "$OPENCAW_PROJECT_AI_DIR/$source" "$retired_dir/$source"
+    if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/$source" ]]; then
+      mv "$OPENCAW_PROJECT_CACHE_DIR/$source" "$retired_dir/$source"
     fi
   done
 
-  classification_archive="$OPENCAW_PROJECT_AI_DIR/archive/memory-v1/classification-$timestamp.tsv"
+  classification_archive="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/classification-$timestamp.tsv"
   cp "$normalized_file" "$classification_archive"
 
-  mkdir -p "$OPENCAW_PROJECT_AI_DIR/reports"
-  report_file="$OPENCAW_PROJECT_AI_DIR/reports/memory-v2-migration-$timestamp.md"
+  mkdir -p "$OPENCAW_PROJECT_CACHE_DIR/reports"
+  report_file="$OPENCAW_PROJECT_CACHE_DIR/reports/memory-v2-migration-$timestamp.md"
   {
     echo '# Memory v2 Migration Report'
     echo

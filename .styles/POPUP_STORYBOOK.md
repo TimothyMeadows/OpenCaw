@@ -22,4 +22,4 @@ Design responsive interfaces and scenes as a bound paper object with readable le
 
 ## Role Fit
 
-Use with `papercraft-art-director`, `web-experience-designer`, `art-director`, and accessibility-aware implementation roles.
+Use with `papercraft-art-director`, `art-director`, and accessibility-aware implementation roles.

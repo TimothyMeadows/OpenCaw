@@ -6,7 +6,7 @@ source "$script_dir/lib/memory-common.sh"
 opencaw_resolve_paths
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-host_tasks_dir="$host_root/.ai/tasks"
+host_tasks_dir="$OPENCAW_PROJECT_CACHE_DIR/tasks"
 open_issues_file="$host_tasks_dir/OPEN_ISSUES.md"
 
 if [[ ! -f "$open_issues_file" ]]; then

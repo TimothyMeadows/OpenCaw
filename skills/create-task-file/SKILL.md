@@ -1,6 +1,7 @@
 ---
 name: create-task-file
 description: Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track its URL while open.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -14,7 +15,7 @@ Do not use while repository-root `BRAINSTORM.md` is active. Explicitly exit Brai
 
 ## Notes
 - The default workflow creates or links a matching GitHub issue.
-- Open issue URLs are tracked in `../.ai/tasks/OPEN_ISSUES.md`.
+- Open issue URLs are tracked in `../.opencaw/.cache/tasks/OPEN_ISSUES.md`.
 - Use `--no-issue` only for exceptional local-only work.
 - If the task already exists as a GitHub issue, use `../commands/import-task-from-issue.sh "<issue-ref>"` instead.
 - These task commands require Python 3.9+; they never install it or any packages.

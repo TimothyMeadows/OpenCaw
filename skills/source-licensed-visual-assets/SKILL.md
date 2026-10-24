@@ -1,6 +1,7 @@
 ---
 name: source-licensed-visual-assets
 description: Select visual assets with documented source, license, intended use, crop, ratio, and accessibility requirements. Use when a design needs stock imagery, icons, textures, audio, video, fonts, or other third-party media that must be safe to hand off and redistribute.
+engines: [AGNOSTIC]
 ---
 
 # Source Licensed Visual Assets

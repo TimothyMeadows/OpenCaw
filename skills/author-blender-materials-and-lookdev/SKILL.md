@@ -1,6 +1,7 @@
 ---
 name: author-blender-materials-and-lookdev
 description: Author Blender 4.5 PBR or stylized materials and controlled look development from the active OpenCaw style contract. Use for shader graphs, reusable node groups, colorspace, material response, style translation, and renderer-compatible look approval.
+engines: [AGNOSTIC]
 ---
 
 # Author Blender Materials and Lookdev

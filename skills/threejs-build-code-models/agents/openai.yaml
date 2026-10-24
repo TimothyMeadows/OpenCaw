@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Code Models"
+  short_description: "Author procedural Three.js models in ordered passes"
+  default_prompt: "Use $threejs-build-code-models to author and verify a code-first Three.js model."

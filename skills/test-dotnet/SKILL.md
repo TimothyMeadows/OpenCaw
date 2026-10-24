@@ -1,6 +1,7 @@
 ---
 name: test-dotnet
 description: Run tests for the host .NET repository and summarize failures clearly.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

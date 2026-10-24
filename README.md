@@ -3,80 +3,38 @@
 
 ![](OpenCaw.png)
 
-OpenCaw helps you work with an AI coding agent the way you would work with a thoughtful teammate: describe what you want in ordinary language, refine the plan together, and let the agent handle the repository-specific machinery.
-
-You do **not** need to memorize role names, invoke skills, or know command syntax before you can use it. Those controls are available when you want extra precision, but the normal interface is simply a conversation.
+**OpenCaw is a shared AI production baseline for video game development.** Describe the game, feature, or asset you want in ordinary language, refine the plan together, and work with your coding agent through design, implementation, playtesting, and review.
 
 ```text
-Help me plan a safe migration from our legacy checkout flow. Do not change code yet. Inspect the repository, identify the risky boundaries, and propose reviewable phases with tests and rollback points.
+Help me build a small playable vertical slice of this action RPG. Start with movement, one enemy, a readable combat HUD, and one reviewed environment prop. Inspect the project, agree on scope and performance targets, then plan the work before editing.
 ```
 
-That is a complete OpenCaw request.
-
-Behind the conversation, OpenCaw provides a shared system for planning, architecture, implementation, task tracking, repository memory, verification, and delivery across tools such as **Cursor, Codex, and Claude**. It can be mounted as `.codex`, `.cursor`, or `.claude` while keeping project-specific context inside the host repository.
+OpenCaw brings game-design methods, engine-specific skills, art and audio workflows, QA, and delivery controls into **Codex, Claude, Cursor**, and other compatible agents. You can begin with a conversation; roles, skills, and commands are optional ways to make a request more precise.
 
 ```mermaid
 flowchart TB
-    accTitle: OpenCaw Brainstorm, planning, and delivery workflows
-    accDescr: A request may explicitly enter persistent Brainstorm discovery before planning, then uses task mode by default, explicit goal mode for ordered task pull requests, or explicit Gauntlet mode for reviewed work-unit pull requests and final promotion.
+    accTitle: OpenCaw video game production
+    accDescr: Describe a game idea or production task, define player experience and budgets, resolve project contracts, and iterate on design, engine implementation, and staged assets. Playtests and technical checks lead to review or further revision. A validated local result goes through separate authorization for publication and runtime asset promotion.
 
-    Request["Natural-language request"] --> Discovery{"Explicit Brainstorm mode?"}
-    Discovery -->|"No"| Plan["Plan the understood work"]
-    Discovery -->|"Yes"| Brainstorm["Activate persistent Brainstorm state"]
-    Brainstorm --> Understand["Clarify one idea to baseline understanding"]
-    Understand --> Research["Project manager plus two independent researchers"]
-    Research --> Organize["Place the researched element in the branch graph"]
-    Organize --> Continue{"Explicitly exit Brainstorm?"}
-    Continue -->|"No; continue ideas"| Understand
-    Continue -->|"Yes"| Summary["Generate the hash-bound summary index"]
-    Summary --> Plan
-    Plan --> Mode{"Delivery mode"}
-
-    Mode -->|"Task: default"| Task["Complete one assignment"]
-    Task --> TaskVerify["Verify the result"]
-    TaskVerify --> TaskGate["Human PR readiness approval"]
-    TaskGate --> TaskQA["Open one PR and run post-PR QA"]
-    TaskQA --> HumanMerge["Human review and merge"]
-
-    Mode -->|"Goal: explicit"| GoalTask["Complete next ordered task"]
-    GoalTask --> GoalVerify["Verify the task"]
-    GoalVerify --> GoalPR["Open its PR automatically"]
-    GoalPR --> GoalQA["Run post-PR QA"]
-    GoalQA --> GoalMore{"More tasks?"}
-    GoalMore -->|"Yes"| GoalTask
-    GoalMore -->|"No"| GoalReport["Prepare goal completion report"]
-    GoalReport --> HumanMerge
-
-    Mode -->|"Gauntlet: explicit"| Bar["Approve bar, delivery base, and progress-PR contract"]
-    Bar --> GBranch["Create durable gauntlet/name integration branch"]
-    GBranch --> Units["Derive independently judgeable work units"]
-    Units --> Build["Builder improves one unit"]
-    Build --> UnitPR["Publish or update its progress PR automatically to the integration branch"]
-    UnitPR --> Critic["Fresh critic reviews the artifact; post round evidence"]
-    Critic -->|"Fail"| RecordUnitFail["Post and record PR QA failure"]
-    RecordUnitFail --> Build
-    Critic -->|"Pass"| UnitQA["Run PR QA and post results"]
-    UnitQA -->|"Fail"| RecordUnitFail
-    UnitQA -->|"Pass"| UnitMerge["Human merges the unit PR"]
-    UnitMerge --> MoreUnits{"All active units integrated?"}
-    MoreUnits -->|"No; start independent or newly unblocked unit"| Build
-    MoreUnits -->|"Yes"| Integration["Fresh critic reviews the integrated artifact"]
-    Integration -->|"Fail"| Reopen["Record failure and reopen affected units"]
-    Reopen --> Remediation["Builder corrects and verifies affected work"]
-    Remediation --> RemediationPR["Run progress readiness and publish remediation PR"]
-    RemediationPR --> Critic
-    Integration -->|"Pass"| GauntletGate["Human promotion-PR readiness approval"]
-    GauntletGate --> Promotion["Open promotion PR to the approved delivery base"]
-    Promotion --> PromotionQA["Run promotion PR QA"]
-    PromotionQA -->|"Pass"| HumanMerge
-    PromotionQA -->|"Fail"| PromotionFail["Record failure, archive completion, and reopen named units"]
-    PromotionFail --> Remediation
+    Request["Describe a game idea, feature, or asset"] --> Brief["Plan player experience, scope, and budgets"]
+    Brief --> Contracts["ENGINE.md, ARCHITECTURE.md, STYLE.md<br/>MEDIA.md when generating media"]
+    Contracts --> Design["Design systems, levels, UI, and feedback"]
+    Design --> Implement["Implement in the selected engine<br/>Stage art and audio with provenance"]
+    Implement --> Verify{"Playtests and technical checks pass?"}
+    Verify -->|"Revise"| Design
+    Verify -->|"Pass"| Review{"Review result and required evidence"}
+    Review -->|"Revise"| Design
+    Review -->|"Accepted"| Local["Validated local build, feature, or asset package"]
+    Local --> Delivery["Follow the selected delivery mode<br/>Apply publication gates and separate human asset acceptance"]
 ```
+
+Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task tracking, and verification evidence live in `.opencaw/.cache/`, so future sessions can continue from recorded decisions.
 
 ---
 
 # Table of Contents
 
+- [Game Production](#game-production)
 - [Start with a Normal Request](#start-with-a-normal-request)
   - [No Magic Words](#no-magic-words)
   - [Choose a Work Mode](#choose-a-work-mode)
@@ -88,7 +46,7 @@ flowchart TB
   - [When Explicit Controls Help](#when-explicit-controls-help)
 - [Install](#install)
   - [Fork OpenCaw First](#fork-opencaw-first)
-  - [Choose a Mount Name](#choose-a-mount-name)
+  - [Fixed Installation Layout](#fixed-installation-layout)
   - [Windows Bash Prerequisite](#windows-bash-prerequisite)
   - [Option 1 — Git Submodule](#option-1--git-submodule)
   - [Option 2 — Clone](#option-2--clone)
@@ -97,7 +55,8 @@ flowchart TB
   - [Runtime Model](#runtime-model)
   - [Session Startup and Context Resolution](#session-startup-and-context-resolution)
   - [Repository Layering](#repository-layering)
-  - [Architecture, Style, and Media Contracts](#architecture-style-and-media-contracts)
+  - [Engine, Architecture, Style, and Media Contracts](#engine-architecture-style-and-media-contracts)
+  - [Game Engine Selection](#game-engine-selection)
   - [Roles](#roles)
   - [Role, Skill, and Command Bindings](#role-skill-and-command-bindings)
   - [Skills](#skills)
@@ -114,26 +73,48 @@ flowchart TB
 
 ---
 
+# Game Production
+
+Use OpenCaw to take a game concept toward a playable, reviewed result, or to improve one part of an existing game.
+
+| Production area | Work OpenCaw helps with | Evidence to collect |
+| --- | --- | --- |
+| Game design | Player decisions, core loops, progression, economies, difficulty, and balance hypotheses | Design briefs and observed playtest results |
+| Gameplay and worlds | Movement, combat, physics, actors, level systems, persistence, and engine integration | Tests and representative playable scenarios |
+| Game UI and feedback | HUD synchronization, screen/input ownership, controller focus, accessibility, camera, VFX, audio cues, and haptics | Layout/input checks and supported-device testing |
+| Art and assets | Visual direction, 2D proofs, native proof-to-model production, Blender authoring, rigging, animation, and runtime handoff | Source ancestry, technical budgets, independent reviews, and human acceptance |
+| Audio | Music, ambience, sound effects, and voice through explicitly selected tools | Rights, provenance, listening review, and runtime budgets |
+| QA and performance | Gameplay regressions, scene budgets, lifecycle cleanup, profiling, and target-platform builds | Actual engine/device results, with blocked checks stated |
+| Game services and delivery | Multiplayer integration, databases, backend services, security, CI/CD, and release preparation | Service/integration tests and reviewed delivery evidence |
+
+Engine-specific workflows cover **Three.js, Babylon.js, Phaser, Unity, Unreal, and Godot**. Each project selects one in `ENGINE.md`; an unconfigured project defaults to Three.js only when existing game evidence does not conflict. Three.js supplies rendering; physics and networking require explicit project choices. Engine-agnostic design and QA skills remain reusable across engines.
+
+`STYLE.md` selects visual direction and the art pipeline. **PROOF_TO_MODEL** is the default: an approved 2D proof is reconstructed natively and finished in Blender, then reviewed before any runtime promotion. CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. The CODE pipeline is specific to Three.js.
+
+OpenCaw supplies guidance and executable workflows. Actual production needs the selected engine, packages, platform SDKs, art tools, and any chosen media capabilities. Dependencies, model licenses, generation budgets, and runtime asset acceptance remain explicit decisions. A structural validation pass does not establish gameplay quality or production readiness.
+
+---
+
 # Start with a Normal Request
 
-OpenCaw is not a command language wrapped around an AI. It is a repository-aware operating system for the conversation you were already going to have.
+Start with what the player should experience, what the game needs, and how you will judge the result. OpenCaw uses the repository and its production contracts to turn that conversation into scoped work.
 
 Start with the outcome:
 
 ```text
-The settings screen has become hard to maintain. Help me understand why, propose a cleaner structure, and then make the smallest safe refactor with tests.
+The inventory HUD loses controller focus when a player closes a modal. Inspect the input and screen ownership, plan a focused fix, and verify focus restoration without changing the layout.
 ```
 
 You can add constraints naturally:
 
 ```text
-Keep the public API stable. Do not add dependencies. Show me the plan before editing, and stop for approval before opening a PR.
+Keep existing save files compatible and stay within the agreed frame-time budget. Do not add dependencies. Show me the plan before editing, and stop for approval before opening a PR.
 ```
 
 You can correct direction naturally too:
 
 ```text
-That plan is too broad. Keep the database untouched and split the UI cleanup from the API work.
+That plan is too broad. Keep the combat rules unchanged and separate the HUD fix from the save-system work.
 ```
 
 OpenCaw uses the baseline instructions, project contracts, repository structure, task state, and relevant memory to turn that conversation into governed work. You can stay at this level for the whole task.
@@ -149,11 +130,11 @@ Role and skill names are **optional controls**, not required incantations.
 | “Review this like a security-minded senior engineer.” | Apply a security review lens without requiring a role name. |
 | “This is large; split only the parts that can safely run in parallel.” | Plan bounded sub-agent lanes when parallelism is useful and available. |
 | “Take this from idea through a reviewed PR, but ask before publishing.” | Track the task, implement, validate, then stop at the PR readiness gate. |
-| “Remember this repository rule for next time.” | Validate and store durable project knowledge under `.ai/`. |
+| “Remember this repository rule for next time.” | Validate and store durable project knowledge under `.opencaw/.cache/`. |
 
 These prompts are examples, not fixed syntax. Equivalent natural wording works.
 
-You may still say `use role security-engineer`, invoke a named skill, or request a command when you know exactly which control you want. OpenCaw does not require that level of specificity to plan or complete ordinary work.
+You may still say `use role gameplay-engineer`, invoke a named skill, or request a command when you know exactly which control you want. OpenCaw does not require that level of specificity to plan or complete ordinary work.
 
 ## Choose a Work Mode
 
@@ -170,19 +151,19 @@ Before those work modes, you may explicitly enter the optional Brainstorm discov
 For ordinary work, describe the assignment directly:
 
 ```text
-Fix the duplicate invoice bug, add a regression test, and stop when the branch is ready for my PR approval.
+Fix the duplicate quest reward after reconnect, add a regression test, and stop when the branch is ready for my PR approval.
 ```
 
 Use goal mode when several tasks should advance automatically through separate PRs:
 
 ```text
-Use goal flow for these four migration tasks. Validate and open each task PR, run its post-PR QA, then continue. Never merge automatically.
+Use goal flow for movement, combat, inventory UI, and save/load in this vertical slice. Validate and open each task PR, run its post-PR QA, then continue. Never merge automatically.
 ```
 
 Use Gauntlet mode when the result should survive repeated independent comparison against a concrete benchmark:
 
 ```text
-Use gauntlet mode for this onboarding redesign. First propose an inspectable quality bar, delivery base, and integration-branch contract for my approval. Publish each unit's progress PR automatically after approval, use fresh critics, and leave every merge and the final promotion PR under human control.
+Use gauntlet mode for this playable combat arena. First propose an inspectable quality bar, delivery base, and integration-branch contract for my approval. Publish each unit's progress PR automatically after approval, use fresh critics, and leave every merge and the final promotion PR under human control.
 ```
 
 Gauntlet mode is appropriate only when a critic can inspect the real output—such as running code, rendered pixels, test or performance results, a finished document, or another concrete artifact. It never permits the builder to grade its own work. Its progress PRs provide review surfaces throughout the loop; the final promotion PR is the integration boundary back to the approved delivery base, not the first review surface.
@@ -229,7 +210,7 @@ Planning is where natural-language use is often most powerful.
 You can begin with uncertainty:
 
 ```text
-I know the reporting module needs to be modernized, but I am not sure where to start. Inspect it and help me turn the problem into a safe sequence of decisions and changes. Do not implement anything yet.
+The combat feels hard to read, but I am not sure whether the problem is timing, animation, camera, or UI. Inspect the current systems and help me define a playtestable improvement plan. Do not implement anything yet.
 ```
 
 OpenCaw can then:
@@ -257,11 +238,11 @@ Turn this idea into small PR-sized tasks and call out what can run in parallel.
 ```
 
 ```text
-Assume zero downtime and no schema breaking changes. What does that change in the plan?
+Assume we must support existing saves and both controller and keyboard input. What does that change in the plan?
 ```
 
 ```text
-We learned the API is shared by mobile. Stop and re-plan around backward compatibility.
+We learned this scene also ships on mobile. Stop and re-plan around touch input, memory use, and the mobile frame-time budget.
 ```
 
 You are not locked into the first plan. OpenCaw treats corrections, new evidence, and changed constraints as reasons to update the plan rather than push through stale assumptions.
@@ -272,13 +253,13 @@ Here is a complete interaction without role or skill syntax:
 
 ```text
 You:
-Our authentication code is spread across the API and web app. I want a simpler design, but I cannot break mobile clients. First inspect the repository and give me a phased plan. Do not edit yet.
+Our combat state is spread across animation callbacks, the player controller, and the HUD. I want clearer ownership without changing attack timing or existing saves. First inspect the repository and give me a phased plan. Do not edit yet.
 
 OpenCaw:
-Inspects the architecture, authentication boundaries, active issues, tests, and relevant repository memory. Returns a plan with assumptions, compatibility risks, phases, and verification.
+Inspects the selected engine, combat state, animation events, UI lifecycle, tests, and relevant repository memory. Returns a plan with ownership boundaries, compatibility risks, phases, and playable verification scenarios.
 
 You:
-Keep token formats unchanged in phase one. Separate observability from the refactor, and make the first task small enough for one reviewer.
+Keep attack timings and save formats unchanged in phase one. Separate presentation cleanup from authoritative combat rules, and make the first task small enough for one reviewer.
 
 OpenCaw:
 Updates the plan, narrows phase one, and makes the dependency order explicit.
@@ -297,14 +278,14 @@ The named machinery is still there—roles, skills, commands, task files, memory
 For a substantial request, the normal flow is:
 
 1. **Resolve the project safely** — find the actual host repository and mounted OpenCaw directory without guessing across workspace boundaries.
-2. **Load high-signal context** — read protected repository memory, project rules, architecture/style contracts, active tasks, and relevant tagged knowledge.
+2. **Load high-signal context** — read protected repository memory, project rules, engine/architecture/style contracts, active tasks, and relevant tagged knowledge.
 3. **Restore or choose discovery** — resume an active Brainstorm before planning, or enter it only after an explicit request.
 4. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done; Brainstorm may use two researcher lanes to deepen that understanding.
 5. **Select and plan the work contract** — after Brainstorm is explicitly closed when active, plan into task mode by default or an explicitly requested goal or Gauntlet lifecycle.
-6. **Choose capabilities** — apply baseline behavior and automatically use relevant skills; explicit roles remain optional specialist lenses.
+6. **Choose capabilities** — resolve the selected engine, filter compatible skills and role capabilities, and apply relevant game-production workflows; explicit roles remain optional specialist lenses.
 7. **Track real work** — create or import a task, link its GitHub issue, and keep the active checklist concise.
 8. **Implement carefully** — make focused changes, preserve unrelated work, and use safe parallel lanes only when they genuinely help.
-9. **Prove the result** — run targeted tests, broader validation, logs, browser checks, or artifacts appropriate to the risk.
+9. **Prove the result** — run targeted tests, engine builds, playtests, performance checks, device/input checks, and asset reviews appropriate to the work; record blocked or unavailable checks.
 10. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
 11. **Deliver by mode** — task work pauses before publication; goal flow may publish validated task PRs; an approved Gauntlet contract may publish unit progress PRs to its integration branch; every path keeps merges human-controlled, and Gauntlet promotion still requires a final human gate.
 
@@ -315,25 +296,25 @@ OpenCaw can do this even if your prompt never mentions a role, skill, command, t
 ### Understand a repository
 
 ```text
-I am new to this codebase. Explain how a request moves from the API entry point to storage, show me the important files, and call out the parts that are risky to change.
+I am new to this game. Trace player input through the gameplay state, animation, HUD, and save system. Show me the important files and the ownership boundaries that are risky to change.
 ```
 
 ### Plan a feature
 
 ```text
-Help me plan team invitations. We need expiring links, audit history, and no new infrastructure. Ask me only for decisions that materially change the design, then produce reviewable implementation tasks.
+Help me plan a progression system for this co-op game. Define player choices, rewards, economy risks, and playtest hypotheses, then split the agreed design into reviewable tasks.
 ```
 
 ### Build a feature
 
 ```text
-Add CSV export to the reporting page. Match the existing architecture, keep the UI accessible, add tests, and verify the download in a browser. Do not publish anything until I approve the PR.
+Build a pause and settings menu for the selected engine. Preserve input ownership, support keyboard and controller navigation, restore focus correctly, and verify the menu in the actual target build. Do not publish until I approve the PR.
 ```
 
 ### Diagnose a bug
 
 ```text
-Users occasionally see duplicate invoices after retrying checkout. Find concrete evidence for the root cause, fix it without changing the public API, and add a regression test.
+Players sometimes receive the same quest reward twice after reconnecting. Trace the authority and persistence boundaries, prove the root cause, and add a regression test for repeated delivery.
 ```
 
 ### Review without editing
@@ -351,13 +332,13 @@ Work on #123. Import the issue into task tracking, implement the smallest comple
 ### Plan safe parallel work
 
 ```text
-This migration is large. Split independent investigation, implementation, and QA work into safe lanes, avoid overlapping write scopes, then integrate and verify everything from the main lane.
+Plan this vertical slice with independent lanes for gameplay, UI, environment art, and QA where the interfaces are stable. Avoid overlapping writes, then integrate and playtest the result from the main lane.
 ```
 
 ### Create visual or media assets
 
 ```text
-Help me define the visual direction for this onboarding flow, produce a reusable style contract, and stage a small set of image concepts for review without promoting them into runtime assets yet.
+Help me define the visual direction for this game, inspect any configured asset libraries, and plan one environment prop through the selected pipeline. Stage proofs and exports for review; ask before generation spending or runtime promotion.
 ```
 
 ### Improve the process itself
@@ -372,7 +353,7 @@ Natural language is the default. Explicit controls are useful when you want to c
 
 | Control | Use it when | Example |
 | --- | --- | --- |
-| Role | You want a named specialist perspective or composition order. | `Use roles backend-architect + security-engineer.` |
+| Role | You want a named specialist perspective or composition order. | `Use roles game-designer + gameplay-engineer.` |
 | Skill | You want one exact reusable workflow. | `Use the dependency audit skill before changing packages.` |
 | Command | You want a deterministic repository script. | `Run the full OpenCaw validation command.` |
 | Agent count | You are authorizing parallel agent work and want a capacity ceiling. | `Use up to 3 agents, but only for independent lanes.` |
@@ -380,34 +361,34 @@ Natural language is the default. Explicit controls are useful when you want to c
 | Brainstorm mode | An idea needs persistent, research-heavy discovery before planning. | `Enter Brainstorm mode and research this game idea.` |
 | Task mode | You want to emphasize that one assignment should end at the normal human PR gate. | `Use task mode for this bug fix.` |
 | Goal flow | You explicitly authorize automated task-to-PR progression across multiple tasks. | `Use goal flow for these four tasks; never merge automatically.` |
-| Gauntlet flow | You want one deliverable repeatedly judged by independent critics against an approved bar. | `Use gauntlet mode for this redesign.` |
+| Gauntlet flow | You want one deliverable repeatedly judged by independent critics against an approved bar. | `Use gauntlet mode for this playable encounter.` |
 
 Explicit role examples:
 
 ```text
-Use role security-engineer + sre and review the service for exploit paths and resilience gaps.
+Use roles gameplay-engineer + qa-engineer to review combat authority, interruption, timing, and repeatable playtest coverage.
 ```
 
 ```text
-Act as project-manager + fullstack-engineer. Build a safe parallel plan, then implement only after I approve it.
+Use roles game-designer + art-director to align the player experience, visual readability, and asset budgets before implementation.
 ```
 
 Explicit goal-flow example:
 
 ```text
-Goal: modernize the reporting module across these five tasks. Raise each task PR after validation, run post-PR QA, then continue. Never merge PRs automatically.
+Goal: build the agreed playable vertical slice across these five tasks. Raise each task PR after validation, run post-PR QA, then continue. Never merge PRs automatically.
 ```
 
 Explicit Brainstorm example:
 
 ```text
-Start Brainstorm mode for a privacy-first family scheduling app. Organize each idea into the existing graph, use both researchers, and do not create a plan until I explicitly exit and select an element.
+Start Brainstorm mode for a cooperative exploration game. Research player goals, comparable games, technical constraints, and scope. Use both researchers, and do not create a plan until I explicitly exit and select an element.
 ```
 
 Explicit Gauntlet example:
 
 ```text
-Use gauntlet flow for the reporting experience. Propose a concrete benchmark and an approved delivery base, create a durable gauntlet integration branch, and let disjoint units publish progress PRs there automatically. Use a fresh critic for every round, require PR QA and human merge before a unit counts as integrated, and keep final promotion human-gated.
+Use gauntlet flow for this dungeon encounter. Propose an inspectable gameplay, readability, asset, and performance benchmark plus an approved delivery base. Publish disjoint progress PRs to the integration branch under the approved contract. Use fresh critics, require PR QA and human merge for integration, and keep final promotion human-gated.
 ```
 
 Brainstorm is explicit because it creates persistent pre-planning state and suspends delivery-mode creation until explicit exit. Goal flow is explicit because it changes the normal PR publication authorization boundary. Gauntlet flow is explicit because its approved contract authorizes progress PR publication and changes the execution and evidence model. That authorization never includes a merge: unit, remediation, and promotion merges remain human decisions, and the final promotion PR retains a human readiness gate. Ordinary natural-language work remains task mode and pauses for approval before publication.
@@ -416,15 +397,9 @@ Brainstorm is explicit because it creates persistent pre-planning state and susp
 
 # Install
 
-OpenCaw is designed to be mounted directly inside an existing repository as one of:
+Install OpenCaw directly at `<project-root>/.opencaw/` in an existing project. Both automated setup and manual installation require this exact directory.
 
-```text
-.codex/
-.cursor/
-.claude/
-```
-
-The mounted directory is the reusable baseline. Project-specific memory, tasks, rules, and generated contracts stay in the host repository.
+The installation contains reusable baseline files plus an ignored `.cache/` child for durable project memory, tasks, rules, and evidence. Project contracts such as `ENGINE.md`, `ARCHITECTURE.md`, and `STYLE.md` stay at the project root. This is a fresh-install layout; earlier install locations are not supported or migrated.
 
 ## Fork OpenCaw First
 
@@ -442,17 +417,11 @@ https://github.com/<your-org>/OpenCaw
 
 Use your fork URL in the installation commands below.
 
-## Choose a Mount Name
+## Fixed Installation Layout
 
-Choose the directory recognized by your AI tool:
+Use `.opencaw` for Codex, Cursor, Claude, and every other supported agent. Do not rename the installation or select a tool-specific directory. The scaffold maintains a block in the host root `AGENTS.md` that reads only `./.opencaw/AGENTS.md`, while preserving other host instructions.
 
-| Tool or convention | Typical mount |
-| --- | --- |
-| Codex | `.codex` |
-| Cursor | `.cursor` |
-| Claude | `.claude` |
-
-Examples below use `.codex`. Replace it consistently if you choose another mount.
+Commands shown in this install section run from the project root. Technical-reference examples using `./commands/` run from inside `.opencaw/`; the equivalent project-root prefix is `./.opencaw/commands/`.
 
 ## Windows Bash Prerequisite
 
@@ -461,19 +430,19 @@ OpenCaw commands use Bash. Linux and macOS normally already provide the expected
 On Windows, Git Bash is recommended for native Windows filesystem performance. After OpenCaw is mounted, inspect available providers from PowerShell:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1"
 ```
 
 Install Git Bash explicitly when needed:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -Install
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider GitBash -Install
 ```
 
 Or explicitly install WSL when Linux tooling compatibility is preferred:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider WSL -Install
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider WSL -Install
 ```
 
 OpenCaw never installs Bash implicitly. Use `-WhatIf` to preview installation or scaffold execution.
@@ -481,7 +450,7 @@ OpenCaw never installs Bash implicitly. Use `-WhatIf` to preview installation or
 Run the canonical scaffold through the selected provider:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
 ```
 
 ## Option 1 — Git Submodule
@@ -489,7 +458,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\.codex\commands\install-w
 Recommended for teams that want centralized OpenCaw updates while pinning each host repository to a reviewed revision:
 
 ```bash
-git submodule add https://github.com/<your-org>/OpenCaw .codex
+git submodule add https://github.com/<your-org>/OpenCaw .opencaw
 git submodule update --init --recursive
 ```
 
@@ -499,40 +468,32 @@ Update later when your team is ready:
 git submodule update --remote
 ```
 
-Equivalent mount examples:
-
-```bash
-git submodule add https://github.com/<your-org>/OpenCaw .cursor
-git submodule add https://github.com/<your-org>/OpenCaw .claude
-```
-
 ## Option 2 — Clone
 
 Use a direct clone when the host repository needs an independent, customized copy:
 
 ```bash
-git clone https://github.com/<your-org>/OpenCaw .codex
-```
-
-Equivalent mount examples:
-
-```bash
-git clone https://github.com/<your-org>/OpenCaw .cursor
-git clone https://github.com/<your-org>/OpenCaw .claude
+git clone https://github.com/<your-org>/OpenCaw .opencaw
 ```
 
 ## Start the First Session
 
-Most compatible agents automatically discover the mounted `AGENTS.md` baseline or the host bootstrap that points to it. If discovery has not happened yet, use a natural request:
+Initialize the durable context files and managed root `AGENTS.md` bootstrap before the first session:
+
+```bash
+bash ./.opencaw/commands/create-host-ai-scaffold.sh
+```
+
+Use the PowerShell `-RunScaffold` command above when Bash is not yet available to the current shell. Compatible agents read the host bootstrap to load the baseline. If discovery has not happened yet, use a natural request:
 
 ```text
-Read the OpenCaw AGENTS.md instructions, initialize the repository-local .ai scaffold, and explain what project context is available before we start.
+Read ./.opencaw/AGENTS.md, initialize the repository-local .opencaw/.cache scaffold, and explain what project context is available before we start.
 ```
 
 After initialization, begin with the work itself:
 
 ```text
-I want to improve the onboarding flow. First help me understand the current implementation and create a safe plan. Do not edit yet.
+I want to improve the first playable tutorial. Inspect the selected engine, current scene, controls, and player feedback, then help me create a scoped plan. Do not edit yet.
 ```
 
 ---
@@ -547,7 +508,7 @@ The rest of this README describes the machinery behind the conversational experi
 | --- | --- | --- |
 | Natural-language request | Outcome, constraints, corrections, authorization, and definition of done | Primary interface |
 | `AGENTS.md` baseline | Startup, planning, safety, task, memory, verification, and delivery policy | Loaded by the agent |
-| Project contracts | Repository architecture, visual language, media policy, and local rules | Created or consulted when relevant |
+| Project contracts | Game engine, software architecture, visual language, media policy, and local rules | Created or consulted when relevant |
 | Roles | Named specialist perspective and priorities | Optional precision control |
 | Skills | Reusable reasoning and workflow instructions | Selected automatically when relevant or explicitly requested |
 | Commands | Deterministic scripts for repeatable execution | Run by the agent or directly by developers |
@@ -562,14 +523,14 @@ Roles, skills, and commands deepen control, but baseline OpenCaw behavior works 
 At session start, OpenCaw follows a memory-first sequence:
 
 1. Resolve the actual project root and mounted baseline with `commands/resolve-opencaw-paths.sh`.
-2. Create the repository-local `.ai` scaffold when required.
-3. Load all of `.ai/SYSTEM_MEMORY.md`.
-4. Review project rules, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, and open issues when present.
+2. Create the repository-local `.opencaw/.cache` scaffold when required.
+3. Load all of `.opencaw/.cache/SYSTEM_MEMORY.md`.
+4. Review project rules, `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, and open issues when present.
 5. Infer relevant memory tags and query ranked context before broad raw searches.
 6. Check the semantic repository-map fingerprint and refresh stale structure when necessary.
 7. Plan and execute the current request using the narrowest safe scope.
 
-The resolver accepts an explicit `OPENCAW_PROJECT_ROOT`, a Git root associated with the host, or the parent of a recognized `.codex`, `.cursor`, or `.claude` mount. It fails closed when the project boundary is ambiguous.
+For installed commands, the resolver uses the direct parent of `.opencaw/` as the project root and fails closed on an invalid layout or conflicting root selection. It never searches a broad workspace parent or discovers alternate installation names. Maintainer source checkouts may use explicit `OPENCAW_PROJECT_ROOT` fixture roots for development and testing; they are not another host installation option.
 
 ## Repository Layering
 
@@ -578,15 +539,17 @@ OpenCaw separates reusable baseline behavior from host-project state.
 ### Shared mounted baseline
 
 ```text
-<project-root>/.codex/    # or .cursor/ or .claude/
+<project-root>/.opencaw/
 ├── AGENTS.md
 ├── .architecture/
+├── .engine/
 ├── .roles/
 ├── .styles/
 ├── skills/
 ├── commands/
 ├── assets/
-└── tests/
+├── tests/
+└── .cache/               # durable host state, ignored by baseline Git
 ```
 
 ### Repository-local project state
@@ -594,34 +557,39 @@ OpenCaw separates reusable baseline behavior from host-project state.
 ```text
 <project-root>/
 ├── AGENTS.md
+├── ENGINE.md
 ├── ARCHITECTURE.md
 ├── STYLE.md
 ├── MEDIA.md                 # optional
-└── .ai/
-    ├── SYSTEM_MEMORY.md
-    ├── MEMORY.md
-    ├── REPO_MAP.md
-    ├── RULES.md
-    ├── DEBUG.md
-    ├── CONTEXT_SUMMARY.md
-    ├── tasks/
-    ├── goals/
-    ├── gauntlets/              # contracts, immutable rounds, and ordered PR/QA ledgers
-    ├── archive/
-    │   ├── tasks/
-    │   ├── goals/
-    │   └── gauntlets/
-    └── reports/
+├── BRAINSTORM.md            # optional discovery state
+├── BRAINSTORM_SUMMARY.md    # optional exit index
+└── .opencaw/
+    └── .cache/
+        ├── SYSTEM_MEMORY.md
+        ├── MEMORY.md
+        ├── REPO_MAP.md
+        ├── RULES.md
+        ├── DEBUG.md
+        ├── CONTEXT_SUMMARY.md
+        ├── tasks/
+        ├── goals/
+        ├── gauntlets/      # contracts, immutable rounds, and ordered PR/QA ledgers
+        ├── archive/
+        │   ├── tasks/
+        │   ├── goals/
+        │   └── gauntlets/
+        └── reports/
 ```
 
-Project-specific learned state belongs under the host repository's `.ai/` directory, never inside the reusable mounted baseline unless the user explicitly asks to modify the baseline itself.
+Project-specific learned state belongs under `.opencaw/.cache/`. Although this directory sits inside the installation, it is local durable state and excluded from the shared baseline's Git history. Preserve and back it up with the project's other durable state; do not treat it as a disposable tool-download cache. Shared configuration changes belong outside `.cache/` and require an explicit baseline-change request.
 
-## Architecture, Style, and Media Contracts
+## Engine, Architecture, Style, and Media Contracts
 
 OpenCaw uses concise host-level contracts so agents do not have to rediscover foundational decisions during every task.
 
 | Contract | Host file | Template source | Purpose |
 | --- | --- | --- | --- |
+| Game engine | `ENGINE.md` | `.engine/` | One game engine, engine-owned languages, prerequisites, and compatible capabilities |
 | Architecture | `ARCHITECTURE.md` | `.architecture/` | Technology, boundaries, data, deployment, and engineering conventions |
 | Visual style and art pipeline | `STYLE.md` | `.styles/*.md`, `.styles/.pipelines/` | Visual language plus one primary production path and supported alternatives |
 | Cloud/local media execution | `MEDIA.md` | `.styles/.pipelines/cloud/`, `.styles/.pipelines/local/` | Capability, provenance, staging, budgets, and promotion policy for generated media |
@@ -632,11 +600,10 @@ When a required architecture or style contract is missing, OpenCaw asks which te
 
 Common templates include:
 
-- `.NET`, .NET Aspire, MAUI, Node.js, Python, Next.js, SPA, React, Angular, and Vue
-- Playwright, SignalR/WebSockets, embedded firmware, and Solidity
-- MSSQL, MySQL, PostgreSQL, SQLite, Cosmos DB, Azure Storage Tables, and Databricks
-- Microservices, event-driven systems, Terraform, Kubernetes, Helm, GitHub Actions, and Azure DevOps
-- Azure-specific infrastructure and application guidance
+- `.NET`, .NET Aspire, MAUI, Node.js, Python, and framework-neutral SPA
+- Playwright and SignalR/WebSockets
+- MSSQL, MySQL, PostgreSQL, SQLite, Cosmos DB, and Azure Storage Tables
+- Microservices, event-driven systems, Terraform, Kubernetes, Helm, and GitHub Actions
 
 Templates live in `.architecture/`; language and tool alignment guidance lives in `.architecture/LANGUAGE_SUPPORT.md`.
 
@@ -648,12 +615,12 @@ Generate a host contract with:
 
 ### Style and art-pipeline contracts
 
-Style templates live in `.styles/` and cover web experiences, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions. Every `STYLE.md` also selects an art pipeline. `CSS3` is the default because most OpenCaw projects are web/frontend work.
+Style templates live in `.styles/` and cover game interfaces, UI systems, 2D/2.5D art, card games, VFX, papercraft, dark fantasy, tactical interfaces, and other asset-production directions. Every `STYLE.md` also selects an art pipeline. `PROOF_TO_MODEL` is the default for approved 2D proofs reconstructed and finished as game-ready 3D assets. CSS/SVG interface work remains supported outside the art pipeline registry.
 
-Generate and validate the default CSS/vector contract with:
+Generate and validate a style contract using the default PROOF_TO_MODEL pipeline with:
 
 ```bash
-./commands/generate-style.sh "WEB_LIGHT_PAPER"
+./commands/generate-style.sh "TACTICAL_UI_HUD"
 ./commands/validate-style-contract.sh
 ```
 
@@ -661,12 +628,39 @@ Select a different primary pipeline or advertise project-supported alternatives 
 
 ```bash
 ./commands/generate-style.sh --pipeline CLOUD "CEL_SHADED_COMIC"
-./commands/generate-style.sh --pipeline LOCAL --allow-pipeline CSS3 "CEL_SHADED_COMIC"
-./commands/generate-style.sh --pipeline CODE --allow-pipeline CSS3 "CEL_SHADED_COMIC"
-./commands/generate-style.sh --pipeline BLENDER --allow-pipeline CSS3 "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline LOCAL --allow-pipeline PROOF_TO_MODEL "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline CODE --allow-pipeline PROOF_TO_MODEL "CEL_SHADED_COMIC"
+./commands/generate-style.sh --pipeline BLENDER --allow-pipeline PROOF_TO_MODEL "CEL_SHADED_COMIC"
 ```
 
-Friendly names such as `imagegen`, `comfyui`, `vector`, `threejs`, and `blender` normalize to `CLOUD`, `LOCAL`, `CSS3`, `CODE`, and `BLENDER`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
+Friendly names such as `imagegen`, `comfyui`, `proof-to-model` (also `proof to model` and `2d-to-3d`), `threejs`, and `blender` normalize to `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDER`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
+
+## Game Engine Selection
+
+Each project selects one engine in `ENGINE.md`; unconfigured projects default to Three.js. Shared definitions and prerequisites live in `.engine/`. Six engines are supported: Three.js, Babylon.js, Phaser, Unity, Unreal and Godot. Architecture describes software structure; STYLE.md describes art production. Blender remains an asset tool.
+
+```bash
+./commands/generate-engine.sh UNITY
+./commands/validate-engine-contract.sh
+./commands/resolve-engine.sh
+./commands/resolve-skill.sh unity-build-ui
+./commands/resolve-role-capabilities.sh computer-science/gameplay-engineer
+./commands/validate-engines.sh
+```
+
+Generation uses concise read directives; `--inline` embeds the definition. Regeneration preserves project content outside the managed block. Invalid contracts and conflicting existing-engine evidence require explicit migration. Browser engine architecture templates remain compatibility redirects.
+
+Every skill declares `engines: [AGNOSTIC]` or one canonical engine. Engine-specific feature skills use prefixes such as `unity-` or `threejs-`. The registry defines engine features across all six engines; Unity has 19 focused skills and Unreal has 22, and role capability resolution filters their effective selection and reports exclusions. A requested skill never changes engines. Legacy Three.js skill names resolve through OpenCaw aliases, while command names and artifact schemas remain compatible.
+
+Unreal workflows cover C++/Blueprint ownership, assets, controls, physics, animation, materials, UI, audio and multiplayer, with dedicated specialists for async work, GAS, movement, modular features, AI/StateTree, Mass, cameras, Niagara, cinematics, world streaming, procedural content and saves. All follow the project's actual version and explicit plugin choices. Engine guidance requires no additional model or hosted service; real API/runtime acceptance needs matching native tools, SDKs and assets. Optional native feature fixtures distinguish source/structure checks from actual execution and do not certify network correction, rendering, sound or physical feedback through headless success.
+
+Task overrides require recorded, hash-bound evidence and an isolated prototype scope. For example, `resolve-engine.sh --override GODOT --task demo --scope prototypes/godot-demo --record-override` records selection; consumers pass `--evidence .opencaw/.cache/tasks/demo/engine-override.json --output prototypes/godot-demo/file`. The task must already exist. CODE commands consume the same receipt through `--engine-evidence FILE` and an explicit prototype source path; manifests and reports remain under that task. Overrides cannot edit incompatible code in an existing game and do not rewrite ENGINE.md. This is cooperative validation, not an OS sandbox.
+
+Unity production adds dedicated 2D content, localization, rendering, native Editor tools and web optimization, plus explicitly selected live services, sessions, voice, purchases and advertising. Native batch tooling remains available; Unity CLI/Pipeline is optional and requires configured project/instance identity. Feature use never installs packages or activates accounts. Match the project Editor and package versions; native, service, visual/audio and device acceptance require their actual prerequisites.
+
+The Three.js CODE pipeline requires THREEJS. Selecting Unity never changes art contracts or installs Three.js. Host packages, matching Editors, SDKs, licensing and optional physics/networking packages remain explicit prerequisites. Engine guidance requires no additional AI model, paid middleware, or hosted service; selected asset-generation pipelines have their own dependencies. Unity code follows its Editor's supported C# environment; Godot preserves GDScript/C# choice and version-specific export restrictions.
+
+Use `design-game-systems` for loops, player decisions, progression and evidence-based balance, and `build-game-ui` for layouts, navigation, modal input ownership and HUD synchronization. `print-gameplay-system-brief.sh --focus design|ui|feedback` creates focused briefs; `validate-gameplay-review.sh --profile general|design|ui|feedback REPORT.md` checks report structure and preserves blocked/not-run results. Gameplay feedback coordinates presentation; haptic feedback means tactile output. Browser tests may inspect a Unity web build, but native UI and physically felt vibration require their actual devices and runtimes.
 
 ## Roles
 
@@ -682,18 +676,18 @@ Current catalogs include computer-science and arts roles. Browse names, domains,
 
 Role references may be:
 
-- an exact name: `backend-architect`
-- an alias: `security`
-- a domain-qualified ID: `computer-science/backend-architect`
+- an exact name: `gameplay-engineer`
+- an alias: `gameplay-programmer`
+- a domain-qualified ID: `computer-science/gameplay-engineer`
 
 Examples:
 
 ```text
-Use role backend-architect and review the service boundaries.
+Use role game-designer and review the core loop, progression, and balance hypotheses.
 ```
 
 ```text
-Act as security + sre. Find exploit paths and operational failure modes.
+Use roles art-director + technical-3d-artist to review silhouette, material consistency, runtime budgets, and handoff evidence.
 ```
 
 If an unqualified name or alias is ambiguous across domains, OpenCaw asks for the domain-qualified role. Exact role-name matches take precedence over aliases.
@@ -703,7 +697,7 @@ If an unqualified name or alias is ambiguous across domains, OpenCaw asks for th
 Roles compose in the order requested:
 
 ```text
-Use roles frontend-developer + qa-engineer.
+Use roles gameplay-engineer + qa-engineer.
 ```
 
 The first role is the primary perspective by default. Later roles add specialist constraints and review lenses. When guidance conflicts, the stricter or safer interpretation wins unless the user sets a different priority.
@@ -711,7 +705,7 @@ The first role is the primary perspective by default. Later roles add specialist
 Deterministic resolution:
 
 ```bash
-./commands/resolve-role.sh "security"
+./commands/resolve-role.sh "gameplay-engineer"
 ```
 
 ## Role, Skill, and Command Bindings
@@ -727,14 +721,14 @@ The JSON file is canonical. The Markdown map is generated deterministically and 
 
 Examples of role bias:
 
-- `backend-architect` emphasizes service boundaries, architecture review, and dependency decisions.
-- `frontend-developer` emphasizes component structure, accessibility, rendering, and browser evidence.
-- `security-engineer` emphasizes threat modeling, vulnerability review, and least privilege.
-- `sre` emphasizes resilience, observability, performance, and incident evidence.
+- `game-designer` emphasizes player decisions, loops, progression, balance hypotheses, and playtest interpretation.
+- `gameplay-engineer` emphasizes runtime systems, engine integration, production tools, optimization, and playtesting.
 - `art-director` emphasizes visual language, asset consistency, production constraints, and specialist art routing.
-- `blender-production-artist` emphasizes immutable source scenes, stage-specific Blender 4.5 production, safe inspection, staged output, and explicit review verdicts.
-- `technical-3d-artist` emphasizes rig, animation, attachment, collision, optimization, and runtime handoff integrity.
-- `gameplay-engineer` emphasizes deterministic runtime systems, production tools, optimization, and playtesting.
+- `blender-production-artist` emphasizes immutable source scenes, Blender 4.5 production, safe inspection, staged output, and explicit review verdicts.
+- `technical-3d-artist` emphasizes rigs, animation, attachments, collision, optimization, and runtime handoff integrity.
+- `qa-engineer` emphasizes reproducible scenarios, input/platform coverage, lifecycle regressions, and evidence quality.
+- `frontend-developer` supports game interfaces, accessibility, rendering, and browser evidence where applicable.
+- `backend-architect`, `security-engineer`, and `sre` support game services, persistence, exploit resistance, resilience, and operations.
 
 Generate and validate the binding map with:
 
@@ -756,30 +750,31 @@ Each skill includes matching interface metadata at `skills/<skill-name>/agents/o
 The agent selects a skill automatically when the request clearly matches its purpose. Explicit invocation remains available:
 
 ```text
-Use the clean-context skill after this work is fully verified.
+Use design-game-systems to turn this progression idea into player decisions, economy hypotheses, and a playtest plan.
 ```
 
 or, where the host interface supports named skill syntax:
 
 ```text
-$clean-context
+$design-game-systems
 ```
 
 ### Common skills
 
 | Area | Examples | Purpose |
 | --- | --- | --- |
-| Discovery | `brainstorm-flow` | Persist, research, branch, visualize, and summarize ideas before planning |
-| Planning and governance | `create-task-file`, `manage-task-issues`, `pr-readiness-gate`, `post-pr-qa` | Track work, preserve authorization boundaries, and publish evidence |
-| Context | `maintain-memory`, `maintain-repository-map`, `clean-context` | Retrieve and preserve durable high-signal project knowledge |
-| Parallel work | `orchestrate-subagents` | Create safe role-resolved lanes and integrate their evidence |
-| Goal delivery | `goal-flow` | Manage explicit multi-task PR and post-PR-QA automation |
-| Adversarial delivery | `gauntlet-flow` | Run builder and fresh-critic rounds through reviewable unit PRs, human-controlled integration, and final promotion |
-| Build and test | `solution-build`, `test-dotnet` | Restore, build, test, and report repository results |
-| Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Discover behavior, author tests, diagnose failures, and package evidence |
-| Data | `install-database-cli-tools`, `database-cli-query` | Prepare and run engine-specific database workflows |
-| Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate reproducible media |
-| Art and experience | `build-threejs-code-characters`, `review-threejs-code-characters`, `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `build-scroll-authored-web-experiences`, `tcg-art-direction` | Produce and independently review source-native characters, original Blender art, runtime actors, and web experiences |
+| Game systems | `design-game-systems`, `design-action-gameplay`, `build-gameplay-runtime`, `author-game-worlds` | Define player decisions and build testable gameplay and worlds |
+| Game UI and feedback | `build-game-ui`, `build-gameplay-runtime`, `build-accessible-motion-systems`, `create-game-vfx` | Plan input ownership, HUD synchronization, readable feedback, accessibility, and device-specific haptics |
+| Selected-engine implementation | `threejs-build-scenes`, `babylonjs-integrate-physics`, `phaserjs-build-tilemaps`, `unity-build-ui`, `unreal-build-gameplay-framework`, `godot-run-tooling` | Use only the features compatible with ENGINE.md and explicitly selected project dependencies |
+| Art and runtime assets | `build-proof-to-model-assets`, `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `tcg-art-direction` | Produce and review assets with ancestry, budgets, handoff evidence, and human acceptance |
+| Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
+| Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
+| Game QA and performance | `test-playable-games`, `optimize-web-games`, `profile-application-performance` | Verify representative play and measure declared budgets on the relevant runtime |
+| Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Verify browser games and web builds; native UI requires native evidence |
+| Game services and tools | `solution-build`, `test-dotnet`, `database-cli-query`, `build-game-production-tools` | Build and test supporting services, persistence, and production tooling |
+| Discovery | `brainstorm-flow` | Research, branch, visualize, and summarize game ideas before planning |
+| Planning and delivery | `create-task-file`, `manage-task-issues`, `pr-readiness-gate`, `post-pr-qa`, `goal-flow`, `gauntlet-flow` | Track work and preserve the selected delivery mode's publication and review gates |
+| Context and coordination | `maintain-memory`, `maintain-repository-map`, `clean-context`, `orchestrate-subagents` | Preserve project knowledge, plan safe parallel lanes, and integrate evidence |
 
 See `skills/INDEX.md` for the complete catalog and `skills/EXTERNAL_SOURCES.md` for capability-adaptation boundaries and dispositions.
 
@@ -811,6 +806,8 @@ Or run the command directly:
 | Group | Commands |
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Engine selection and compatibility | `generate-engine.sh`, `validate-engine-contract.sh`, `resolve-engine.sh`, `resolve-skill.sh`, `resolve-role-capabilities.sh`, `validate-engines.sh` |
+| Gameplay design, UI, and feedback | `print-gameplay-system-brief.sh`, `validate-gameplay-review.sh` |
 | Brainstorm discovery | `brainstorm-mode.sh`, `validate-brainstorm.sh`, `show-brainstorm.sh` |
 | Architecture, style, and art pipelines | `generate-architecture.sh`, `generate-style.sh`, `validate-style-contract.sh`, `resolve-art-pipeline.sh`, `validate-art-pipelines.sh` |
 | External 3D asset libraries | `list-external-asset-libraries.sh`, `inspect-external-asset-library.sh`, `copy-external-asset.sh` |
@@ -826,6 +823,7 @@ Or run the command directly:
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
+| Native proof-to-model assets | `proof-to-model.sh` |
 | Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
 | Code-first Three.js characters | `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `measure-code-character-evidence.sh`, `record-code-character-calibration.sh`, `record-code-character-gate.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
@@ -840,7 +838,7 @@ OpenCaw supports parallel work when the user requests multiple agents or when th
 Natural request:
 
 ```text
-This feature has independent API, UI, and QA work. Split it into safe parallel lanes, keep file ownership separate, then integrate and verify from the main lane.
+This vertical slice has independent gameplay, HUD, environment-art, and QA work with agreed interfaces. Split only the ready work into safe parallel lanes, keep file ownership separate, then integrate and playtest from the main lane.
 ```
 
 Count-constrained request:
@@ -852,7 +850,7 @@ Use up to 4 agents. Do not invent work just to fill every slot, and reserve fina
 For substantial task-backed work, the durable lane plan lives at:
 
 ```text
-.ai/tasks/<task-name>/SUBAGENTS.md
+.opencaw/.cache/tasks/<task-name>/SUBAGENTS.md
 ```
 
 It records:
@@ -886,11 +884,70 @@ Brainstorm precedes planning; Task, Goal, and Gauntlet remain sibling delivery m
 | Stage or mode | Activation | Durable state | Loop | Publication |
 | --- | --- | --- | --- | --- |
 | Brainstorm | Explicit `start` or `enter Brainstorm mode`, or active repository state restored at startup | `BRAINSTORM.md`; hash-bound `BRAINSTORM_SUMMARY.md` on exit | Clarify, branch, research with two independent researchers, and synthesize ideas | None; delivery creation is blocked while active |
-| Task | Default for a specific assignment; may also be named explicitly | `.ai/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
-| Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.ai/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
-| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.ai/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
+| Task | Default for a specific assignment; may also be named explicitly | `.opencaw/.cache/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
+| Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.opencaw/.cache/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
+| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.opencaw/.cache/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
 
 Task, Goal, and Gauntlet are sibling delivery modes. Brainstorm may feed planning for any one of them, but never nests with or creates them. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request selects conflicting stages or delivery modes, OpenCaw asks which governs before changing project state.
+
+```mermaid
+flowchart TB
+    accTitle: OpenCaw game development planning and delivery
+    accDescr: A game-development request may enter explicit Brainstorm discovery; exit then requires selecting an idea and explicitly requesting a plan, then uses task mode by default, explicit goal mode for ordered task pull requests, or explicit Gauntlet mode for reviewed work-unit pull requests and final promotion.
+
+    Request["Natural-language request"] --> Discovery{"Explicit Brainstorm mode?"}
+    Discovery -->|"No"| Plan["Plan the understood work"]
+    Discovery -->|"Yes"| Brainstorm["Activate persistent Brainstorm state"]
+    Brainstorm --> Understand["Clarify one idea to baseline understanding"]
+    Understand --> Research["Project manager plus two independent researchers"]
+    Research --> Organize["Place the researched element in the branch graph"]
+    Organize --> Continue{"Explicitly exit Brainstorm?"}
+    Continue -->|"No; continue ideas"| Understand
+    Continue -->|"Yes"| Summary["Generate the hash-bound summary index"]
+    Summary --> SelectIdea["Select an idea and explicitly request a plan"]
+    SelectIdea --> Plan
+    Plan --> Mode{"Delivery mode"}
+
+    Mode -->|"Task: default"| Task["Complete one gameplay, art, tooling, or QA assignment"]
+    Task --> TaskVerify["Verify the result"]
+    TaskVerify --> TaskGate["Human PR readiness approval"]
+    TaskGate --> TaskQA["Open one PR and run post-PR QA"]
+    TaskQA --> HumanMerge["Human review and merge"]
+
+    Mode -->|"Goal: explicit"| GoalTask["Complete next ordered game milestone task"]
+    GoalTask --> GoalVerify["Verify the task"]
+    GoalVerify --> GoalPR["Open its PR automatically"]
+    GoalPR --> GoalQA["Run post-PR QA"]
+    GoalQA --> GoalMore{"More tasks?"}
+    GoalMore -->|"Yes"| GoalTask
+    GoalMore -->|"No"| GoalReport["Prepare goal completion report"]
+    GoalReport --> HumanMerge
+
+    Mode -->|"Gauntlet: explicit"| Bar["Approve bar, delivery base, and progress-PR contract"]
+    Bar --> GBranch["Create durable gauntlet/name integration branch"]
+    GBranch --> Units["Derive independently judgeable work units"]
+    Units --> Build["Builder improves one game-production unit"]
+    Build --> UnitPR["Publish or update its progress PR automatically to the integration branch"]
+    UnitPR --> Critic["Fresh critic inspects the build or asset; post evidence"]
+    Critic -->|"Fail"| RecordUnitFail["Post and record PR QA failure"]
+    RecordUnitFail --> Build
+    Critic -->|"Pass"| UnitQA["Run PR QA and post results"]
+    UnitQA -->|"Fail"| RecordUnitFail
+    UnitQA -->|"Pass"| UnitMerge["Human merges the unit PR"]
+    UnitMerge --> MoreUnits{"All active units integrated?"}
+    MoreUnits -->|"No; start independent or newly unblocked unit"| Build
+    MoreUnits -->|"Yes"| Integration["Fresh critic reviews the integrated artifact"]
+    Integration -->|"Fail"| Reopen["Record failure and reopen affected units"]
+    Reopen --> Remediation["Builder corrects and verifies affected work"]
+    Remediation --> RemediationPR["Run progress readiness and publish remediation PR"]
+    RemediationPR --> Critic
+    Integration -->|"Pass"| GauntletGate["Human promotion-PR readiness approval"]
+    GauntletGate --> Promotion["Open promotion PR to the approved delivery base"]
+    Promotion --> PromotionQA["Run promotion PR QA"]
+    PromotionQA -->|"Pass"| HumanMerge
+    PromotionQA -->|"Fail"| PromotionFail["Record failure, archive completion, and reopen named units"]
+    PromotionFail --> Remediation
+```
 
 ### Brainstorm lifecycle
 
@@ -935,7 +992,7 @@ Supersession requires exactly one canonical `- Unit supersession: <item-id> | sc
 
 `GAUNTLET.md` is the live contract and index. It records flow and status, the parent task, objective, approved quality bar, constraints and permissions, retained work-unit definitions and active scopes, execution/quality/unit-manifest fingerprints, frozen base commit, round/progress-PR/completion/promotion ledgers, merge topology, integration review, delivery state, and review notes. Append-only publication checkpoints live beside it and are consumed by opened entries in the hashed progress-PR ledger.
 
-Do not fabricate progressive PR events for a Gauntlet started under the earlier single-final-PR contract. Preserve that run and report under `.ai/archive/gauntlets/`, then create a new progressive Gauntlet or explicitly supersede its old units and rebuild them through real work-unit PRs. Historical evidence without an observed PR head, QA result, and human merge cannot satisfy the new completion gate.
+Do not fabricate progressive PR events for a Gauntlet started under the earlier single-final-PR contract. Preserve that run and report under `.opencaw/.cache/archive/gauntlets/`, then create a new progressive Gauntlet or explicitly supersede its old units and rebuild them through real work-unit PRs. Historical evidence without an observed PR head, QA result, and human merge cannot satisfy the new completion gate.
 
 #### Work units and progress PRs
 
@@ -965,10 +1022,10 @@ Builder and critic identity sets must remain globally disjoint across the Gauntl
 Every critic report uses the exact contract documented by the `gauntlet-flow` skill: ordered `Artifact Inspected`, `Bar Comparison`, `Guardrail Results`, `Verdict`, `Largest Remaining Gap`, and `Next Strategy` sections; at least one `- Artifact: <project-relative-file>` entry that is a regular file in the reviewed commit tree; one `- Head SHA: <full-sha>` matching the live PR or integration head; and exactly one `- Verdict: pass|fail|blocked`. Evidence is append-only under:
 
 ```text
-.ai/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
+.opencaw/.cache/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
 ```
 
-PR events are durable under `.ai/gauntlets/<gauntlet-name>/pr-events/<item-id>/event-NNN.md`. Recording `opened`, `qa-pass`, `qa-fail`, `merged`, or `closed` performs a fresh live-GitHub query and persists same-repository identity, PR-body checkpoint, state, draft flag, created/closed/merged times, head/base SHAs, all current fingerprints, target, merge actor and bot flag, and merge commit. Record human merges promptly in integration order so every `baseRefOid` connects the prior chain tip to the new `mergeCommit`; direct integration commits are forbidden. Any retained GitHub timeline event that enabled auto-merge, auto-rebase, auto-squash, or entry into a merge queue invalidates a progress or promotion PR, even if the automation was later disabled. Completion and readiness re-query every terminal PR used for topology or remediation causality rather than trusting mutable local text. For PR events recorded in the same UTC second, append order in the hashed Progress PR Ledger supplies causal order; equal-time records in different ledgers must be joined by an explicit evidence edge rather than lexical path or evidence-type ordering.
+PR events are durable under `.opencaw/.cache/gauntlets/<gauntlet-name>/pr-events/<item-id>/event-NNN.md`. Recording `opened`, `qa-pass`, `qa-fail`, `merged`, or `closed` performs a fresh live-GitHub query and persists same-repository identity, PR-body checkpoint, state, draft flag, created/closed/merged times, head/base SHAs, all current fingerprints, target, merge actor and bot flag, and merge commit. Record human merges promptly in integration order so every `baseRefOid` connects the prior chain tip to the new `mergeCommit`; direct integration commits are forbidden. Any retained GitHub timeline event that enabled auto-merge, auto-rebase, auto-squash, or entry into a merge queue invalidates a progress or promotion PR, even if the automation was later disabled. Completion and readiness re-query every terminal PR used for topology or remediation causality rather than trusting mutable local text. For PR events recorded in the same UTC second, append order in the hashed Progress PR Ledger supplies causal order; equal-time records in different ledgers must be joined by an explicit evidence edge rather than lexical path or evidence-type ordering.
 
 Each QA verdict requires a new exact same-PR comment containing `<!-- opencaw-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`. The recorder verifies its source hash, reviewed head, verdict, affected set, trusted human collaborator, creation/update timestamps, PR ownership, and uniqueness. Each unit round also binds the opened event and resolved remediation root by path and hash, making the external comment an anchor that cannot be locally reassigned to a different failure. Canonical ledger lines bind one-to-one to file hashes, and mutation commands use an atomic per-Gauntlet lock, compare-and-swap, and no-clobber installation.
 
@@ -1019,9 +1076,9 @@ OpenCaw's Gauntlet mode adapts Matt Shumer's [Gauntlet Loop method](https://some
 Real work is tracked under:
 
 ```text
-.ai/tasks/TODO.md
-.ai/tasks/<task-name>/TASK.md
-.ai/tasks/OPEN_ISSUES.md
+.opencaw/.cache/tasks/TODO.md
+.opencaw/.cache/tasks/<task-name>/TASK.md
+.opencaw/.cache/tasks/OPEN_ISSUES.md
 ```
 
 Rules:
@@ -1060,15 +1117,15 @@ PRs for task-backed work include issue linkage such as `Closes #123`. QA results
 
 ## Memory v2
 
-OpenCaw keeps all memory and context inside the resolved host repository:
+OpenCaw keeps all memory and context in the resolved host repository's durable `.opencaw/.cache/` directory, ignored by the shared baseline's Git repository:
 
 ```text
-.ai/SYSTEM_MEMORY.md
-.ai/MEMORY.md
-.ai/REPO_MAP.md
-.ai/RULES.md
-.ai/DEBUG.md
-.ai/CONTEXT_SUMMARY.md
+.opencaw/.cache/SYSTEM_MEMORY.md
+.opencaw/.cache/MEMORY.md
+.opencaw/.cache/REPO_MAP.md
+.opencaw/.cache/RULES.md
+.opencaw/.cache/DEBUG.md
+.opencaw/.cache/CONTEXT_SUMMARY.md
 ```
 
 ### Memory layers
@@ -1104,10 +1161,10 @@ OpenCaw proactively records only verified, stable, reusable facts. It does not s
 
 ## Art Pipelines and Generative Media
 
-OpenCaw separates visual direction from production method. Every visual task combines an art style with one resolved art pipeline:
+OpenCaw separates visual direction from production method. Asset-production tasks combine an art style with one resolved art pipeline:
 
 1. Choose one or more art styles for composition, color, shape, lighting, motion, and review guidance.
-2. Choose one primary art pipeline. New `STYLE.md` contracts default to `CSS3`.
+2. Choose one primary art pipeline. New `STYLE.md` contracts default to `PROOF_TO_MODEL`.
 3. Use an explicit current-prompt override when one task needs a different registered pipeline.
 4. Configure `MEDIA.md` only when `CLOUD` or `LOCAL` generation is used.
 5. Stop when the selected pipeline is unavailable or fails; never switch pipelines silently.
@@ -1118,7 +1175,7 @@ The five pipelines are:
 | --- | --- | --- |
 | `CLOUD` | Session-supported generated images/audio | Token or cost budget, staging, provenance, human review |
 | `LOCAL` | Loopback-only ComfyUI images/audio | Local GPU, pinned tools/models, licenses, checksums |
-| `CSS3` | CSS, mathematical geometry, inline SVG/vector | No raster, canvas, WebGL, or generated-image dependency |
+| `PROOF_TO_MODEL` | Approved 2D proof, native Pixal3D, Blender finishing | Immutable originals, hashed ancestry, independent review and human acceptance |
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
 | `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
 
@@ -1131,8 +1188,8 @@ Pipeline contracts and owned assets live under:
 ├── local/PIPELINE.md
 ├── local/toolchain.json
 ├── local/model-packs.json
-├── css3/PIPELINE.md
-├── css3/art-tokens.css
+├── proof-to-model/PIPELINE.md
+├── proof-to-model/manifest.schema.json
 ├── code/PIPELINE.md
 ├── code/code-model-manifest.schema.json
 ├── code/code-character-profile.schema.json
@@ -1143,11 +1200,11 @@ Pipeline contracts and owned assets live under:
 
 Legacy media-configuration directories are prohibited; pipeline assets belong only to their owners under `.styles/.pipelines/`.
 
-An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “make this pure CSS/vector,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`:
+An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “reconstruct this approved proof,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`. CSS/SVG game-interface work remains supported separately; it is not a registered art pipeline:
 
 ```bash
 ./commands/resolve-art-pipeline.sh --override imagegen \
-  --evidence .ai/tasks/current-task/pipeline-selection.json
+  --evidence .opencaw/.cache/tasks/current-task/pipeline-selection.json
 ```
 
 For cloud/local execution, generate the optional media contract with canonical names or aliases:
@@ -1157,7 +1214,7 @@ For cloud/local execution, generate the optional media contract with canonical n
 ./commands/generate-media-contract.sh CLOUD LOCAL
 ```
 
-Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. `CSS3`, `CODE`, and `BLENDER` do not require `MEDIA.md`; Blender reads it only when cloud/local generated inputs are part of the production brief.
+Image generation obeys both the resolved pipeline in `STYLE.md` and `MEDIA.md`. Music, sound effects, ambience, and voice use `MEDIA.md` without depending on visual style. Existing-proof `PROOF_TO_MODEL`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Proof generation remains a separate authorized CLOUD/LOCAL operation.
 
 Cloud/local media guardrails include:
 
@@ -1188,44 +1245,70 @@ Create and validate the linked contract before authoring or collecting gate evid
 
 ```bash
 ./commands/create-code-character-profile.sh actor-id \
-  --manifest .ai/tasks/current-task/code-model.json \
+  --manifest .opencaw/.cache/tasks/current-task/code-model.json \
   --brief "Readable source-native runtime actor" \
   --intended-use "representative gameplay"
 ./commands/validate-code-character-profile.sh --strict \
-  .ai/tasks/current-task/code-character.json
+  .opencaw/.cache/tasks/current-task/code-character.json
 ```
 
 The deterministic evidence command has two explicit modes. `analyze` evaluates repository-contained calibration observations and marks the report untrusted. Freeze each machine gate's passing and focused failing reports transactionally before recording a passing gate result. `capture` uses a task-local ESM adapter and only host-installed Three.js, Playwright, and Chromium to collect trusted machine evidence:
 
 ```bash
 ./commands/measure-code-character-evidence.sh analyze \
-  .ai/tasks/current-task/code-character.json \
-  --measurements .ai/tasks/current-task/evidence/structure-pass.json \
-  --output .ai/tasks/current-task/evidence/structure-pass-report.json
+  .opencaw/.cache/tasks/current-task/code-character.json \
+  --measurements .opencaw/.cache/tasks/current-task/evidence/structure-pass.json \
+  --output .opencaw/.cache/tasks/current-task/evidence/structure-pass-report.json
 ./commands/measure-code-character-evidence.sh analyze \
-  .ai/tasks/current-task/code-character.json \
-  --measurements .ai/tasks/current-task/evidence/structure-fail.json \
-  --output .ai/tasks/current-task/evidence/structure-fail-report.json
+  .opencaw/.cache/tasks/current-task/code-character.json \
+  --measurements .opencaw/.cache/tasks/current-task/evidence/structure-fail.json \
+  --output .opencaw/.cache/tasks/current-task/evidence/structure-fail-report.json
 ./commands/record-code-character-calibration.sh \
-  .ai/tasks/current-task/code-character.json \
+  .opencaw/.cache/tasks/current-task/code-character.json \
   --gate structure-integrity \
-  --passing .ai/tasks/current-task/evidence/structure-pass-report.json \
-  --failing .ai/tasks/current-task/evidence/structure-fail-report.json
+  --passing .opencaw/.cache/tasks/current-task/evidence/structure-pass-report.json \
+  --failing .opencaw/.cache/tasks/current-task/evidence/structure-fail-report.json
 ./commands/measure-code-character-evidence.sh capture \
-  .ai/tasks/current-task/code-character.json \
-  --adapter .ai/tasks/current-task/evidence/adapter.mjs \
-  --output-dir .ai/tasks/current-task/evidence/browser-capture
+  .opencaw/.cache/tasks/current-task/code-character.json \
+  --adapter .opencaw/.cache/tasks/current-task/evidence/adapter.mjs \
+  --output-dir .opencaw/.cache/tasks/current-task/evidence/browser-capture
 ./commands/record-code-character-gate.sh \
-  .ai/tasks/current-task/code-character.json \
+  .opencaw/.cache/tasks/current-task/code-character.json \
   --gate structure-integrity --decision pass \
   --summary "Declared structure satisfies its contextual checks" \
   --strategy "Measure the frozen semantic graph and normalized tolerances" \
-  --evidence machine-report=.ai/tasks/current-task/evidence/browser-capture/report.json
+  --evidence machine-report=.opencaw/.cache/tasks/current-task/evidence/browser-capture/report.json
 ```
 
 Capture uses `127.0.0.1` with an OS-assigned port, keeps the Chromium sandbox enabled, blocks service workers and external requests, confines served modules and new outputs to the project, and serializes one output directory. It captures required views and intended sizes, semantic masks, isolated signature parts, and runtime evidence. Missing Three.js, Playwright, or Chromium stops clearly without installation or pipeline fallback. Machine results never approve identity, silhouette, form, materials, style, or appeal.
 
 The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for modeling, UVs and textures, materials, procedural scenes, rigging, simulation, lighting, rendering, optimization, export, and review. It preserves the source `.blend`, authors only in declared repository-confined working copies, prefers typed connected Blender operations, validates exceptional exact-content `bpy`, and treats CLI tools as read-only inspection. Blender, addons, packages, and providers are never installed automatically. If live authoring is unavailable, the workflow stops instead of switching pipelines or backends.
+
+### Native proof to model
+
+`PROOF_TO_MODEL` turns a selected 2D proof into a staged 3D asset through native reconstruction and Blender finishing. It replaces the retired CSS3 pipeline. Regenerate legacy contracts with `./commands/generate-style.sh --pipeline PROOF_TO_MODEL "<STYLE>"`, preserving selected styles and custom instructions. CSS3, CSS, vector, and css-vector pipeline aliases fail explicitly. CSS/SVG interface development and its specialist role remain supported.
+
+Use `build-proof-to-model-assets` and `./commands/proof-to-model.sh` for `init`, `doctor`, `setup`, `preprocess`, `reconstruct`, `finish`, `review`, `record`, `validate`, `status`, and `promote`. Run a subcommand with `--help` for exact arguments. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. Ordinary production never downloads tools or invokes proof generators implicitly. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling project is required.
+
+State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable proofs, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
+
+The default 3D asset path keeps production and acceptance separate:
+
+```mermaid
+flowchart TB
+    accTitle: Native proof-to-model game asset production
+    accDescr: Start with an asset brief, rights and library search. Human selection approves the proof. Preprocessing is reviewed before native reconstruction and Blender finishing. Export verification and independent review precede separate human runtime acceptance and explicit promotion. Revisions invalidate dependent evidence.
+
+    Brief["Brief, rights, budgets,<br/>and configured library search"] --> Proof["Select proof<br/>Human approval"]
+    Proof --> Input["Preprocess and review<br/>proof-derived input"]
+    Input --> Reconstruct["Native Pixal3D<br/>reconstruction"]
+    Reconstruct --> Finish["Blender finishing<br/>retopology, UV/bake, LODs, collision"]
+    Finish --> Review["Export verification<br/>and independent review"]
+    Review --> Accept["Separate human<br/>runtime acceptance"]
+    Accept --> Promote["Explicit promotion<br/>to assets/models/"]
+```
+
+Rejected or changed inputs return to the affected stage and invalidate dependent results. Reconstruction does not establish likeness, rigging, animation, or production readiness by itself.
 
 ### Optional external 3D asset libraries
 
@@ -1256,10 +1339,10 @@ When libraries are configured, OpenCaw searches them before creating, generating
 ./commands/list-external-asset-libraries.sh
 ./commands/inspect-external-asset-library.sh studio
 ./commands/copy-external-asset.sh studio characters/hero \
-  --evidence .ai/tasks/current-task/external-asset-copy.json
+  --evidence .opencaw/.cache/tasks/current-task/external-asset-copy.json
 ```
 
-The deterministic destination is `assets/models/<library-id>/<source-relative-path>`. Commands reject symbolic links, traversal, overlapping source/project roots, destination escapes, and overwrites. Only the repository-local copy may be loaded, imported, edited, or used. Asset-level provenance, licenses, selected pipeline, formats, and runtime budgets still apply: the library does not relax `CSS3` or `CODE` boundaries.
+The deterministic destination is `assets/models/<library-id>/<source-relative-path>`. Commands reject symbolic links, traversal, overlapping source/project roots, destination escapes, and overwrites. Only the repository-local copy may be loaded, imported, edited, or used. Asset-level provenance, licenses, selected pipeline, formats, and runtime budgets still apply: the library does not relax `PROOF_TO_MODEL` or `CODE` boundaries.
 
 ## Validation
 
@@ -1315,28 +1398,26 @@ Verification for host-project work remains proportional to the task: targeted te
 
 ## Repository Layout
 
+Installed projects use this baseline layout. Root project contracts and the host bootstrap sit one directory above it, as shown under Repository Layering.
+
 ```text
-OpenCaw/
+.opencaw/
 ├── AGENTS.md                         # shared behavior contract
 ├── README.md
-├── BRAINSTORM.md                     # optional persistent pre-planning ideas and active state
-├── BRAINSTORM_SUMMARY.md             # optional generated hash-bound idea index
-├── ARCHITECTURE.md                   # architecture contract for this repository
-├── STYLE.md                          # visual-style and art-pipeline contract
-├── MEDIA.md                          # optional CLOUD/LOCAL execution contract
 ├── .architecture/                    # reusable architecture templates
+├── .engine/                          # six-engine definitions and compatibility registry
 ├── .roles/                           # domain roles, aliases, and capability maps
 │   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
-│   └── .pipelines/                   # CLOUD, LOCAL, CSS3, CODE model/character, and BLENDER contracts/assets
+│   └── .pipelines/                   # CLOUD, LOCAL, PROOF_TO_MODEL, CODE model/character, and BLENDER contracts/assets
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
 │   └── lib/inspect-blender-scene.py  # read-only Blender scene inventory
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures
-└── .ai/                              # repository-local memory, tasks, goals, and Gauntlet round/PR evidence
+└── .cache/                           # durable project context; ignored by baseline Git
 ```
 
 Bundled Playwright assets include configuration, package-script, report, and CLI-reference templates under `assets/playwright/` and `assets/playwright-cli/`. Host repositories continue to own their actual application tests, credentials, runtime artifacts, and generated reports.
@@ -1346,6 +1427,8 @@ Bundled Playwright assets include configuration, package-script, report, and CLI
 # Contributing
 
 Contributions are welcome.
+
+A standalone `OpenCaw/` checkout is for maintaining the baseline itself, not for installing it into another project. Its own project contracts remain at that checkout's root and its development context uses `.opencaw/.cache/`. Development commands can target explicit fixture host roots; ordinary host installations must still live directly at `<project-root>/.opencaw/`.
 
 Typical flow:
 
@@ -1362,7 +1445,7 @@ Example:
 ```bash
 git clone https://github.com/<your-org>/OpenCaw
 cd OpenCaw
-git checkout -b feature/add-architecture-framework
+git checkout -b feature/improve-gameplay-review
 ```
 
 After making changes:
@@ -1376,7 +1459,7 @@ git commit -m "feat(architecture): add framework"
 When contributing:
 
 - keep changes small enough to review
-- preserve the layering boundary between the shared baseline and host-project `.ai` state
+- preserve the layering boundary between shared baseline files and durable host-project `.opencaw/.cache` state
 - keep architecture, role, skill, style, and command schemas valid
 - add regression coverage for workflow fixes
 - avoid hidden dependency installation or external mutations
