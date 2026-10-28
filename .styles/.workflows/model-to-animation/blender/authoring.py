@@ -577,16 +577,30 @@ def bake(recipe):
         for owner in owners:
             assign_action(owner, action)
             owner.rotation_mode = "QUATERNION"
+        previous_objects = {}
+        previous_bones = {}
         for frame, values in samples:
             for value in values:
                 owner = node(value["node"])
                 owner.matrix_basis = value["matrix"]
+                rotation = owner.rotation_quaternion.copy()
+                previous = previous_objects.get(owner.name)
+                if previous is not None and previous.dot(rotation) < 0:
+                    rotation.negate()
+                owner.rotation_quaternion = rotation
+                previous_objects[owner.name] = rotation.copy()
                 for prop in ("location", "rotation_quaternion", "scale"):
                     owner.keyframe_insert(prop, frame=frame)
                 for name, matrix in value["bones"].items():
                     bone = owner.pose.bones[name]
                     bone.rotation_mode = "QUATERNION"
                     bone.matrix_basis = matrix
+                    rotation = bone.rotation_quaternion.copy()
+                    previous = previous_bones.get((owner.name, name))
+                    if previous is not None and previous.dot(rotation) < 0:
+                        rotation.negate()
+                    bone.rotation_quaternion = rotation
+                    previous_bones[(owner.name, name)] = rotation.copy()
                     for prop in ("location", "rotation_quaternion", "scale"):
                         bone.keyframe_insert(prop, frame=frame)
         finalize_action(action, owners)

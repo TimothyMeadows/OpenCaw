@@ -8,6 +8,8 @@ Use the exact ordered slots `front`, `right`, `back`, `left`, `top`, `bottom`. L
 
 The native contract uses Blender/NeRF world Z up, camera local -Z forward and +Y image up; matrices are row-major camera-to-world. Use the pipeline's fixed cardinal/polar rig, distance, horizontal FOV and positive mesh scale. Top/bottom have explicit roll; generic world-up look-at logic is singular at the poles. Keep one framing/scale convention across the set. Arbitrary illustrations do not supply measured calibration; label prescribed generated cameras `nominal-prescribed`.
 
+Pixal3D's `meshScale` is inverse scale: its conditioning cube has half-extent `0.5 / meshScale` in camera-world units. A value of `1/6` therefore creates a six-unit cube. All prescribed cameras must sit outside that cube with a positive depth margin; positivity of the individual fields is insufficient. Verify framing against the actual padded silhouettes and camera projection before a live run. Exterior cameras alone do not establish correct calibration or visual quality. Correcting camera metadata retains image ancestry but invalidates whole-set approval and downstream results.
+
 No per-view tight crop, stretch or silhouette enlargement is permitted during matte/input preparation. Preserve true alpha where suitable or invoke the pinned explicit BiRefNet path. Pad on a common square canvas, retain transforms and adjust horizontal FOV for centered padding. Inference receives six separate prepared images and camera JSON, never the contact sheet.
 
 ## Generate and revise

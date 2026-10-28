@@ -6,14 +6,26 @@ namespace OpenCaw.AssetProduction;
 internal sealed class OwnedProcessTree : IDisposable
 {
     IntPtr job;
-    public OwnedProcessTree(Process process)
+    public OwnedProcessTree(Process process, long? maximumPrivateBytes = null)
     {
         if (!OperatingSystem.IsWindows())
+        {
+            if (maximumPrivateBytes is not null) throw new PlatformNotSupportedException("Owned-job aggregate committed-memory ceiling requires Windows; no unbounded fallback");
             return;
+        }
         job = CreateJobObject(IntPtr.Zero, null);
         if (job == IntPtr.Zero)
             throw new Win32Exception();
         var info = new ExtendedLimit { BasicLimitInformation = new BasicLimit { LimitFlags = 0x2000 } };
+        if (maximumPrivateBytes is { } memory)
+        {
+            // JOB_OBJECT_LIMIT_JOB_MEMORY caps aggregate committed memory charged
+            // to the owned job, including descendants. It is not resident RAM,
+            // GPU memory or an OS sandbox. Process.Start precedes assignment;
+            // an assignment failure kills the launched tree in the caller.
+            info.BasicLimitInformation.LimitFlags |= 0x200;
+            info.JobMemoryLimit = new UIntPtr(checked((ulong)memory));
+        }
         if (!SetInformationJobObject(job, 9, ref info, (uint)Marshal.SizeOf<ExtendedLimit>()) || !AssignProcessToJobObject(job, process.Handle))
         {
             var error = Marshal.GetLastWin32Error();

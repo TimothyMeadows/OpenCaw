@@ -21,6 +21,12 @@ Use for Geometry Nodes, modular kits, deterministic instancing, procedural place
 
 Read [procedural-scene-contract.md](references/procedural-scene-contract.md) for deterministic and realization requirements.
 
+Read only the subject references needed for the current output:
+
+- [modular-kit-assembly.md](references/modular-kit-assembly.md) for dimensions, pivots, junction coverage and complete assembly tests.
+- [geometry-nodes-authoring.md](references/geometry-nodes-authoring.md) for node interfaces, field domains, evaluation bounds and regeneration evidence.
+- [vegetation-production.md](references/vegetation-production.md) for plant structure, foliage placement, wind masks and distance-dependent delivery.
+
 ## Guardrails
 
 - Do not depend on scene order, selection, wall-clock time, or undeclared randomness.

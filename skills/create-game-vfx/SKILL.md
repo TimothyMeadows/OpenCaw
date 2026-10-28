@@ -14,6 +14,8 @@ engines: [AGNOSTIC]
 
 ## Workflow
 
+For effects timed across a dance, combination or charge/cast sequence, coordinate with `build-model-actions`. Bind cues to real reviewed step/clip markers and anchors, capture fixed target points explicitly, and keep cancellation/resource cleanup separate from gameplay hit and projectile decisions.
+
 1. Define the gameplay event, audience, visibility distance, camera, duration, priority, and success signal.
 2. Break the effect into anticipation, activation, impact, sustain, and release as applicable.
 3. Assign shape, color, motion, scale, depth, audio, camera, and UI layers without duplicating feedback.

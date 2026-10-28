@@ -28,6 +28,8 @@ Read project.godot, exact Godot version, renderer, target platforms, enabled plu
 
 ## Verification
 
+For Blender source/export delivery, read [Blender asset handoff](references/blender-asset-handoff.md) for explicit import prerequisites, editable scene ownership, reimport and target evidence.
+
 - Load and reload a representative scene in actual Godot; check imported resources, autoload duplication, signal lifetime and queued deletion.
 - Exercise successful, unreachable and cancelled navigation plus scene removal during asynchronous loading.
 - Round-trip versioned state, reject malformed or missing-content records and measure load/allocation budgets on the target surface.

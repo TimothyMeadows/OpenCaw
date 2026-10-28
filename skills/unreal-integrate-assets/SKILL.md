@@ -28,6 +28,8 @@ Record Unreal version, target platforms, source asset rights/provenance, importe
 
 ## Verification
 
+For Blender-authored content, read [Blender asset handoff](references/blender-asset-handoff.md) before native import, reimport or target material/LOD/collision acceptance.
+
 - Reopen native assets in the selected Editor and inspect geometry, hierarchy, material assignments, collision and textures.
 - Reimport a controlled fixture and verify intentional settings/references survive without duplicate packages or lost bindings.
 - Cook/package and load the asset by the real runtime path, including soft-loaded dependencies; record size, LOD and memory evidence.

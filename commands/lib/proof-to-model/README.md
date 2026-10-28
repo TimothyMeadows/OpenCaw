@@ -144,6 +144,14 @@ Front faces -Y; subject-right is -X and subject-left is +X. Prompts and
 side-specific attachments must use these subject-relative labels. An optional
 per-view `cameraAngleX` overrides the shared horizontal FOV.
 
+`meshScale` is an inverse scale in the pinned projector: the conditioning cube's
+half-extent is `0.5 / meshScale` in camera-world units. All six prescribed cameras
+must be outside this cube with a positive depth margin. For example, `meshScale=1/6`
+and `distance=1.8` puts the cameras inside a six-unit cube and is rejected before
+inference. Exterior placement is a necessary preflight check, not measured image
+calibration or likeness acceptance. Camera corrections require a new proof-set
+revision and approval even when the six image files are unchanged.
+
 Mounted baselines work through the wrapper's trusted `--baseline-root`. The CLI
 copies the three fixed reviewed Blender entrypoints into each attempt, hashes
 the source and copied bundle, checks the actual Blender version, and records
@@ -265,7 +273,152 @@ Interrupted imports resume only matching completed reuse preprocessing, preservi
 its exact attempt and bytes. Incomplete or incompatible
 ancestry fails explicitly instead of silently regenerating or inventing evidence.
 
+## Explicit finishing settings
+
+Default/schemaVersion1 finishing retains QuadriFlow. SchemaVersion2 explicitly
+selects reviewed `rigid-parts` HIGH/LOW preparation, shared real bake atlases,
+measured part/pivot/repair ancestry and native memory limits; see
+[RIGID_PARTS.md](../../../.styles/.pipelines/proof-to-model/RIGID_PARTS.md).
+Its exact handoff and authoring-evidence hashes bind an independent technical
+input review. It never selects itself on failure or creates human acceptance.
+
+`finish --finish-settings inputs/finish-settings.json` selects an optional,
+project-local finishing configuration. See
+`.styles/.pipelines/proof-to-model/finishing-settings.schema.json`. The runtime
+hashes the input and retains an immutable snapshot in the finishing attempt.
+It does not rewrite the original recipe, STYLE, proof images or camera contract.
+Changing these settings invalidates finishing and its dependent reviews; existing
+conditioning and reconstruction evidence stays bound to its original inputs.
+
+```json
+{
+  "schemaVersion": 1,
+  "topologyPreparation": {
+    "method": "voxel-remesh",
+    "voxelSize": 0.002,
+    "maxEstimatedVoxels": 200000000,
+    "maxPreparedTriangles": 8000000
+  },
+  "collision": {
+    "method": "kdop-26",
+    "padding": 0.001,
+    "maxVolumeRatio": 2.0
+  },
+  "quadriFlow": {
+    "coordinateScale": 1024,
+    "simplification": {
+      "method": "collapse",
+      "targetTriangles": 1000000,
+      "maxVertexSurfaceErrorMetres": 0.0005,
+      "protectedRegions": []
+    }
+  }
+}
+```
+
+Voxel preparation applies to a separate low working mesh, with grid and geometry
+budgets. The imported high mesh remains the baking source, and the editable master
+retains the prepared intermediate. QuadriFlow must report successful completion
+and produce usable measured topology before baking proceeds.
+Optional `quadriFlow.coordinateScale` explicitly selects a solver representation:
+one power of two from1 through1024; absent means1. Blender's short-edge preflight
+uses mesh-local units. The producer scales only the working mesh coordinates and
+compensates its object scale, verifying unchanged world vertices and triangle
+inputs before invoking QuadriFlow. Physical units and the original transform are
+restored before UV/baking/export, including failure paths. The original high and
+preserved preparation remain unchanged. No factor is chosen or escalated
+automatically; insufficient scale, overflow, failed invariants or invalid output
+stop the stage. This does not collapse short-edge clusters, discard components,
+rescale the project or relax manifold/orientation/completion checks.
+
+Optional `quadriFlow.simplification` explicitly reduces a working preparation
+before its solver call. `targetTriangles` is a hard measured per-part input cap,
+not the final QuadriFlow face target. Select it from actual geometry/error
+measurements. The producer performs at most one Collapse; an already-compliant
+part records its unchanged geometry and zero reduction calls. Preserve the
+original preparation and HIGH separately. Reject changed component identity,
+Euler characteristic, orientation, manifoldness or an unmet cap/error budget.
+
+For a disconnected preparation, the single Collapse reduces the component with
+the most actual triangles (lowest original component ID breaks ties). Retain
+every other component's original coordinates, polygon/corner ordering, actual
+tessellation and supported stored attributes exactly in the same local frame.
+Subtract those retained triangles from the caller's total cap before reducing
+the main component. Insufficient remaining capacity, unsupported preservation
+or any identity/attribute change fails. Verify the complete recombined mesh and
+roll back atomically on failure. This prevents the modifier retessellating tiny
+components merely because they share a mesh with the main surface.
+
+`protectedRegions` contains up to128 unique named, ordered world-space boxes:
+`{"id":"fitting","min":[0.15,-0.21,0.03],"max":[0.21,-0.13,0.11]}`.
+These coordinates illustrate the shape; inspect the actual asset before using
+them. Zero collapse weights inside selected boxes request held vertices;
+independent checks require every original selected vertex identity exactly once
+and its stored coordinates bit-identical after the operation. Vertices outside
+the boxes remain reducible. A held vertex alone does not certify unchanged face
+interiors or polygon winding, so the component and surface checks still apply.
+The hard error check queries every source and candidate vertex against the
+opposite surface in world metres. It does not establish a continuous Hausdorff
+bound or certify face interiors/visual quality. Report both directions, region
+coverage and component findings. No automatic box, cap, tolerance or weight
+escalation is allowed. All declared regions must match the prepared asset.
+
+Reducing input lowers initial storage, but the pinned QuadriFlow implementation
+can grow intermediate subdivisions without an internal face/byte ceiling. Input
+caps and output targets cannot guarantee solver memory or success. Preserve
+process deadlines, failed evidence and separate visual review.
+
+`kdop-26` selects a conservative convex approximation from 26 support planes.
+The producer verifies containment of every source-part vertex, convexity, positive
+volume, the original recipe's face limit and the declared volume ratio against
+the exact hull. It records the approximation explicitly. It is not an exact hull
+or an automatic substitution for a failed one. Explicit `none` preparation and
+`exact-hull` collision selections are also supported; absent settings preserve
+those legacy selections. Missing settings or failed measurements block the stage.
+The existing `colliderMaxFaces` cap counts planar polygon faces before GLB
+triangulation; the report records runtime collision triangles separately.
+
+Native exact-hull topology is computed on quantized coordinates. A bounded,
+deterministic construction adapter may flip an unsupported adjacent triangle
+diagonal only when the replacement facets support all actual source/hull
+points. It preserves vertex bytes, transform and face count. The independent
+convexity/containment validator and its tolerances remain unchanged; unsupported
+points or an exhausted repair budget reject. This is exact-hull correctness
+refinement, not a switch to `kdop-26` or an arbitrary proxy repair during review.
+
+These settings add no dependency, inference, installation, rig or human acceptance.
+Articulation and material fidelity still need subject-specific review.
+
 ## Recovery and budgets
+
+After the configured finishing-attempt budget is exhausted, an explicit human
+decision may authorize exactly one additional finish using
+`finish --finish-budget .opencaw/.cache/tasks/TASK/reviews/finish-budget.json`.
+The task-local receipt has this exact shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "kind": "finish-attempt-budget",
+  "stage": "finish",
+  "decision": "approved",
+  "human": true,
+  "reviewer": "actual approving person",
+  "reason": "Explain the diagnosed failure and approved retry.",
+  "manifestSha256": "CURRENT_MANIFEST_FILE_SHA256",
+  "consumedFinishAttempts": 3,
+  "maxFinishAttempts": 4
+}
+```
+
+Bind the exact current manifest bytes and actual number of `finish` starts;
+`maxFinishAttempts` must equal that count plus one. The CLI rejects pending,
+stale, replayed, out-of-task or malformed evidence, and retains the exact receipt
+and its identity in the new attempt. This changes no toolchain, upstream inputs,
+existing attempts or reconstruction budget. It cannot authorize another stage,
+model acceptance, promotion or installation. The CLI records the caller's human
+assertion; it does not authenticate the reviewer. Never fabricate this receipt,
+reset history or create a fresh version to evade an exhausted budget.
 
 An asset lock prevents concurrent state mutation. The selected GPU lock and
 `CUDA_VISIBLE_DEVICES` assignment cover engine execution. A separate setup lock
@@ -274,6 +427,15 @@ interrupted/failed attempts remain visible. Rerunning an invalid stage invalidat
 dependent stages and reviews, subject to the explicit attempt budget. Changed
 style requires a new version. Timeout overrides may reduce, but cannot expand,
 the configured deadline. Logs are bounded by actual UTF-8 bytes.
+
+Both Blender child calls use the real attempt-local `temp/` directory for
+TEMP/TMP/TMPDIR, with routing recorded before launch; parent environment remains
+unchanged. Reject links, files or unsupported Windows temp-path lengths instead
+of allowing a user-profile fallback. Use a shorter project/task path while
+retaining the fixed `.opencaw` installation layout. Fixed Python entrypoints
+also disable bytecode writes explicitly: Blender's embedded Python can ignore
+the requested PYTHONDONTWRITEBYTECODE environment flag at startup. Temp routing
+is application behavior and does not provide an operating-system sandbox.
 
 Windows uses an owned kill-on-close job; Linux uses a process group when `setsid`
 is available. Cancellation, timeout and log failures terminate the owned process

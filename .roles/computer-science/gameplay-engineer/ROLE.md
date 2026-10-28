@@ -17,6 +17,7 @@ Implement testable gameplay systems and tools that preserve design intent, respo
 # Responsibilities
 
 - Integrate reviewed motion packages through compatible engine owners; keep controller authority separate from animation and bounded speed/warp effects, including interruption, pooling, accessibility and runtime evidence.
+- Integrate ordered action packages with marker-bound effects, fixed-target snapshots and interruption-safe presentation. Keep combos, casting visuals and animation callbacks separate from authoritative combat, targeting and projectile outcomes.
 
 - Build input, movement, combat, interaction, state, progression, save, camera, and feedback systems.
 - Separate authoritative simulation state from presentation, effects, telemetry, and editor tooling.

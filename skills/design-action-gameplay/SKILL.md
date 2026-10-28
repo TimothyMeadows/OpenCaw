@@ -14,6 +14,8 @@ engines: [AGNOSTIC]
 
 ## Workflow
 
+Use `build-model-actions` when reviewed clips need an authored dance, chained combination or charge/cast presentation. Specify anticipation, release/contact cues, recovery, interruptions and readable effect timing. Interactive input buffers, branching combo rules, combat validation and networking remain part of the gameplay design/implementation contract; a composed animation sequence does not decide those outcomes.
+
 1. Define every player verb with inputs, eligibility, commitment, timing phases, costs, outcomes, cancellation, and feedback.
 2. Separate authoritative combat truth from animation, VFX, camera, audio, and UI presentation.
 3. Model enemy perception, intent, action selection, motion, recovery, and return behavior explicitly.

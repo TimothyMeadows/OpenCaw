@@ -54,6 +54,9 @@ bash commands/validate-media-contract.sh "$runtime_dir/cloud/MEDIA.md"
 ! grep -q '^- LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
 bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD LOCAL
 bash commands/validate-media-contract.sh "$runtime_dir/hybrid/MEDIA.md"
+bash commands/generate-media-contract.sh --inline --output "$runtime_dir/inline/MEDIA.md" CLOUD LOCAL
+awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$runtime_dir/inline/MEDIA.md" > "$runtime_dir/inline/MEDIA-crlf.md"
+bash commands/validate-media-contract.sh "$runtime_dir/inline/MEDIA-crlf.md"
 grep -Fq '.styles/.pipelines/cloud/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud pipeline path"
 grep -Fq '.styles/.pipelines/local/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local pipeline path"
 ! grep -Fq '.media/' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained a stale .media path"
@@ -188,6 +191,56 @@ for modality in image music sfx voice; do
 EOF
   bash commands/validate-media-generation-manifest.sh "$dir/manifest.json"
 done
+echo "Checking native project-relative receipts and retained legacy resolution"
+native_project="$runtime_dir/project-relative"
+node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
+[[ -n "$node_bin" ]] || fail 'Node.js is required for receipt fixtures'
+native_project_for_node="$native_project"
+template_for_node="$runtime_dir/manifests/image/manifest.json"
+if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  native_project_for_node="$(wslpath -w "$native_project_for_node")"
+  template_for_node="$(wslpath -w "$template_for_node")"
+fi
+"$node_bin" - "$native_project_for_node" "$template_for_node" <<'NODE'
+const fs=require('fs'),path=require('path');
+const root=process.argv[2],template=process.argv[3];
+const receipts=path.join(root,'.opencaw/.cache/tasks/native');
+const staged=path.join(root,'.art-staging/proofs');
+const outside=path.join(path.dirname(root),'project-relative-sibling');
+for(const directory of [receipts,staged,outside]) fs.mkdirSync(directory,{recursive:true});
+for(const directory of [staged,outside]) fs.copyFileSync(path.join(path.dirname(template),'candidate.bin'),path.join(directory,'candidate.bin'));
+const base=JSON.parse(fs.readFileSync(template,'utf8'));
+function write(name,output) {
+  const data=structuredClone(base);data.outputs[0].stagedPath=output;
+  fs.writeFileSync(path.join(receipts,name+'.json'),JSON.stringify(data));return data;
+}
+const valid=write('valid','.art-staging/proofs/candidate.bin');
+write('escape','../project-relative-sibling/candidate.bin');
+write('absolute',path.join(staged,'candidate.bin'));
+write('missing','.art-staging/proofs/missing.bin');
+const stale=write('changed-hash','.art-staging/proofs/candidate.bin');stale.outputs[0].sha256='0'.repeat(64);fs.writeFileSync(path.join(receipts,'changed-hash.json'),JSON.stringify(stale));
+fs.writeFileSync(path.join(outside,'manifest.json'),JSON.stringify(valid));
+fs.symlinkSync(staged,path.join(root,'inside-link'),'junction');
+fs.symlinkSync(outside,path.join(root,'outside-link'),'junction');
+fs.symlinkSync(receipts,path.join(root,'manifest-link'),'junction');
+fs.symlinkSync(root,path.join(path.dirname(root),'project-alias'),'junction');
+write('inside-link','inside-link/candidate.bin');
+write('outside-link','outside-link/candidate.bin');
+NODE
+native_receipts="$native_project/.opencaw/.cache/tasks/native"
+bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$native_receipts/valid.json"
+expect_failure "$runtime_dir/project-legacy.log" bash commands/validate-media-generation-manifest.sh "$native_receipts/valid.json"
+for adverse in escape absolute missing changed-hash inside-link outside-link; do
+  expect_failure "$runtime_dir/project-$adverse.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$native_receipts/$adverse.json"
+done
+expect_failure "$runtime_dir/project-manifest-escape.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$runtime_dir/project-relative-sibling/manifest.json"
+expect_failure "$runtime_dir/project-manifest-link.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$native_project/manifest-link/valid.json"
+expect_failure "$runtime_dir/project-root-link.log" bash commands/validate-media-generation-manifest.sh --project-root "$runtime_dir/project-alias" "$runtime_dir/project-alias/.opencaw/.cache/tasks/native/valid.json"
+expect_failure "$runtime_dir/project-duplicate.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" --project-root "$native_project" "$native_receipts/valid.json"
+expect_failure "$runtime_dir/project-missing-option.log" bash commands/validate-media-generation-manifest.sh --project-root
+grep -Fq 'hash mismatch' "$runtime_dir/project-changed-hash.log" || fail 'changed project output did not fail its hash'
+grep -Fq 'symbolic link or junction' "$runtime_dir/project-inside-link.log" || fail 'project output alias was not rejected'
+grep -Fq 'escapes the project root' "$runtime_dir/project-manifest-escape.log" || fail 'outside manifest was not rejected before reading'
 cp "$runtime_dir/manifests/image/manifest.json" "$runtime_dir/invalid-hash.json"; cp "$runtime_dir/manifests/image/candidate.bin" "$runtime_dir/candidate.bin"; sed -i 's/[a-f0-9]\{64\}/0000000000000000000000000000000000000000000000000000000000000000/' "$runtime_dir/invalid-hash.json"
 expect_failure "$runtime_dir/hash.log" bash commands/validate-media-generation-manifest.sh "$runtime_dir/invalid-hash.json"
 cp "$runtime_dir/manifests/voice/manifest.json" "$runtime_dir/unreviewed.json"; cp "$runtime_dir/manifests/voice/candidate.bin" "$runtime_dir/candidate.bin"; sed -i 's/"status":"accepted"/"status":"pending"/' "$runtime_dir/unreviewed.json"

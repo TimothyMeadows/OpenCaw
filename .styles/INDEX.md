@@ -46,7 +46,16 @@ Pipeline contracts and their owned assets live under `.styles/.pipelines/` and a
 - `CODE` authors procedural Three.js TypeScript/JavaScript models.
 - `BLENDER` authors Blender 4.5 LTS scenes, assets, renders, and runtime exports.
 
-See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, the code-model schema, and Blender production boundaries.
+### Downstream production pipelines
+
+- [`MODEL_TO_ANIMATION`](.workflows/model-to-animation/WORKFLOW.md) prepares reviewed models for skinned, articulated or rigid motion, authors or retargets clips, and verifies selected-engine playback and speed/warp effects before separate runtime acceptance.
+- [`MODEL_TO_ACTION`](.workflows/model-to-action/WORKFLOW.md) composes those reviewed clips into ordered dances, combinations and charge/cast sequences, with timed model-attached effects and fixed-target presentation.
+
+This motion pipeline follows model creation and keeps the primary `STYLE.md` pipeline selection intact. Use `build-model-animations` and `model-to-animation.sh`; its implementation lives under `.styles/.workflows/model-to-animation/`.
+
+Action composition follows individual clip production. Use `build-model-actions` and `model-to-action.sh`; its implementation lives under `.styles/.workflows/model-to-action/`. It preserves the primary pipeline and engine, and requires its own sequence review and runtime acceptance.
+
+See [.styles/.pipelines/INDEX.md](.pipelines/INDEX.md) for primary and downstream contracts, shared provenance, local manifests, code-model schemas and Blender production boundaries.
 
 ## Optional External Asset Libraries
 

@@ -17,9 +17,11 @@ Use when a Blender asset needs measured budgets, LODs, collision proxies, transf
 3. Create reversible LOD, proxy, bake, and simplification steps from an immutable source.
 4. Apply only delivery-required transforms and modifiers; record exclusions and format substitutions.
 5. Export to a staging path and re-import or inspect the produced artifact independently.
-6. Route static assets through `prepare-game-art-handoff` and rigged actors through `prepare-rigged-runtime-actors`.
+6. Route static assets through `prepare-game-art-handoff` and compatible skinned actors through `prepare-rigged-runtime-actors`. Articulated and rigid motion retain their reviewed profiled motion-package handoff; do not invent a skeleton to satisfy another schema.
 
 Read [optimization-export-contract.md](references/optimization-export-contract.md) for formats, budgets, and proof.
+
+For game delivery, use [engine-handoff-checklist.md](references/engine-handoff-checklist.md) to curate one runtime variant and route importer/material/animation checks to the selected engine owner.
 
 ## Guardrails
 

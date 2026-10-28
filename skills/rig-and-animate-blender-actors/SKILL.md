@@ -19,9 +19,10 @@ For native model-to-animation production, route through `build-model-animations`
 3. Weight at representative extremes and inspect shoulders, hips, joints, face, equipment, and detachable parts.
 4. Author actions with stable frame ranges, loop policy, root motion, contacts, markers, and NLA ownership.
 5. Test action transitions, attachments, retargeting assumptions, and exportable deform bones.
-6. Hand the reviewed actor to `prepare-rigged-runtime-actors` for runtime manifest and gameplay proof.
+6. Hand a compatible skinned actor to `prepare-rigged-runtime-actors`; retain the profiled motion-package handoff for articulated or rigid assets instead of inventing a skeleton.
 
 Read [rig-animation-authoring-contract.md](references/rig-animation-authoring-contract.md) for rig, action, and evidence rules.
+Read [subject-articulation-and-deformation.md](references/subject-articulation-and-deformation.md) when choosing a rig profile, preparing a subject for motion, or diagnosing joint, facial, equipment, or mechanism failures.
 
 ## Guardrails
 

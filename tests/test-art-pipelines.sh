@@ -30,6 +30,137 @@ project_command() { OPENCAW_PROJECT_ROOT="$project" "$@"; }
 
 echo "[1/6] validating the pipeline catalog and PROOF_TO_MODEL constraints"
 bash commands/validate-art-pipelines.sh
+node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
+[[ -n "$node_bin" ]] || fail "Node.js is required for finishing-schema regression checks"
+"$node_bin" <<'FINISH_SCHEMA_CASES'
+const fs = require('fs'), vm = require('vm'), assert = require('assert');
+const schemaPath = '.styles/.pipelines/proof-to-model/finishing-settings.schema.json';
+const source = fs.readFileSync('commands/validate-art-pipelines.sh', 'utf8').replace(/\r\n/g, '\n');
+const program = source.match(/"\$node_bin" <<'NODE'\n([\s\S]*?)\nNODE/);
+assert(program, 'The actual art schema validator must be exercised.');
+const original = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+function check(schema) {
+  const fixtureFs = Object.create(fs);
+  fixtureFs.readFileSync = (file, ...args) => file === schemaPath ? JSON.stringify(schema) : fs.readFileSync(file, ...args);
+  vm.runInNewContext(program[1], { require: name => name === 'fs' ? fixtureFs : require(name) }, { timeout: 2000 });
+}
+check(original);
+const reordered = structuredClone(original);
+reordered.oneOf.reverse();
+check(reordered);
+// Mutate only in-memory schemas: never weaken or overwrite the shared schema.
+const legacy = schema => schema.$defs.legacyQuadriFlow;
+const rigid = schema => schema.$defs.rigidParts;
+const parts = schema => rigid(schema).properties.rigidParts;
+const negatives = [
+  ['missing route selection', s => delete s.oneOf],
+  ['unversioned fallback route', s => s.oneOf.push({ type: 'object' })],
+  ['duplicate v1 route', s => s.oneOf[1].$ref = s.oneOf[0].$ref],
+  ['route reference siblings', s => s.oneOf[0].default = {}],
+  ['open v1 object', s => legacy(s).additionalProperties = true],
+  ['open v2 object', s => rigid(s).additionalProperties = true],
+  ['v1 missing collision requirement', s => legacy(s).required = legacy(s).required.filter(k => k !== 'collision')],
+  ['v1 missing version', s => delete legacy(s).properties.schemaVersion.const],
+  ['v2 wrong version', s => rigid(s).properties.schemaVersion.const = 1],
+  ['v2 noninteger version', s => rigid(s).properties.schemaVersion.type = 'number'],
+  ['v1 mixed rigid route', s => legacy(s).properties.rigidParts = parts(s)],
+  ['v2 implicit method', s => rigid(s).required = rigid(s).required.filter(k => k !== 'method')],
+  ['v2 wrong method', s => rigid(s).properties.method.const = 'quadri-flow'],
+  ['v2 mixed solver route', s => rigid(s).properties.quadriFlow = legacy(s).properties.quadriFlow],
+  ['v2 implicit voxel fallback', s => rigid(s).properties.topologyPreparation.properties.method.const = 'voxel-remesh'],
+  ['v2 open preparation', s => rigid(s).properties.topologyPreparation.additionalProperties = true],
+  ['v1 absent collision alternative', s => legacy(s).properties.collision.oneOf.pop()],
+  ['v2 implicit collision fallback', s => rigid(s).properties.collision.oneOf.push({ type: 'object' })],
+  ['v2 open collision alternative', s => rigid(s).properties.collision.oneOf[0].additionalProperties = true],
+  ['v2 unbounded collision padding', s => delete rigid(s).properties.collision.oneOf[1].properties.padding.maximum],
+  ['v2 missing handoff requirement', s => parts(s).required = parts(s).required.filter(k => k !== 'handoff')],
+  ['v2 missing review requirement', s => parts(s).required = parts(s).required.filter(k => k !== 'reviewEvidence')],
+  ['v2 open handoff', s => parts(s).additionalProperties = true],
+  ['v2 empty handoff path', s => parts(s).properties.handoff.minLength = 0],
+  ['v2 unbounded review path', s => delete parts(s).properties.reviewEvidence.maxLength],
+  ['v2 loose handoff hash', s => parts(s).properties.handoffSha256.pattern = '.*'],
+  ['v2 shortened review hash', s => parts(s).properties.reviewEvidenceSha256.minLength = 1],
+  ['v2 unbounded triangle output', s => delete parts(s).properties.maxLod0Triangles.maximum],
+  ['v2 fractional triangle output', s => parts(s).properties.maxLod0Triangles.type = 'number'],
+  ['v2 unbounded GLB bytes', s => delete parts(s).properties.maxGlbBytes.maximum],
+  ['v2 required UV override', s => parts(s).required.push('uvAtlas')],
+  ['v2 missing UV override definition', s => delete parts(s).properties.uvAtlas],
+  ['v2 open UV override', s => parts(s).properties.uvAtlas.additionalProperties = true],
+  ['v2 implicit UV method', s => parts(s).properties.uvAtlas.required.pop()],
+  ['v2 unsupported UV method', s => parts(s).properties.uvAtlas.properties.method.const = 'automatic'],
+  ['v2 fractional pixel margin', s => parts(s).properties.uvAtlas.properties.islandMarginPixels.type = 'number'],
+  ['v2 zero pixel margin', s => parts(s).properties.uvAtlas.properties.islandMarginPixels.minimum = 0],
+  ['v2 unbounded pixel margin', s => delete parts(s).properties.uvAtlas.properties.islandMarginPixels.maximum],
+  ['v1 mixed UV override', s => legacy(s).properties.uvAtlas = parts(s).properties.uvAtlas],
+  ['v2 required UV repair', s => parts(s).properties.uvAtlas.required.push('triangleRepair')],
+  ['v2 missing UV repair definition', s => delete parts(s).properties.uvAtlas.properties.triangleRepair],
+  ['v2 open UV repair', s => parts(s).properties.uvAtlas.properties.triangleRepair.additionalProperties = true],
+  ['v2 implicit UV repair budget', s => parts(s).properties.uvAtlas.properties.triangleRepair.required.pop()],
+  ['v2 automatic UV repair method', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.method.const = 'automatic'],
+  ['v2 default UV repair', s => parts(s).properties.uvAtlas.properties.triangleRepair.default = {}],
+  ['v2 default UV repair method', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.method.default = 'density-preserving-isolated-cells-v1'],
+  ['v2 fractional UV repair cell type', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.minCellPixels.type = 'number'],
+  ['v2 unsupported UV repair cell size', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.minCellPixels.const = 8],
+  ['v2 zero UV repair budget', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.maxTriangles.minimum = 0],
+  ['v2 unbounded UV repair budget', s => delete parts(s).properties.uvAtlas.properties.triangleRepair.properties.maxTriangles.maximum],
+  ['v2 fractional UV repair budget', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.maxTriangles.type = 'number'],
+  ['v2 caller UV repair tolerance', s => parts(s).properties.uvAtlas.properties.triangleRepair.properties.epsilon = {type:'number'}],
+  ['v2 required normal import', s => parts(s).required.push('importNormals')],
+  ['v2 missing normal definition', s => delete parts(s).properties.importNormals],
+  ['v2 open normal profile', s => parts(s).properties.importNormals.additionalProperties = true],
+  ['v2 implicit normal method', s => parts(s).properties.importNormals.required = []],
+  ['v2 automatic normal method', s => parts(s).properties.importNormals.properties.method.const = 'automatic'],
+  ['v2 default normal profile', s => parts(s).properties.importNormals.default = {method:'stored-corner-fan-v1'}],
+  ['v2 default normal method', s => parts(s).properties.importNormals.properties.method.default = 'stored-corner-fan-v1'],
+  ['v2 caller normal tolerance', s => parts(s).properties.importNormals.properties.maxError = {type:'number'}],
+  ['v1 mixed normal profile', s => legacy(s).properties.importNormals = parts(s).properties.importNormals],
+  ['v2 required LOD profile', s => parts(s).required.push('lods')],
+  ['v2 missing LOD definition', s => delete parts(s).properties.lods],
+  ['v2 open LOD profile', s => parts(s).properties.lods.additionalProperties = true],
+  ['v2 implicit LOD method', s => parts(s).properties.lods.required.pop()],
+  ['v2 automatic LOD method', s => parts(s).properties.lods.properties.method.const = 'automatic'],
+  ['v2 default LOD profile', s => parts(s).properties.lods.default = {}],
+  ['v2 default LOD method', s => parts(s).properties.lods.properties.method.default = 'original-component-finite-collapse-v1'],
+  ['v2 nonarray LOD errors', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.type = 'object'],
+  ['v2 empty LOD errors', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.minItems = 0],
+  ['v2 excessive LOD errors', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.maxItems = 9],
+  ['v2 missing positive LOD bound', s => delete parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.items.exclusiveMinimum],
+  ['v2 loose LOD upper bound', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.items.maximum = 2],
+  ['v2 ambiguous LOD minimum', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.items.minimum = 0],
+  ['v2 default LOD error array', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.default = [.003]],
+  ['v2 default LOD error item', s => parts(s).properties.lods.properties.maxVertexSurfaceErrorMetres.items.default = .003],
+  ['v2 missing contact policy definition', s => delete parts(s).properties.lods.properties.contactPolicy],
+  ['v2 implicit required contact policy', s => parts(s).properties.lods.required.push('contactPolicy')],
+  ['v2 nonstring contact policy', s => parts(s).properties.lods.properties.contactPolicy.type = 'number'],
+  ['v2 unsupported contact policy', s => parts(s).properties.lods.properties.contactPolicy.const = 'automatic'],
+  ['v2 default contact policy', s => parts(s).properties.lods.properties.contactPolicy.default = 'protected-contact-rings-v1'],
+  ['v2 missing contact authority dependency', s => delete parts(s).allOf],
+  ['v2 empty contact authority dependency', s => parts(s).allOf = []],
+  ['v2 duplicate contact authority dependency', s => parts(s).allOf.push(structuredClone(parts(s).allOf[0]))],
+  ['v2 unconditional contact dependency', s => delete parts(s).allOf[0].if],
+  ['v2 omitted conditional LOD presence', s => parts(s).allOf[0].if.required = []],
+  ['v2 omitted contact selector presence', s => parts(s).allOf[0].if.properties.lods.required = []],
+  ['v2 missing contact topology requirement', s => parts(s).allOf[0].then.required = []],
+  ['v2 bypassable contact dependency', s => parts(s).allOf[0].else = {}],
+  ['v2 caller LOD ratios', s => parts(s).properties.lods.properties.requestedRatios = {type:'array'}],
+  ['v1 mixed LOD profile', s => legacy(s).properties.lods = parts(s).properties.lods],
+  ['v2 missing resource policy', s => rigid(s).required = rigid(s).required.filter(k => k !== 'resources')],
+  ['v2 open resource policy', s => rigid(s).properties.resources.additionalProperties = true],
+  ['v2 unbounded memory', s => delete rigid(s).properties.resources.properties.maxPrivateBytes.maximum],
+  ['v1 open solver', s => legacy(s).properties.quadriFlow.additionalProperties = true],
+  ['v1 unpinned solver scale', s => legacy(s).properties.quadriFlow.properties.coordinateScale.enum.push(3)],
+  ['v1 open simplification', s => legacy(s).properties.quadriFlow.properties.simplification.additionalProperties = true],
+  ['v1 missing protected regions', s => legacy(s).properties.quadriFlow.properties.simplification.required.pop()]
+];
+for (const [label, mutate] of negatives) {
+  const candidate = structuredClone(original);
+  mutate(candidate);
+  let rejected = false;
+  try { check(candidate); } catch { rejected = true; }
+  assert(rejected, `The actual validator accepted ${label}.`);
+}
+console.log(`Finishing schema checks passed: 2 valid arrangements and ${negatives.length} malformed schemas rejected.`);
+FINISH_SCHEMA_CASES
 [[ ! -e .styles/.gpu ]] || fail "legacy pipeline tree exists"
 [[ ! -e .media ]] || fail "legacy media tree exists"
 [[ ! -e .styles/.pipelines/css3 ]] || fail "retired CSS3 directory exists"
@@ -84,6 +215,9 @@ project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/d
 project_command bash commands/generate-style.sh --inline --pipeline blender --allow-pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
 grep -Fq '<!-- BEGIN ART PIPELINE: BLENDER -->' "$project/STYLE.md" || fail "inline contract omitted BLENDER"
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
+awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$project/STYLE.md" > "$project/STYLE-crlf.md"
+project_command bash commands/validate-style-contract.sh "$project/STYLE-crlf.md" >/dev/null
+project_command bash commands/resolve-art-pipeline.sh --style "$project/STYLE-crlf.md" --json >/dev/null
 expect_failure "$runtime_dir/invalid.log" bash commands/generate-style.sh --pipeline unknown CEL_SHADED_COMIC
 expect_failure "$runtime_dir/duplicate.log" bash commands/generate-style.sh --pipeline PROOF_TO_MODEL --allow-pipeline proof-to-model CEL_SHADED_COMIC
 

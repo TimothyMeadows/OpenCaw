@@ -21,6 +21,8 @@ Use when a Blender asset needs seams, measured UVs, atlases or UDIMs, bake cages
 
 Read [uv-bake-texture-contract.md](references/uv-bake-texture-contract.md) for required measurements and map rules.
 
+Use [surface-detail-and-atlases.md](references/surface-detail-and-atlases.md) for measured density, hair/foliage cards, atlas region ownership, mip checks and renderer-specific packed-map delivery.
+
 ## Guardrails
 
 - Do not use UDIMs or oversized maps when the target cannot consume them.

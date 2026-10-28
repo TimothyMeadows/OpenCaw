@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/proof-to-model/rigid-handoff.schema.json",
+  "title": "Reviewed articulated HIGH/LOW source handoff",
+  "$comment": "Native parsing limits handoff/authoring to524288 UTF-8 bytes, review to65536; rejects duplicates, invalid paths, cyclic/unknown parent IDs, reused mesh names, stale hashes/reviews and malformed affine matrices. Independent preparation review binds the full handoff and authoring hashes; it is never human model/runtime acceptance. Actual Blender checks imported triangle counts, HIGH/LOW surfaces, materials, UVs, hierarchy and exports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "profile",
+    "coordinateFrame",
+    "sourceRawSha256",
+    "preparedGlb",
+    "preparedGlbSha256",
+    "sourceToPreparedMatrix",
+    "authoringEvidence",
+    "authoringEvidenceSha256",
+    "parts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "type": "integer"
+    },
+    "profile": {
+      "const": "articulated"
+    },
+    "coordinateFrame": {
+      "const": "opencaw-proof-z-up"
+    },
+    "sourceRawSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "preparedGlb": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Native validation additionally rejects traversal, reserved names, backslashes, absolute paths, reparse points and filesystem aliases."
+    },
+    "preparedGlbSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "sourceToPreparedMatrix": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "array",
+        "minItems": 4,
+        "maxItems": 4,
+        "items": {
+          "type": "number",
+          "minimum": -1000000000.0,
+          "maximum": 1000000000.0
+        }
+      }
+    },
+    "authoringEvidence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "Native validation additionally rejects traversal, reserved names, backslashes, absolute paths, reparse points and filesystem aliases."
+    },
+    "authoringEvidenceSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "parentId",
+          "pivot",
+          "highObject",
+          "lowObject",
+          "maxTriangles",
+          "maxVertexSurfaceErrorMetres",
+          "materialMode",
+          "bakeGroup",
+          "collision",
+          "collisionReason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "parentId": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            ]
+          },
+          "pivot": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            }
+          },
+          "highObject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "lowObject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxTriangles": {
+            "type": "integer",
+            "minimum": 4,
+            "maximum": 8000000
+          },
+          "maxVertexSurfaceErrorMetres": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "materialMode": {
+            "enum": [
+              "preserve",
+              "bake"
+            ]
+          },
+          "bakeGroup": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            ]
+          },
+          "collision": {
+            "type": "boolean"
+          },
+          "collisionReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "materialMode": {
+                  "const": "preserve"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "bakeGroup": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "bakeGroup": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "reviewEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "decision",
+        "human",
+        "reviewer",
+        "reason",
+        "sourceRawSha256",
+        "preparedGlbSha256",
+        "handoffSha256",
+        "authoringEvidenceSha256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "rigid-preparation"
+        },
+        "decision": {
+          "const": "approved"
+        },
+        "human": {
+          "const": false
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "sourceRawSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "preparedGlbSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "handoffSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "authoringEvidenceSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    },
+    "authoringEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "sourceRawSha256",
+        "preparedGlbSha256",
+        "sources",
+        "repairs"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "rigid-part-authoring"
+        },
+        "sourceRawSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "preparedGlbSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256",
+              "role"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "description": "Native validation additionally rejects traversal, reserved names, backslashes, absolute paths, reparse points and filesystem aliases."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+                "minLength": 64,
+                "maxLength": 64
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              }
+            }
+          }
+        },
+        "repairs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "partId",
+              "sourceKind",
+              "sourceDescription",
+              "highTriangles",
+              "lowTriangles",
+              "intentionalChanges"
+            ],
+            "properties": {
+              "partId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "sourceKind": {
+                "enum": [
+                  "reconstruction-part",
+                  "authored-detail"
+                ]
+              },
+              "sourceDescription": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "highTriangles": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9223372036854775807
+              },
+              "lowTriangles": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9223372036854775807
+              },
+              "intentionalChanges": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

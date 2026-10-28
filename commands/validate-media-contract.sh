@@ -35,6 +35,7 @@ for heading in "# MEDIA.md" "## Pipeline Availability" "## Capability Matrix" "#
 done
 
 mapfile -t selected < <(awk '
+  { sub(/\r$/, "") }
   /^Generated from OpenCaw media pipeline templates:/ { list=1; next }
   /^---$/ { list=0 }
   list && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print }

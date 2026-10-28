@@ -54,6 +54,9 @@ done
 bash ./tests/test-model-to-animation.sh
 "$python_bin" tests/test-model-animation-blender.py
 "$python_bin" tests/test-model-animation-native-integration.py
+bash ./tests/test-model-to-action.sh
+"$python_bin" tests/test-model-action-blender.py
+"$python_bin" tests/test-model-action-native-integration.py
 ./tests/test-code-character-contract.sh
 ./tests/test-code-character-skills.sh
 ./tests/test-code-character-evidence.sh

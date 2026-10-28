@@ -14,6 +14,10 @@ if (args.Length > 0 && args[0] == "--spawn-child")
     await Task.Delay(TimeSpan.FromSeconds(30));
     return 0;
 }
+if (args.Length > 0 && args[0] == "--blender-environment-probe")
+    return FinishingSettingsTests.ObserveChildEnvironment(args);
+if (args.Length > 0 && args[0] is "--rigid-memory-allocate" or "--rigid-memory-parent")
+    return RigidFinishingTests.ObserveAllocation(args);
 var root = Path.Combine(Path.GetTempPath(), "opencaw-proof-tests-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
 var w = new Workspace(root);
@@ -105,6 +109,9 @@ try
     await MultiViewReuseTests.Run(w, Check, Reject);
     await MultiViewGeometryTests.Run(w, Check, Reject);
     await MultiViewPipelineTests.Run(w, Check, Reject);
+    await FinishingSettingsTests.Run(w, Check, Reject);
+    await FinishAttemptBudgetTests.Run(w, Check, Reject);
+    await RigidFinishingTests.Run(w, Check, Reject);
     passed += CompatibilityTests.Run();
     File.AppendAllText(w.Resolve("STYLE.md"), "changed");
     await Reject(() => new Pipeline(w, opts, new NativeProcess(), new AlphaProcessor()).Execute("validate", default), "changed style invalidates evidence");

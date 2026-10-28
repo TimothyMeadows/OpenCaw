@@ -10,6 +10,8 @@ engines: [AGNOSTIC]
 
 Use after model production when an asset needs rigging/hierarchy preparation, a motion set, retargeting, complete motion review or selected-engine animation/effect handoff. Existing engine playback edits may only need that engine's animation skill.
 
+For a dance pattern, chained combination or charge/cast sequence assembled from reviewed clips, use `build-model-actions` after individual clip production. Keep source clip ancestry and separate composed-action review; missing source clips return here for authoring or retargeting.
+
 ## Workflow
 
 1. Resolve the project engine and this skill; read architecture, STYLE.md and `.styles/.workflows/model-to-animation/WORKFLOW.md`. This downstream workflow does not replace the primary art pipeline, select another engine or install dependencies.

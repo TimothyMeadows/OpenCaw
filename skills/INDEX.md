@@ -104,22 +104,23 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 
 - `build-proof-to-model-assets` - Classify original anatomy/structure, prepare a reviewed six-view proof set, and produce staged 3D assets through native multi-view reconstruction and Blender finishing.
 - `build-model-animations` - Prepare skinned, articulated and rigid models, author or retarget reviewed motions, and hand them to compatible engine animation and effects owners.
+- `build-model-actions` - Compose reviewed animation clips into ordered actions, with transitions, model-attached effects, fixed-target presentation and sequence-level review.
 - `select-art-pipeline` - Resolve CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER from a prompt override or `STYLE.md` and record task-local evidence.
 - `use-external-asset-library` - Inspect optional read-only 3D asset libraries and copy an authorized candidate into `assets/models/` before use.
 - `threejs-build-code-models` - Author deterministic procedural Three.js models through ordered, evidence-backed code passes.
 - `threejs-build-code-characters` - Author source-native Three.js characters and creatures through linked profiles, six ordered gates, calibrated machine evidence, and explicit lifecycle ownership.
 - `threejs-review-code-characters` - Independently review Three.js character readability and style from answer-neutral, hash-bound evidence packets.
-- `direct-blender-production` - Direct safe Blender 4.5 production sessions from brief through staged, reviewed handoff.
-- `model-blender-assets` - Model, sculpt, retopologize, and clean production Blender assets.
-- `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, maps, atlases, UDIMs, and packed textures.
-- `author-blender-materials-and-lookdev` - Translate the active style contract into controlled Blender materials and look development.
-- `build-procedural-blender-scenes` - Build deterministic Geometry Nodes systems, modular kits, and procedural scene assemblies.
-- `rig-and-animate-blender-actors` - Author armatures, skinning, controls, actions, NLA, and runtime-ready animation handoffs.
-- `simulate-blender-effects` - Prepare deterministic Blender simulations, caches, and render or VFX handoffs.
+- `direct-blender-production` - Direct safe Blender 4.5 sessions, matched reference comparisons and detail checkpoints through reviewed handoff.
+- `model-blender-assets` - Build hard-surface assemblies, subject-specific meshes, grooms/cards and measured sculpt/retopology candidates.
+- `prepare-blender-uvs-and-textures` - Prepare measured UVs, controlled bakes, mip-aware atlases and explicit target texture channels.
+- `author-blender-materials-and-lookdev` - Translate the active style into controlled materials, constructed surface detail and verified target response.
+- `build-procedural-blender-scenes` - Build bounded Geometry Nodes systems, connected modular kits, vegetation and repeatable assemblies.
+- `rig-and-animate-blender-actors` - Author subject-specific deformation or mechanical articulation with complete-motion handoff evidence.
+- `simulate-blender-effects` - Prepare controlled simulations, cloth pins/collisions/settling, caches and verified render or VFX handoffs.
 - `light-and-frame-blender-scenes` - Design Blender cameras, lighting rigs, exposure, composition, and final framing.
 - `render-and-composite-blender-output` - Produce staged still, animation, pass, alpha, and pre-rendered 2D or 2.5D output.
-- `optimize-and-export-blender-assets` - Measure, optimize, export, and independently verify GLB, FBX, USD, or Alembic deliverables.
-- `review-blender-deliverables` - Review scene reports and visual evidence with severity-ranked defects and ship/block verdicts.
+- `optimize-and-export-blender-assets` - Curate, measure, export and independently verify runtime variants through selected-engine importers.
+- `review-blender-deliverables` - Review profile and subject evidence, matched comparisons and remaining defects with explicit ship/block verdicts.
 - `maintain-art-style-contract` - Maintain, generate, or validate `STYLE.md` against selected `.styles` templates.
 - `review-isometric-production` - Review isometric art for projection, anchors, depth sorting, occlusion, and gameplay readability.
 - `prepare-game-art-handoff` - Prepare game art assets for engine/runtime handoff with metadata and validation checks.

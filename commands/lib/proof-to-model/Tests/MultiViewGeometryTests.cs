@@ -24,6 +24,30 @@ static class MultiViewGeometryTests
         var valid = ProofSet();
         MultiViewGeometry.Validate(valid);
         check(true, "six prescribed cameras accept JSON integer mesh scale without coercing strings");
+        JsonObject CameraAt(double meshScale, double distance)
+        {
+            var set = ProofSet();
+            set["camera"]!["meshScale"] = meshScale;
+            set["camera"]!["distance"] = distance;
+            for (var i = 0; i < MultiViewGeometry.Views.Length; i++)
+                set["views"]![i]!["cameraToWorld"] = MultiViewGeometry.Matrix(MultiViewGeometry.Views[i], distance);
+            return set;
+        }
+        // Reproduces the live owl input: the inverse scale creates a six-unit
+        // cube while cameras are only 1.8 units away. Positive finite fields and
+        // valid matrices alone must not admit this physically inconsistent rig.
+        await reject(() => Task.Run(() => MultiViewGeometry.Validate(CameraAt(1.0 / 6, 1.8))),
+            "live inverse-scale camera-inside-cube regression rejected before inference");
+        await reject(() => Task.Run(() => MultiViewGeometry.Validate(CameraAt(1, .5))),
+            "camera on conditioning-cube face rejected");
+        await reject(() => Task.Run(() => MultiViewGeometry.Validate(CameraAt(1, .5000001))),
+            "near-zero conditioning depth rejected with native float precision margin");
+        await reject(() => Task.Run(() => MultiViewGeometry.Validate(CameraAt(double.Epsilon, 1.8))),
+            "finite positive scale cannot overflow conditioning extent");
+        MultiViewGeometry.Validate(CameraAt(1, 1.8));
+        check(true, "unit conditioning cube with exterior cameras accepted without claiming image calibration");
+        MultiViewGeometry.Validate(CameraAt(1.0 / 6, 10.8));
+        check(true, "equivalently scaled exterior rig accepted instead of banning small meshScale values");
         check(MultiViewGeometry.Matrix("front")[1]![3]!.GetValue<double>() < 0
             && MultiViewGeometry.Matrix("right")[0]![3]!.GetValue<double>() < 0
             && MultiViewGeometry.Matrix("left")[0]![3]!.GetValue<double>() > 0,

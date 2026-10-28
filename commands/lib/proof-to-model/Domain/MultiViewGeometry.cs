@@ -34,10 +34,17 @@ public static class MultiViewGeometry
             throw new InvalidOperationException("Camera convention must be blender-nerf-z-up");
         if (Text(camera["calibration"]) is not ("nominal-prescribed" or "measured"))
             throw new InvalidOperationException("Camera calibration must distinguish nominal-prescribed from measured");
-        Positive(Number(camera["meshScale"], "meshScale"), "meshScale");
+        var meshScale = Number(camera["meshScale"], "meshScale");
+        Positive(meshScale, "meshScale");
         Fov(Number(camera["cameraAngleX"], "cameraAngleX"));
         var distance = Number(camera["distance"], "distance");
         Positive(distance, "distance");
+        // The pinned engine projects grid coordinates as grid / mesh_scale / 2.
+        // Each cardinal camera must be outside that cube, with positive depth
+        // even at its nearest face. A smaller meshScale makes this cube larger.
+        var halfExtent = 0.5 / meshScale;
+        if (!double.IsFinite(halfExtent) || distance - halfExtent <= 1e-6 * Math.Max(distance, halfExtent))
+            throw new InvalidOperationException("Camera is inside or on the Pixal3D conditioning cube; meshScale is inverse scale (cube half-extent = 0.5 / meshScale). Choose consistent meshScale and distance, revise the camera contract and obtain fresh proof-set approval before inference.");
         var views = proofSet["views"] as JsonArray ?? throw new InvalidOperationException("Proof set needs six ordered views");
         if (views.Count != Views.Length)
             throw new InvalidOperationException("Proof set needs exactly six views: " + string.Join(", ", Views));

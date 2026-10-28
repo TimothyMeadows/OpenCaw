@@ -26,6 +26,8 @@ Read ProjectVersion.txt, package manifest and lock, existing assembly definition
 6. Define save records using stable domain identifiers and schema versions instead of scene instance references. Validate loaded data before applying it, restore dependencies in order, and make failed migration preserve the original save.
 7. Separate Editor-only authoring assemblies from runtime assemblies. Use project-owned validation to catch missing scripts, broken prefab links, duplicate IDs and invalid content before building.
 
+For staged Blender assets, read [Blender asset handoff](references/blender-asset-handoff.md) for importer identity, actual rig selection, curated LODs and renderer-specific material review.
+
 ## Verification
 
 - Open and reload a representative scene with real Unity; check missing scripts, GUID references, prefab variants and deterministic bootstrap.

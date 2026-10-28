@@ -825,6 +825,7 @@ Or run the command directly:
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
 | Native proof-to-model assets | `proof-to-model.sh` |
 | Native model-to-animation production | `model-to-animation.sh` |
+| Native model-to-action composition | `model-to-action.sh` |
 | Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
 | Code-first Three.js characters | `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `measure-code-character-evidence.sh`, `record-code-character-calibration.sh`, `record-code-character-gate.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
@@ -1170,7 +1171,7 @@ OpenCaw separates visual direction from production method. Asset-production task
 4. Configure `MEDIA.md` only when `CLOUD` or `LOCAL` generation is used.
 5. Stop when the selected pipeline is unavailable or fails; never switch pipelines silently.
 
-The five pipelines are:
+The five primary art pipelines selectable in `STYLE.md` are:
 
 | Pipeline | Primary output | Boundary |
 | --- | --- | --- |
@@ -1180,7 +1181,18 @@ The five pipelines are:
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
 | `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
 
-Pipeline contracts and owned assets live under:
+Downstream production pipelines compose with model creation:
+
+| Pipeline | Primary output | Boundary |
+| --- | --- | --- |
+| [`MODEL_TO_ANIMATION`](#model-to-animation) | Reviewed skinned, articulated or rigid motion packages with selected-engine playback and effects | Reviewed model input, rig/motion approvals, independent review and separate human runtime acceptance |
+| [`MODEL_TO_ACTION`](#model-to-action) | Ordered compound animations with timed model-attached effects and fixed-target presentation | Reviewed source clips, explicit timing/blends, sequence review and separate runtime acceptance; gameplay retains authority |
+
+`MODEL_TO_ANIMATION` follows `PROOF_TO_MODEL`, `BLENDER`, a copied library model or an explicitly compatible `CODE` handoff. It keeps the selected `STYLE.md` pipeline and `ENGINE.md` engine; use `build-model-animations` and `model-to-animation.sh` for this stage. See the [production catalog](.styles/.pipelines/INDEX.md).
+
+`MODEL_TO_ACTION` composes those individual clips into reviewed sequences through `build-model-actions` and `model-to-action.sh`. Both downstream stages preserve the primary art selection and selected engine.
+
+Primary pipeline contracts and owned assets live under:
 
 ```text
 .styles/.pipelines/
@@ -1199,7 +1211,7 @@ Pipeline contracts and owned assets live under:
 └── blender/PIPELINE.md
 ```
 
-Legacy media-configuration directories are prohibited; pipeline assets belong only to their owners under `.styles/.pipelines/`.
+Legacy media-configuration directories are prohibited. Primary art-pipeline assets belong to their owners under `.styles/.pipelines/`; downstream motion and action assets live in their own directories under `.styles/.workflows/`.
 
 An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “reconstruct this approved proof,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`. CSS/SVG game-interface work remains supported separately; it is not a registered art pipeline:
 
@@ -1285,6 +1297,8 @@ Capture uses `127.0.0.1` with an OS-assigned port, keeps the Chromium sandbox en
 
 The `BLENDER` pipeline uses the existing Blender 4.5 LTS production suite for modeling, UVs and textures, materials, procedural scenes, rigging, simulation, lighting, rendering, optimization, export, and review. It preserves the source `.blend`, authors only in declared repository-confined working copies, prefers typed connected Blender operations, validates exceptional exact-content `bpy`, and treats CLI tools as read-only inspection. Blender, addons, packages, and providers are never installed automatically. If live authoring is unavailable, the workflow stops instead of switching pipelines or backends.
 
+The same skills provide subject-specific construction guidance for hard-surface mechanisms, characters and creatures, vehicles, hair cards, foliage, modular environments and cloth. Briefs record detail priorities, inferred hidden structure, articulation, texture and assembly requirements. Reviews compare matched cameras and neutral light before close details, inspect complete applicable motion, and verify a curated runtime export through the selected engine's importer and material rules. These references add no mandatory model, service, addon or paid middleware; technical checks remain separate from artistic acceptance.
+
 ### Native proof to model
 
 `PROOF_TO_MODEL` starts by classifying anatomy, structure, materials and occlusion in the original source images. Observations, researched inferences and unknowns stay distinct: a horse and rider remain separate subjects, and a skull-shaped metal helmet remains armor. Generated proofs cannot become evidence about the originals. One usable canonical source supplies one angle; generate the other five. An oblique or cropped source remains an anchor and may require six canonical proofs. With multiple originals, generate only missing usable angles.
@@ -1296,6 +1310,12 @@ Approve front, subject-right, back, subject-left, top and bottom together with t
 Run a subcommand with `--help` for exact arguments. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling project is required.
 
 State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable originals, classification, proof candidates, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof-set selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
+
+Finishing defaults to QuadriFlow. Rigid/articulated assets may explicitly select
+[reviewed per-part HIGH/LOW finishing](.styles/.pipelines/proof-to-model/RIGID_PARTS.md),
+with real shared bake atlases or verified unchanged materials, pivots and repair
+ancestry, LOD0 limits and a supported native memory policy. A failed solver never
+switches methods automatically.
 
 Fresh assets use manifest v2. Historical v1 requires explicit `--mode single-view-diagnostic`, cannot satisfy six-view production and cannot promote. Reuse requires matching source, interpretation, views, cameras, style, recipe and MV identities; it does not inherit human approval. The pinned engine accepts six inputs, while its published MV validation covers four. Structural, simulated-process and controlled Blender checks cannot certify real six-view inference, anatomy or visual quality; those require an authorized live acceptance run.
 
@@ -1311,7 +1331,7 @@ flowchart TB
     Proofs --> Set["Review originals and all six proofs<br/>Human proof-set approval"]
     Set --> Input["Prepare and review six inputs<br/>Alpha, shared framing and cameras"]
     Input --> Reconstruct["Native Pixal3D MV<br/>All six separate images"]
-    Reconstruct --> Finish["Blender finishing<br/>retopology, UV/bake, LODs, collision"]
+    Reconstruct --> Finish["Explicit Blender finishing<br/>QuadriFlow or reviewed rigid parts<br/>UV/bake, LODs, collision"]
     Finish --> Review["Matching six-camera comparisons<br/>Export checks and independent review"]
     Review --> Accept["Separate human<br/>runtime acceptance"]
     Accept --> Promote["Explicit promotion<br/>to assets/models/"]
@@ -1347,6 +1367,25 @@ flowchart TB
     Review --> Engine["Compatible engine animation and effects<br/>Movement remains simulation-owned"]
     Engine --> Accept["Independent review and separate<br/>human runtime acceptance"]
     Accept --> Promote["Explicit reviewed asset promotion"]
+```
+
+### Model to action
+
+`MODEL_TO_ACTION` assembles individually reviewed animation clips into a larger action. A dance can play several steps in order, a combination can chain distinct punches and kicks, and a casting action can charge an effect at a hand anchor, release a visual fireball toward a fixed target, then recover. Missing individual animations are authored through MODEL_TO_ANIMATION first.
+
+Recipes declare clip trims, rates, bounded repetitions, incoming blends and effect cues tied to step offsets or actual source markers. The native compiler preserves source clip hashes and produces editable Blender sequences, real composite GLB animations and an action package with timing, anchors, target bindings and effect ownership. Full sequence review covers transitions and cue timing; source clip approval alone does not approve a composed action.
+
+The Three.js presentation adapter plays actual exported actions and owns attached charge effects, bounded particles and fixed-target visual projectiles. Pause freezes the sequence; cancellation, restart and disposal retire old callbacks and release owned resources. The fixed target is captured at action start. Gameplay controls valid targets, movement, collisions, damage, costs and projectile outcomes; animation and VFX callbacks remain presentation signals.
+
+Use the workflow under `.styles/.workflows/model-to-action/` with an existing reviewed motion package, explicit source review and budgets. Initial shared composition uses in-place clips; root-motion actions require an explicitly compatible movement implementation. The primary `STYLE.md` pipeline and `ENGINE.md` selection remain authoritative. Adobe integrations, hidden downloads and automatic acceptance are excluded. Action selection, independent review and human runtime acceptance remain separate from explicit promotion.
+
+```mermaid
+flowchart LR
+    Clips["Reviewed individual clips"] --> Sequence["Ordered steps, trims and blends"]
+    Sequence --> Cues["Anchored effects and fixed-target cues"]
+    Cues --> Export["Editable source and actual compound clips"]
+    Export --> Review["Complete sequence and engine review"]
+    Review --> Accept["Separate human runtime acceptance"]
 ```
 
 ### Optional external 3D asset libraries

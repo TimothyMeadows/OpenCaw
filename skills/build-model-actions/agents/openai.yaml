@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Model Actions"
+  short_description: "Compose clips into reviewed actions and timed effects"
+  default_prompt: "Use $build-model-actions to compose these reviewed clips into an ordered action, synchronize effects, and verify the selected-engine presentation."

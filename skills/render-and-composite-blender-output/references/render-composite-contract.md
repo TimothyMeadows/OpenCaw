@@ -13,3 +13,9 @@ Name required passes and their consumers. Declare premultiplied or straight alph
 Render representative first, middle, last, high-motion, high-contrast, transparency, and effect-heavy frames before a full sequence. Verify frame numbering, continuity, noise, edge halos, color, alpha, temporal stability, audio duration when applicable, and exact output count.
 
 Renders stay staged under the media contract until accepted. Record the reviewed scene hash, settings, representative frames, full output inventory, and output hashes.
+
+## Diagnostic separation
+
+Retain a neutral material/detail pass without presentation glare, depth-of-field blur or grading that conceals defects. Check alpha over dark and light backgrounds; color fringes can indicate a premultiplication or color-transform mismatch rather than damaged geometry. Inspect thin cards, metallic highlights and emissive edges across motion for shimmer and unstable denoising. A still cannot establish temporal quality.
+
+Treat re-rendering with changed exposure, denoising, compositor nodes or output transforms as a new candidate. Preserve the previous evidence and compare identical source frames/settings where possible. Missing frames, mismatched passes or unverified target media remain explicit defects, not a successful full delivery.

@@ -27,6 +27,8 @@ Own safe, reproducible Blender 4.5 production from brief and working copy throug
 - Keep source files immutable and working, backup, cache, staging, and runtime paths explicit.
 - Prefer typed connected-tool operations and govern exceptional `bpy` use through exact-content validation and backup checkpoints.
 - Produce repository-confined inspection reports, required visual evidence, severity-ranked defects, and explicit delivery verdicts.
+- Select subject-specific construction references for hard surfaces, characters/creatures, vehicles, grooms, foliage, modular kits and cloth; review functional seams, articulation, density and concealed surfaces at the intended camera.
+- Match comparison cameras and neutral lighting before detail revisions; hand off one curated runtime variant through the resolved engine's importer/material owners with remaining defects explicit.
 
 # Behavior
 

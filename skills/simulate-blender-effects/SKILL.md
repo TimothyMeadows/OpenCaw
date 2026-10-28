@@ -20,6 +20,7 @@ Use for Blender cloth, hair, rigid-body, particle, fluid, smoke, volume, collisi
 6. Route runtime effects through `create-game-vfx`; route pre-rendered output through `render-and-composite-blender-output`.
 
 Read [simulation-bake-contract.md](references/simulation-bake-contract.md) for cache and acceptance requirements.
+Read [cloth-preparation-and-review.md](references/cloth-preparation-and-review.md) for garments, capes, flags, soft panels or other cloth work that needs explicit mesh, attachment, collision and settling decisions.
 
 ## Guardrails
 

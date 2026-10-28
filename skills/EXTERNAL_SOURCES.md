@@ -129,6 +129,19 @@ This ledger records OpenCaw's disposition of each selected capability idea. It i
 | CA-112 | enhance | Camera and Volume configuration | `unity-configure-rendering` |
 | CA-113 | enhance | Render Graph resource and pass verification | `unity-configure-rendering` |
 
+| CA-114 | enhance | Manufactured assemblies and subject-specific construction | `model-blender-assets` |
+| CA-115 | enhance | Groom flow, hair-card coverage and atlas handoff | `model-blender-assets` |
+| CA-116 | enhance | Measured texture density, mip-aware atlases and explicit channel semantics | `prepare-blender-uvs-and-textures` |
+| CA-117 | enhance | Modular connection coverage and bounded procedural authoring | `build-procedural-blender-scenes` |
+| CA-118 | enhance | Vegetation structure, wind masks, coverage and distance review | `build-procedural-blender-scenes` |
+| CA-119 | enhance | Subject-specific deformation and mechanical articulation | `rig-and-animate-blender-actors` |
+| CA-120 | enhance | Cloth preparation, pins, settling and cache replay | `simulate-blender-effects` |
+| CA-121 | enhance | Matched reference comparison and construction-detail review | `direct-blender-production` |
+| CA-122 | enhance | Constructed surface response and portable shader handoff | `author-blender-materials-and-lookdev` |
+| CA-123 | enhance | Curated runtime export and selected-engine import evidence | `optimize-and-export-blender-assets` |
+| CA-124 | consolidate | Genre and mood checklists | Existing STYLE.md translation and art-direction owners; no duplicate style skills |
+| CA-125 | reject | Mutable bridge installers, broad code execution and screenshot-only acceptance | Existing tool discovery, exact-script validation and independent/human review remain authoritative |
+
 ## Adaptation boundary
 
 - OpenCaw guidance is independently authored from capability intent. Distinctive external wording is not retained.

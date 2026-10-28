@@ -140,6 +140,8 @@ PROOF_TO_MODEL classifies only registered original images; generated proofs and 
 
 PROOF_TO_MODEL uses only its fixed, audited, hash-bound Blender batch scripts on repository-local working copies. This batch-authoring exception does not relax standalone BLENDER connected-authoring policy or authorize arbitrary scripts. Setup is dry-run unless explicitly executed with applicable license evidence; never install drivers or download during ordinary production. Preserve set approvals, immutable originals, recipe/tool hashes, and independent review evidence. The pinned engine accepts six views but upstream validation covers four; structural/simulated checks do not establish six-view visual quality. Rigging and animation require subject-specific evidence when applicable. CSS/SVG game interface work remains supported outside the retired CSS3 pipeline.
 
+Default finishing requires successful QuadriFlow. Explicit schemaVersion2 `rigid-parts` instead requires independently reviewed authored HIGH/LOW pairs, complete hash-bound repair/part/pivot ancestry, applicable material preservation or real grouped baking, per-part error and LOD0 limits, and supported native memory enforcement. Follow `./.styles/.pipelines/proof-to-model/RIGID_PARTS.md`; never select it after solver failure automatically, relabel a proxy HIGH, reset attempts or inherit human model/motion acceptance from technical input review.
+
 If a selected pipeline is unavailable or fails, stop and request direction. Never switch or fall back to a different pipeline silently.
 
 ### Optional external asset libraries
@@ -166,6 +168,16 @@ MODEL_TO_ANIMATION is a downstream asset-production workflow, defined in `./.sty
 - Keep authoritative movement/collision/gameplay separate from clip playback and particles. Speed/acceleration/turn and explicit warp phases drive bounded selected-engine presentation through stable anchors, clocks, cancellation, pooling and accessibility controls. GPU effect replay does not imply deterministic gameplay.
 - State and reviews remain under `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs remain in versioned non-runtime staging. Require current rig/hierarchy and motion review, independent review and separate human runtime acceptance before explicit promotion.
 - A GLB does not contain a portable engine state machine or native particle system. Use compatible engine owners and actual target evidence. Phaser's 2D path requires an explicit sprite/pre-rendered handoff; CODE remains THREEJS-specific source authoring. Missing native or browser prerequisites remain blocked/not-run, without a silent fallback or installation.
+
+## Model-to-action workflow
+
+MODEL_TO_ACTION composes reviewed individual clips into ordered actions under `./.styles/.workflows/model-to-action/WORKFLOW.md`. Use `build-model-actions` and `./commands/model-to-action.sh` after MODEL_TO_ANIMATION or a compatible reviewed motion handoff. It is a downstream production pipeline, listed in the pipeline catalogs, and does not replace the primary STYLE selection or select an engine.
+
+Bind the source model, rig, actual clip hashes and explicit source-motion review. Declare trims, playback rates, bounded repetitions, incoming blends, marker/step-relative effect cues and fixed-target bindings. Missing clips or anchors require a reviewed fix; never replace them with empty actions or guessed attachments. The initial shared compositor requires in-place clips and rejects unsupported root extraction rather than suppressing movement silently.
+
+Only the action workflow's fixed audited/hash-bound Blender bundle may compose its declared working copies. Preserve editable sequences, real exported composite clips, per-step ancestry and complete sequence/transition review. This exception does not change standalone BLENDER policy or another pipeline's scripts. Require separate action selection, independent review and human runtime acceptance before explicit promotion; input changes invalidate dependent evidence.
+
+Engine playback captures fixed target points at action start, owns one presentation clock and cleans up attachments, particles and visual projectiles on cancellation, restart or disposal. Frame variation and synchronous callbacks cannot repeat retired events or double-apply motion. Gameplay retains targeting, collision, damage, movement, costs, cooldowns and projectile outcomes; effects and animation callbacks grant no gameplay authority. No Adobe integration, provider fallback, automatic installation or production promotion is implied.
 
 ## Generative media workflow
 

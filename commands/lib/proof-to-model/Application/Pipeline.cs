@@ -10,6 +10,10 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
 {
 
     string manifestPath = ""; Manifest m = new();
+    (string Path, byte[] Bytes, JsonObject Value)? finishingSelection;
+    (string Path, byte[] Bytes, FinishAttemptBudget Value)? finishBudgetSelection;
+    RigidSelection? rigidSelection;
+    string? budgetManifestHash;
     string Need(string key) => options.GetValueOrDefault(key) ?? throw new InvalidOperationException("Missing --" + key);
     string Id(string value) => Regex.IsMatch(value, "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$") && value != ".." ? value : throw new InvalidOperationException("Unsafe identifier");
     string Hash(string relative) => w.HashFile(w.Resolve(relative));
@@ -80,6 +84,10 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
     string Artifact(string stage, string name) => RequireStage(stage).Artifacts.TryGetValue(name, out var path) ? path : throw new InvalidOperationException("Missing " + name + " artifact");
     public async Task Execute(string command, CancellationToken cancellation)
     {
+        if (options.ContainsKey("finish-settings") && command != "finish")
+            throw new InvalidOperationException("--finish-settings is supported only by finish");
+        if (options.ContainsKey("finish-budget") && command != "finish")
+            throw new InvalidOperationException("--finish-budget is supported only by finish");
         if (command == "init")
         {
             Init();
@@ -91,7 +99,10 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
         using var assetLock = w.Lock(State + "/asset.lock");
         // Re-read after acquiring ownership: a preceding run may have atomically
         // saved newer state between the initial layout check and this lock.
+        budgetManifestHash = options.ContainsKey("finish-budget") ? Hash(manifestPath) : null;
         m = w.Load<Manifest>(manifestPath);
+        if (budgetManifestHash is not null && Hash(manifestPath) != budgetManifestHash)
+            throw new InvalidOperationException("Manifest changed while loading finish budget context");
         CheckStatePaths();
         if (!IsMultiView && command is not ("status" or "doctor") && options.GetValueOrDefault("mode") != "single-view-diagnostic")
             throw new InvalidOperationException("Historical v1 state is single-view. Initialize a fresh v2 version for six-view production; --mode single-view-diagnostic explicitly selects diagnostic execution only.");
@@ -100,6 +111,8 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
             Console.WriteLine(JsonSerializer.Serialize(new
             {
                 manifest = m,
+                manifestSha256 = Hash(manifestPath),
+                finishBudget = new { consumedFinishAttempts = ConsumedAttempts("finish") },
                 approvalFingerprints = new
                 {
                     proof = ApprovalFingerprint("proof"),
@@ -151,7 +164,13 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
                 RequireApproval(ProofApprovalKind);
                 RequireApproval("preprocessing");
                 RequireStage("reconstruct");
-                await RunStage(command, RequireStage("reconstruct").Outputs.Keys.Append(m.Recipe).Append(m.Toolchain), Finish, cancellation);
+                finishingSelection = ReadFinishingSettings();
+                rigidSelection = ReadRigidSelection();
+                finishBudgetSelection = ReadFinishBudget();
+                await RunStage(command, RequireStage("reconstruct").Outputs.Keys.Append(m.Recipe).Append(m.Toolchain)
+                    .Concat(finishingSelection is { } selected ? new[] { selected.Path } : [])
+                    .Concat(rigidSelection?.Inputs.Keys ?? Enumerable.Empty<string>())
+                    .Concat(finishBudgetSelection is { } budget ? new[] { budget.Path } : []), Finish, cancellation);
                 break;
             case "review":
                 RequireStage("finish");
@@ -391,19 +410,41 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
         var maxAttempts = IsMultiView && name is "classify" or "prepare-proofs"
             ? w.Load<JsonObject>(m.Recipe)["proofPreparation"]!["maxSetRevisions"]!.GetValue<int>()
             : Toolchain["limits"]?["maxAttempts"]?.GetValue<int>() ?? 3;
-        if (maxAttempts < 1 || m.History.Count(item => item["event"]?.GetValue<string>() == "stage-start" && item["stage"]?.GetValue<string>() == name) >= maxAttempts)
-            throw new InvalidOperationException("Stage attempt budget exhausted; select a new asset version/budget explicitly");
+        if (name == "finish" && finishBudgetSelection is { } budget)
+        {
+            ValidateFinishBudgetContext(budget.Value);
+            maxAttempts = budget.Value.MaxFinishAttempts;
+        }
+        if (maxAttempts < 1 || ConsumedAttempts(name) >= maxAttempts)
+            throw new InvalidOperationException(name == "finish" ? "Finish attempt budget exhausted; authorize exactly one additional finish with --finish-budget TASK_LOCAL_JSON bound to the current status manifestSha256 and consumedFinishAttempts" : "Stage attempt budget exhausted; select a new asset version/budget explicitly");
         _ = Timeout;
         var paths = inputs.Concat(MetadataPaths).Distinct().ToArray();
         var stage = new Stage { Attempt = m.Staging + "/attempts/" + name + "-" + Guid.NewGuid().ToString("N"), Inputs = paths.ToDictionary(x => x, Hash), Fingerprint = Fingerprint(paths) };
         Directory.CreateDirectory(w.Resolve(stage.Attempt));
-        m.History.Add(new()
+        var start = new JsonObject
         {
             ["event"] = "stage-start",
             ["stage"] = name,
             ["attempt"] = stage.Attempt,
             ["timestamp"] = DateTimeOffset.UtcNow.ToString("O")
-        });
+        };
+        if (name == "finish" && finishBudgetSelection is { } authorization)
+        {
+            var snapshot = BindInputSnapshot(stage, authorization.Path, authorization.Bytes, "finishBudget", "finish-budget.json");
+            stage.Outputs[snapshot] = stage.Inputs[snapshot];
+            start["finishBudget"] = new JsonObject
+            {
+                ["source"] = authorization.Path, ["sourceSha256"] = stage.Inputs[authorization.Path],
+                ["snapshot"] = snapshot, ["snapshotSha256"] = stage.Inputs[snapshot],
+                ["manifestSha256"] = authorization.Value.ManifestSha256,
+                ["consumedFinishAttempts"] = authorization.Value.ConsumedFinishAttempts,
+                ["maxFinishAttempts"] = authorization.Value.MaxFinishAttempts,
+                ["reviewer"] = authorization.Value.Reviewer, ["reason"] = authorization.Value.Reason,
+                ["kind"] = "finish-attempt-budget", ["stage"] = "finish", ["decision"] = "approved", ["human"] = true
+            };
+            if (Hash(manifestPath) != budgetManifestHash) throw new InvalidOperationException("Manifest changed before spending finish budget receipt");
+        }
+        m.History.Add(start);
         m.Stages[name] = stage;
         var order = StageOrder;
         foreach (var later in order.Skip(Array.IndexOf(order, name) + 1))
@@ -593,9 +634,70 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
         if (!s.Artifacts.Values.Any(x => x.EndsWith("transforms.json")) || !s.Artifacts.Values.Any(x => x.EndsWith("input.png")))
             throw new InvalidOperationException("Engine did not retain single-view input and transforms ancestry");
     }
+    int ConsumedAttempts(string stage) => m.History.Count(item => item["event"]?.GetValue<string>() == "stage-start" && item["stage"]?.GetValue<string>() == stage);
+    void ValidateFinishBudgetContext(FinishAttemptBudget receipt)
+    {
+        var configured = Toolchain["limits"]?["maxAttempts"]?.GetValue<int>() ?? 3;
+        var consumed = ConsumedAttempts("finish");
+        if (configured < 1 || consumed < configured)
+            throw new InvalidOperationException("Finish budget recovery is allowed only after the valid configured finish budget is exhausted");
+        if (receipt.ManifestSha256 != budgetManifestHash || Hash(manifestPath) != budgetManifestHash)
+            throw new InvalidOperationException("Stale finish budget receipt: manifestSha256 must match the exact current manifest file");
+        if (receipt.ConsumedFinishAttempts != consumed)
+            throw new InvalidOperationException("Stale finish budget receipt: consumedFinishAttempts must match current finish stage-start history");
+    }
+    (string Path, byte[] Bytes, FinishAttemptBudget Value)? ReadFinishBudget()
+    {
+        if (!options.ContainsKey("finish-budget")) return null;
+        var input = ReadRelativeJsonInput("finish-budget", FinishAttemptBudget.MaximumBytes, taskEvidence: true);
+        var receipt = FinishAttemptBudget.Parse(input.Bytes);
+        ValidateFinishBudgetContext(receipt);
+        return (input.Path, input.Bytes, receipt);
+    }
+    (string Path, byte[] Bytes, JsonObject Value)? ReadFinishingSettings()
+    {
+        if (!options.ContainsKey("finish-settings")) return null;
+        var input = ReadRelativeJsonInput("finish-settings", FinishingSettings.MaximumBytes);
+        var value = FinishingSettings.Parse(input.Bytes);
+        if (value["rigidParts"]?["uvAtlas"] is not null)
+            FinishingSettings.ValidateUvAtlasRecipe(value, w.Load<JsonObject>(m.Recipe)["textureSize"]!.GetValue<double>());
+        if (value["rigidParts"]?["lods"] is not null)
+            FinishingSettings.ValidateLodRecipe(value, w.Load<JsonObject>(m.Recipe)["lodRatios"]!.AsArray().Count);
+        return (input.Path, input.Bytes, value);
+    }
+    (string Path, byte[] Bytes) ReadRelativeJsonInput(string option, int maximumBytes, bool taskEvidence = false)
+    {
+        var supplied = Need(option);
+        var normalized = supplied.Replace('\\', '/');
+        if (string.IsNullOrWhiteSpace(normalized) || Path.IsPathRooted(supplied) || normalized.Contains(':')
+            || normalized.Split('/').Any(part => part is "" or "." or ".." || part.EndsWith(' ') || part.EndsWith('.')
+                || part.Any(char.IsControl) || part.IndexOfAny(['<', '>', '"', '|', '?', '*']) >= 0
+                || Regex.IsMatch(part, @"^(CON|PRN|AUX|NUL|COM[1-9Â¹Â²Â³]|LPT[1-9Â¹Â²Â³]|CONIN\$|CONOUT\$)(\.|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            || !normalized.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("--" + option + " requires a project-relative JSON path without traversal or aliases");
+        var path = w.Relative(normalized);
+        if (taskEvidence) RequireTaskEvidence(path);
+        using var stream = File.OpenRead(w.Resolve(path));
+        using var reader = new BinaryReader(stream);
+        return (path, reader.ReadBytes(maximumBytes + 1));
+    }
+    string BindInputSnapshot(Stage stage, string source, byte[] bytes, string artifact, string filename)
+    {
+        var expected = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(bytes));
+        if (stage.Inputs.GetValueOrDefault(source) != expected || Hash(source) != expected)
+            throw new InvalidOperationException("Bound " + artifact + " input changed after validation; retry explicitly with current evidence");
+        var snapshot = stage.Attempt + "/" + filename;
+        using (var output = new FileStream(w.Resolve(snapshot), FileMode.CreateNew, FileAccess.Write, FileShare.None)) output.Write(bytes);
+        stage.Inputs[snapshot] = expected;
+        stage.Artifacts[artifact] = snapshot;
+        return snapshot;
+    }
     async Task Finish(Stage s, CancellationToken c)
     {
         ValidateRecipe();
+        if (finishingSelection is { } selected)
+            BindInputSnapshot(s, selected.Path, selected.Bytes, "finishingSettings", "finishing-settings.json");
+        if (rigidSelection is not null) await SnapshotRigidInputs(s, c);
         await Blender(s, "finish", Artifact("reconstruct", "glb"), c);
         foreach (var required in new[] { "blend", "glb", "report" })
             if (!s.Artifacts.ContainsKey(required))
@@ -641,7 +743,9 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
         var scriptDirectory = Path.Combine(Path.GetFullPath(baseline), ".styles/.pipelines/proof-to-model/blender");
         var bundle = s.Attempt + "/scripts";
         Directory.CreateDirectory(w.Resolve(bundle));
-        foreach (var file in new[] { "finish.py", "review.py", "common.py" })
+        foreach (var file in rigidSelection is not null && mode == "finish"
+                     ? new[] { "finish.py", "review.py", "common.py", "rigid_finish.py", "rigid_source_topology.py" }
+                     : new[] { "finish.py", "review.py", "common.py" })
         {
             var source = Path.Combine(scriptDirectory, file);
             if ((File.GetAttributes(source) & FileAttributes.ReparsePoint) != 0)
@@ -653,17 +757,65 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
         }
         var blender = Executable("blender");
         s.ExternalInputs[blender] = w.HashFile(blender);
-        await native.Run(blender, ["--version"], w.Root, w.Resolve(s.Attempt + "/blender-version.log"), 15, c);
-        var version = Compatibility.StripStreamMarkers(File.ReadAllText(w.Resolve(s.Attempt + "/blender-version.log")));
-        if (!Compatibility.IsBlender45Log(version))
-            throw new InvalidOperationException("Blender 4.5 LTS required");
-        w.Save(s.Attempt + "/tool-identity.json", new
+        var temporaryDirectory = s.Attempt + "/temp";
+        string ConfinedTemporaryDirectory()
+        {
+            var path = w.Resolve(temporaryDirectory);
+            // GetTempPath/GetTempPath2 use MAX_PATH-sized results on Windows.
+            // An overlong TEMP/TMP may be ignored in favour of USERPROFILE;
+            // reject before launch instead of routing writes outside the asset.
+            if (OperatingSystem.IsWindows() && Path.TrimEndingDirectorySeparator(path).Length + 2 > 260)
+                throw new InvalidOperationException("Blender temporary directory exceeds the Windows temporary-path limit; select a shorter project/task path. No alternate temporary location was selected.");
+            Directory.CreateDirectory(path);
+            // Re-resolve after creation and before each launch; existing links,
+            // junctions, non-directories and escaped parents must not route temp.
+            path = w.Resolve(temporaryDirectory);
+            if (!Directory.Exists(path) || (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidOperationException("Blender temporary directory must be a real confined attempt directory");
+            return path;
+        }
+        var childTemporaryDirectory = ConfinedTemporaryDirectory();
+        var childEnvironment = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["TEMP"] = childTemporaryDirectory, ["TMP"] = childTemporaryDirectory,
+            ["TMPDIR"] = childTemporaryDirectory, ["PYTHONDONTWRITEBYTECODE"] = "1"
+        };
+        var processEnvironment = new
+        {
+            temporaryDirectory,
+            temporaryEnvironmentVariables = new[] { "TEMP", "TMP", "TMPDIR" },
+            pythonDontWriteBytecode = true,
+            scope = "Child process environment routing; not an operating-system sandbox"
+        };
+        var maximumPrivateBytes = mode == "finish" && rigidSelection is not null
+            ? finishingSelection!.Value.Value["resources"]!["maxPrivateBytes"]!.GetValue<long>() : (long?)null;
+        void SaveToolIdentity(string? observedVersion) => w.Save(s.Attempt + "/tool-identity.json", new
         {
             executable = blender,
             sha256 = w.HashFile(blender),
-            version
+            version = observedVersion,
+            processEnvironment,
+            resourcePolicy = maximumPrivateBytes is null ? null : new
+            {
+                maxPrivateBytes = maximumPrivateBytes,
+                accounting = "Windows owned-job aggregate committed memory including descendants; not resident RAM or GPU memory",
+                limitations = "Process.Start precedes job assignment; assignment failure terminates the launched tree. No OS sandbox is claimed."
+            }
         });
+        SaveToolIdentity(null);
         s.Artifacts["toolIdentity"] = s.Attempt + "/tool-identity.json";
+        // Retain routing/executable provenance even if the version probe fails
+        // or the process is interrupted before a job/result can be produced.
+        Save();
+        _ = ConfinedTemporaryDirectory();
+        if (maximumPrivateBytes is { } probeLimit)
+            await native.RunWithLimits(blender, ["--version"], w.Root, w.Resolve(s.Attempt + "/blender-version.log"), 15, probeLimit, c, LogBudget, childEnvironment);
+        else
+            await native.Run(blender, ["--version"], w.Root, w.Resolve(s.Attempt + "/blender-version.log"), 15, c, LogBudget, childEnvironment);
+        var version = Compatibility.StripStreamMarkers(File.ReadAllText(w.Resolve(s.Attempt + "/blender-version.log")));
+        if (!Compatibility.IsBlender45Log(version))
+            throw new InvalidOperationException("Blender 4.5 LTS required");
+        SaveToolIdentity(version);
         var script = bundle + "/" + mode + ".py";
         var job = s.Attempt + "/job.json";
         var result = s.Attempt + "/outputs/result.json";
@@ -688,21 +840,46 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
             classification = IsMultiView && mode == "review" ? w.Load<JsonObject>(m.Classification) : null,
             outputDir = s.Attempt + "/outputs",
             recipe,
+            finishingSettings = mode == "finish" ? finishingSelection?.Value : null,
+            rigidHandoff = mode == "finish" ? rigidSelection?.Handoff : null,
+            taskEvidenceRoot = mode == "finish" && rigidSelection is not null ? $".opencaw/.cache/tasks/{m.Task}" : null,
             subjectRequirements,
+            processEnvironment,
             result
         });
-        await native.Run(blender, ["--background", "--factory-startup", "--disable-autoexec", "--python-exit-code", "1", "--python", w.Resolve(script), "--", "--job", w.Resolve(job)], w.Root, w.Resolve(s.Attempt + "/process.log"), Timeout, c, LogBudget);
+        _ = ConfinedTemporaryDirectory();
+        string[] arguments = ["--background", "--factory-startup", "--disable-autoexec", "--python-exit-code", "1", "--python", w.Resolve(script), "--", "--job", w.Resolve(job)];
+        if (maximumPrivateBytes is { } selectedLimit)
+            await native.RunWithLimits(blender, arguments, w.Root, w.Resolve(s.Attempt + "/process.log"), Timeout, selectedLimit, c, LogBudget, childEnvironment);
+        else
+            await native.Run(blender, arguments, w.Root, w.Resolve(s.Attempt + "/process.log"), Timeout, c, LogBudget, childEnvironment);
         var data = w.Load<JsonObject>(result);
         if (data["status"]?.GetValue<string>() != "prepared" || data["stages"] is not JsonArray || data["measurements"] is not JsonObject)
             throw new InvalidOperationException("Invalid Blender measured result");
         foreach (var artifact in data["artifacts"]!.AsObject())
         {
+            if (artifact.Key is "finishingSettings" or "finishBudget" or "toolIdentity" or "rigidHandoff" or "rigidPreparedSource" or "rigidPreparationReview" or "rigidAuthoringEvidence" or "rigidLineage")
+                throw new InvalidOperationException("Native finishing settings/budget/tool identity cannot be replaced by a producer artifact");
             var path = w.Relative(artifact.Value!.GetValue<string>());
             if (!path.StartsWith(s.Attempt + "/outputs/", StringComparison.Ordinal))
                 throw new InvalidOperationException("Blender artifact escapes attempt output");
             s.Artifacts[artifact.Key] = path;
         }
         s.Artifacts["result"] = result;
+        if (mode == "finish" && rigidSelection is { } rigid)
+        {
+            var limits = finishingSelection!.Value.Value["rigidParts"]!;
+            if (data["rigidHandoffSha256"]?.GetValue<string>() != ByteHash(rigid.HandoffBytes)
+                || data["inputSha256"]?.GetValue<string>() != Hash(input)
+                || data["finishingSettings"]?["method"]?.GetValue<string>() != "rigid-parts")
+                throw new InvalidOperationException("Rigid producer result lacks exact raw/handoff/method identities");
+            var triangles = data["measurements"]?["lod0Triangles"]?.GetValue<long>() ?? 0;
+            var bytes = data["measurements"]?["glbBytes"]?.GetValue<long>() ?? 0;
+            if (triangles < 1 || triangles > limits["maxLod0Triangles"]!.GetValue<long>()
+                || bytes < 1 || bytes > limits["maxGlbBytes"]!.GetValue<long>()
+                || !s.Artifacts.TryGetValue("glb", out var finishedGlb) || new FileInfo(w.Resolve(finishedGlb)).Length != bytes)
+                throw new InvalidOperationException("Rigid producer must report actual bounded LOD0/GLB measurements, not empty or mismatched evidence");
+        }
     }
     void Record()
     {
@@ -837,18 +1014,25 @@ public sealed partial class Pipeline(IWorkspace w, Dictionary<string, string> op
             throw new InvalidOperationException("Empty/missing artifact: " + relative);
         if (Path.GetExtension(full) == ".glb")
         {
-            var bytes = File.ReadAllBytes(full);
-            if (bytes.Length < 20 || BitConverter.ToUInt32(bytes, 0) != 0x46546c67 || BitConverter.ToUInt32(bytes, 4) != 2 || BitConverter.ToUInt32(bytes, 8) != bytes.Length)
+            using var stream = File.OpenRead(full);
+            using var reader = new BinaryReader(stream);
+            if (stream.Length < 20 || reader.ReadUInt32() != 0x46546c67 || reader.ReadUInt32() != 2 || reader.ReadUInt32() != stream.Length)
                 throw new InvalidOperationException("Invalid GLB container");
         }
         if (Path.GetExtension(full) == ".png")
         {
-            var bytes = File.ReadAllBytes(full);
+            using var stream = File.OpenRead(full);
+            using var reader = new BinaryReader(stream);
+            var bytes = reader.ReadBytes(33);
             if (bytes.Length < 33 || !bytes.Take(8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
                 throw new InvalidOperationException("Invalid PNG");
         }
-        if (Path.GetExtension(full) == ".blend" && !File.ReadAllBytes(full).Take(7).SequenceEqual("BLENDER"u8.ToArray()))
-            throw new InvalidOperationException("Invalid Blender file");
+        if (Path.GetExtension(full) == ".blend")
+        {
+            using var stream = File.OpenRead(full);
+            using var reader = new BinaryReader(stream);
+            if (!reader.ReadBytes(7).SequenceEqual("BLENDER"u8.ToArray())) throw new InvalidOperationException("Invalid Blender file");
+        }
     }
     void Promote()
     {

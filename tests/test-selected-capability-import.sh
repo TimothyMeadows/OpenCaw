@@ -55,7 +55,7 @@ ledger="skills/EXTERNAL_SOURCES.md"
 require_file "$ledger"
 require_text "$ledger" '## Review boundary'
 require_text "$ledger" 'Do not retain a source repository, commit, author identity, personal material, or audit payload.'
-for disposition in create enhance defer reject; do
+for disposition in create enhance consolidate defer reject; do
   grep -Eq "\| CA-[0-9]{3} \| ${disposition} \|" "$ledger" || fail "ledger has no $disposition disposition"
 done
 require_text "$ledger" '| CA-001 | create | Rigged runtime actor preparation | `prepare-rigged-runtime-actors` and `arts/technical-3d-artist` |'
@@ -68,7 +68,7 @@ record_count="$(grep -Ec '^\| CA-[0-9]{3} \|' "$ledger")"
 [[ "$record_count" -ge 18 ]] || fail "ledger must retain all 18 reviewed disposition records"
 duplicate_ids="$(awk -F '|' '/^\| CA-[0-9][0-9][0-9] \|/ { id=$2; gsub(/[[:space:]]/, "", id); print id }' "$ledger" | sort | uniq -d)"
 [[ -z "$duplicate_ids" ]] || fail "ledger contains duplicate disposition IDs: $duplicate_ids"
-if grep -E '^\| CA-[0-9]{3} \|' "$ledger" | grep -Ev '^\| CA-[0-9]{3} \| (create|enhance|defer|reject|retired) \|'; then
+if grep -E '^\| CA-[0-9]{3} \|' "$ledger" | grep -Ev '^\| CA-[0-9]{3} \| (create|enhance|consolidate|defer|reject|retired) \|'; then
   fail "ledger contains an unsupported disposition"
 fi
 grep -Fq 'No external code, script, executable, binary, model, image, video, audio, demo, generated output, runtime bundle, dependency, endpoint, credential, identity, personal path, or project-specific artifact is imported.' "$ledger" || fail "ledger does not state the no-payload boundary"

@@ -13,4 +13,7 @@ public interface IWorkspace
 public interface INativeProcess
 {
     Task Run(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, CancellationToken cancellation = default, long maximumLogBytes = 16777216, IReadOnlyDictionary<string, string>? environment = null);
+    bool SupportsPrivateMemoryLimit => false;
+    Task RunWithLimits(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, long maximumPrivateBytes, CancellationToken cancellation = default, long maximumLogBytes = 16777216, IReadOnlyDictionary<string, string>? environment = null)
+        => throw new PlatformNotSupportedException("This native runner does not implement the explicitly selected owned-job committed-memory ceiling; nothing was launched");
 }

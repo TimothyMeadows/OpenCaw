@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "fps": 24,
+  "actions": [
+    {
+      "id": "dance-pattern",
+      "role": "dance",
+      "steps": [
+        {
+          "id": "left",
+          "clip": "dance-left",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 2,
+          "blendIn": 0
+        },
+        {
+          "id": "right",
+          "clip": "dance-right",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 2,
+          "blendIn": 0.25
+        }
+      ],
+      "cues": []
+    },
+    {
+      "id": "chained-combo",
+      "role": "combo",
+      "steps": [
+        {
+          "id": "jab-left",
+          "clip": "punch-left",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0
+        },
+        {
+          "id": "jab-right",
+          "clip": "punch-right",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0.125
+        },
+        {
+          "id": "finishing-kick",
+          "clip": "kick",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0.125
+        }
+      ],
+      "cues": [
+        {
+          "id": "contact-sparks",
+          "type": "particles",
+          "anchor": "hand.cast",
+          "start": {
+            "step": "jab-left",
+            "occurrence": 0,
+            "marker": "contact"
+          },
+          "end": {
+            "step": "jab-left",
+            "occurrence": 0,
+            "offset": 0.75
+          },
+          "color": "#FFD060",
+          "radius": 0.12,
+          "capacity": 32,
+          "rate": 24,
+          "seed": 7
+        }
+      ]
+    },
+    {
+      "id": "charge-cast",
+      "role": "cast",
+      "steps": [
+        {
+          "id": "charge",
+          "clip": "charge",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0
+        },
+        {
+          "id": "cast",
+          "clip": "cast",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0.125
+        },
+        {
+          "id": "recover",
+          "clip": "idle",
+          "from": 0,
+          "to": 1,
+          "rate": 1,
+          "repeat": 1,
+          "blendIn": 0.125
+        }
+      ],
+      "cues": [
+        {
+          "id": "charge-orb",
+          "type": "orb",
+          "anchor": "hand.cast",
+          "start": {
+            "step": "charge",
+            "occurrence": 0,
+            "offset": 0
+          },
+          "end": {
+            "step": "cast",
+            "occurrence": 0,
+            "marker": "release"
+          },
+          "color": "#FF6010",
+          "radius": 0.2
+        },
+        {
+          "id": "fireball",
+          "type": "projectile",
+          "anchor": "hand.cast",
+          "start": {
+            "step": "cast",
+            "occurrence": 0,
+            "marker": "release"
+          },
+          "end": {
+            "step": "recover",
+            "occurrence": 0,
+            "offset": 0.75
+          },
+          "color": "#FF8020",
+          "radius": 0.16,
+          "target": "fixed-target"
+        }
+      ]
+    }
+  ],
+  "targets": [
+    {
+      "id": "fixed-target",
+      "mode": "fixed-world-point",
+      "maxDistance": 100
+    }
+  ],
+  "budgets": {
+    "maxActions": 16,
+    "maxStepsPerAction": 64,
+    "maxExpandedSteps": 256,
+    "maxActionSeconds": 120,
+    "maxEffects": 64,
+    "maxParticles": 2048,
+    "maxFrames": 20000,
+    "maxReviewFrames": 1200,
+    "maxRuntimeBytes": 33554432,
+    "timeoutSeconds": 180,
+    "maxLogBytes": 16777216,
+    "maxAttempts": 16
+  },
+  "review": {
+    "fps": 5,
+    "resolution": [
+      512,
+      512
+    ],
+    "cameras": [
+      "front",
+      "three-quarter"
+    ],
+    "targets": {
+      "fixed-target": [
+        2,
+        1.3,
+        2
+      ]
+    }
+  },
+  "provenance": {
+    "provider": "native-blender",
+    "rights": "Original controlled engineering fixture; no external artwork or animation"
+  }
+}

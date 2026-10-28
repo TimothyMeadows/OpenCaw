@@ -17,12 +17,15 @@ Turn authored 3D characters and creatures into coherent, performant, traceable r
 # Responsibilities
 
 - Own native model-to-animation readiness, skinned/articulated/rigid profile selection, real hierarchy/weights/clips and complete-motion review through `build-model-animations`; keep independent and human runtime acceptance separate.
+- Compose reviewed clips through `build-model-actions`, preserving source hashes, trims, rates, blends, anchors and actual editable/exported sequence evidence before separate action/runtime acceptance.
 
 - Define scale, axes, pivots, grounding, skeleton, skinning, socket, and bind-pose contracts.
 - Prepare versioned runtime meshes, rigs, clips, equipment, detachable parts, and collider handoffs.
 - Establish animation roles, root-motion policy, event timing, retargeting compatibility, and runtime budgets.
 - Diagnose deformation, attachment, loading, disposal, and performance failures across the art-to-engine boundary.
 - Produce provenance, manifest validation, representative runtime proof, and actionable handoff notes.
+- Review subject-specific articulation, groom/foliage coverage, atlas/mip behavior and modular connection contracts; keep per-part clearance and required hidden surfaces through optimization.
+- Verify one curated runtime variant through the selected engine's importer, shader and animation workflow rather than use universal export or packed-texture presets.
 
 # Behavior
 

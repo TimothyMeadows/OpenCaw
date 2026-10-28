@@ -3,7 +3,19 @@ namespace OpenCaw.AssetProduction;
 
 public class NativeProcess : INativeProcess
 {
-    public async Task Run(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, CancellationToken cancellation = default, long maximumLogBytes = 16777216, IReadOnlyDictionary<string, string>? environment = null)
+    public bool SupportsPrivateMemoryLimit => OperatingSystem.IsWindows() && Environment.Is64BitProcess;
+    public Task Run(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, CancellationToken cancellation = default, long maximumLogBytes = 16777216, IReadOnlyDictionary<string, string>? environment = null)
+        => RunCore(executable, arguments, cwd, log, seconds, null, cancellation, maximumLogBytes, environment);
+    public Task RunWithLimits(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, long maximumPrivateBytes, CancellationToken cancellation = default, long maximumLogBytes = 16777216, IReadOnlyDictionary<string, string>? environment = null)
+    {
+        if (maximumPrivateBytes is < 67_108_864 or > 68_719_476_736)
+            throw new InvalidOperationException("Owned-job committed-memory budget must be 64MiB..64GiB");
+        if (!SupportsPrivateMemoryLimit)
+            throw new PlatformNotSupportedException("The selected aggregate committed-memory ceiling requires 64-bit Windows owned jobs; blocked before launch and log creation");
+        cancellation.ThrowIfCancellationRequested();
+        return RunCore(executable, arguments, cwd, log, seconds, maximumPrivateBytes, cancellation, maximumLogBytes, environment);
+    }
+    async Task RunCore(string executable, IEnumerable<string> arguments, string cwd, string log, int seconds, long? maximumPrivateBytes, CancellationToken cancellation, long maximumLogBytes, IReadOnlyDictionary<string, string>? environment)
     {
         if (seconds < 1 || seconds > 86400)
             throw new InvalidOperationException("Deadline must be 1..86400 seconds");
@@ -28,14 +40,21 @@ public class NativeProcess : INativeProcess
         OwnedProcessTree lifetime;
         try
         {
-            lifetime = new OwnedProcessTree(process);
+            lifetime = new OwnedProcessTree(process, maximumPrivateBytes);
         }
-        catch { if (!process.HasExited) process.Kill(true); throw; }
+        catch { if (!process.HasExited) process.Kill(true); await process.WaitForExitAsync(); throw; }
         using var owned = lifetime;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
         deadline.CancelAfter(TimeSpan.FromSeconds(seconds));
         var gate = new SemaphoreSlim(1, 1);
         long logged = 0;
+        if (maximumPrivateBytes is { } memory)
+        {
+            var policy = $"resource-policy: windows-owned-job-aggregate-committed-memory maxPrivateBytes={memory}; process-start-to-job-assignment window is not sandboxed; resident RAM and GPU memory are not measured\n";
+            logged = System.Text.Encoding.UTF8.GetByteCount(policy);
+            await writer.WriteAsync(policy);
+            await writer.FlushAsync();
+        }
         var maximumLog = maximumLogBytes;
         if (maximumLog < 1024 || maximumLog > 1073741824)
             throw new InvalidOperationException("Log budget must be 1KiB..1GiB");
