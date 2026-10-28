@@ -73,7 +73,7 @@ playwright.config.ts
 ## OpenCaw Report Rules
 
 - Assume interactive Playwright UI mode and report servers may not be available.
-- Prefer Markdown evidence reports generated under the host `.ai/reports/` directory.
+- Prefer Markdown evidence reports generated under the host `.opencaw/.cache/reports/` directory.
 - Use JSON, JUnit, screenshots, traces, videos, and discovery snapshots as source artifacts.
 - Use `playwright-report-summary.sh`, `playwright-artifact-index.sh`, `playwright-discovery-report.sh`, and `playwright-evidence-report.sh` as non-interactive substitutes for browsing the Playwright UI.
 

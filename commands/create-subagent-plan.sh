@@ -3,13 +3,14 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
+source "$script_dir/lib/workflow-path-common.sh"
 opencaw_resolve_paths
 
 usage() {
   cat <<'EOF'
 Usage: ./commands/create-subagent-plan.sh "<task_name>" ["agent_count"] [--dry-run]
 
-Creates <project-root>/.ai/tasks/<task_name>/SUBAGENTS.md when it does not already exist.
+Creates <project-root>/.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md when it does not already exist.
 Use --dry-run to print the plan scaffold without writing files.
 EOF
 }
@@ -52,8 +53,9 @@ if [[ -n "$agent_count" && ! "$agent_count" =~ ^[1-9][0-9]*$ ]]; then
   exit 1
 fi
 
-task_dir="$OPENCAW_PROJECT_AI_DIR/tasks/$task_name"
+task_dir="$(opencaw_workflow_directory tasks "$task_name")"
 target="$task_dir/SUBAGENTS.md"
+[[ ! -L "$target" ]] || { echo "Subagent plan must not be a symbolic link: $target" >&2; exit 1; }
 requested="${agent_count:-unspecified}"
 lane_count="${agent_count:-1}"
 

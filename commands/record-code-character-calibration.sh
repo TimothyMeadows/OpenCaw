@@ -7,6 +7,9 @@ Usage: ./commands/record-code-character-calibration.sh PROFILE.json --gate ID --
 
 Transactionally freezes one machine gate's deterministic passing and focused failing fixture reports.
 Repeat --passing or --failing to register multiple independently stored calibration reports.
+
+Engine prototype option: --engine-evidence FILE consumes a previously recorded engine override.
+Source/adapter output stays in its isolated scope; task manifests/reports stay in its recorded task.
 EOF
 }
 

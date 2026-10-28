@@ -1,14 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host_root="${OPENCAW_HOST_ROOT:-$(pwd)}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+OPENCAW_PROJECT_ROOT="${OPENCAW_HOST_ROOT:-${OPENCAW_PROJECT_ROOT:-}}"
+opencaw_resolve_paths
+host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
 scan_root="${1:-.}"
-output_dir="${2:-.ai/reports}"
+output_dir="${2:-.opencaw/.cache/reports}"
 
 cd "$host_root"
 mkdir -p "$output_dir"
 
-node - "$scan_root" "$output_dir" "$host_root" <<'NODE'
+node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
+[[ -n "$node_bin" ]] || { echo 'Node.js is required for Playwright reports; nothing was installed.' >&2; exit 1; }
+node_scan="$scan_root"
+node_output="$output_dir"
+node_host="$host_root"
+if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  [[ "$scan_root" == . ]] || node_scan="$(wslpath -w "$(realpath -m "$scan_root")")"
+  node_output="$(wslpath -w "$(cd "$output_dir" && pwd -P)")"
+  node_host="$(wslpath -w "$host_root")"
+fi
+"$node_bin" - "$node_scan" "$node_output" "$node_host" <<'NODE'
 const fs = require('fs');
 const path = require('path');
 

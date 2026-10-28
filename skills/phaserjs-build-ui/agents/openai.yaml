@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build UI"
+  short_description: "Build Phaser HUDs with focus and state ownership"
+  default_prompt: "Use $phaserjs-build-ui to implement responsive game screens with accessible interaction and synchronized HUD state."

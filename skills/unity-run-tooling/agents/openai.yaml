@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Run Tooling"
+  short_description: "Run Tooling for Unity projects"
+  default_prompt: "Use $unity-run-tooling for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

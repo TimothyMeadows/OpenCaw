@@ -1,6 +1,7 @@
 ---
 name: build-procedural-blender-scenes
 description: Build deterministic Blender 4.5 Geometry Nodes systems, modular kits, instanced assemblies, and procedural set dressing. Use for reproducible scene generation, seed policy, instance ownership, realization decisions, modular placement, and procedural export handoff.
+engines: [AGNOSTIC]
 ---
 
 # Build Procedural Blender Scenes
@@ -19,6 +20,12 @@ Use for Geometry Nodes, modular kits, deterministic instancing, procedural place
 6. Record realization, baking, regeneration, and manual-override policy before staging.
 
 Read [procedural-scene-contract.md](references/procedural-scene-contract.md) for deterministic and realization requirements.
+
+Read only the subject references needed for the current output:
+
+- [modular-kit-assembly.md](references/modular-kit-assembly.md) for dimensions, pivots, junction coverage and complete assembly tests.
+- [geometry-nodes-authoring.md](references/geometry-nodes-authoring.md) for node interfaces, field domains, evaluation bounds and regeneration evidence.
+- [vegetation-production.md](references/vegetation-production.md) for plant structure, foliage placement, wind masks and distance-dependent delivery.
 
 ## Guardrails
 

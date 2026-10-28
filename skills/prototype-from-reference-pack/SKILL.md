@@ -1,6 +1,7 @@
 ---
 name: prototype-from-reference-pack
 description: Create several original, separately testable prototypes from an approved UI reference pack. Use when research must become implementation experiments while changing identity, content, structure, and interaction choices enough to stand independently.
+engines: [AGNOSTIC]
 ---
 
 # Prototype From Reference Pack

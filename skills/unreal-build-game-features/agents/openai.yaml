@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Game Features"
+  short_description: "Own Unreal feature activation and unload"
+  default_prompt: "Use $unreal-build-game-features for the selected Unreal project with reversible resource ownership, bounded teardown and native lifecycle evidence."

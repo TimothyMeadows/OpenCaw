@@ -1,6 +1,7 @@
 ---
 name: use-external-asset-library
 description: Discover approved read-only 3D models, rigs, animations, and bundles from optional external libraries configured in STYLE.md, then copy a selected asset into the repository before loading or modifying it. Use before creating, generating, or downloading a 3D asset when STYLE.md contains external asset libraries.
+engines: [AGNOSTIC]
 ---
 
 # Use External Asset Library
@@ -22,7 +23,7 @@ Use for 3D model, rig, animation, Blender, WebGL, or game-asset work when `STYLE
 
 - With `BLENDER`, use copied `.blend` files or bundles as working templates or approved reusable assets; never open the external source directly.
 - With `CODE`, use a copied mesh only as authorized reference/template evidence. Do not turn model-library loading into the primary runtime implementation.
-- With `CSS3`, do not use 3D model assets.
+- With `PROOF_TO_MODEL`, preserve copy receipts and source ancestry, and validate rights, recipe, stage evidence, and budgets before using copied models.
 - With any other workflow, proceed only when the active pipeline and repository architecture explicitly permit the copied format and intended runtime use.
 
 ## Output
@@ -44,4 +45,4 @@ Use for 3D model, rig, animation, Blender, WebGL, or game-asset work when `STYLE
 
 - `./commands/list-external-asset-libraries.sh [--style STYLE.md] [--json]`
 - `./commands/inspect-external-asset-library.sh LIBRARY_ID [--style STYLE.md] [--json]`
-- `./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .ai/tasks/<task>/FILE.json]`
+- `./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .opencaw/.cache/tasks/<task>/FILE.json]`

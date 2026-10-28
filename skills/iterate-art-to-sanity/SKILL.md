@@ -1,6 +1,7 @@
 ---
 name: iterate-art-to-sanity
 description: Iterate generated images until they pass mandatory sanity rules for anatomy, text quality, language alignment, and safety.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Animate Actors"
+  short_description: "Integrate Babylon actor animation and blending"
+  default_prompt: "Use $babylonjs-animate-actors to implement AnimationGroup transitions with independent actors and clear movement ownership."

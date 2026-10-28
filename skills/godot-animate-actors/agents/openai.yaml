@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Animate Actors"
+  short_description: "Animate Actors for Godot projects"
+  default_prompt: "Use $godot-animate-actors for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Build UI"
+  short_description: "Build UI for Godot projects"
+  default_prompt: "Use $godot-build-ui for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

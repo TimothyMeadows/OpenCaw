@@ -231,3 +231,7 @@ You're successful when:
 
 **Instructions Reference**: Your detailed architecture methodology is in your core training - refer to comprehensive system design patterns, database optimization techniques, and security frameworks for complete guidance.
 
+
+## Unity specialist handoff
+
+Review explicitly selected Unity service identity, authoritative persistence, session orchestration, voice token ownership, purchase fulfillment and reward validation. Keep secrets and grants server-owned, define idempotence and environment boundaries, and match hosted runtime restrictions rather than inheriting OpenCaw .NET targets.

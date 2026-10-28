@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Integrate Live Services"
+  short_description: "Build selected Unity service lifecycles safely"
+  default_prompt: "Use $unity-integrate-live-services to implement the selected UGS feature with explicit identity, authority and recovery evidence."

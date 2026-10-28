@@ -33,14 +33,8 @@ Available OpenCaw art style templates:
 - TILESET_ENVIRONMENT
 - VECTOR_UI
 - WARM_TAVERN_FANTASY
-- WEB_ATMOSPHERIC
-- WEB_DARK_GLASS
-- WEB_EDITORIAL
-- WEB_LIGHT_PAPER
-- WEB_SKEUOMORPHIC
-- WEB_TECHNICAL_GRID
 
-Use one or more of these with exactly one primary art pipeline when generating `../STYLE.md` for a host repository. New contracts default to `CSS3` unless the user explicitly selects another registered pipeline.
+Use one or more of these with exactly one primary art pipeline when generating `../STYLE.md` for a host repository. New contracts default to `PROOF_TO_MODEL` unless the user explicitly selects another registered pipeline.
 
 ## Art Pipelines
 
@@ -48,11 +42,20 @@ Pipeline contracts and their owned assets live under `.styles/.pipelines/` and a
 
 - `CLOUD` uses active session-supported image/audio generation.
 - `LOCAL` uses pinned loopback-only ComfyUI image/audio generation.
-- `CSS3` uses CSS, mathematical geometry, and inline SVG/vector output only.
+- `PROOF_TO_MODEL` turns approved 2D proofs into staged, finished 3D assets using native Pixal3D and Blender 4.5 LTS.
 - `CODE` authors procedural Three.js TypeScript/JavaScript models.
 - `BLENDER` authors Blender 4.5 LTS scenes, assets, renders, and runtime exports.
 
-See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manifests, CSS tokens, the code-model schema, and Blender production boundaries.
+### Downstream production pipelines
+
+- [`MODEL_TO_ANIMATION`](.workflows/model-to-animation/WORKFLOW.md) prepares reviewed models for skinned, articulated or rigid motion, authors or retargets clips, and verifies selected-engine playback and speed/warp effects before separate runtime acceptance.
+- [`MODEL_TO_ACTION`](.workflows/model-to-action/WORKFLOW.md) composes those reviewed clips into ordered dances, combinations and charge/cast sequences, with timed model-attached effects and fixed-target presentation.
+
+This motion pipeline follows model creation and keeps the primary `STYLE.md` pipeline selection intact. Use `build-model-animations` and `model-to-animation.sh`; its implementation lives under `.styles/.workflows/model-to-animation/`.
+
+Action composition follows individual clip production. Use `build-model-actions` and `model-to-action.sh`; its implementation lives under `.styles/.workflows/model-to-action/`. It preserves the primary pipeline and engine, and requires its own sequence review and runtime acceptance.
+
+See [.styles/.pipelines/INDEX.md](.pipelines/INDEX.md) for primary and downstream contracts, shared provenance, local manifests, code-model schemas and Blender production boundaries.
 
 ## Optional External Asset Libraries
 
@@ -72,11 +75,6 @@ See `.styles/.pipelines/INDEX.md` for contracts, shared provenance, local manife
 - Responsive bound-page experiences: `POPUP_STORYBOOK` plus `LAYERED_PAPERCRAFT`
 - Sprite-rendered 3D pipelines: `PRE_RENDERED_2_5D` or `HD_2D`
 - Effects-heavy combat or magic: `GAME_VFX`
-- Content-led web products and documentation: `WEB_LIGHT_PAPER` or `WEB_EDITORIAL`
-- Dense technical products and operational interfaces: `WEB_TECHNICAL_GRID`
-- Layered dark interfaces: `WEB_DARK_GLASS`
-- Immersive campaign or showcase pages: `WEB_ATMOSPHERIC`
-- Interfaces that benefit from restrained physical affordances: `WEB_SKEUOMORPHIC`
 
 ## Research Basis
 

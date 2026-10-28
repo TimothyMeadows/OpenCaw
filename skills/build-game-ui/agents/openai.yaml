@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Game UI"
+  short_description: "Build HUDs, menus, navigation, and focus"
+  default_prompt: "Use $build-game-ui to implement the game interface with explicit screen ownership, HUD lifecycle, and device verification."

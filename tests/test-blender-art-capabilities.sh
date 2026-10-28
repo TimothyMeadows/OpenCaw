@@ -46,8 +46,8 @@ require_text '.roles/ROLE_SKILL_MAP.json' '"commands/resolve-art-pipeline.sh"'
 for skill in "${skills[@]}"; do require_text '.roles/ROLE_SKILL_MAP.json' "\"$skill\""; done
 for command in "${commands[@]}"; do require_file "$command"; [[ -x "$command" ]] || fail "$command is not executable"; bash -n "$command"; done
 style_project="$temp_root/style-project"
-mkdir -p "$style_project/.ai/tasks/blender-pipeline-test"
-OPENCAW_PROJECT_ROOT="$style_project" bash commands/generate-style.sh --pipeline blender --allow-pipeline CSS3 CEL_SHADED_COMIC >/dev/null
+mkdir -p "$style_project/.opencaw/.cache/tasks/blender-pipeline-test"
+OPENCAW_PROJECT_ROOT="$style_project" bash commands/generate-style.sh --pipeline blender --allow-pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
 OPENCAW_PROJECT_ROOT="$style_project" bash commands/validate-style-contract.sh "$style_project/STYLE.md" >/dev/null
 grep -A1 '^Primary OpenCaw art pipeline:' "$style_project/STYLE.md" | grep -Fxq -- '- BLENDER' || fail "blender alias did not select BLENDER"
 selection="$(OPENCAW_PROJECT_ROOT="$style_project" bash commands/resolve-art-pipeline.sh --style "$style_project/STYLE.md" --override bpy --json)"
@@ -59,6 +59,32 @@ brief_two="$(commands/print-blender-production-brief.sh prop engine --profile st
 [[ "$brief_one" == "$brief_two" ]] || fail "production brief is not deterministic"
 grep -Fq -- '- Supported Blender: 4.5 LTS' <<<"$brief_one" || fail "brief does not pin Blender 4.5 LTS"
 expect_failure bad-brief commands/print-blender-production-brief.sh prop engine --profile unsupported
+for profile in static-asset rigged-actor procedural-scene render-scene simulation; do
+  first="$(commands/print-blender-production-brief.sh 'subject with spaces' 'selected engine' --profile "$profile")"
+  second="$(commands/print-blender-production-brief.sh 'subject with spaces' 'selected engine' --profile "$profile")"
+  [[ "$first" == "$second" ]] || fail "$profile brief is not deterministic"
+  grep -Fq -- '- Asset kind: subject with spaces' <<<"$first" || fail "brief lost the requested subject"
+  grep -Fq -- "- Profile: $profile" <<<"$first" || fail "brief lost the selected profile"
+  grep -Fq -- '- Applicability: mark unused fields not applicable with a reason; required unavailable work stays blocked/not-run' <<<"$first" || fail "brief treats every discovery field as mandatory"
+  grep -Fq -- '- Selected ENGINE.md and importer/shader versions:' <<<"$first" || fail "brief omitted engine discovery"
+  grep -Fq -- '- Observed features, inferred hidden structure and uncertainties:' <<<"$first" || fail "brief conflates observation and inference"
+  grep -Fq -- '- Blocked/not-run checks and remaining defects:' <<<"$first" || fail "brief omitted incomplete verification"
+  case "$profile" in
+    static-asset) expected='Mechanism pivots, contact/clearance and concealed surfaces:' ;;
+    rigged-actor) expected='Skinned/articulated/rigid profile and actual model readiness:' ;;
+    procedural-scene) expected='Module dimensions, grid, pivots and corner/junction coverage:' ;;
+    render-scene) expected='Required passes, alpha interpretation and compositor ownership:' ;;
+    simulation) expected='Cloth density, pin gradients, collision separation and settling:' ;;
+  esac
+  grep -Fq -- "$expected" <<<"$first" || fail "$profile omitted its production discovery fields"
+  if [[ "$profile" != simulation ]]; then
+    ! grep -Fq -- '- Cloth density, pin gradients, collision separation and settling:' <<<"$first" || fail "cloth-specific discovery leaked into $profile"
+  fi
+done
+expect_failure missing-brief-profile commands/print-blender-production-brief.sh prop engine
+expect_failure duplicate-brief-profile commands/print-blender-production-brief.sh prop engine --profile static-asset --profile simulation
+expect_failure multiline-brief-subject commands/print-blender-production-brief.sh $'prop\nforged field' engine --profile static-asset
+expect_failure cr-brief-target commands/print-blender-production-brief.sh prop $'engine\rforged field' --profile static-asset
 
 echo "[3/8] building scene-report fixtures"
 fixture_root="$temp_root/project"
@@ -218,11 +244,64 @@ require_text skills/create-game-vfx/SKILL.md '`simulate-blender-effects`'
 require_text skills/maintain-art-style-contract/SKILL.md '`author-blender-materials-and-lookdev`'
 for skill in "${skills[@]}"; do require_text skills/INDEX.md "\`$skill\`"; done
 if command -v rg >/dev/null 2>&1; then
-  scan_command=(rg -n -i 'https?://|[A-Za-z]:\\Users\\|api[_ -]?key|automatic publication')
+  scan_command=(rg -n -i '[A-Za-z]:\\Users\\|api[_ -]?key|automatic publication')
 else
-  scan_command=(grep -R -E -n -i 'https?://|[A-Za-z]:\\Users\\|api[_ -]?key|automatic publication')
+  scan_command=(grep -R -E -n -i '[A-Za-z]:\\Users\\|api[_ -]?key|automatic publication')
 fi
 if "${scan_command[@]}" "${skills[@]/#/skills/}" .roles/arts/blender-production-artist commands/lib/inspect-blender-scene.py; then fail "Blender capability files contain an external identity, personal path, credential, or publication automation"; fi
+
+# Versioned primary documentation is useful research, not an imported identity
+# or permission to install/execute content. Keep all other URLs rejected here.
+"$node_bin" - "${skills[@]/#/skills/}" .roles/arts/blender-production-artist commands/lib/inspect-blender-scene.py <<'NODE'
+const fs = require('fs');
+const path = require('path');
+function allowedDocumentation(value) {
+  let url;
+  try { url = new URL(value); } catch { return false; }
+  if (url.protocol !== 'https:' || url.username || url.password || url.port) return false;
+  if (url.hostname === 'docs.blender.org') return /^\/(?:manual\/en\/4\.5|api\/4\.5)\//.test(url.pathname);
+  if (url.hostname === 'developer.blender.org') return url.pathname.startsWith('/docs/release_notes/4.1/');
+  return url.hostname === 'registry.khronos.org' && url.pathname.startsWith('/glTF/specs/2.0/');
+}
+const controls = [
+  ['https://docs.blender.org/manual/en/4.5/physics/cloth/index.html', true],
+  ['https://docs.blender.org/api/4.5/bpy.types.BevelModifier.html', true],
+  ['https://developer.blender.org/docs/release_notes/4.1/modeling/', true],
+  ['https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#materials', true],
+  ['http://docs.blender.org/manual/en/4.5/physics/cloth/index.html', false],
+  ['https://docs.blender.org.example.invalid/manual/en/4.5/', false],
+  ['HTTPS://example.invalid/payload', false],
+  ['https://docs.blender.org@example.invalid/manual/en/4.5/', false],
+  ['https://user:pass@docs.blender.org/manual/en/4.5/', false],
+  ['https://docs.blender.org:9876/manual/en/4.5/', false],
+  ['https://docs.blender.org/download/addon.py', false],
+  ['https://docs.blender.org/manual/en/4.5/../../download/addon.py', false],
+  ['https://registry.khronos.org/downloads/helper.sh', false]
+];
+function unapprovedURLs(text) {
+  return [...text.matchAll(/https?:\/\/[^\s<>"'`)]+/gi)]
+    .map(match => match[0]).filter(value => !allowedDocumentation(value));
+}
+for (const [value, expected] of controls) {
+  const rejected = unapprovedURLs(`Reference: (${value})`);
+  if (rejected.length !== (expected ? 0 : 1) || (!expected && rejected[0] !== value)) {
+    throw new Error(`documentation URL extraction/rejection control failed: ${value}`);
+  }
+}
+function scan(file) {
+  const stat = fs.lstatSync(file);
+  if (stat.isSymbolicLink()) throw new Error(`unexpected linked capability: ${file}`);
+  if (stat.isDirectory()) {
+    for (const name of fs.readdirSync(file)) scan(path.join(file, name));
+    return;
+  }
+  const text = fs.readFileSync(file, 'utf8');
+  for (const value of unapprovedURLs(text)) {
+    throw new Error(`unapproved external URL in ${file}: ${value}`);
+  }
+}
+for (const file of process.argv.slice(2)) scan(file);
+NODE
 
 echo "[8/8] checking generated and structural validators"
 bash commands/generate-role-skill-map.sh --check >/dev/null

@@ -1,6 +1,7 @@
 ---
 name: derive-visual-spec-from-video
 description: Convert a supplied video into an implementation-neutral visual and motion specification. Use when a product demo, interaction recording, animation study, or gameplay clip must be analyzed for layout, timing, state changes, assets, responsive behavior, and accessible fallbacks.
+engines: [AGNOSTIC]
 ---
 
 # Derive Visual Spec From Video

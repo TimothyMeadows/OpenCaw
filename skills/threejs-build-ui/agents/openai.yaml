@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build UI"
+  short_description: "Connect accessible game UI to Three.js worlds"
+  default_prompt: "Use $threejs-build-ui to connect game screens and world anchors with correct focus, state and input ownership."

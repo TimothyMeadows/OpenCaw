@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Build Physics"
+  short_description: "Build Physics for Unity projects"
+  default_prompt: "Use $unity-build-physics for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

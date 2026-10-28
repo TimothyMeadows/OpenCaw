@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Configure Rendering"
+  short_description: "Configure pipelines, cameras and renderer resources"
+  default_prompt: "Use $unity-configure-rendering to configure the selected Unity renderer with version-matched APIs, owned resources and measured output."

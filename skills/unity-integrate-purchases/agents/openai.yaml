@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Integrate Purchases"
+  short_description: "Build recoverable Unity store transactions"
+  default_prompt: "Use $unity-integrate-purchases to implement the selected store workflow with validated, durable and idempotent fulfillment."

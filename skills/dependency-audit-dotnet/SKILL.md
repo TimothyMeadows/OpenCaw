@@ -1,6 +1,7 @@
 ---
 name: dependency-audit-dotnet
 description: Review package usage in the host .NET repository and identify likely update, duplication, or cleanup opportunities.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

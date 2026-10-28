@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Build Scenes"
+  short_description: "Build Babylon scenes with clear asset ownership"
+  default_prompt: "Use $babylonjs-build-scenes to implement scene and asset lifecycles with measured browser behavior."

@@ -1,6 +1,7 @@
 ---
 name: enforce-art-language-safety
 description: Enforce text language and safety policy for generated images with explicit user-language override handling.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

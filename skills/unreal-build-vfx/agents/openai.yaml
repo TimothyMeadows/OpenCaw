@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build VFX"
+  short_description: "Build bounded Niagara effects and pooling"
+  default_prompt: "Use $unreal-build-vfx to author and integrate selected Unreal Niagara effects with explicit pool ownership, cancellation and target evidence."

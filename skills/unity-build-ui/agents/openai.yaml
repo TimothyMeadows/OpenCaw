@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unity Build UI"
+  short_description: "Build UI for Unity projects"
+  default_prompt: "Use $unity-build-ui for the selected Unity project with explicit engine compatibility, lifecycle ownership, and verification evidence."
+

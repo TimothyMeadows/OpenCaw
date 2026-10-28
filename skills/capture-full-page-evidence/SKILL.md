@@ -1,6 +1,7 @@
 ---
 name: capture-full-page-evidence
 description: Capture reliable full-page browser evidence for lazy-loaded, animated, canvas, WebGL, and reveal-heavy pages. Use when ordinary screenshots are blank, incomplete, inconsistent with live behavior, or insufficient for QA and reference analysis.
+engines: [AGNOSTIC]
 ---
 
 # Capture Full Page Evidence

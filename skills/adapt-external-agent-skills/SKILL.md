@@ -1,6 +1,7 @@
 ---
 name: adapt-external-agent-skills
 description: Redesign an external agent capability as a concise OpenCaw-native role, skill, command, or rejection decision. Use after a security review when useful behavior must be integrated without copying source text, code, assets, identities, vendor assumptions, or unsafe side effects.
+engines: [AGNOSTIC]
 ---
 
 # Adapt External Agent Skills

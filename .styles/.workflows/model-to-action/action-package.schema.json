@@ -1,0 +1,659 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-action-package/v1"
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "profile": {
+      "enum": [
+        "skinned",
+        "articulated",
+        "rigid"
+      ]
+    },
+    "fps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "engine": {
+      "type": "object"
+    },
+    "rig": {
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "properties": {
+        "runtimeUp": {
+          "const": "+Y"
+        },
+        "runtimeForward": {
+          "const": "+Z"
+        }
+      },
+      "required": [
+        "runtimeUp",
+        "runtimeForward"
+      ],
+      "additionalProperties": false
+    },
+    "sourceMotion": {
+      "type": "object",
+      "properties": {
+        "packageSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "modelSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceReviewSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "rights": {
+          "type": "object",
+          "properties": {
+            "authorized": {
+              "const": true
+            },
+            "license": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "authorized",
+            "license"
+          ]
+        },
+        "rigId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clips": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+              },
+              "motionSha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "id",
+              "motionSha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "packageSha256",
+        "modelSha256",
+        "sourceReviewSha256",
+        "rights",
+        "rigId",
+        "clips"
+      ],
+      "additionalProperties": false
+    },
+    "anchors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "node"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "mode": {
+            "const": "fixed-world-point"
+          },
+          "maxDistance": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 100000
+          }
+        },
+        "required": [
+          "id",
+          "mode",
+          "maxDistance"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 256
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "maxActions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "maxStepsPerAction": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "maxExpandedSteps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2048
+        },
+        "maxActionSeconds": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maxEffects": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "maxParticles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "maxFrames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "maxReviewFrames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "maxRuntimeBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1073741824
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "maxLogBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1073741824
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "maxVerificationBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 68719476736,
+          "default": 8589934592,
+          "description": "Maximum total bytes of immutable independent-reimport pose verification spool; omitted recipes use8GiB."
+        }
+      },
+      "required": [
+        "maxActions",
+        "maxStepsPerAction",
+        "maxExpandedSteps",
+        "maxActionSeconds",
+        "maxEffects",
+        "maxParticles",
+        "maxFrames",
+        "maxReviewFrames",
+        "maxRuntimeBytes",
+        "timeoutSeconds",
+        "maxLogBytes",
+        "maxAttempts"
+      ],
+      "additionalProperties": false
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "clip": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 1e-06,
+            "maximum": 3600
+          },
+          "motionSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                },
+                "clip": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                },
+                "occurrence": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 15
+                },
+                "start": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "end": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "sourceStart": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "sourceEnd": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "rate": {
+                  "type": "number",
+                  "minimum": 0.1,
+                  "maximum": 4
+                },
+                "blendIn": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 30
+                },
+                "motionSha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "id",
+                "clip",
+                "occurrence",
+                "start",
+                "end",
+                "sourceStart",
+                "sourceEnd",
+                "rate",
+                "blendIn",
+                "motionSha256"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 2048
+          },
+          "cues": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "type": {
+                      "const": "orb"
+                    },
+                    "anchor": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "start": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "end": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0.001,
+                      "maximum": 10
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "anchor",
+                    "start",
+                    "end",
+                    "color",
+                    "radius"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "type": {
+                      "const": "particles"
+                    },
+                    "anchor": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "start": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "end": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0.001,
+                      "maximum": 10
+                    },
+                    "capacity": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 65536
+                    },
+                    "rate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "seed": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "anchor",
+                    "start",
+                    "end",
+                    "color",
+                    "radius",
+                    "capacity",
+                    "rate",
+                    "seed"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "type": {
+                      "const": "projectile"
+                    },
+                    "anchor": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    },
+                    "start": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "end": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 3600
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0.001,
+                      "maximum": 10
+                    },
+                    "target": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "anchor",
+                    "start",
+                    "end",
+                    "color",
+                    "radius",
+                    "target"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 256
+          },
+          "markers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                },
+                "at": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "step": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                },
+                "occurrence": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 15
+                }
+              },
+              "required": [
+                "id",
+                "at",
+                "name",
+                "step",
+                "occurrence"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 200000
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "clip",
+          "duration",
+          "motionSha256",
+          "steps",
+          "cues",
+          "markers"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "accepted"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "asset",
+    "version",
+    "profile",
+    "fps",
+    "model",
+    "source",
+    "motion",
+    "engine",
+    "rig",
+    "coordinateSystem",
+    "sourceMotion",
+    "anchors",
+    "targets",
+    "budgets",
+    "actions",
+    "verification"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.local/schemas/model-to-action/action-package.schema.json",
+  "title": "Reviewed compound action and presentation package"
+}

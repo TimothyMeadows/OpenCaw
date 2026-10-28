@@ -44,7 +44,7 @@ class FakeGitHub:
         if method == "POST":
             self.posts += 1
             # The intent must already be durable before the remote write.
-            journal = root / ".ai/tasks/work/operations/create-issue.json"
+            journal = root / ".opencaw/.cache/tasks/work/operations/create-issue.json"
             assert json.loads(journal.read_text())["state"] == "pending"
             if self.fail_before_create:
                 raise execution.TaskError("Simulated uncertain write")
@@ -78,7 +78,7 @@ class Fixture(unittest.TestCase):
         self.git("add", "seed.txt")
         self.git("commit", "-qm", "test baseline")
         execution.create_task(self.root, "work", "Work", no_issue=True)
-        self.task = self.root / ".ai/tasks/work/TASK.md"
+        self.task = self.root / ".opencaw/.cache/tasks/work/TASK.md"
         self.api = FakeGitHub(self.root)
         self.patch = mock.patch.object(execution, "api", self.api)
         self.patch.start()
@@ -92,7 +92,7 @@ class Fixture(unittest.TestCase):
         return execution.create_issue(self.root, "work", **kwargs)
 
     def journal(self):
-        return json.loads((self.root / ".ai/tasks/work/operations/create-issue.json").read_text())
+        return json.loads((self.root / ".opencaw/.cache/tasks/work/operations/create-issue.json").read_text())
 
     def prepare(self, verdict="verified"):
         text = self.task.read_text().replace("| unknown | Not yet observed |", f"| {verdict} | Current local fixture |")
@@ -116,12 +116,41 @@ class Fixture(unittest.TestCase):
 
 
 class IssueRecoveryTests(Fixture):
+    def test_fresh_task_uses_only_installed_private_cache(self):
+        self.assertTrue(self.task.is_file())
+        self.assertFalse((self.root / ".ai").exists())
+        self.create()
+        self.assertTrue((self.root / ".opencaw/.cache/tasks/work/operations/create-issue.json").is_file())
+        self.assertFalse((self.root / ".ai").exists())
+
+    def test_retired_task_location_is_not_discovered(self):
+        old = self.root / ".ai/tasks/legacy/TASK.md"
+        old.parent.mkdir(parents=True)
+        old.write_text("Retired task contents must remain untouched.\n")
+        with self.assertRaisesRegex(execution.TaskError, "Missing regular file"):
+            execution.create_issue(self.root, "legacy")
+        self.assertEqual(old.read_text(), "Retired task contents must remain untouched.\n")
+        self.assertEqual(self.api.posts, 0)
+
+    def test_mount_and_cache_symlink_components_are_rejected(self):
+        for component in (".opencaw", ".opencaw/.cache"):
+            with self.subTest(component=component), tempfile.TemporaryDirectory(dir=self.root) as temporary:
+                project = Path(temporary)
+                target = project / "elsewhere"
+                target.mkdir()
+                link = project / component
+                link.parent.mkdir(parents=True, exist_ok=True)
+                link.symlink_to(target, target_is_directory=True)
+                with self.assertRaisesRegex(execution.TaskError, "Symlink"):
+                    execution.create_task(project, "blocked", "Blocked", no_issue=True)
+                self.assertEqual(list(target.iterdir()), [])
+
     def test_normal_creation_and_reuse(self):
         first = self.create()
         self.assertEqual(first, self.create())
         self.assertEqual(self.api.posts, 1)
         self.assertEqual(self.journal()["state"], "confirmed")
-        self.assertEqual((self.root / ".ai/tasks/OPEN_ISSUES.md").read_text().splitlines(), [first])
+        self.assertEqual((self.root / ".opencaw/.cache/tasks/OPEN_ISSUES.md").read_text().splitlines(), [first])
 
     def test_lost_response_reconciles_without_another_post(self):
         self.api.fail_after_create = True
@@ -163,7 +192,7 @@ class IssueRecoveryTests(Fixture):
         with self.assertRaisesRegex(execution.TaskError, "reconcile-only"):
             self.create(reconcile_only=True)
         self.assertEqual(self.api.posts, 0)
-        self.assertFalse((self.root / ".ai/tasks/work/operations").exists())
+        self.assertFalse((self.root / ".opencaw/.cache/tasks/work/operations").exists())
 
     def test_reconcile_only_and_retry_are_mutually_exclusive(self):
         with self.assertRaises(execution.TaskError):
@@ -183,7 +212,7 @@ class IssueRecoveryTests(Fixture):
         self.create()
         url = self.api.issues[0]["html_url"]
         self.task.write_text(self.task.read_text().replace(url, ""))
-        (self.root / ".ai/tasks/work/operations/create-issue.json").unlink()
+        (self.root / ".opencaw/.cache/tasks/work/operations/create-issue.json").unlink()
         self.create()
         self.assertEqual(self.api.posts, 1)
 
@@ -198,7 +227,7 @@ class IssueRecoveryTests(Fixture):
         self.create()
         self.assertIn(2, self.api.pages)
         self.assertEqual(self.api.posts, 1)
-        self.assertEqual((self.root / ".ai/tasks/OPEN_ISSUES.md").read_text(), "")
+        self.assertEqual((self.root / ".opencaw/.cache/tasks/OPEN_ISSUES.md").read_text(), "")
 
     def test_legacy_explicit_link_is_verified_and_reused(self):
         self.api.issues = [self.api.issue(7)]
@@ -244,7 +273,7 @@ class IssueRecoveryTests(Fixture):
         self.assertEqual(self.api.posts, 1)
 
     def test_malformed_journal_is_not_overwritten(self):
-        operations = self.root / ".ai/tasks/work/operations"
+        operations = self.root / ".opencaw/.cache/tasks/work/operations"
         operations.mkdir()
         journal = operations / "create-issue.json"
         journal.write_text("{broken")
@@ -269,7 +298,7 @@ class IssueRecoveryTests(Fixture):
     def test_symlinked_operation_directory_is_rejected(self):
         target = self.root / "unrelated"
         target.mkdir()
-        (self.root / ".ai/tasks/work/operations").symlink_to(target, target_is_directory=True)
+        (self.root / ".opencaw/.cache/tasks/work/operations").symlink_to(target, target_is_directory=True)
         with self.assertRaisesRegex(execution.TaskError, "Symlink"):
             self.create()
         self.assertEqual(list(target.iterdir()), [])
@@ -430,7 +459,7 @@ class CheckpointTests(Fixture):
     def test_missing_checkpoint_does_not_create_state(self):
         with self.assertRaisesRegex(execution.TaskError, "No checkpoint"):
             self.validate()
-        self.assertFalse((self.root / ".ai/tasks/work/checkpoints").exists())
+        self.assertFalse((self.root / ".opencaw/.cache/tasks/work/checkpoints").exists())
 
     def test_symlink_evidence_is_rejected(self):
         self.prepare()

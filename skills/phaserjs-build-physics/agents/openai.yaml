@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build Physics"
+  short_description: "Build explicitly selected Arcade or Matter physics"
+  default_prompt: "Use $phaserjs-build-physics to implement the selected solver with controlled stepping and observable collision behavior."

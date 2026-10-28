@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Async Systems"
+  short_description: "Own Unreal background work and cancellation"
+  default_prompt: "Use $unreal-build-async-systems for the selected Unreal project with explicit thread ownership, bounded cancellation and scoped native evidence."

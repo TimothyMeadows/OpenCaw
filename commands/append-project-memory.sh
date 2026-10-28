@@ -68,7 +68,7 @@ if [[ -n "$replace" ]]; then
     exit 1
   fi
 
-  opencaw_archive_file "$OPENCAW_PROJECT_MEMORY_FILE" replace "$OPENCAW_PROJECT_AI_DIR/archive/memory"
+  opencaw_archive_file "$OPENCAW_PROJECT_MEMORY_FILE" replace "$OPENCAW_PROJECT_CACHE_DIR/archive/memory"
   awk -v fact="$replace" '
     {
       original = $0

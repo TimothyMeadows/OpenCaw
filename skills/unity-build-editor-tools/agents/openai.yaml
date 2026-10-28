@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Build Editor Tools"
+  short_description: "Author undoable Unity inspectors and Editor tools"
+  default_prompt: "Use $unity-build-editor-tools to create version-compatible Unity authoring tools with undo, safe serialization, and explicit Editor/runtime boundaries."

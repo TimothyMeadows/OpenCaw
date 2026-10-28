@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unreal Animate Actors"
+  short_description: "Animate Actors for Unreal projects"
+  default_prompt: "Use $unreal-animate-actors for the selected Unreal project with explicit engine compatibility, native ownership, and verification evidence."
+

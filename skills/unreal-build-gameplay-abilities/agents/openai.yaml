@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Gameplay Abilities"
+  short_description: "Own GAS grants, targets and prediction cleanup"
+  default_prompt: "Use $unreal-build-gameplay-abilities for the selected Unreal project with idempotent grants, authoritative target validation and scoped native evidence."

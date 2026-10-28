@@ -1,0 +1,617 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-motion-package/v1"
+    },
+    "profile": {
+      "enum": [
+        "skinned",
+        "articulated",
+        "rigid"
+      ]
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "sourceInput": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "coordinateSystem": {
+      "type": "object"
+    },
+    "rig": {
+      "type": "object"
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fps": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 120
+          },
+          "startFrame": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "endFrame": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000000
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 0.0001,
+            "maximum": 3600
+          },
+          "loop": {
+            "type": "boolean"
+          },
+          "rootMotion": {
+            "enum": [
+              "in-place",
+              "extract"
+            ]
+          },
+          "rootDisplacement": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "minItems": 0,
+            "maxItems": 100000
+          },
+          "markers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "time": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "event": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+                }
+              },
+              "required": [
+                "time",
+                "event"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 10000
+          },
+          "motionSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "duration",
+          "loop",
+          "rootMotion"
+        ],
+        "additionalProperties": true
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "anchors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "parent": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "node",
+          "position",
+          "parent"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "min": {
+            "type": "number",
+            "minimum": -1000000000.0,
+            "maximum": 1000000000.0
+          },
+          "max": {
+            "type": "number",
+            "minimum": -1000000000.0,
+            "maximum": 1000000000.0
+          },
+          "default": {
+            "type": "number",
+            "minimum": -1000000000.0,
+            "maximum": 1000000000.0
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "node": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "property": {
+                  "enum": [
+                    "rotation",
+                    "position"
+                  ]
+                },
+                "axis": {
+                  "enum": [
+                    "x",
+                    "y",
+                    "z"
+                  ]
+                },
+                "mode": {
+                  "enum": [
+                    "angular-speed",
+                    "angle",
+                    "position"
+                  ]
+                },
+                "scale": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "offset": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                }
+              },
+              "required": [
+                "node",
+                "property",
+                "axis",
+                "mode",
+                "scale"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "id",
+          "unit",
+          "min",
+          "max",
+          "default"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "clip": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "terminal": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "trigger": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 30
+          },
+          "interruptible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "trigger",
+          "duration"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "type": {
+            "enum": [
+              "particles",
+              "trail",
+              "material"
+            ]
+          },
+          "anchor": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "parameter": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "maxParticles": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "lifetime": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 3600
+          },
+          "space": {
+            "enum": [
+              "local",
+              "world"
+            ]
+          },
+          "rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "color": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16777215
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000.0,
+                  "maximum": 1000000000.0
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            ]
+          },
+          "size": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 10000
+          },
+          "velocity": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": -1000000000.0,
+              "maximum": 1000000000.0
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "qualityMin": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "reducedMotionScale": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "anchor",
+          "maxParticles",
+          "lifetime",
+          "space"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "maxTriangles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
+        },
+        "maxMaterials": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "maxClips": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "maxSamples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "maxPreviewFrames": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "maxBones": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "maxInfluences": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "maxTextureBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 68719476736
+        },
+        "maxRuntimeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 68719476736
+        },
+        "maxClipSeconds": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 3600
+        },
+        "maxLogBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1073741824
+        }
+      },
+      "required": [
+        "maxTriangles",
+        "maxMaterials",
+        "maxClips",
+        "maxSamples",
+        "maxPreviewFrames",
+        "maxAttempts",
+        "timeoutSeconds",
+        "maxBones",
+        "maxInfluences",
+        "maxTextureBytes",
+        "maxRuntimeBytes",
+        "maxClipSeconds",
+        "maxLogBytes"
+      ],
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object"
+    },
+    "engine": {
+      "type": "object"
+    },
+    "ancestry": {
+      "type": "object"
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "profile",
+    "model",
+    "source",
+    "coordinateSystem",
+    "rig",
+    "clips",
+    "anchors",
+    "parameters",
+    "states",
+    "transitions",
+    "effects",
+    "provenance",
+    "budgets",
+    "verification"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.local/schemas/motion/package-v1",
+  "title": "Profiled motion model, semantic clips and selected-engine bindings"
+}

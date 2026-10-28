@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Animate Sprites"
+  short_description: "Build interruptible Phaser sprite animation"
+  default_prompt: "Use $phaserjs-animate-sprites to implement clip transitions and presentation tweens with safe interruption and cleanup."

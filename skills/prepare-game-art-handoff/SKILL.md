@@ -1,6 +1,7 @@
 ---
 name: prepare-game-art-handoff
 description: Prepare game art assets for implementation handoff with style references, source/runtime file paths, atlas metadata, pivots, anchors, animation rows, collision assumptions, sorting layers, licensing, and validation checks. Use when art roles deliver assets to engineering, QA, game design, or documentation.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

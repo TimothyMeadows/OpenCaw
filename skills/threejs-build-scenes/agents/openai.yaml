@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Scenes"
+  short_description: "Build Three.js scene and resource lifecycles"
+  default_prompt: "Use $threejs-build-scenes to implement a version-aware scene lifecycle with explicit ownership and browser evidence."

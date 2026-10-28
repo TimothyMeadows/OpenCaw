@@ -158,14 +158,14 @@ done
 gauntlet_validate_name "$task_name" 'Parent task name'
 task_path="${task_path#\`}"
 task_path="${task_path%\`}"
-expected_task_path=".ai/tasks/$task_name/TASK.md"
+expected_task_path=".opencaw/.cache/tasks/$task_name/TASK.md"
 [[ "$task_path" == "$expected_task_path" ]] || {
   echo "Parent Task file must be \`$expected_task_path\`." >&2
   exit 1
 }
 task_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$task_path"
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_AI_DIR/tasks" 'Task root'
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_AI_DIR/tasks/$task_name" 'Parent task directory'
+gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks" 'Task root'
+gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name" 'Parent task directory'
 [[ -f "$task_file" && ! -L "$task_file" ]] || {
   echo "Parent task file does not exist: $task_path" >&2
   exit 1
@@ -276,7 +276,7 @@ fi
 
 # Cross-ledger replay reads evidence before some tree-specific validators run.
 # Preflight every durable evidence tree once so no cross-reference can traverse
-# an intermediate symlink or leave the resolved project .ai boundary.
+# an intermediate symlink or leave the resolved project .opencaw/.cache boundary.
 for evidence_tree in publication-checkpoints rounds pr-events promotion-events completion-events; do
   gauntlet_preflight_evidence_tree \
     "$gauntlet_dir/$evidence_tree" "Gauntlet $evidence_tree evidence tree"
@@ -566,7 +566,7 @@ if [[ -d "$gauntlet_dir/rounds" ]]; then
         echo "Round progress PR repository does not match the parent issue: $relative_round" >&2
         exit 1
       }
-      [[ "$metadata_opened_event" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/${item_dir}/event-[0-9]{3,}\.md$ ]] || {
+      [[ "$metadata_opened_event" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_dir}/event-[0-9]{3,}\.md$ ]] || {
         echo "Work-unit round lacks its exact hash-anchored opened event: $relative_round" >&2
         exit 1
       }
@@ -599,7 +599,7 @@ if [[ -d "$gauntlet_dir/rounds" ]]; then
         elif [[ "$round_qa_time" == "$round_recorded_at" \
           && "$metadata_remediation_root" == "$round_qa_relative" ]]; then
           round_qa_critic_round="$(gauntlet_section_field "$round_qa_candidate" 'PR Event Metadata' 'Critic round')"
-          if [[ "$round_qa_critic_round" == .ai/gauntlets/*/rounds/*/round-*.md ]] \
+          if [[ "$round_qa_critic_round" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]] \
             && gauntlet_round_event_precedes \
               "$gauntlet_file" "$round_qa_critic_round" "$relative_round"; then
             round_qa_precedes=1
@@ -748,7 +748,7 @@ while IFS= read -r ledger_line; do
       exit 1
     }
   fi
-  expected_ledger_evidence=".ai/gauntlets/$gauntlet_name/rounds/$ledger_item/round-$ledger_round.md"
+  expected_ledger_evidence=".opencaw/.cache/gauntlets/$gauntlet_name/rounds/$ledger_item/round-$ledger_round.md"
   [[ "$ledger_evidence" == "$expected_ledger_evidence" ]] || {
     echo "Round Ledger path does not match its item and round: $ledger_evidence" >&2
     exit 1
@@ -986,7 +986,7 @@ if [[ -d "$gauntlet_dir/pr-events" ]]; then
         echo "PR event predates external PR creation: $relative_event" >&2
         exit 1
       }
-      [[ "$metadata_publication_checkpoint" =~ ^\.ai/gauntlets/${gauntlet_name}/publication-checkpoints/${event_item}/checkpoint-[0-9]{3,}\.md$ \
+      [[ "$metadata_publication_checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${event_item}/checkpoint-[0-9]{3,}\.md$ \
         && -f "$OPENCAW_PROJECT_ROOT_RESOLVED/$metadata_publication_checkpoint" \
         && ! -L "$OPENCAW_PROJECT_ROOT_RESOLVED/$metadata_publication_checkpoint" \
         && "$metadata_publication_checkpoint_hash" == "$(gauntlet_hash_file "$OPENCAW_PROJECT_ROOT_RESOLVED/$metadata_publication_checkpoint")" ]] || {
@@ -1004,7 +1004,7 @@ if [[ -d "$gauntlet_dir/pr-events" ]]; then
             exit 1
           fi
           printf '%s\n' "$metadata_evidence_url" >> "$qa_comment_evidence_seen"
-          [[ "$metadata_critic_round" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/${event_item}/round-[0-9]{3,}\.md$ ]] || {
+          [[ "$metadata_critic_round" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/${event_item}/round-[0-9]{3,}\.md$ ]] || {
             echo "QA event references invalid critic evidence: $relative_event" >&2
             exit 1
           }
@@ -1149,7 +1149,7 @@ if [[ -d "$gauntlet_dir/pr-events" ]]; then
             if [[ "$inherited_time" < "$recorded_at" ]]; then
               inherited_precedes=1
             elif [[ "$inherited_time" == "$recorded_at" ]]; then
-              if [[ "$inherited_path" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+              if [[ "$inherited_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
                 gauntlet_progress_pr_event_precedes \
                   "$gauntlet_file" "$inherited_path" "$relative_event" \
                   && inherited_precedes=1
@@ -1165,8 +1165,8 @@ if [[ -d "$gauntlet_dir/pr-events" ]]; then
               latest_inherited_time="$inherited_time"
               latest_inherited_trigger="$inherited_path"
             elif [[ "$latest_inherited_time" == "$inherited_time" ]]; then
-              if [[ "$latest_inherited_trigger" == .ai/gauntlets/*/pr-events/*/event-*.md \
-                && "$inherited_path" == .ai/gauntlets/*/pr-events/*/event-*.md ]]; then
+              if [[ "$latest_inherited_trigger" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
+                && "$inherited_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
                 if gauntlet_progress_pr_event_precedes \
                   "$gauntlet_file" "$latest_inherited_trigger" "$inherited_path"; then
                   latest_inherited_trigger="$inherited_path"
@@ -1525,7 +1525,7 @@ while IFS= read -r pr_ledger_line; do
     echo "Progress PR Ledger references an unknown work unit: $pr_ledger_item" >&2
     exit 1
   }
-  expected_pr_ledger_record=".ai/gauntlets/$gauntlet_name/pr-events/$pr_ledger_item/event-$pr_ledger_sequence.md"
+  expected_pr_ledger_record=".opencaw/.cache/gauntlets/$gauntlet_name/pr-events/$pr_ledger_item/event-$pr_ledger_sequence.md"
   [[ "$pr_ledger_record" == "$expected_pr_ledger_record" ]] || {
     echo "Progress PR Ledger path does not match its item and event: $pr_ledger_record" >&2
     exit 1
@@ -1749,7 +1749,7 @@ if [[ -d "$promotion_event_dir" ]]; then
       echo "Promotion QA event has a stale execution contract or base SHA: $relative_promotion_event" >&2
       exit 1
     }
-    [[ "$promotion_completion" =~ ^\.ai/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ ]] || {
+    [[ "$promotion_completion" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ ]] || {
       echo "Promotion QA event references invalid completion evidence: $relative_promotion_event" >&2
       exit 1
     }
@@ -1940,7 +1940,7 @@ if [[ -d "$promotion_event_dir" ]]; then
 
     promotion_integration_relative="$(gauntlet_section_field \
       "$promotion_completion_file" 'Completion Event Metadata' 'Integration round')"
-    [[ "$promotion_integration_relative" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
+    [[ "$promotion_integration_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
       echo "Promotion QA completion references invalid integration evidence: $relative_promotion_event" >&2
       exit 1
     }
@@ -1998,7 +1998,7 @@ if [[ -d "$promotion_event_dir" ]]; then
         echo "Promotion QA affected units must be unique and comma-sorted: $relative_promotion_event" >&2
         exit 1
       }
-      expected_archived_report=".ai/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$expected_promotion_label.md"
+      expected_archived_report=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$expected_promotion_label.md"
       [[ "$promotion_archived_report" == "$expected_archived_report" \
         && "$promotion_archived_hash" =~ ^[0-9a-f]{64}$ ]] || {
         echo "Failing Promotion QA event has noncanonical archived-report metadata: $relative_promotion_event" >&2
@@ -2082,7 +2082,7 @@ while IFS= read -r promotion_ledger_line; do
   promotion_ledger_hash="${BASH_REMATCH[22]}"
   promotion_ledger_count=$((promotion_ledger_count + 1))
 
-  expected_promotion_record=".ai/gauntlets/$gauntlet_name/promotion-events/event-$promotion_ledger_sequence.md"
+  expected_promotion_record=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/event-$promotion_ledger_sequence.md"
   [[ "$promotion_ledger_record" == "$expected_promotion_record" ]] || {
     echo "Promotion QA Ledger path does not match its event: $promotion_ledger_record" >&2
     exit 1
@@ -2217,9 +2217,9 @@ if [[ -d "$completion_event_dir" ]]; then
       echo "Completion event sequence or outcome is noncanonical: $relative_completion_event" >&2
       exit 1
     }
-    expected_completion_report=".ai/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md"
+    expected_completion_report=".opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md"
     [[ "$completion_report" == "$expected_completion_report" \
-      && "$completion_integration_round" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
+      && "$completion_integration_round" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
       echo "Completion event has a noncanonical report or integration-round path: $relative_completion_event" >&2
       exit 1
     }
@@ -2280,7 +2280,7 @@ while IFS= read -r completion_ledger_line; do
   completion_ledger_record="${BASH_REMATCH[12]}"
   completion_ledger_hash="${BASH_REMATCH[13]}"
   completion_ledger_count=$((completion_ledger_count + 1))
-  expected_completion_record=".ai/gauntlets/$gauntlet_name/completion-events/event-$completion_ledger_sequence.md"
+  expected_completion_record=".opencaw/.cache/gauntlets/$gauntlet_name/completion-events/event-$completion_ledger_sequence.md"
   [[ "$completion_ledger_record" == "$expected_completion_record" ]] || {
     echo "Completion Ledger path does not match its sequence: $completion_ledger_record" >&2
     exit 1
@@ -2846,12 +2846,12 @@ while IFS=$'\t' read -r timeline_time timeline_manifest timeline_quality timelin
   timeline_item='aggregate'
   timeline_scope='aggregate'
   case "$timeline_path" in
-    .ai/gauntlets/"$gauntlet_name"/rounds/*/round-*.md)
+    .opencaw/.cache/gauntlets/"$gauntlet_name"/rounds/*/round-*.md)
       timeline_item="$(gauntlet_section_field "$timeline_file" 'Round Metadata' 'Item')"
       timeline_scope="$(gauntlet_section_field \
         "$timeline_file" 'Round Metadata' 'Scope fingerprint' | tr '[:upper:]' '[:lower:]')"
       ;;
-    .ai/gauntlets/"$gauntlet_name"/pr-events/*/event-*.md)
+    .opencaw/.cache/gauntlets/"$gauntlet_name"/pr-events/*/event-*.md)
       timeline_item="$(gauntlet_section_field "$timeline_file" 'PR Event Metadata' 'Item')"
       timeline_scope="$(gauntlet_section_field \
         "$timeline_file" 'PR Event Metadata' 'Scope fingerprint' | tr '[:upper:]' '[:lower:]')"
@@ -2885,7 +2885,7 @@ if [[ -n "$first_opened_row" ]]; then
   first_quality_checkpoint="$(gauntlet_section_field \
     "$first_opened_file" 'PR Event Metadata' 'Publication checkpoint')"
   first_quality_checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$first_quality_checkpoint"
-  [[ "$first_quality_checkpoint" =~ ^\.ai/gauntlets/${gauntlet_name}/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md$ \
+  [[ "$first_quality_checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md$ \
     && -f "$first_quality_checkpoint_file" && ! -L "$first_quality_checkpoint_file" \
     && "$(gauntlet_section_field "$first_quality_checkpoint_file" 'Publication Checkpoint Metadata' 'Quality bar fingerprint')" == "$quality_chain" ]] || {
     echo 'The first opened event lacks a safe publication checkpoint for its baseline quality generation.' >&2
@@ -3119,7 +3119,7 @@ while IFS=$'\t' read -r trigger_item _terminal_event terminal_time opened_event 
     "$opened_trigger_file" 'PR Event Metadata' 'Publication checkpoint')"
   opened_trigger_checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$opened_trigger_checkpoint"
   [[ -f "$opened_trigger_file" && ! -L "$opened_trigger_file" \
-    && "$opened_trigger_checkpoint" =~ ^\.ai/gauntlets/${gauntlet_name}/publication-checkpoints/${trigger_item}/checkpoint-[0-9]{3,}\.md$ \
+    && "$opened_trigger_checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${trigger_item}/checkpoint-[0-9]{3,}\.md$ \
     && -f "$opened_trigger_checkpoint_file" && ! -L "$opened_trigger_checkpoint_file" ]] || {
     echo "Remediation PR lacks its safe publication-checkpoint authorization cutoff: $opened_event" >&2
     exit 1
@@ -3127,7 +3127,7 @@ while IFS=$'\t' read -r trigger_item _terminal_event terminal_time opened_event 
   opened_trigger_cutoff="$(gauntlet_section_field \
     "$opened_trigger_checkpoint_file" 'Publication Checkpoint Metadata' 'Recorded at')"
   trigger_time=''
-  if [[ "$remediation_trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]]; then
+  if [[ "$remediation_trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]]; then
     trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_trigger"
     [[ -f "$trigger_file" && ! -L "$trigger_file" ]] || {
       echo "Remediation references missing or unsafe integration evidence: $remediation_trigger" >&2
@@ -3145,7 +3145,7 @@ while IFS=$'\t' read -r trigger_item _terminal_event terminal_time opened_event 
       echo "Integration remediation trigger does not affect $trigger_item: $remediation_trigger" >&2
       exit 1
     }
-  elif [[ "$remediation_trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
+  elif [[ "$remediation_trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
     trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_trigger"
     trigger_source_item="${BASH_REMATCH[1]}"
     trigger_verdict="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Verdict')"
@@ -3162,7 +3162,7 @@ while IFS=$'\t' read -r trigger_item _terminal_event terminal_time opened_event 
       exit 1
     }
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Recorded at')"
-  elif [[ "$remediation_trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
+  elif [[ "$remediation_trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
     trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_trigger"
     [[ -f "$trigger_file" && ! -L "$trigger_file" \
       && "$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Verdict')" == 'fail' ]] || {
@@ -3176,7 +3176,7 @@ while IFS=$'\t' read -r trigger_item _terminal_event terminal_time opened_event 
       exit 1
     }
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Recorded at')"
-  elif [[ "$remediation_trigger" =~ ^\.ai/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]]; then
+  elif [[ "$remediation_trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]]; then
     trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_trigger"
     trigger_source_item="${BASH_REMATCH[1]}"
     trigger_event="$(gauntlet_section_field "$trigger_file" 'PR Event Metadata' 'Event')"
@@ -3263,7 +3263,7 @@ elif [[ "$latest_promotion_verdict" == 'fail' && "$status" == 'passed' ]]; then
   current_integration_evidence="${current_integration_evidence#\`}"
   current_integration_evidence="${current_integration_evidence%\`}"
   [[ "$(gauntlet_section_field "$gauntlet_file" 'Integration Review' 'Verdict')" == 'pass' \
-    && "$current_integration_evidence" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ \
+    && "$current_integration_evidence" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ \
     && "$(gauntlet_section_field "$gauntlet_file" 'Integration Review' 'Head SHA' | tr '[:upper:]' '[:lower:]')" != "$latest_promotion_head_sha" \
     && ( "$(gauntlet_section_field "$OPENCAW_PROJECT_ROOT_RESOLVED/$current_integration_evidence" 'Round Metadata' 'Recorded at')" > "$latest_promotion_recorded_at" \
       || "$(gauntlet_section_field "$OPENCAW_PROJECT_ROOT_RESOLVED/$current_integration_evidence" 'Round Metadata' 'Recorded at')" == "$latest_promotion_recorded_at" ) ]] || {
@@ -3615,7 +3615,7 @@ if [[ "$phase" == 'complete' ]]; then
   [[ "$integration_verdict" == 'pass' ]] || { echo 'Integration Review verdict must be pass.' >&2; exit 1; }
   integration_evidence="${integration_evidence#\`}"
   integration_evidence="${integration_evidence%\`}"
-  [[ "$integration_evidence" =~ ^\.ai/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
+  [[ "$integration_evidence" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/integration/round-[0-9]{3,}\.md$ ]] || {
     echo 'Integration Review evidence path is invalid.' >&2
     exit 1
   }

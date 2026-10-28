@@ -1,13 +1,14 @@
 ---
 name: model-blender-assets
-description: Model, sculpt, retopologize, and clean production Blender 4.5 assets. Use for blockouts, hard-surface or organic meshes, topology repair, silhouette refinement, deformation topology, and game-ready modeling checkpoints.
+description: Model, sculpt, retopologize, and clean production Blender 4.5 assets. Use for hard-surface assemblies, organic or vehicle construction, groom/hair-card geometry, silhouette refinement, deformation topology, and game-ready modeling checkpoints.
+engines: [AGNOSTIC]
 ---
 
 # Model Blender Assets
 
 ## When to use
 
-Use for Blender blockout, hard-surface, organic, sculpting, retopology, topology-cleanup, silhouette, or deformation-mesh work.
+Use for Blender blockout, hard-surface, organic, sculpting, retopology, groom/hair-card geometry, topology-cleanup, silhouette, or deformation-mesh work.
 
 ## Workflow
 
@@ -19,6 +20,13 @@ Use for Blender blockout, hard-surface, organic, sculpting, retopology, topology
 6. Hand the approved working copy to UV, rigging, procedural, or export stages without overwriting its source.
 
 Read [modeling-and-topology-contract.md](references/modeling-and-topology-contract.md) for topology and evidence requirements.
+
+Read only the construction guidance needed by the subject:
+
+- [Hard-surface assemblies](references/hard-surface-assemblies.md): manufactured surfaces, panel seams, small mechanisms and independent moving parts.
+- [Subject construction](references/subject-construction.md): character, creature and vehicle landmarks, concealed geometry and deformation handoff.
+- [Groom and hair cards](references/groom-and-hair-cards.md): surface attachment, guide flow, coverage, card geometry and distance-dependent delivery.
+- [Sculpt and retopology](references/sculpt-and-retopology.md): preserving a useful base mesh, selecting remeshing deliberately and verifying derived topology.
 
 ## Guardrails
 

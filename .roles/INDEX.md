@@ -44,7 +44,6 @@ Current role catalog location:
 - `technical-3d-artist`
 - `tile-set-artist`
 - `token-vfx-artist`
-- `web-experience-designer`
 
 ### Full Stack
 - `fullstack-engineer`
@@ -66,29 +65,22 @@ Current role catalog location:
 - `sre`
 
 ### Data & Platform
-- `ai-data-remediation-engineer`
-- `data-engineer`
 - `database-optimizer`
 - `devops-automator`
 
 ### General Engineering
 - `ai-engineer`
 - `code-reviewer`
-- `embedded-firmware-engineer`
 - `generative-media-pipeline-engineer`
 - `git-workflow-master`
-- `incident-response-commander`
 - `senior-developer`
-- `solidity-smart-contract-engineer`
 - `technical-writer`
-- `threat-detection-engineer`
 
 ## Aliases
 
 The following aliases may be used when requesting a role. Prefer exact role names when possible.
 Alias entries use domain-qualified role ids so collisions can be disambiguated when needed.
 
-- `computer-science/ai-data-remediation-engineer`: `ai`, `ai data remediation engineer`, `ai-data-remediation-engineer`, `aidataremediationengineer`, `analytics`, `data`, `llm`, `ml`
 - `computer-science/ai-engineer`: `ai`, `ai engineer`, `ai-engineer`, `aiengineer`, `llm`, `ml`
 - `computer-science/autonomous-optimization-architect`: `architect`, `autonomous optimization architect`, `autonomous-optimization-architect`, `autonomousoptimizationarchitect`
 - `computer-science/backend-architect`: `api`, `api-architect`, `architect`, `backend`, `backend architect`, `backend-architect`, `backendarchitect`
@@ -114,18 +106,14 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `arts/technical-3d-artist`: `technical-3d-artist`, `3d-technical-artist`, `rigging-artist`, `technical-animator`
 - `arts/tile-set-artist`: `tile-set-artist`, `tileset-artist`, `biome-artist`, `environment-tile-artist`, `terrain-artist`
 - `arts/token-vfx-artist`: `token-vfx-artist`, `token-vfx`, `token-artist`, `minion-artist`, `card-vfx`
-- `arts/web-experience-designer`: `web-experience-designer`, `web-designer`, `experience-designer`, `interactive-web-designer`
-- `computer-science/data-engineer`: `analytics`, `data`, `data engineer`, `data-engineer`, `dataengineer`
 - `computer-science/database-optimizer`: `analytics`, `data`, `database optimizer`, `database-optimizer`, `databaseoptimizer`
 - `computer-science/devops-automator`: `ci-cd`, `cicd`, `devops`, `devops automator`, `devops-automator`, `devopsautomator`, `platform`
-- `computer-science/embedded-firmware-engineer`: `embedded firmware engineer`, `embedded-firmware-engineer`, `embeddedfirmwareengineer`
 - `computer-science/frontend-developer`: `frontend`, `frontend developer`, `frontend-developer`, `frontenddeveloper`, `ui`, `web`
 - `computer-science/game-designer`: `game-designer`, `game-design`, `gameplay-designer`, `systems-designer`, `encounter-designer`
 - `computer-science/gameplay-engineer`: `gameplay-engineer`, `gameplay-programmer`, `game-engineer`, `runtime-gameplay-engineer`
 - `computer-science/fullstack-engineer`: `full stack`, `full-stack`, `fullstack`, `fullstack engineer`, `fullstack-engineer`, `fullstackengineer`
 - `computer-science/git-workflow-master`: `git workflow master`, `git-workflow-master`, `gitworkflowmaster`
 - `computer-science/generative-media-pipeline-engineer`: `media-pipeline-engineer`, `generative-pipeline-engineer`, `ai-media-pipeline-engineer`
-- `computer-science/incident-response-commander`: `incident response commander`, `incident-response-commander`, `incidentresponsecommander`
 - `computer-science/mobile-app-builder`: `mobile app builder`, `mobile-app-builder`, `mobileappbuilder`
 - `computer-science/project-manager`: `agent-coordinator`, `delivery-lead`, `delivery-manager`, `multi-agent-coordinator`, `pm`, `project manager`, `project-manager`, `projectmanager`
 - `computer-science/qa-engineer`: `qa`, `qa engineer`, `qa-engineer`, `quality assurance`, `quality engineer`, `quality-engineer`, `test engineer`, `test-engineer`
@@ -134,10 +122,8 @@ Alias entries use domain-qualified role ids so collisions can be disambiguated w
 - `computer-science/security-engineer`: `appsec`, `secure-coding`, `security`, `security engineer`, `security-engineer`, `securityengineer`
 - `computer-science/senior-developer`: `senior developer`, `senior-developer`, `seniordeveloper`
 - `computer-science/software-architect`: `architect`, `software architect`, `software-architect`, `softwarearchitect`
-- `computer-science/solidity-smart-contract-engineer`: `solidity smart contract engineer`, `solidity-smart-contract-engineer`, `soliditysmartcontractengineer`
 - `computer-science/sre`: `ops`, `reliability`, `site-reliability-engineer`, `sre`
 - `computer-science/technical-writer`: `technical writer`, `technical-writer`, `technicalwriter`
-- `computer-science/threat-detection-engineer`: `threat detection engineer`, `threat-detection-engineer`, `threatdetectionengineer`
 
 ## Multi-role examples
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unity Build 2D Content"
+  short_description: "Author sprites, atlases and Tilemaps safely"
+  default_prompt: "Use $unity-build-2d-content to author sprite and Tilemap content for the selected Unity project with stable identities and verified loading lifetimes."

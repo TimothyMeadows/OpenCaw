@@ -1,6 +1,7 @@
 ---
 name: clean-rebuild-dotnet
 description: Clean, restore, and rebuild the host .NET solution.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

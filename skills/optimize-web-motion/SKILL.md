@@ -1,6 +1,7 @@
 ---
 name: optimize-web-motion
 description: Profile and reduce the CPU, GPU, memory, and lifecycle cost of browser animation, canvas, WebGL, timers, listeners, and observers. Use for jank, high power use, long-session slowdown, offscreen work, memory growth, or motion regressions that require measured fixes.
+engines: [AGNOSTIC]
 ---
 
 # Optimize Web Motion
@@ -31,3 +32,7 @@ description: Profile and reduce the CPU, GPU, memory, and lifecycle cost of brow
 - Do not remove meaningful feedback solely to improve a score.
 - Do not claim a performance improvement without comparable measurements.
 - Do not hide leaked ownership by forcing periodic reloads.
+
+## Engine and feedback budgets
+
+Resolve ENGINE.md and compatible feature skills before engine APIs. Declare target device, build, frame/CPU/GPU/memory/loading budgets and measurement windows; do not impose universal 60 FPS. Measure representative UI layout, HUD lifecycle, overlapping effects and shader/audio/haptic requests, including disabled accessibility settings and interruption. Browser profiling requires a browser build; native engines need native tooling. Feedback cannot determine authoritative outcomes and physical haptics require hardware evidence.

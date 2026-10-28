@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unreal Build Audio"
+  short_description: "Build Audio for Unreal projects"
+  default_prompt: "Use $unreal-build-audio for the selected Unreal project with explicit engine compatibility, native ownership, and verification evidence."
+

@@ -358,9 +358,10 @@ async function captureOperation(root, values) {
 }
 
 async function main() {
-  const [operation, rootArg, ...values] = process.argv.slice(2);
+  let [operation, rootArg, ...values] = process.argv.slice(2);
   if (!operation || !rootArg) fail('Internal invocation requires an operation and project root.');
   const root = rootPath(rootArg);
+  if (['capture', 'analyze'].includes(operation)) values = require('./engine-contract.cjs').codeProduction(root, 'evidence', operation, values);
   if (operation === 'analyze') return analyzeOperation(root, values);
   if (operation === 'capture') return captureOperation(root, values);
   fail(`Unknown code-character evidence operation: ${operation}`);

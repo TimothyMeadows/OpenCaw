@@ -1,6 +1,7 @@
 ---
 name: orchestrate-subagents
 description: Plan and coordinate parallel subagent lanes using OpenCaw roles, durable task artifacts, and tool-specific execution guidance.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -11,7 +12,7 @@ Use before spawning subagents or delegating work so each lane has a resolved rol
 Do not use this task-backed lane workflow for active Brainstorm mode. `brainstorm-flow` owns its fixed main project-manager plus two read-only researcher team and keeps researcher reports ephemeral without `SUBAGENTS.md`.
 
 ## Output
-- `../.ai/tasks/<task_name>/SUBAGENTS.md` lane plan
+- `../.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md` lane plan
 - requested and effective capacity
 - lane IDs, role IDs, agent types, scopes, write sets, dependencies, outputs, and verification paths
 - integration order and conflict risks

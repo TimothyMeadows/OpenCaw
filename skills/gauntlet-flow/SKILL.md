@@ -1,6 +1,7 @@
 ---
 name: gauntlet-flow
 description: "Run an explicitly requested OpenCaw Gauntlet as a persistent builder-versus-critic loop with progressive work-unit PRs into one integration branch. Use when a user says `gauntlet`, `gauntlet mode`, `gauntlet flow`, or a planning artifact declares `Flow: gauntlet` for an ambitious deliverable that can be inspected with concrete evidence."
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -11,7 +12,7 @@ Do not activate or create Gauntlet flow while repository-root `BRAINSTORM.md` is
 
 ## Workflow
 
-1. Create or import one parent task and GitHub issue through normal task flow, verify the issue URL is in its `TASK.md`, then create `.ai/gauntlets/<name>/GAUNTLET.md`; the Gauntlet scaffold requires that task to exist first.
+1. Create or import one parent task and GitHub issue through normal task flow, verify the issue URL is in its `TASK.md`, then create `.opencaw/.cache/gauntlets/<name>/GAUNTLET.md`; the Gauntlet scaffold requires that task to exist first.
 2. Define the objective, inspectable artifact, constraints, quality bar, delivery base branch plus exact commit SHA, and `gauntlet/<name>` integration branch created exactly at that commit. If the lead proposes them, pause for approval. The first accepted opened event freezes the parent task, objective, constraints/permissions, base identity, static delivery policy, approved bar, and normalized unit manifest into separate execution-contract, quality, and unit-manifest fingerprints.
 3. Decompose the deliverable into stable, independently judgeable work units with a durable ID, title, and inspectable scope/acceptance boundary. The normalized manifest contains sorted retained ID/title/scope definitions plus sorted supersession ID/scope/replacement edges; transient checkbox/status state is excluded. Approve it with `- Unit manifest approval: <fingerprint> | units: <comma-sorted-ids> | approved by: <identity> | approved at: <canonical-UTC>`. Retain every definition; additions, definition changes, or edge changes require an approved `Unit manifest revision`, changed title/scope additionally requires a matching `Unit scope-title revision`, and splits/merges require canonical supersession markers. Every per-unit checkpoint, PR event, and round must use a unit and title/scope definition present in the manifest generation active at that timestamp. Never erase failed work. The supersession graph must be acyclic, terminate only at active leaves, and transfer every outstanding unit-local, integration, or promotion failure root to every active descendant.
 4. Keep coupled work under one sequential owner. Use project-manager subagent lanes only for units with disjoint write sets.
@@ -103,7 +104,7 @@ Resume a stopped or blocked run only after explicit user direction and after the
 
 ## Output
 
-- `.ai/gauntlets/<name>/GAUNTLET.md`
+- `.opencaw/.cache/gauntlets/<name>/GAUNTLET.md`
 - immutable `publication-checkpoints/<item-id>/checkpoint-NNN.md` progress-publication authorizations and their one-time PR-body bindings
 - immutable `rounds/<item-id>/round-NNN.md` evidence
 - immutable `pr-events/<item-id>/event-NNN.md` progress-PR evidence

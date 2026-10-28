@@ -65,7 +65,7 @@ for file in "${files[@]}"; do
   total=$((total + count))
 
   if [[ "$dry_run" == 'false' && "$count" -gt 0 ]]; then
-    opencaw_archive_file "$file" "purge-${tag//:/-}" "$OPENCAW_PROJECT_AI_DIR/archive/memory"
+    opencaw_archive_file "$file" "purge-${tag//:/-}" "$OPENCAW_PROJECT_CACHE_DIR/archive/memory"
     awk -v wanted="$tag" '
       {
         original = $0

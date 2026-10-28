@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "engine": {
+    "path": ".local/tools/proof-to-model/engine/trellis-cli.exe",
+    "version": "v0.10.1-desktop-alpha",
+    "commit": "1f432fd3f0689c504fa1e9b15b038c33584174d1",
+    "repository": "https://github.com/raven38/pixal3d.cpp",
+    "installationReceipt": ".local/tools/proof-to-model/installation.json",
+    "archives": [
+      {
+        "platform": "linux-x64-cuda12",
+        "url": "https://github.com/raven38/pixal3d.cpp/releases/download/v0.10.1-desktop-alpha/trellis-cuda12-linux-x64.tar.gz",
+        "sha256": "7d7a32fd56ff64c949232602f87ac2d5b0edc84b7bf8b5ce04f2ddf4c6723ac9",
+        "sizeBytes": 673816051,
+        "archive": "tar.gz",
+        "executable": "trellis-cli",
+        "destination": ".local/tools/proof-to-model/engine",
+        "license": "pixal3d-cpp-mit",
+        "licenseAccepted": false
+      },
+      {
+        "platform": "windows-x64-cuda12",
+        "url": "https://github.com/raven38/pixal3d.cpp/releases/download/v0.10.1-desktop-alpha/trellis-cuda12-windows-x64.zip",
+        "sha256": "c4b6a1e80858f964d5692ce23c697d2127615b281471e9eac6f51274386c81d4",
+        "sizeBytes": 640046179,
+        "archive": "zip",
+        "executable": "trellis-cli.exe",
+        "destination": ".local/tools/proof-to-model/engine",
+        "license": "pixal3d-cpp-mit",
+        "licenseAccepted": false
+      }
+    ],
+    "minimumDriver": "575",
+    "minimumCuda": "12.9"
+  },
+  "blender": {
+    "path": "blender",
+    "version": "4.5"
+  },
+  "models": [
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/dinov3.gguf",
+      "sha256": "0dd4ffd4b46a248f5b7d49c35275d68461fbf73f57ddb4c1fa8afb4f7bb45a0d",
+      "license": "dinov3",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_naf.gguf",
+      "sha256": "c4f6cd80e94c8d120360ba50a3633322e6ecce0163966e3b7650b24f99c18569",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_shape_flow_1024_mv.gguf",
+      "sha256": "50cd892247d73d4750b720d5612cef03cc0c02ec806b9e37d0d54d7ec579a94b",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_shape_flow_512_mv.gguf",
+      "sha256": "79a8ff77d0da194a8d6fc348914549aa0442d07a32de7a10f065f35d50116152",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_ss_flow_mv.gguf",
+      "sha256": "5211bb54a3f9ec77ab9451cb37031543f516bbb3cf592026210b69a2468adf4c",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_tex_flow_1024_mv.gguf",
+      "sha256": "e14a590dc6c77211bd591582159252ec473165b9401c4813df6e4f1a6bf69456",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/shape_dec.gguf",
+      "sha256": "0de7c7a675022dd8696d526a9279e5a50b2a35c8a79452f434a72dc53d40f169",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/ss_dec.gguf",
+      "sha256": "2790b5eecb261cc877d9bf175ce2bd6dd48cd65be8c042c5f5bc023dfca01cf7",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/tex_dec.gguf",
+      "sha256": "88b4fced46455e02f316664d5c43584a311921dd9a1cdc1b7b7d981cca9214d4",
+      "license": "pixal3d-models",
+      "licenseAccepted": false
+    },
+    {
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/birefnet.gguf",
+      "sha256": "10c5dd4dcac904cf81c9a16180eb66f167dd52ab55867f54a44567b0b2babbc1",
+      "license": "birefnet",
+      "licenseAccepted": false
+    }
+  ],
+  "files": [
+    {
+      "id": "DINOV3_LICENSE-md",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/DINOV3_LICENSE.md",
+      "sha256": "25d122eb8f5b880fd23c736fb6ea8018ee45c12237e00b8a86d14c653904999e",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/DINOV3_LICENSE.md",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 7503,
+      "kind": "metadata"
+    },
+    {
+      "id": "LICENSE-md",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/LICENSE.md",
+      "sha256": "49d99b0e8581da082491f4766d6507016d10795d35c78ed9ca547d37a11630bb",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/LICENSE.md",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 2129,
+      "kind": "metadata"
+    },
+    {
+      "id": "MIT_LICENSE-md",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/MIT_LICENSE.md",
+      "sha256": "8a37ac9d3587a7cec9bd64fe9043482de7ad53a461532faa3a9f4840cf3f7e59",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/MIT_LICENSE.md",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1566,
+      "kind": "metadata"
+    },
+    {
+      "id": "README-md",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/README.md",
+      "sha256": "e85fe5d230540526e91082fc057433708d7378ca1846e68da54b1ab283fe5181",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/README.md",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 3607,
+      "kind": "metadata"
+    },
+    {
+      "id": "dinov3-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/dinov3.gguf",
+      "sha256": "0dd4ffd4b46a248f5b7d49c35275d68461fbf73f57ddb4c1fa8afb4f7bb45a0d",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/dinov3.gguf",
+      "license": "dinov3",
+      "licenseAccepted": false,
+      "sizeBytes": 323657920,
+      "kind": "model"
+    },
+    {
+      "id": "pixal3d-models-json",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d-models.json",
+      "sha256": "5648ee78259808ff2b664574a666cd880c2c2b584ab8cd225bf80480e17d669f",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d-models.json",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 2580,
+      "kind": "metadata"
+    },
+    {
+      "id": "pixal3d_naf-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d_naf.gguf",
+      "sha256": "c4f6cd80e94c8d120360ba50a3633322e6ecce0163966e3b7650b24f99c18569",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_naf.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1334656,
+      "kind": "model"
+    },
+    {
+      "id": "pixal3d_shape_flow_1024_mv-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d_shape_flow_1024_mv.gguf",
+      "sha256": "50cd892247d73d4750b720d5612cef03cc0c02ec806b9e37d0d54d7ec579a94b",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_shape_flow_1024_mv.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1476761760,
+      "kind": "model"
+    },
+    {
+      "id": "pixal3d_shape_flow_512_mv-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d_shape_flow_512_mv.gguf",
+      "sha256": "79a8ff77d0da194a8d6fc348914549aa0442d07a32de7a10f065f35d50116152",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_shape_flow_512_mv.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1476761760,
+      "kind": "model"
+    },
+    {
+      "id": "pixal3d_ss_flow_mv-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d_ss_flow_mv.gguf",
+      "sha256": "5211bb54a3f9ec77ab9451cb37031543f516bbb3cf592026210b69a2468adf4c",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_ss_flow_mv.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1426559744,
+      "kind": "model"
+    },
+    {
+      "id": "pixal3d_tex_flow_1024_mv-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/pixal3d_tex_flow_1024_mv.gguf",
+      "sha256": "e14a590dc6c77211bd591582159252ec473165b9401c4813df6e4f1a6bf69456",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/pixal3d_tex_flow_1024_mv.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 1476813984,
+      "kind": "model"
+    },
+    {
+      "id": "shape_dec-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/shape_dec.gguf",
+      "sha256": "0de7c7a675022dd8696d526a9279e5a50b2a35c8a79452f434a72dc53d40f169",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/shape_dec.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 881361568,
+      "kind": "model"
+    },
+    {
+      "id": "ss_dec-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/ss_dec.gguf",
+      "sha256": "2790b5eecb261cc877d9bf175ce2bd6dd48cd65be8c042c5f5bc023dfca01cf7",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/ss_dec.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 147379392,
+      "kind": "model"
+    },
+    {
+      "id": "tex_dec-gguf",
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/resolve/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/tex_dec.gguf",
+      "sha256": "88b4fced46455e02f316664d5c43584a311921dd9a1cdc1b7b7d981cca9214d4",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/tex_dec.gguf",
+      "license": "pixal3d-models",
+      "licenseAccepted": false,
+      "sizeBytes": 881344576,
+      "kind": "model"
+    },
+    {
+      "id": "birefnet",
+      "url": "https://huggingface.co/ilintar/trellis2-gguf/resolve/a57397bd3d351599d9729fc144b3f87c3f87d65b/q8/birefnet.gguf",
+      "sha256": "10c5dd4dcac904cf81c9a16180eb66f167dd52ab55867f54a44567b0b2babbc1",
+      "path": ".local/tools/proof-to-model/models/pixal3d-mv/birefnet.gguf",
+      "license": "birefnet",
+      "licenseAccepted": false,
+      "sizeBytes": 882749024,
+      "kind": "model"
+    }
+  ],
+  "modelDir": ".local/tools/proof-to-model/models/pixal3d-mv",
+  "licenses": {
+    "pixal3d-cpp-mit": {
+      "url": "https://github.com/raven38/pixal3d.cpp/blob/1f432fd3f0689c504fa1e9b15b038c33584174d1/LICENSE",
+      "accepted": false
+    },
+    "pixal3d-models": {
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/blob/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/LICENSE.md",
+      "accepted": false
+    },
+    "dinov3": {
+      "url": "https://huggingface.co/raven38/pixal3d-q8_0-v1/blob/1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91/DINOV3_LICENSE.md",
+      "accepted": false
+    },
+    "birefnet": {
+      "url": "https://github.com/ZhengPeng7/BiRefNet/blob/main/LICENSE",
+      "accepted": false
+    }
+  },
+  "preprocessing": {
+    "arguments": [
+      "--models",
+      "{modelDir}",
+      "--bg-removal",
+      "birefnet",
+      "--bg-only",
+      "--dump-bg",
+      "{input}",
+      "{output}"
+    ],
+    "outputPattern": "{outputStem}_cutout.png"
+  },
+  "reconstruction": {
+    "arguments": [
+      "--views",
+      "{input}",
+      "--models",
+      "{modelDir}",
+      "--pixal3d-weights",
+      "mv",
+      "--num-views",
+      "6",
+      "--res",
+      "1024",
+      "--seed",
+      "42",
+      "--gss",
+      "10",
+      "--require-gpu",
+      "{output}"
+    ]
+  },
+  "limits": {
+    "timeoutSeconds": 1800,
+    "minimumFreeBytes": 53687091200,
+    "maxAttempts": 1,
+    "maxLogBytes": 16777216
+  },
+  "modelFamily": "mv",
+  "viewCount": 6,
+  "modelSet": {
+    "id": "pixal3d-q8_0",
+    "version": "v1",
+    "revision": "1c4f4bdddb5fef1dc5efa512d4b88e899b10bd91",
+    "manifestSha256": "5648ee78259808ff2b664574a666cd880c2c2b584ab8cd225bf80480e17d669f",
+    "modelBytes": 8091975360,
+    "validatedUpstreamViews": 4,
+    "requestedViews": 6
+  }
+}

@@ -1,6 +1,7 @@
 ---
 name: validate-generated-media
 description: Validate generated image and audio batches for manifest completeness, exact coverage, geometry, technical budgets, artifacts, rights, consent, and reviewed promotion. Use before runtime handoff.
+engines: [AGNOSTIC]
 ---
 
 # Validate Generated Media

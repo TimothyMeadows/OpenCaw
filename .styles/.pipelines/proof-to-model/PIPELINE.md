@@ -1,0 +1,63 @@
+# PROOF_TO_MODEL Art Pipeline
+
+## Intent
+
+Produce editable, measured 3D game assets through original-source research/classification, a human-approved six-angle proof set, pinned Pixal3D multi-view reconstruction and Blender 4.5 LTS finishing. PROOF_TO_MODEL is the default; CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. Never switch pipelines or engines silently. CSS3 is retired; ordinary CSS/SVG interface work remains supported outside this registry.
+
+## Inputs
+
+- Resolve STYLE.md and record its hash and any task-local prompt override. Read architecture and applicable rights, budgets, scale, interfaces, subject requirements, and runtime format constraints.
+- Inspect configured external libraries first; copy selected assets with the existing library command before opening them. Preserve copy receipts, rights, original hashes, and source ancestry.
+- Supply authorized original source images and preserve immutable bytes, source IDs/hashes, rights and available prompt/reference/provider metadata. Original sources remain distinct from generated proof candidates and reconstruction renders.
+- Independently authorize any required CLOUD/LOCAL proof generation and revisions. Read MEDIA.md for generated media; selecting this pipeline never generates images, creates a media contract or authorizes spending.
+- Supply an explicit recipe: geometry/texture budgets, cage extrusion and ray distance in metres, UV margin, LOD ratios, semantic parts, collision limits, and rigging/animation applicability. Missing applicable settings block execution.
+- Use the checked-in toolchain pins and manifest schema beside this contract. Setup defaults to dry-run; explicit execution verifies platform, space, hashes, model revisions, and license evidence. Never install drivers, accept licenses, or download during ordinary production.
+
+## Production Rules
+
+1. Use `commands/proof-to-model.sh` and its native .NET 10 runner: `init`, `doctor`, `setup`, `classify`, `prepare-proofs`, `reuse`, `preprocess`, `reconstruct`, `finish`, `review`, `record`, `validate`, `status`, `promote`. Consult command help for arguments. No Docker daemon, AssetForge, AssetFurnace, Bubo runtime checkout, or sibling project is required.
+2. Keep state/manifests/receipts below `.opencaw/.cache/tasks/<task>/`, immutable originals and versioned attempts below `.art-staging/proof-to-model/<asset>/<version>/`, and audited dependencies below ignored `.local/tools/proof-to-model/`. Resolve all paths within the project; reject symbolic-link escapes and runtime staging overlap.
+3. First inspect and research only the registered original source images. Separate living anatomy from equipment and nonliving assemblies; record entities, parts, materials, pose, occlusion, asymmetry and source support. Distinguish observed, research-inferred, user-specified and unknown claims. Research supports general plausibility rather than unseen source-specific detail. Generated/revised proofs and model renders never become classification image evidence, including by copy or rename. The assistant performs inspection/research; `classify` registers and validates the actual report.
+4. Plan exactly six ordered views: front, subject-right, back, subject-left, top and bottom. Freeze one identity, pose, scale, assembly, materials and explicit camera/frame convention. A canonical original may supply one slot and require five generations; an oblique/cropped source stays an anchor and may require six canonical generations. With multiple sources, generate only missing/rejected coverage. Resolve consequential unknowns/conflicts before dependent generation and honor explicit set/per-view/revision budgets under MEDIA.md. `prepare-proofs` imports actual image/receipt artifacts; it is not an image generator.
+5. Show originals and all six current proofs together, including inferred hidden surfaces, for human review. Target revisions to selected angles and retain rejected candidates and unaffected image bytes. Record the `proof-set` approval kind using the current `proofSet` status fingerprint. Approval binds the complete current set, classification, camera and style; a diagnostic `proof` receipt cannot approve the set. Hidden anatomy and unseen surfaces remain inferred completions after acceptance.
+6. Inspect actual alpha for every approved image. Preserve suitable mattes; otherwise explicitly run pinned BiRefNet through Pixal3D. Retain cutouts, masks and ancestry. Pad on a common square canvas without stretching or independent tight cropping, retaining transforms and adjusted FOV. Inspect and approve actual preprocessing; never substitute threshold matting or a placeholder backend.
+7. Call pinned Pixal3D MV inference directly with the distinct verified MV model set, `--views`, camera JSON, `--num-views 6` and all six exact prepared frames. Validate their actual identities/count rather than relying on the native requested count, which can clamp to available images. Preserve submitted input/camera hashes, raw output, executable/model identities and receipts. Bound execution, stream logs, pass argument arrays, cancel process trees and serialize reconstruction per GPU. Native execution is not an OS sandbox.
+8. Finishing uses Blender 4.5 LTS and only fixed audited, hash-bound `blender/finish.py` and `blender/review.py` batch scripts on declared repository-local working copies. Preserve every source and raw reconstruction. Apply any declared raw-engine geometry-frame correction exactly once and record it. This batch-authoring exception does not change standalone BLENDER connected-tool policy or authorize arbitrary scripts.
+9. Default finishing performs measured QuadriFlow retopology and requires actual successful operator completion before baking. Explicit `finish --finish-settings` may select bounded voxel preparation on a separate low working copy, preserving the original high source and intermediate. Rigid/articulated assets may instead explicitly select schemaVersion2 `rigid-parts` with independently reviewed authored HIGH/LOW pairs, bound part/repair ancestry, pivots, final error/triangle/byte limits and a supported native memory policy; follow [RIGID_PARTS.md](RIGID_PARTS.md). Never select that route on solver failure or relabel a reduced proxy HIGH. Preserve valid UVs or unwrap with declared margin; perform applicable real high-to-low/grouped-atlas baking using recorded cage/ray and tangent conventions, with exact unchanged-material preservation explicitly measured. Record source/target correspondence and packed textures. Generate measured LODs and applicable per-part convex collision: exact hull by default, or an explicit conservative `kdop-26` proxy with complete containment, convexity, face and volume checks. Settings are hash-bound separately from conditioning contracts; no automatic fallback, tolerance change or recipe-budget expansion. Applicable stages cannot succeed through placeholders or undocumented skips.
+10. Save editable blend sources and GLB packages; independently re-import exports and inspect transforms, textures, materials, hierarchy, external dependencies and budgets. Review immutable originals, approved proofs, prepared inputs and six matching perspective GLB views using supplied camera matrices/FOV, explicit polar roll and one declared shared mesh fit. Label nominal alignment honestly; neither fitting nor schema checks establish likeness, anatomy or production readiness.
+11. Persist stage inputs/outputs, hashes, source/classification/proof/camera ancestry, tool/model/script/recipe identities, reviews and failure history. Changed inputs invalidate dependent results and approvals. Retain failed/interrupted attempts and immutable candidates; no single-view donor or four-image subset satisfies six-view reuse. An exhausted finish budget may accept exactly one additional attempt through an explicit human `--finish-budget` receipt bound to the current manifest and consumed count. Preserve its immutable snapshot; never reset history or rewrite upstream toolchain/approval evidence to bypass a limit.
+12. Require independent review and separate human runtime acceptance bound to current artifact hashes before promotion to `assets/models/`. Automated checks cannot fabricate human approvals. Rigging/animation require separate subject-specific skill work and current evidence when applicable.
+
+## Cameras and compatibility
+
+The canonical rig uses row-major Blender/NeRF camera-to-world matrices, world Z up, camera local -Z forward and +Y image up. Store exact cardinal/polar matrices, positive mesh scale, distance, horizontal FOV and calibration evidence. Prescribed views derived from an arbitrary illustration use `nominal-prescribed`, not invented measured calibration. Explicit top/bottom roll prevents polar look-at singularities.
+
+Front faces -Y, subject-right is -X and subject-left is +X. Use those same labels in generation prompts, asymmetric attachment review, camera matrices and ordered inference frames. Per-view horizontal FOV overrides take precedence over the shared camera value.
+
+New manifests use v2 six-view production. Historical v1/single-view work is available only through explicit `--mode single-view-diagnostic` with the separate diagnostic toolchain; it never falls back from, substitutes for or completes six-view production. Preserve historical evidence and use a fresh asset version for migration.
+
+Upstream validates MV at four views; six-view input is accepted with a warning and requires separate bounded native acceptance. No new engine version or anatomy model is required. The separately pinned Q8 MV set adds four flow files of approximately 5.45 GiB; shared model bytes may be reused only after exact hash verification. Installation, model-license evidence and generation spending remain separate from pipeline selection.
+
+## Output Contract
+
+- Versioned manifests with asset identity, rights, immutable original source set, source-only classification/research, selected six-view revisions, camera/inference ancestry, style/recipe/tool/model fingerprints, stage receipts, budgets, applicability, reviews and promotion history.
+- Immutable originals/proof candidates, six masks/prepared frames and camera data, raw reconstruction and per-attempt logs; editable blend, GLB, textures, LOD/collider data and independent re-import findings.
+- Original-source and approved/prepared-proof comparison surfaces, six matching-camera renders, declared frame/nominal-fit measurements, severity-ranked defects, independent reviewer identity/evidence and separate human acceptance or rejection reasons.
+- No unreviewed runtime promotion. Missing dependencies or approvals remain blocked/pending with an actionable reason; never report simulated-process tests as live reconstruction evidence.
+
+## Acceptance Checks
+
+- Verify style selection, rights, external-library ancestry, source-only classification, complete six-proof approval, cameras and current hashes before expensive stages. Check horse/rider occlusion, metallic skull-helmet interpretation, intentional fantasy anatomy, asymmetric attachments and conflicting originals through explicit evidence and review.
+- Validate every applicable stage, GLB format and independent re-import, budgets, materials/UV/textures, transforms, collision and LOD lineage, and applicable rig/animation evidence.
+- Verify cancellation, interrupted recovery, concurrent GPU exclusion, stale receipts, missing dependencies, corrupt outputs, and path confinement.
+- Require actual controlled Blender six-camera fixture execution for Blender acceptance and a separately authorized bounded real six-frame Pixal3D run for live MV acceptance. Simulated processes and real Blender rendering do not prove live reconstruction quality. Unavailable tools/models/licenses block those live claims.
+- Reject retired CSS3/CSS/vector/css-vector aliases with migration guidance. Never silently fall back to CLOUD, LOCAL, CODE, BLENDER, or another reconstruction backend.
+
+## Role Fit
+
+- `computer-science/generative-media-pipeline-engineer`: native orchestration, pins, audit, provenance, recovery and promotion gates.
+- `arts/generative-art-designer`: proof art direction, authorized inputs and human selection evidence.
+- `arts/blender-production-artist`: finishing, material fidelity, measured exports and subject-specific rigging/animation.
+- `arts/art-director` and `computer-science/qa-engineer`: independent visual/technical review and runtime acceptance evidence.
+
+Use `build-proof-to-model-assets`. Preserve imported Bubo attribution and the capability ledger in the native runtime; Bubo supplies adapted execution primitives, not a runtime dependency.

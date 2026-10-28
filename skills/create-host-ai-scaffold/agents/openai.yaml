@@ -1,4 +1,4 @@
 interface:
-  display_name: "Create Host Ai Scaffold"
-  short_description: "Help with Create Host Ai Scaffold tasks"
-  default_prompt: "Use $create-host-ai-scaffold to complete this OpenCaw workflow with explicit evidence and safety checks."
+  display_name: "Create Host AI Scaffold"
+  short_description: "Initialize fixed .opencaw bootstrap and project cache"
+  default_prompt: "Use $create-host-ai-scaffold to initialize durable .opencaw/.cache context and the host AGENTS bootstrap for the fixed .opencaw installation, preserving project content."

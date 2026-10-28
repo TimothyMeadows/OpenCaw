@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "engine": "UNITY",
+  "fixture": "opencaw-native-unity",
+  "minimumChecks": 5,
+  "files": [
+    "Assets/Editor/OpenCawFixture.cs",
+    "Assets/OpenCawFixtureProbe.cs",
+    "Assets/OpenCawFixtureActor.cs",
+    "Packages/manifest.json"
+  ]
+}

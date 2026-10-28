@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Controls"
+  short_description: "Implement Three.js picking and input ownership"
+  default_prompt: "Use $threejs-build-controls to implement camera and player input with correct picking, cancellation and device ownership."

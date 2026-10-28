@@ -629,8 +629,8 @@ function create(root, values) {
   requireString(options['intended-use'], '--intended-use');
   const linked = relativeArtifact(root, options.manifest, 'Linked code-model manifest');
   const linkedValidation = validateManifest(root, linked.absolute, 'base');
-  const output = relativeInside(root, options.output ?? `.ai/tasks/${characterId}/code-character.json`, 'Character profile output');
-  if (!output.relative.startsWith('.ai/tasks/')) fail('Character profile output must be below .ai/tasks/.');
+  const output = relativeInside(root, options.output ?? `.opencaw/.cache/tasks/${characterId}/code-character.json`, 'Character profile output');
+  if (!output.relative.startsWith('.opencaw/.cache/tasks/')) fail('Character profile output must be below .opencaw/.cache/tasks/.');
   if (fs.existsSync(output.absolute)) fail(`Character profile already exists: ${output.relative}`);
   fs.mkdirSync(path.dirname(output.absolute), { recursive: true });
   const modelParts = linkedValidation.manifest.runtime.parts;
@@ -901,9 +901,10 @@ function assertPassReady(rootValue, profilePath, manifestRelative, passId) {
 }
 
 function main() {
-  const [operation, rootArg, ...values] = process.argv.slice(2);
+  let [operation, rootArg, ...values] = process.argv.slice(2);
   if (!operation || !rootArg) fail('Internal invocation requires an operation and project root.');
   const root = rootPath(rootArg);
+  if (['create', 'calibrate', 'record'].includes(operation)) values = require('./engine-contract.cjs').codeProduction(root, 'character', operation, values);
   if (operation === 'create') return create(root, values);
   if (operation === 'validate') return validateOperation(root, values);
   if (operation === 'calibrate') return calibrate(root, values);

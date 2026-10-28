@@ -63,6 +63,10 @@ if ! ./commands/validate-skill-safety.sh "$skills_dir"; then
   status=1
 fi
 
+if ! ./commands/validate-engines.sh; then
+  status=1
+fi
+
 if [[ $status -eq 0 ]]; then
   echo "Skills validation passed."
 fi

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Babylon.js Integrate Physics"
+  short_description: "Integrate a selected Babylon physics plugin"
+  default_prompt: "Use $babylonjs-integrate-physics to integrate the explicitly selected plugin with controlled stepping and collision evidence."

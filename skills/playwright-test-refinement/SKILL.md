@@ -1,6 +1,7 @@
 ---
 name: playwright-test-refinement
 description: Refine, rerun, and stabilize Playwright tests using prior failures, traces, screenshots, and source-controlled test code.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

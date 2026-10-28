@@ -1,0 +1,880 @@
+{
+  "schemaVersion": 1,
+  "profile": "skinned",
+  "fps": 24,
+  "requiredClips": [
+    "idle",
+    "run",
+    "jump-start",
+    "airborne",
+    "land",
+    "swim-enter",
+    "swim",
+    "swim-exit",
+    "death"
+  ],
+  "rig": {
+    "mode": "declared",
+    "node": "MotionRig",
+    "rootNode": "MotionRoot",
+    "rootBone": "root",
+    "bones": [
+      {
+        "name": "root",
+        "head": [
+          0,
+          0,
+          0
+        ],
+        "tail": [
+          0,
+          0,
+          0.2
+        ],
+        "deform": false
+      },
+      {
+        "name": "hips",
+        "head": [
+          0,
+          0,
+          0.9
+        ],
+        "tail": [
+          0,
+          0,
+          1.1
+        ],
+        "parent": "root"
+      },
+      {
+        "name": "spine",
+        "head": [
+          0,
+          0,
+          1.1
+        ],
+        "tail": [
+          0,
+          0,
+          1.45
+        ],
+        "parent": "hips"
+      },
+      {
+        "name": "head",
+        "head": [
+          0,
+          0,
+          1.45
+        ],
+        "tail": [
+          0,
+          0,
+          1.85
+        ],
+        "parent": "spine"
+      },
+      {
+        "name": "upperarm.L",
+        "head": [
+          0.2,
+          0,
+          1.42
+        ],
+        "tail": [
+          0.6,
+          0,
+          1.42
+        ],
+        "parent": "spine"
+      },
+      {
+        "name": "forearm.L",
+        "head": [
+          0.6,
+          0,
+          1.42
+        ],
+        "tail": [
+          0.95,
+          0,
+          1.42
+        ],
+        "parent": "upperarm.L"
+      },
+      {
+        "name": "thigh.L",
+        "head": [
+          0.13,
+          0,
+          0.9
+        ],
+        "tail": [
+          0.13,
+          0,
+          0.48
+        ],
+        "parent": "hips"
+      },
+      {
+        "name": "shin.L",
+        "head": [
+          0.13,
+          0,
+          0.48
+        ],
+        "tail": [
+          0.13,
+          0,
+          0.1
+        ],
+        "parent": "thigh.L"
+      },
+      {
+        "name": "foot.L",
+        "head": [
+          0.13,
+          0,
+          0.1
+        ],
+        "tail": [
+          0.13,
+          -0.22,
+          0.1
+        ],
+        "parent": "shin.L"
+      },
+      {
+        "name": "upperarm.R",
+        "head": [
+          -0.2,
+          0,
+          1.42
+        ],
+        "tail": [
+          -0.6,
+          0,
+          1.42
+        ],
+        "parent": "spine"
+      },
+      {
+        "name": "forearm.R",
+        "head": [
+          -0.6,
+          0,
+          1.42
+        ],
+        "tail": [
+          -0.95,
+          0,
+          1.42
+        ],
+        "parent": "upperarm.R"
+      },
+      {
+        "name": "thigh.R",
+        "head": [
+          -0.13,
+          0,
+          0.9
+        ],
+        "tail": [
+          -0.13,
+          0,
+          0.48
+        ],
+        "parent": "hips"
+      },
+      {
+        "name": "shin.R",
+        "head": [
+          -0.13,
+          0,
+          0.48
+        ],
+        "tail": [
+          -0.13,
+          0,
+          0.1
+        ],
+        "parent": "thigh.R"
+      },
+      {
+        "name": "foot.R",
+        "head": [
+          -0.13,
+          0,
+          0.1
+        ],
+        "tail": [
+          -0.13,
+          -0.22,
+          0.1
+        ],
+        "parent": "shin.R"
+      }
+    ],
+    "skinning": {
+      "method": "automatic-heat"
+    }
+  },
+  "parts": [],
+  "anchors": [
+    {
+      "id": "body.center",
+      "node": "Humanoid",
+      "position": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "id": "idle",
+      "role": "idle",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "spine"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ],
+            [
+              12,
+              [
+                0.01999866669333308,
+                0,
+                0,
+                0.9998000066665778
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "run",
+      "role": "run",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "thigh.L"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                -0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ],
+            [
+              12,
+              [
+                0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ],
+            [
+              24,
+              [
+                -0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ]
+          ]
+        },
+        {
+          "target": {
+            "bone": "thigh.R"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ],
+            [
+              12,
+              [
+                -0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ],
+            [
+              24,
+              [
+                0.22310636213174545,
+                0,
+                0,
+                0.9747941070689433
+              ]
+            ]
+          ]
+        },
+        {
+          "target": {
+            "bone": "upperarm.L"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0.14943813247359922,
+                0,
+                0,
+                0.9887710779360422
+              ]
+            ],
+            [
+              12,
+              [
+                -0.14943813247359922,
+                0,
+                0,
+                0.9887710779360422
+              ]
+            ],
+            [
+              24,
+              [
+                0.14943813247359922,
+                0,
+                0,
+                0.9887710779360422
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "jump-start",
+      "role": "jump-start",
+      "loop": false,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "location",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                -0.12,
+                0
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0.1,
+                0
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "airborne",
+      "role": "airborne",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "location",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0.1,
+                0
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                0.15,
+                0
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0.1,
+                0
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "land",
+      "role": "land",
+      "loop": false,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "location",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0.1,
+                0
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                -0.15,
+                0
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "swim-enter",
+      "role": "swim-enter",
+      "loop": false,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ],
+            [
+              12,
+              [
+                0.36627252908604757,
+                0,
+                0,
+                0.9305076219123143
+              ]
+            ],
+            [
+              24,
+              [
+                0.6816387600233341,
+                0,
+                0,
+                0.7316888688738209
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "swim",
+      "role": "swim",
+      "loop": true,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0.6816387600233341,
+                0,
+                0,
+                0.7316888688738209
+              ]
+            ],
+            [
+              12,
+              [
+                0.7032794192004103,
+                0,
+                0,
+                0.7109135380122773
+              ]
+            ],
+            [
+              24,
+              [
+                0.6816387600233341,
+                0,
+                0,
+                0.7316888688738209
+              ]
+            ]
+          ]
+        },
+        {
+          "target": {
+            "bone": "thigh.L"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                -0.09983341664682815,
+                0,
+                0,
+                0.9950041652780258
+              ]
+            ],
+            [
+              12,
+              [
+                0.09983341664682815,
+                0,
+                0,
+                0.9950041652780258
+              ]
+            ],
+            [
+              24,
+              [
+                -0.09983341664682815,
+                0,
+                0,
+                0.9950041652780258
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "swim-exit",
+      "role": "swim-exit",
+      "loop": false,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0.6816387600233341,
+                0,
+                0,
+                0.7316888688738209
+              ]
+            ],
+            [
+              12,
+              [
+                0.36627252908604757,
+                0,
+                0,
+                0.9305076219123143
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "death",
+      "role": "death",
+      "loop": false,
+      "rootMotion": "in-place",
+      "startFrame": 0,
+      "endFrame": 24,
+      "channels": [
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "rotation_quaternion",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0,
+                1
+              ]
+            ],
+            [
+              12,
+              [
+                0.29552020666133955,
+                0,
+                0,
+                0.955336489125606
+              ]
+            ],
+            [
+              24,
+              [
+                0.644217687237691,
+                0,
+                0,
+                0.7648421872844885
+              ]
+            ]
+          ]
+        },
+        {
+          "target": {
+            "bone": "hips"
+          },
+          "property": "location",
+          "keyframes": [
+            [
+              0,
+              [
+                0,
+                0,
+                0
+              ]
+            ],
+            [
+              12,
+              [
+                0,
+                -0.2,
+                0
+              ]
+            ],
+            [
+              24,
+              [
+                0,
+                -0.65,
+                0
+              ]
+            ]
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "states": [
+    {
+      "id": "idle",
+      "clip": "idle",
+      "terminal": false
+    },
+    {
+      "id": "run",
+      "clip": "run",
+      "terminal": false
+    },
+    {
+      "id": "jump-start",
+      "clip": "jump-start",
+      "terminal": false
+    },
+    {
+      "id": "airborne",
+      "clip": "airborne",
+      "terminal": false
+    },
+    {
+      "id": "land",
+      "clip": "land",
+      "terminal": false
+    },
+    {
+      "id": "swim-enter",
+      "clip": "swim-enter",
+      "terminal": false
+    },
+    {
+      "id": "swim",
+      "clip": "swim",
+      "terminal": false
+    },
+    {
+      "id": "swim-exit",
+      "clip": "swim-exit",
+      "terminal": false
+    },
+    {
+      "id": "death",
+      "clip": "death",
+      "terminal": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "idle",
+      "to": "run",
+      "trigger": "run",
+      "duration": 0.25
+    },
+    {
+      "from": "run",
+      "to": "jump-start",
+      "trigger": "jump",
+      "duration": 0.25
+    },
+    {
+      "from": "swim",
+      "to": "death",
+      "trigger": "death",
+      "duration": 0.25
+    }
+  ],
+  "parameters": [],
+  "effects": [],
+  "budgets": {
+    "maxTriangles": 10000,
+    "maxBones": 64,
+    "maxInfluences": 4,
+    "maxMaterials": 6,
+    "maxTextureBytes": 1048576,
+    "maxRuntimeBytes": 8388608,
+    "maxClips": 24,
+    "maxClipSeconds": 5,
+    "maxSamples": 10000,
+    "maxPreviewFrames": 600,
+    "maxAttempts": 20,
+    "timeoutSeconds": 120,
+    "maxLogBytes": 16777216
+  },
+  "review": {
+    "renderer": "BLENDER_WORKBENCH",
+    "fps": 12,
+    "resolution": [
+      256,
+      256
+    ],
+    "cameras": [
+      "front",
+      "three-quarter"
+    ]
+  },
+  "provenance": {
+    "provider": "native-blender",
+    "purpose": "Editable authoring example; fit declared geometry, parts and skeleton to the actual reviewed model",
+    "rights": "Supply actual model and imported clip rights separately"
+  }
+}

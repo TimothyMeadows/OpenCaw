@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Model Animations"
+  short_description: "Produce reviewed rigs, motion and engine handoffs"
+  default_prompt: "Use $build-model-animations to prepare this model, author or retarget its motions, and verify the selected-engine handoff."

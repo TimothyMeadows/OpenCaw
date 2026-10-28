@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Proof to Model Assets"
+  short_description: "Classify sources and turn six proofs into reviewed 3D assets"
+  default_prompt: "Use $build-proof-to-model-assets to classify original sources, prepare six approved views and run native multi-view production with hashed lineage and review gates."

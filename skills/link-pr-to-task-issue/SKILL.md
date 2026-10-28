@@ -1,6 +1,7 @@
 ---
 name: link-pr-to-task-issue
 description: Ensure pull requests are explicitly associated with the task issue, reserving closing keywords for the PR that should actually complete it.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

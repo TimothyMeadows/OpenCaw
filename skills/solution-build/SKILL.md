@@ -1,6 +1,7 @@
 ---
 name: solution-build
 description: Build the host .NET solution or project and summarize the first meaningful compiler error if it fails.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

@@ -372,3 +372,7 @@ You're successful when:
 
 **Instructions Reference**: Your detailed DevOps methodology is in your core training - refer to comprehensive infrastructure patterns, deployment strategies, and monitoring frameworks for complete guidance.
 
+
+## Unity specialist handoff
+
+Support selected Unity toolchain identity, web delivery headers, native build evidence and optional service deployment planning. Bind environment/credentials, reconcile asynchronous operations and preserve rollback/budgets; account linking, installation and deployment remain separately authorized.

@@ -55,11 +55,11 @@ ledger="skills/EXTERNAL_SOURCES.md"
 require_file "$ledger"
 require_text "$ledger" '## Review boundary'
 require_text "$ledger" 'Do not retain a source repository, commit, author identity, personal material, or audit payload.'
-for disposition in create enhance defer reject; do
+for disposition in create enhance consolidate defer reject; do
   grep -Eq "\| CA-[0-9]{3} \| ${disposition} \|" "$ledger" || fail "ledger has no $disposition disposition"
 done
 require_text "$ledger" '| CA-001 | create | Rigged runtime actor preparation | `prepare-rigged-runtime-actors` and `arts/technical-3d-artist` |'
-require_text "$ledger" '| CA-002 | create | Scroll-authored web experiences | `build-scroll-authored-web-experiences` |'
+require_text "$ledger" '| CA-002 | retired | Scroll-authored web experiences | Removed from the game-production baseline; prior adaptation retained here for traceability |'
 require_text "$ledger" '| CA-008 | enhance | Production release history | `build-game-production-tools` reference |'
 require_text "$ledger" '| CA-009 | enhance | Acceptance-to-evidence verification | `verify-and-explain` reference |'
 require_text "$ledger" '| CA-010 | defer | Platform-specific native performance profiling |'
@@ -68,7 +68,7 @@ record_count="$(grep -Ec '^\| CA-[0-9]{3} \|' "$ledger")"
 [[ "$record_count" -ge 18 ]] || fail "ledger must retain all 18 reviewed disposition records"
 duplicate_ids="$(awk -F '|' '/^\| CA-[0-9][0-9][0-9] \|/ { id=$2; gsub(/[[:space:]]/, "", id); print id }' "$ledger" | sort | uniq -d)"
 [[ -z "$duplicate_ids" ]] || fail "ledger contains duplicate disposition IDs: $duplicate_ids"
-if grep -E '^\| CA-[0-9]{3} \|' "$ledger" | grep -Ev '^\| CA-[0-9]{3} \| (create|enhance|defer|reject) \|'; then
+if grep -E '^\| CA-[0-9]{3} \|' "$ledger" | grep -Ev '^\| CA-[0-9]{3} \| (create|enhance|consolidate|defer|reject|retired) \|'; then
   fail "ledger contains an unsupported disposition"
 fi
 grep -Fq 'No external code, script, executable, binary, model, image, video, audio, demo, generated output, runtime bundle, dependency, endpoint, credential, identity, personal path, or project-specific artifact is imported.' "$ledger" || fail "ledger does not state the no-payload boundary"
@@ -87,7 +87,7 @@ require_text "$evidence_ref" 'automated, runtime, visual, performance, or extern
 require_text "$evidence_ref" 'An overall pass requires every required row to be verified.'
 
 echo "[3/7] checking selected capability surfaces"
-for skill in prepare-rigged-runtime-actors build-scroll-authored-web-experiences; do
+for skill in prepare-rigged-runtime-actors; do
   require_file "skills/$skill/SKILL.md"
   require_file "skills/$skill/agents/openai.yaml"
   require_text "skills/$skill/agents/openai.yaml" "\$$skill"
@@ -220,14 +220,13 @@ expect_validation_failure shipped-without-root bash "$validator" "$valid_charact
 echo "[5/7] checking the no-copy and no-payload boundary"
 selected_surfaces=(
   skills/prepare-rigged-runtime-actors
-  skills/build-scroll-authored-web-experiences
   skills/build-game-production-tools
   skills/verify-and-explain
   .roles/arts/technical-3d-artist
   commands/validate-rigged-actor-manifest.sh
 )
 
-if find "${selected_surfaces[@]:0:5}" -type f \
+if find "${selected_surfaces[@]:0:4}" -type f \
   ! -name '*.md' ! -name '*.yaml' -print -quit | grep -q .; then
   fail "selected skill and role surfaces contain an executable, binary, or unsupported payload"
 fi
@@ -252,14 +251,13 @@ echo "[6/7] validating changed skill safety and links"
 for skill in \
   skills/build-game-production-tools \
   skills/verify-and-explain \
-  skills/prepare-rigged-runtime-actors \
-  skills/build-scroll-authored-web-experiences; do
+  skills/prepare-rigged-runtime-actors; do
   bash commands/validate-skill-safety.sh "$skill"
 done
 
 echo "[7/7] checking stable capability ownership"
 [[ "$(count_skill_name prepare-rigged-runtime-actors)" -eq 1 ]] || fail "rigged runtime actor skill ownership is missing or duplicated"
-[[ "$(count_skill_name build-scroll-authored-web-experiences)" -eq 1 ]] || fail "scroll-authored web skill ownership is missing or duplicated"
+[[ "$(count_skill_name build-scroll-authored-web-experiences)" -eq 0 ]] || fail "retired scroll-authored web skill is still active"
 [[ "$(find .roles -mindepth 3 -maxdepth 3 -name ROLE.md -path '*/technical-3d-artist/ROLE.md' | wc -l | tr -d ' ')" -eq 1 ]] || fail "technical 3D artist role ownership is missing or duplicated"
 
 echo "Selected capability import tests passed."

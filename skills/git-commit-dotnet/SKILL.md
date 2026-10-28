@@ -1,6 +1,7 @@
 ---
 name: git-commit-dotnet
 description: Generate a concise conventional commit message from the current diff and commit host repository changes.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

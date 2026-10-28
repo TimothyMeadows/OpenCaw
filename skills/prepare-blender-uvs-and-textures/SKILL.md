@@ -1,6 +1,7 @@
 ---
 name: prepare-blender-uvs-and-textures
 description: Prepare Blender 4.5 UV layouts, bake inputs, texture maps, atlases, UDIMs, and packed delivery. Use for seam planning, texel-density control, UV channels, bake cages, map verification, texture packing, and runtime texture handoff.
+engines: [AGNOSTIC]
 ---
 
 # Prepare Blender UVs and Textures
@@ -19,6 +20,8 @@ Use when a Blender asset needs seams, measured UVs, atlases or UDIMs, bake cages
 6. Store source and staged textures separately and verify every image dependency in the scene report.
 
 Read [uv-bake-texture-contract.md](references/uv-bake-texture-contract.md) for required measurements and map rules.
+
+Use [surface-detail-and-atlases.md](references/surface-detail-and-atlases.md) for measured density, hair/foliage cards, atlas region ownership, mip checks and renderer-specific packed-map delivery.
 
 ## Guardrails
 

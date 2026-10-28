@@ -7,7 +7,7 @@ opencaw_resolve_paths
 opencaw_ensure_system_memory
 opencaw_ensure_project_files
 
-ai_dir="$OPENCAW_PROJECT_AI_DIR"
+ai_dir="$OPENCAW_PROJECT_CACHE_DIR"
 archive_dir="$ai_dir/archive/context-snapshots"
 summary_file="$ai_dir/CONTEXT_SUMMARY.md"
 todo_file="$ai_dir/tasks/TODO.md"

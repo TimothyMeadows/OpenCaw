@@ -1,0 +1,410 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-model-action/v1"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$"
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "enum": [
+        "skinned",
+        "articulated",
+        "rigid"
+      ]
+    },
+    "staging": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "motion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recipe": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceReview": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blender": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blenderSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "engineReceipt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "engine": {
+      "type": "object"
+    },
+    "originals": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "sourceInputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "baselineInputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "stages": {
+      "type": "object",
+      "properties": {
+        "inspect": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "running",
+                "failed",
+                "complete"
+              ]
+            },
+            "attempt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "inputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "externalInputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "artifacts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "status",
+            "attempt",
+            "inputs",
+            "externalInputs",
+            "outputs",
+            "artifacts"
+          ],
+          "additionalProperties": false
+        },
+        "compose": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "running",
+                "failed",
+                "complete"
+              ]
+            },
+            "attempt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "inputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "externalInputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "artifacts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "status",
+            "attempt",
+            "inputs",
+            "externalInputs",
+            "outputs",
+            "artifacts"
+          ],
+          "additionalProperties": false
+        },
+        "export": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "running",
+                "failed",
+                "complete"
+              ]
+            },
+            "attempt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "inputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "externalInputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "artifacts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "status",
+            "attempt",
+            "inputs",
+            "externalInputs",
+            "outputs",
+            "artifacts"
+          ],
+          "additionalProperties": false
+        },
+        "review": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "running",
+                "failed",
+                "complete"
+              ]
+            },
+            "attempt": {
+              "type": "string",
+              "minLength": 1
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "inputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "externalInputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "outputs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "artifacts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "status",
+            "attempt",
+            "inputs",
+            "externalInputs",
+            "outputs",
+            "artifacts"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "action",
+              "independent",
+              "human"
+            ]
+          },
+          "reviewer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "kind",
+          "reviewer",
+          "evidence",
+          "evidenceHash",
+          "fingerprint",
+          "timestamp"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "task",
+    "asset",
+    "version",
+    "actor",
+    "profile",
+    "staging",
+    "model",
+    "motion",
+    "recipe",
+    "sourceReview",
+    "blender",
+    "blenderSha256",
+    "engineReceipt",
+    "engine",
+    "originals",
+    "sourceInputs",
+    "baselineInputs",
+    "stages",
+    "approvals",
+    "history"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.local/schemas/model-to-action/manifest.schema.json",
+  "title": "Persistent native model-to-action state"
+}

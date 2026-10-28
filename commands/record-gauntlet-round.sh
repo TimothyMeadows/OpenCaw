@@ -280,7 +280,7 @@ fi
 
 next_round=$((max_round + 1))
 printf -v round_label '%03d' "$next_round"
-round_relative=".ai/gauntlets/$gauntlet_name/rounds/$item_id/round-$round_label.md"
+round_relative=".opencaw/.cache/gauntlets/$gauntlet_name/rounds/$item_id/round-$round_label.md"
 round_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$round_relative"
 [[ ! -e "$round_target" ]] || { echo "Round evidence already exists: $round_relative" >&2; exit 1; }
 

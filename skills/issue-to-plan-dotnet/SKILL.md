@@ -1,6 +1,7 @@
 ---
 name: issue-to-plan-dotnet
 description: Convert a .NET bug report or feature request into an ordered implementation plan with validation steps.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

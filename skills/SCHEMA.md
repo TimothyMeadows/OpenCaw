@@ -25,6 +25,7 @@ skills/<skill-name>/agents/openai.yaml
 ---
 name: <skill-name>
 description: <short description>
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -70,9 +71,11 @@ skill1
 A skill must:
 
 - be reusable across repositories
-- not depend on specific frameworks
+- declare engine compatibility explicitly; shared workflows use AGNOSTIC and feature workflows use exactly one registered engine
 - define clear inputs/outputs
 - be composable with other skills
+
+Skills that keep project context must resolve paths through OpenCaw and write it only under `<project-root>/.opencaw/.cache/`. This is durable host state ignored by baseline Git, even though it is nested inside the fixed `.opencaw/` installation. Shared configuration and reusable assets stay outside `.cache/`; project `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, optional `MEDIA.md`, and optional Brainstorm contracts remain at the host root. Project-root command examples use `./.opencaw/commands/`; alternate install folders and install-location migration are unsupported.
 
 ---
 
@@ -147,3 +150,9 @@ Rules:
 - skills should not conflict
 - prefer deterministic structure
 - prioritize clarity over verbosity
+
+## Engine classification
+
+Every skill has exactly one inline `engines: [AGNOSTIC]` or `engines: [ENGINE]` frontmatter declaration. V1 registered engines are THREEJS, BABYLONJS, PHASERJS, UNITY, UNREAL and GODOT. Empty, mixed, duplicate and unknown declarations are invalid. Engine skills use their canonical lowercase engine prefix (for example `unity-build-ui`); AGNOSTIC skills cannot use engine prefixes. Feature names may place the engine prefix before the action.
+
+Run `commands/resolve-skill.sh SKILL` before activation or delegation. An incompatible result excludes the skill; requesting it never selects its engine. AGNOSTIC means shared engine policy, not universal platform/tool availability. Browser QA still requires a browser surface; native UI requires native evidence. Legacy Three.js names are aliases in the OpenCaw resolver, not duplicate skill folders or a promise of host-native alias support.

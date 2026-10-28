@@ -1,6 +1,7 @@
 ---
 name: database-cli-query
 description: Run or structure database connectivity and query workflows through supported CLI tools for MSSQL, MySQL, PostgreSQL, SQLite, Azure Storage Tables, Cosmos DB metadata, and Databricks SQL.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

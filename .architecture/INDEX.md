@@ -2,18 +2,13 @@
 
 Available templates in this OpenCaw baseline:
 
-- ANGULAR
-- AZURE
-- AZURE_DEVOPS
 - AZURE_STORAGE_TABLES
 - BABYLONJS
 - COLYSEUS
 - COSMOSDB
-- DATABRICKS
 - DOCKER
 - DOTNET
 - DOTNET_ASPIRE
-- EMBEDDED_FIRMWARE
 - EVENT_DRIVEN
 - GITHUB_ACTIONS
 - HELM
@@ -23,20 +18,16 @@ Available templates in this OpenCaw baseline:
 - MICROSERVICES
 - MSSQL
 - MYSQL
-- NEXTJS
 - NODE
 - PHASERJS
 - POSTGRESDB
 - PYTHON
 - PLAYWRIGHT
-- REACT
 - SIGNALR_WEBSOCKETS
-- SOLIDITY
 - SPA
 - SQLITE
 - TERRAFORM
 - THREEJS
 - TILED
-- VUE
 
 Use one or more of these when generating `../ARCHITECTURE.md` for a host repository.

@@ -1,6 +1,7 @@
 ---
 name: playwright-reporting
 description: Generate non-interactive Playwright evidence reports that replace Playwright UI mode and HTML report browsing in OpenCaw sessions.
+engines: [AGNOSTIC]
 ---
 
 ## When to use
@@ -28,5 +29,5 @@ Produce one or more host-owned Markdown reports:
 - Use `commands/playwright-report-summary.sh` when JSON reporter output exists.
 - Use `commands/playwright-artifact-index.sh` to replace browsing report/artifact folders manually.
 - Use `commands/playwright-discovery-report.sh` to summarize browser discovery sessions.
-- Reports should be written to the host `.ai/reports/` directory by default.
+- Reports should be written to the host `.opencaw/.cache/reports/` directory by default.
 - Do not open Playwright UI mode or start the HTML report server unless the user explicitly asks for an interactive local view.

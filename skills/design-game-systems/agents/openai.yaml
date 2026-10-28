@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Game Systems"
+  short_description: "Specify rules and test balance hypotheses"
+  default_prompt: "Use $design-game-systems to define player decisions, rules, progression, and a playtest plan for this game."

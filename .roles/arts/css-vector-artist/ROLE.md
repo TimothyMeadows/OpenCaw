@@ -18,6 +18,8 @@ Create scalable, production-ready interface art, logo systems, HUD visuals, map 
 
 # Responsibilities
 
+- CSS/SVG interface authoring is supported independently of the art pipeline registry; do not select the retired CSS3 pipeline or reinterpret vector work as PROOF_TO_MODEL.
+
 - Design interface illustrations, iconography, decorative systems, and logo assets with CSS and SVG/vector outputs only.
 - Build reusable visual systems that remain crisp across responsive breakpoints and high-density displays.
 - Define art direction tokens for color, spacing, stroke, radius, gradients, and elevation.

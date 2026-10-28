@@ -1,6 +1,7 @@
 ---
 name: record-debug-resolution
 description: Record a reusable bug diagnosis or resolution in detailed debug history and tagged project memory. Use after a verified root cause or fix is likely to help future debugging.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

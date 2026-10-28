@@ -1,5 +1,11 @@
-# OpenCaw runtime context artifacts
-.ai/archive/
-.ai/migrations/
-.ai/reports/
-.ai/CONTEXT_SUMMARY.md
+# Project-local durable OpenCaw state; never ship it in the shared baseline.
+# .cache/ applies when this repository is installed at <project>/.opencaw.
+/.cache/
+# A standalone maintainer checkout stores its own context at this canonical path.
+/.opencaw/.cache/
+
+# Project-local native toolchains and versioned asset working directories
+.local/
+.art-staging/
+commands/lib/proof-to-model/**/bin/
+commands/lib/proof-to-model/**/obj/

@@ -21,7 +21,7 @@ Ship reliable, high-quality mobile apps with strong UX and predictable architect
 ## Language and Architecture Priority
 
 - **Primary**: C# / .NET MAUI (`MAUI`, `DOTNET`)
-- **Secondary**: TypeScript/JavaScript with Node.js tooling (`NODE`, `REACT`)
+- **Secondary**: TypeScript/JavaScript with Node.js tooling (`NODE`)
 - **Fallback**: Use another language only when an explicit architecture template supports it.
 - Never default to unsupported mobile language stacks.
 

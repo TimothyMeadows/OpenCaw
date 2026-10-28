@@ -51,6 +51,7 @@ fi
 
 mapfile -t selected_styles < <(
   awk '
+    { sub(/\r$/, "") }
     /^Generated from OpenCaw style templates:/ { in_list=1; next }
     /^Primary OpenCaw art pipeline:/ { in_list=0 }
     in_list && /^- / {
@@ -63,6 +64,7 @@ mapfile -t selected_styles < <(
 
 mapfile -t primary_pipelines < <(
   awk '
+    { sub(/\r$/, "") }
     /^Primary OpenCaw art pipeline:/ { in_list=1; next }
     /^Allowed OpenCaw art pipelines:/ { in_list=0 }
     in_list && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print }
@@ -71,6 +73,7 @@ mapfile -t primary_pipelines < <(
 
 mapfile -t allowed_pipelines < <(
   awk '
+    { sub(/\r$/, "") }
     /^Allowed OpenCaw art pipelines:/ { in_list=1; next }
     /^---$/ { in_list=0 }
     in_list && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print }

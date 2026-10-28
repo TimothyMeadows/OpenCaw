@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "settings": {
+    "RequiredPackages": "com.unity.modules.ai,com.unity.modules.assetbundle,com.unity.modules.audio,com.unity.modules.imageconversion,com.unity.modules.jsonserialize,com.unity.modules.physics,com.unity.modules.physics2d,com.unity.modules.ui,com.unity.modules.uielements,com.unity.modules.unitywebrequest"
+  },
+  "packages": {}
+}

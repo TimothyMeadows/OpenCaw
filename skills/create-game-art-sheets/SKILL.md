@@ -1,6 +1,7 @@
 ---
 name: create-game-art-sheets
 description: Plan and specify production-ready game art sheets, including environment tilesets, biome/terrain sets, autotile sets, prop atlases, and directional character animation sheets with 4, 6, 8, 16, or custom facing counts. Use when art roles need to create tilesets or sprite animation sets before implementation handoff.
+engines: [AGNOSTIC]
 ---
 
 ## When to use

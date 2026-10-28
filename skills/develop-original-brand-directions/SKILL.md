@@ -1,6 +1,7 @@
 ---
 name: develop-original-brand-directions
 description: Develop multiple distinct visual brand directions from product intent and optionally supplied references while controlling similarity and avoiding signature elements. Use for campaign worlds, product identities, art-direction alternatives, and generation briefs that require coherent differentiation.
+engines: [AGNOSTIC]
 ---
 
 # Develop Original Brand Directions

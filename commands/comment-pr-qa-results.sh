@@ -111,7 +111,7 @@ if [[ -n "$gauntlet_verdict" || -n "$gauntlet_head_sha" || -n "$gauntlet_source"
   }
   gauntlet_validate_head_sha "$gauntlet_head_sha" 'Gauntlet QA head SHA'
   gauntlet_head_sha="${gauntlet_head_sha,,}"
-  [[ "$gauntlet_source" =~ ^\.ai/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
+  [[ "$gauntlet_source" =~ ^\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
     echo 'Gauntlet QA source must be a project-relative immutable round or completion event.' >&2
     exit 1
   }

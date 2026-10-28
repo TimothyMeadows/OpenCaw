@@ -169,10 +169,12 @@ function preflightTree(source) {
 
 function prepareEvidence(projectRoot, evidenceArgument) {
   if (!evidenceArgument || evidenceArgument === '-') return null;
-  const tasksRoot = path.join(projectRoot, '.ai', 'tasks');
-  ensureSafeDirectory(projectRoot, ['.ai', 'tasks']);
+  const tasksRoot = path.join(projectRoot, '.opencaw', '.cache', 'tasks');
+  // Check each component independently: combining the mount and cache in one
+  // segment would bypass a link at .opencaw and fail on a fresh installation.
+  ensureSafeDirectory(projectRoot, ['.opencaw', '.cache', 'tasks']);
   const output = path.resolve(evidenceArgument);
-  if (!inside(tasksRoot, output) || output === tasksRoot) fail('Copy evidence must be a file below the project .ai/tasks directory.');
+  if (!inside(tasksRoot, output) || output === tasksRoot) fail('Copy evidence must be a file below the project .opencaw/.cache/tasks directory.');
   const relativeSegments = path.relative(tasksRoot, path.dirname(output)).split(path.sep).filter(Boolean);
   ensureSafeDirectory(tasksRoot, relativeSegments);
   if (fs.existsSync(output) && fs.lstatSync(output).isSymbolicLink()) fail('Copy evidence must not be a symbolic link.');

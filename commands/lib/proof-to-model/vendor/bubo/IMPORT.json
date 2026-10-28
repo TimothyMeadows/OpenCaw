@@ -1,0 +1,81 @@
+{
+    "commit":  "f597fcab07f0dc3e1c4709f23fae4a028cf04373",
+    "schemaVersion":  1,
+    "files":  [
+                  {
+                      "sha256":  "778d72178697c463c4f126c80f8f7d607fa996cba4ec9f644e24d8c313facf7a",
+                      "gitBlobSha":  "0579ee813b0c1bd8e7b53c837f8e12a09337dfdd",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\WorkspaceGuard.cs",
+                      "sourcePath":  "src/LocalAgent.Runtime/WorkspaceGuard.cs",
+                      "sourceSha256":  "778d72178697c463c4f126c80f8f7d607fa996cba4ec9f644e24d8c313facf7a",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "6bbd893e128424c40bab70e1e003d7a4482c4d2782f6e948589b69863104fb00",
+                      "gitBlobSha":  "b3b887193c44a594b4fc500e7ea32b8c106e7fe5",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\ToolRegistry.cs",
+                      "sourcePath":  "src/LocalAgent.Runtime/Tools/ToolRegistry.cs",
+                      "sourceSha256":  "6bbd893e128424c40bab70e1e003d7a4482c4d2782f6e948589b69863104fb00",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "f4c8d3658989a23546e9670ea4f3b5193c3b0491047e94aefa3f012f0b3a2959",
+                      "gitBlobSha":  "4aa512e9faf1a3bbb07ae48e360bd2b6462523d5",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\TranscriptEvent.cs",
+                      "sourcePath":  "src/LocalAgent.Abstractions/TranscriptEvent.cs",
+                      "sourceSha256":  "f4c8d3658989a23546e9670ea4f3b5193c3b0491047e94aefa3f012f0b3a2959",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "550e04aaae23d4765b7750fdaac6a7fa996a4e4bed66b589647e798c9bbfc18a",
+                      "gitBlobSha":  "6a5802d039bb47795a3aa18d45ca2530cb2600ec",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\ToolRequest.cs",
+                      "sourcePath":  "src/LocalAgent.Abstractions/ToolRequest.cs",
+                      "sourceSha256":  "550e04aaae23d4765b7750fdaac6a7fa996a4e4bed66b589647e798c9bbfc18a",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "6b1f74d463e9a1f87468bb7d7277e5a75d98b785378bb5d33e1f5a5f55e50431",
+                      "gitBlobSha":  "86f04750c2974b539bdb1a4db5d72feb0445b14d",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\ToolResult.cs",
+                      "sourcePath":  "src/LocalAgent.Abstractions/ToolResult.cs",
+                      "sourceSha256":  "6b1f74d463e9a1f87468bb7d7277e5a75d98b785378bb5d33e1f5a5f55e50431",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "ec63b84616f4e1c7b69e78b2d52f86844a52692ad54119b4b71f7794ba782188",
+                      "gitBlobSha":  "7ed15628f3f5927be9cd7856d8c830781c63139f",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\IWorkspaceGuard.cs",
+                      "sourcePath":  "src/LocalAgent.Abstractions/IWorkspaceGuard.cs",
+                      "sourceSha256":  "ec63b84616f4e1c7b69e78b2d52f86844a52692ad54119b4b71f7794ba782188",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "c8d48b3befe7d4735b43f6c1a3ce0e6ba3573aa1f373d722f73c4af6aad2f27e",
+                      "gitBlobSha":  "1d062c8151164e651c1fd3e1cc4ebcdd6437d1bf",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\IAgentTool.cs",
+                      "sourcePath":  "src/LocalAgent.Abstractions/IAgentTool.cs",
+                      "sourceSha256":  "c8d48b3befe7d4735b43f6c1a3ce0e6ba3573aa1f373d722f73c4af6aad2f27e",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "79104fa229352d4ca0908cdf9164d521c969fc6bb56b4808a4bf268c49dcaeff",
+                      "gitBlobSha":  "077293469ab7b71d57e4a3f7a42a420c9e9b24ca",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\WorkspaceGuardTests.cs",
+                      "sourcePath":  "tests/LocalAgent.Runtime.Tests/WorkspaceGuardTests.cs",
+                      "sourceSha256":  "79104fa229352d4ca0908cdf9164d521c969fc6bb56b4808a4bf268c49dcaeff",
+                      "byteEquivalentToPinnedSource":  true
+                  },
+                  {
+                      "sha256":  "c57f6535a951e34f9ed1e8ed1ec86066f4ec439c541984702d8decb790843ed2",
+                      "gitBlobSha":  "7b24d8633293f02663c3286c31b103a73875b5ab",
+                      "localPath":  "commands\\lib\\proof-to-model\\vendor\\bubo\\LICENSE",
+                      "sourcePath":  "LICENSE",
+                      "sourceSha256":  "c57f6535a951e34f9ed1e8ed1ec86066f4ec439c541984702d8decb790843ed2",
+                      "byteEquivalentToPinnedSource":  true
+                  }
+              ],
+    "source":  "https://github.com/TimothyMeadows/Bubo",
+    "license":  "MIT",
+    "verification":  "Decoded GitHub Contents API bytes at pinned commit compared via SHA256 with local originals; all 9 matched"
+}

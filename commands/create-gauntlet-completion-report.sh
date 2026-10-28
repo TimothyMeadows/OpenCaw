@@ -216,7 +216,7 @@ if [[ "$completion_status" == 'complete' ]]; then
   fi
   next_completion_event=$((max_completion_event + 1))
   printf -v completion_event_label '%03d' "$next_completion_event"
-  completion_event_relative=".ai/gauntlets/$gauntlet_name/completion-events/event-$completion_event_label.md"
+  completion_event_relative=".opencaw/.cache/gauntlets/$gauntlet_name/completion-events/event-$completion_event_label.md"
   completion_event_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$completion_event_relative"
   [[ ! -e "$completion_event_target" && ! -L "$completion_event_target" ]] || {
     echo "Completion event evidence already exists: $completion_event_relative" >&2
@@ -339,13 +339,13 @@ if [[ "$completion_status" == 'complete' ]]; then
 - Quality bar fingerprint: $completing_quality
 - Execution contract fingerprint: $completing_execution
 - Base commit SHA: $completing_base
-- Report: .ai/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md
+- Report: .opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md
 - Report projection sha256: $report_projection_hash
 - Recorded at: $generated_at
 EOF
   chmod 0644 "$completion_event_stage"
   completion_event_hash="$(gauntlet_hash_file "$completion_event_stage")"
-  completion_ledger_entry="- event: $completion_event_label | outcome: complete | integration-round: $completing_integration_round | head-sha: $completing_head_sha | scope: $completing_scope | manifest: $completing_manifest | contract: $completing_execution | base-sha: $completing_base | quality: $completing_quality | report: .ai/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md | report-projection: $report_projection_hash | record: $completion_event_relative | sha256: $completion_event_hash"
+  completion_ledger_entry="- event: $completion_event_label | outcome: complete | integration-round: $completing_integration_round | head-sha: $completing_head_sha | scope: $completing_scope | manifest: $completing_manifest | contract: $completing_execution | base-sha: $completing_base | quality: $completing_quality | report: .opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md | report-projection: $report_projection_hash | record: $completion_event_relative | sha256: $completion_event_hash"
   gauntlet_append_completion_ledger "$main_stage" "$completion_ledger_entry"
   completion_ledger_stage="$(mktemp "$gauntlet_dir/.completion-ledger-stage.XXXXXX")"
   gauntlet_extract_section "$main_stage" 'Completion Ledger' > "$completion_ledger_stage"

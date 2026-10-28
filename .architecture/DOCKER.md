@@ -684,7 +684,7 @@ For Python:
 
 For frontend SPAs:
 
-- use `SPA`, framework-specific templates, and `DOCKER`
+- use `SPA` and `DOCKER`; document any host-approved UI framework separately
 - build static assets in a Node stage
 - serve assets from a minimal web server or platform-specific runtime
 - keep runtime configuration strategy explicit

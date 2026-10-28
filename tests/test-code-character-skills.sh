@@ -13,13 +13,13 @@ require_text() {
   grep -Fqi -- "$text" "$file" || fail "$file omits required text: $text"
 }
 
-builder='skills/build-threejs-code-characters'
-reviewer='skills/review-threejs-code-characters'
-parent='skills/build-threejs-code-models/SKILL.md'
+builder='skills/threejs-build-code-characters'
+reviewer='skills/threejs-review-code-characters'
+parent='skills/threejs-build-code-models/SKILL.md'
 
 echo '[1/4] checking specialized triggers and generic routing'
 require_text "$builder/SKILL.md" 'characters, creatures, and runtime actors'
-require_text "$builder/SKILL.md" 'Use `build-threejs-code-models` directly for props'
+require_text "$builder/SKILL.md" 'Use `threejs-build-code-models` directly for props'
 require_text "$reviewer/SKILL.md" 'reviewer gates'
 require_text "$reviewer/SKILL.md" 'isolated from builder history'
 require_text "$parent" 'Route characters, creatures, animated actors'
@@ -49,10 +49,10 @@ if find "$builder" "$reviewer" -type f \( -name 'README*' -o -name 'CHANGELOG*' 
 fi
 
 echo '[3/4] checking generated metadata, catalogs, and role routing'
-require_text "$builder/agents/openai.yaml" 'Use $build-threejs-code-characters'
-require_text "$reviewer/agents/openai.yaml" 'Use $review-threejs-code-characters'
-require_text 'skills/INDEX.md' '`build-threejs-code-characters`'
-require_text 'skills/INDEX.md' '`review-threejs-code-characters`'
+require_text "$builder/agents/openai.yaml" 'Use $threejs-build-code-characters'
+require_text "$reviewer/agents/openai.yaml" 'Use $threejs-review-code-characters'
+require_text 'skills/INDEX.md' '`threejs-build-code-characters`'
+require_text 'skills/INDEX.md' '`threejs-review-code-characters`'
 "$node_bin" <<'NODE'
 const fs = require('fs');
 const map = JSON.parse(fs.readFileSync('.roles/ROLE_SKILL_MAP.json', 'utf8'));
@@ -67,22 +67,22 @@ const reviewers = [
   'computer-science/game-designer'
 ];
 for (const role of builders) {
-  if (!map[role].skills.includes('build-threejs-code-characters')) throw new Error(`Missing builder routing: ${role}`);
+  if (!map[role].skills.includes('threejs-build-code-characters')) throw new Error(`Missing builder routing: ${role}`);
   for (const command of ['commands/create-code-character-profile.sh', 'commands/validate-code-character-profile.sh', 'commands/record-code-character-calibration.sh', 'commands/record-code-character-gate.sh', 'commands/measure-code-character-evidence.sh']) {
     if (!map[role].commands.includes(command)) throw new Error(`Missing builder command ${command}: ${role}`);
   }
 }
 for (const role of reviewers) {
-  if (!map[role].skills.includes('review-threejs-code-characters')) throw new Error(`Missing reviewer routing: ${role}`);
+  if (!map[role].skills.includes('threejs-review-code-characters')) throw new Error(`Missing reviewer routing: ${role}`);
   for (const command of ['commands/validate-code-character-profile.sh', 'commands/record-code-character-gate.sh']) {
     if (!map[role].commands.includes(command)) throw new Error(`Missing reviewer command ${command}: ${role}`);
   }
 }
 for (const role of ['computer-science/gameplay-engineer', 'computer-science/frontend-developer']) {
-  if (map[role].skills.includes('review-threejs-code-characters')) throw new Error(`Builder-only role unexpectedly owns reviewer skill: ${role}`);
+  if (map[role].skills.includes('threejs-review-code-characters')) throw new Error(`Builder-only role unexpectedly owns reviewer skill: ${role}`);
 }
 for (const role of ['computer-science/qa-engineer', 'computer-science/game-designer']) {
-  if (map[role].skills.includes('build-threejs-code-characters')) throw new Error(`Reviewer-only role unexpectedly owns builder skill: ${role}`);
+  if (map[role].skills.includes('threejs-build-code-characters')) throw new Error(`Reviewer-only role unexpectedly owns builder skill: ${role}`);
 }
 NODE
 

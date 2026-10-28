@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Mass Entities"
+  short_description: "Own Mass composition, processing and lifetime"
+  default_prompt: "Use $unreal-build-mass-entities for the selected Unreal project with declared access, deferred structural changes and native lifecycle evidence."

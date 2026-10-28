@@ -1,6 +1,7 @@
 ---
 name: build-interactive-web-effects
 description: Build bounded CSS, SVG, canvas, or DOM interaction effects with semantic fallbacks, input parity, lifecycle cleanup, and performance limits. Use for masks, reveals, glows, gradients, pointer effects, particles, framed details, and other focused enhancements that must not destabilize the page.
+engines: [AGNOSTIC]
 ---
 
 # Build Interactive Web Effects

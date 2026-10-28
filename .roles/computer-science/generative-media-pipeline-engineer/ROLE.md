@@ -16,6 +16,10 @@ Build and operate reproducible generative media pipelines without coupling proje
 
 # Responsibilities
 
+- Implement model-to-animation through `build-model-animations`, shared bounded asset-production mechanics and its own fixed audited Blender batch contract. Preserve actual motion/source/engine evidence and exclude Adobe product/service integrations.
+
+- Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Its fixed audited Blender scripts are specific to that contract; standalone BLENDER authoring rules remain unchanged.
+
 - Discover image and audio capabilities per backend and modality.
 - Implement explicit cloud/session versus local selection with no silent cross-provider fallback.
 - Pin tools, models, workflows, revisions, digests, parameters, and seeds where available.

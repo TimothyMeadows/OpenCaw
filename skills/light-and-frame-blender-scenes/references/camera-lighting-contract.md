@@ -13,3 +13,7 @@ Record rig name, light types, transforms, energy, size, color, shadow policy, en
 Evaluate focal hierarchy, silhouette separation, material differentiation, depth cues, navigation or action visibility, facial readability, highlight clipping, crushed values, flicker, shadow noise, and accessibility in the final viewing context.
 
 Deliver a neutral diagnostic view and representative final views. If multiple aspect ratios are required, define compositions or safe crops for each instead of assuming a center crop.
+
+## Reference matching
+
+Use the [reference comparison contract](../../direct-blender-production/references/reference-comparison-contract.md) when diagnosing likeness. Match camera assumptions before altering proportions, keep neutral and final light separate, and include target-size views plus close-ups of declared detail priorities. A single oblique reference does not measure concealed geometry or prove a unique lens solution.

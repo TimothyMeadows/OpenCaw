@@ -1,0 +1,4 @@
+interface:
+  display_name: "Unreal Build Procedural Content"
+  short_description: "Build reproducible PCG and procedural geometry"
+  default_prompt: "Use $unreal-build-procedural-content to author an explicitly selected Unreal generator with reproducible inputs, owned outputs and regeneration evidence."

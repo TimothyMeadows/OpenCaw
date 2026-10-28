@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build Scenes"
+  short_description: "Build Phaser scenes and shared asset lifecycles"
+  default_prompt: "Use $phaserjs-build-scenes to implement restart-safe scenes with explicit asset and game-instance ownership."

@@ -68,7 +68,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/gauntlet-common.sh"
 opencaw_root="$OPENCAW_ROOT"
 host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-output_dir="${OPENCAW_REPORT_DIR:-$host_root/.ai/reports}"
+output_dir="${OPENCAW_REPORT_DIR:-$OPENCAW_PROJECT_CACHE_DIR/reports}"
 gauntlet_execution_fingerprint='none'
 gauntlet_base_commit_sha='none'
 gauntlet_manifest_fingerprint='none'
@@ -251,7 +251,7 @@ if [[ $gauntlet_progress_flow -eq 1 ]]; then
   fi
   next_checkpoint=$((max_checkpoint + 1))
   printf -v checkpoint_label '%03d' "$next_checkpoint"
-  gauntlet_publication_checkpoint_relative=".ai/gauntlets/$gauntlet_name/publication-checkpoints/$gauntlet_progress_item/checkpoint-$checkpoint_label.md"
+  gauntlet_publication_checkpoint_relative=".opencaw/.cache/gauntlets/$gauntlet_name/publication-checkpoints/$gauntlet_progress_item/checkpoint-$checkpoint_label.md"
   gauntlet_publication_checkpoint="$OPENCAW_PROJECT_ROOT_RESOLVED/$gauntlet_publication_checkpoint_relative"
   checkpoint_stage="$(mktemp "$gauntlet_dir/.publication-checkpoint-stage.XXXXXX")"
   checkpoint_root_created=0

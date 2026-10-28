@@ -1,0 +1,5 @@
+interface:
+  display_name: "Godot Build Multiplayer"
+  short_description: "Build Multiplayer for Godot projects"
+  default_prompt: "Use $godot-build-multiplayer for the selected Godot project with explicit engine compatibility, project-language preservation, and verification evidence."
+

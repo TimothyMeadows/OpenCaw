@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phaser.js Build Audio"
+  short_description: "Integrate bounded Phaser music and sound playback"
+  default_prompt: "Use $phaserjs-build-audio to implement browser-safe playback with explicit voice, scene and persistent-music ownership."
