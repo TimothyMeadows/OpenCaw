@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const {pathToFileURL} = require('node:url');
 const ROOT = path.resolve(__dirname, '..');
 const TASK = path.join(ROOT, '.opencaw/.cache/tasks/model-to-animation-design');
-const ADAPTER = path.join(ROOT, '.styles/.workflows/model-to-animation/engines/threejs-motion.mjs');
+const ADAPTER = path.join(ROOT, 'runtime/bubo/resources/model-to-animation/engines/threejs-motion.mjs');
 
 function protocolThree() {
   class Vector3 {

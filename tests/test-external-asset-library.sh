@@ -29,6 +29,20 @@ contains_exact_line() {
   sed 's/\r$//' "$2" | grep -Fqx -- "$1"
 }
 hash_file() { sha256sum "$1" | awk '{print $1}'; }
+make_fixture_link() {
+  node - "$1" "$2" <<'NODE'
+const fs=require('fs'), path=require('path');
+const [targetArg,linkArg]=process.argv.slice(2), target=path.resolve(targetArg), link=path.resolve(linkArg);
+try { fs.symlinkSync(target,link,fs.statSync(target).isDirectory()?'dir':'file'); }
+catch(error) {
+  if(process.platform!=='win32' || !['EPERM','EACCES'].includes(error.code)) throw error;
+  // An actual junction covers the same reparse rejection without file-symlink
+  // privilege. Its target is always another owned fixture directory.
+  fs.symlinkSync(fs.statSync(target).isDirectory()?target:path.dirname(target),link,'junction');
+}
+if(!fs.lstatSync(link).isSymbolicLink()) throw new Error('Fixture requires an actual filesystem link, not an emulated copy.');
+NODE
+}
 
 printf 'blend fixture\n' > "$library/characters/Hero Rig/hero.blend"
 printf 'walk animation\n' > "$library/characters/Hero Rig/walk.bvh"
@@ -36,8 +50,8 @@ printf 'texture fixture\n' > "$library/characters/Hero Rig/textures/hero.png"
 printf 'crate model\n' > "$library/props/crate.glb"
 printf 'not a model\n' > "$library/props/readme.txt"
 printf 'bad bundle model\n' > "$library/bad-bundle/model.glb"
-ln -s ../props/crate.glb "$library/linked.glb"
-ln -s ../props/crate.glb "$library/bad-bundle/linked.glb"
+make_fixture_link "$library/props/crate.glb" "$library/linked.glb"
+make_fixture_link "$library/props/crate.glb" "$library/bad-bundle/linked.glb"
 source_hash_before="$(hash_file "$library/props/crate.glb")"
 source_stat_before="$(stat -c '%Y:%s' "$library/props/crate.glb")"
 
@@ -136,9 +150,9 @@ mkdir -p "$library/symlinked"
 printf 'symlink target model\n' > "$library/symlinked/model.glb"
 mkdir -p "$runtime_dir/outside-destination"
 mkdir -p "$project/assets/models/studio"
-ln -s "$runtime_dir/outside-destination" "$project/assets/models/studio/symlinked"
+make_fixture_link "$runtime_dir/outside-destination" "$project/assets/models/studio/symlinked"
 expect_failure "$runtime_dir/destination-link.log" bash commands/copy-external-asset.sh studio symlinked/model.glb
-rm "$project/assets/models/studio/symlinked"
+node -e 'require("fs").unlinkSync(process.argv[1])' "$project/assets/models/studio/symlinked"
 expect_failure "$runtime_dir/evidence-escape.log" bash commands/copy-external-asset.sh studio symlinked/model.glb --evidence "$runtime_dir/outside-evidence.json"
 [[ ! -e "$project/assets/models/studio/symlinked/model.glb" ]] || fail 'evidence-boundary failure copied the asset'
 printf 'project-contained model\n' > "$project/project-source.glb"

@@ -1,0 +1,52 @@
+name: Pinned Bubo integration
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  host-boundary:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Explicitly build and verify the recorded Bubo commit
+        shell: bash
+        run: bash commands/build-bubo-runtime.sh Release
+      - name: Session-local Python command alias on Windows
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p .local/ci-bin
+          printf '#!/usr/bin/env bash\nexec python -X utf8 "$@"\n' > .local/ci-bin/python3
+          chmod +x .local/ci-bin/python3
+          cygpath -w "$PWD/.local/ci-bin" >> "$GITHUB_PATH"
+      - name: Host policy, clone/submodule installations and admission
+        shell: bash
+        run: |
+          node tests/test-bubo-host-context.cjs
+          node tests/test-bubo-installation.cjs
+          node tests/test-bubo-installation.cjs --real-runtime
+          bash tests/test-opencaw-layout.sh
+          bash tests/test-art-pipelines.sh
+          bash tests/test-external-asset-library.sh
+          bash tests/test-task-execution.sh
+          bash commands/validate-readme.sh
+          bash commands/validate-art-pipelines.sh
+          node tests/test-engine-selection.cjs
+      - name: Actual managed Linux cancellation and native group cleanup
+        if: runner.os == 'Linux'
+        run: python3 tests/test-bubo-cancellation.py
+      - name: Host-owned job boundary executable assertions
+        shell: bash
+        run: bash commands/test-bubo-runtime.sh host

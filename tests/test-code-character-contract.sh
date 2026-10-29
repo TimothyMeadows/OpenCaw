@@ -196,7 +196,16 @@ expect_failure "$runtime_dir/repeated-class.log" bash commands/record-code-chara
   --strategy 'widen the ear stance' --reviewer-id independent-reviewer --reviewer-type agent \
   --reviewer-packet evidence/blockout-packet-repeat.md --observed-answer 'Still ambiguous' \
   --evidence reviewer-packet=evidence/blockout-packet-repeat.md --evidence render=evidence/blockout-repeat.txt
-ln -s "$project/evidence/calibration-passing.json" "$project/evidence/linked.txt"
+"$node_bin" - "$project/evidence/calibration-passing.json" "$project/evidence/linked.txt" <<'NODE'
+const fs=require('fs'),path=require('path');
+const [target,link]=process.argv.slice(2).map(value=>path.resolve(value));
+try { fs.symlinkSync(target,link,'file'); }
+catch(error) {
+  if(process.platform!=='win32'||!['EPERM','EACCES'].includes(error.code)) throw error;
+  fs.symlinkSync(path.dirname(target),link,'junction');
+}
+if(!fs.lstatSync(link).isSymbolicLink()) throw new Error('Evidence fixture requires an actual link/reparse point.');
+NODE
 expect_failure "$runtime_dir/symlink.log" bash commands/record-code-character-gate.sh "$profile" \
   --gate blockout-readability --decision pass --summary 'linked evidence' --strategy 'inspect a linked artifact' \
   --reviewer-id independent-reviewer --reviewer-type agent --reviewer-packet evidence/blockout-packet-repeat.md \

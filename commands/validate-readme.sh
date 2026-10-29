@@ -73,10 +73,17 @@ if (fenceCount % 2 !== 0) errors.push(`Unbalanced fenced code blocks: ${fenceCou
 const codeTokens = [...content.matchAll(/`([^`\r\n]+)`/g)].map(match => match[1]);
 const repositoryPaths = [...new Set(codeTokens
   .filter(value => !/[<*>]/.test(value))
-  .filter(value => /^(?:\.\/)?(?:commands|skills|\.roles|\.styles|\.architecture|\.engine|assets|tests)\//.test(value))
+  .filter(value => /^(?:\.\/)?(?:commands|runtime|skills|\.roles|\.styles|\.architecture|\.engine|assets|tests)\//.test(value))
   .map(value => value.replace(/^\.\//, '')))];
 for (const relativePath of repositoryPaths) {
   if (!fs.existsSync(path.join(repoRoot, relativePath))) errors.push(`Documented path does not exist: ${relativePath}`);
+}
+// Local Markdown links are part of the same resource contract as code tokens.
+for (const match of content.matchAll(/\]\(([^\s)]+)\)/g)) {
+  const target = match[1].split('#')[0];
+  if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('//')) continue;
+  if (/^(?:\.\/)?(?:commands|runtime|skills|\.roles|\.styles|\.architecture|\.engine|assets|tests)\//.test(target)
+      && !fs.existsSync(path.join(repoRoot, target))) errors.push(`Documented Markdown link does not exist: ${target}`);
 }
 
 const commandNames = [...new Set(codeTokens.filter(value => /^[a-z0-9][a-z0-9-]+\.(?:sh|ps1)$/.test(value)))];

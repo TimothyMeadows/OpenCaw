@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-dotnet run --project "$repo_root/commands/lib/model-to-animation/Tests/RuntimeTests.csproj" --no-launch-profile
+bash "$repo_root/commands/test-bubo-runtime.sh" model-to-animation
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo 'Node.js is required for motion presentation contract tests.' >&2; exit 1; }
 test_file="$repo_root/tests/test-model-animation-engine.cjs"

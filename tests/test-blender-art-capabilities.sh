@@ -177,7 +177,7 @@ args_log="$temp_root/blender-args.log"
 cat >"$fake_blender" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ "${1:-}" == "--version" ]]; then echo 'Blender 4.5.3'; exit 0; fi
+if [[ "${1:-}" == "--version" ]]; then echo "Blender ${FAKE_BLENDER_VERSION:-4.5.3}"; exit 0; fi
 printf '%s\n' "$@" >"$FAKE_BLENDER_ARGS"
 output=''
 while [[ $# -gt 0 ]]; do if [[ "$1" == '--output' ]]; then output="$2"; break; fi; shift; done
@@ -186,6 +186,25 @@ cp "$FAKE_BLENDER_REPORT" "$output"
 EOF
 chmod +x "$fake_blender"
 export FAKE_BLENDER_ARGS="$args_log" FAKE_BLENDER_REPORT="$valid_report"
+if [[ "${OS:-}" == Windows_NT ]]; then
+  # The standalone native runner executes native Windows programs. Build an
+  # owned test apphost instead of treating a Bash script as a Win32 executable.
+  fake_project="$temp_root/fake-native"
+  mkdir -p "$fake_project"
+  cat >"$fake_project/Fixture.csproj" <<'XML'
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings></PropertyGroup></Project>
+XML
+  cat >"$fake_project/Program.cs" <<'CS'
+if (args.SequenceEqual(new[]{"--version"})) { Console.WriteLine("Blender " + (Environment.GetEnvironmentVariable("FAKE_BLENDER_VERSION") ?? "4.5.3")); return; }
+File.WriteAllLines(Environment.GetEnvironmentVariable("FAKE_BLENDER_ARGS")!, args);
+var index = Array.IndexOf(args,"--output");
+if (index < 0) throw new Exception("Fixture requires --output");
+File.Copy(Environment.GetEnvironmentVariable("FAKE_BLENDER_REPORT")!,args[index+1],true);
+CS
+  dotnet build "$fake_project/Fixture.csproj" -o "$fake_project/out" --nologo >/dev/null
+  fake_blender="$fake_project/out/Fixture.exe"
+  export FAKE_BLENDER_ARGS="$(node_path "$args_log")" FAKE_BLENDER_REPORT="$(node_path "$valid_report")"
+fi
 dry_output="$fixture_root/dry.json"
 commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender" --output "$dry_output" --dry-run >/dev/null
 [[ ! -e "$dry_output" ]] || fail "inspector dry run mutated output"
@@ -193,14 +212,18 @@ report_output="$fixture_root/scene-report.json"
 commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender" --output "$report_output" >/dev/null
 require_file "$report_output"
 for flag in --background --factory-startup --disable-autoexec --offline-mode --python-exit-code; do grep -Fxq -- "$flag" "$args_log" || fail "inspector omitted $flag"; done
-grep -Fxq -- '4' "$args_log" || fail "inspector omitted nonzero Python exit code"
+grep -Fxq -- '1' "$args_log" || fail "inspector omitted the pinned Bubo Python exit code"
 expect_failure overwrite commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender" --output "$report_output"
 commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender" --output "$report_output" --replace >/dev/null
 expect_failure missing-binary commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$temp_root/missing"
-bad_blender="$temp_root/bad-blender"; sed 's/Blender 4.5.3/Blender 4.4.9/' "$fake_blender" >"$bad_blender"; chmod +x "$bad_blender"
-expect_failure wrong-version commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$bad_blender"
-ln -s "$fixture_root/scene.blend" "$fixture_root/linked.blend"
-expect_failure scene-symlink commands/inspect-blender-scene.sh "$fixture_root/linked.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender"
+export FAKE_BLENDER_VERSION='4.4.9'
+expect_failure wrong-version commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender"
+unset FAKE_BLENDER_VERSION
+if ln -s "$fixture_root/scene.blend" "$fixture_root/linked.blend" && [[ -L "$fixture_root/linked.blend" ]]; then
+  expect_failure scene-symlink commands/inspect-blender-scene.sh "$fixture_root/linked.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender"
+else
+  echo 'NOT RUN: file-symlink privilege unavailable; native host boundary suites cover actual Windows junctions.'
+fi
 expect_failure output-escape commands/inspect-blender-scene.sh "$fixture_root/scene.blend" --root "$fixture_root" --profile static-asset --blender "$fake_blender" --output "$temp_root/outside.json"
 
 echo "[6/8] exercising restricted Blender Python validation"
@@ -248,11 +271,11 @@ if command -v rg >/dev/null 2>&1; then
 else
   scan_command=(grep -R -E -n -i '[A-Za-z]:\\Users\\|api[_ -]?key|automatic publication')
 fi
-if "${scan_command[@]}" "${skills[@]/#/skills/}" .roles/arts/blender-production-artist commands/lib/inspect-blender-scene.py; then fail "Blender capability files contain an external identity, personal path, credential, or publication automation"; fi
+if "${scan_command[@]}" "${skills[@]/#/skills/}" .roles/arts/blender-production-artist runtime/bubo/resources/blender/inspect-blender-scene.py; then fail "Blender capability files contain an external identity, personal path, credential, or publication automation"; fi
 
 # Versioned primary documentation is useful research, not an imported identity
 # or permission to install/execute content. Keep all other URLs rejected here.
-"$node_bin" - "${skills[@]/#/skills/}" .roles/arts/blender-production-artist commands/lib/inspect-blender-scene.py <<'NODE'
+"$node_bin" - "${skills[@]/#/skills/}" .roles/arts/blender-production-artist runtime/bubo/resources/blender/inspect-blender-scene.py <<'NODE'
 const fs = require('fs');
 const path = require('path');
 function allowedDocumentation(value) {

@@ -8,6 +8,8 @@ An action package is presentation data. Gameplay owns movement, collisions, targ
 
 ## Inputs
 
+Execution resources, schemas, recipes and technical contracts belong to the pinned `runtime/bubo/resources/model-to-action/` dependency. OpenCaw retains this policy contract and `commands/model-to-action.sh`; production invokes the verified prebuilt Bubo CLI. Initialize/build explicitly before native work; never use a sibling checkout or build/install during generation.
+
 - Resolve project paths, ENGINE.md, STYLE.md and compatible coordinating/engine skills. Inspect configured external libraries first and use verified repository-local copies.
 - Supply a reviewed `opencaw-motion-package/v1`, its actual compatible self-contained GLB and explicit source clip/rig identities. Preserve original package, model, source rights, mappings and per-clip motion hashes.
 - Record human source-motion selection bound to the exact package/model/rig and every used clip, with `rights: {authorized: true, license: TEXT}` covering the source model and selected motions. This is recorded permission/provenance, not license acceptance on the user's behalf. The assertion may review staged clips; it does not fabricate prior runtime approval.

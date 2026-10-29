@@ -7,5 +7,3 @@
 # Project-local native toolchains and versioned asset working directories
 .local/
 .art-staging/
-commands/lib/proof-to-model/**/bin/
-commands/lib/proof-to-model/**/obj/

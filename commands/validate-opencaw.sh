@@ -16,6 +16,10 @@ done
 ./tests/test-opencaw-layout.sh
 ./tests/test-cache-workflows.sh
 ./tests/test-runtime-cache-layout.sh
+node ./tests/test-bubo-installation.cjs
+node ./tests/test-bubo-host-context.cjs
+node ./tests/test-bubo-installation.cjs --real-runtime
+bash ./commands/test-bubo-runtime.sh host
 ./commands/validate-engines.sh
 ./tests/test-engine-selection.sh
 ./tests/test-unreal-capabilities.sh
@@ -49,6 +53,7 @@ for candidate in python python3 python.exe; do
   fi
 done
 [[ -n "$python_bin" ]] || { echo 'Python 3.10+ is required for native proof-to-model integration checks.' >&2; exit 1; }
+if [[ "$(uname -s)" == Linux ]]; then "$python_bin" tests/test-bubo-cancellation.py; fi
 "$python_bin" tests/test-proof-model-blender.py
 "$python_bin" tests/test-proof-model-native-integration.py
 bash ./tests/test-model-to-animation.sh

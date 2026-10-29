@@ -13,8 +13,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 BLENDER = os.environ.get("BLENDER_EXE", "C:/Program Files/Blender Foundation/Blender 4.5/blender.exe")
-CLI = Path(os.environ.get("PROOF_TO_MODEL_DLL", str(
-    ROOT / "commands/lib/proof-to-model/bin/Debug/net10.0/ProofToModel.dll")))
+CLI = ROOT / "commands/lib/bubo-host-adapter.cjs"
 VIEWS = ("front", "right", "back", "left", "top", "bottom")
 DISTANCE = 3.1192049980163574
 FOV = 0.3490658503988659
@@ -42,8 +41,8 @@ def main():
     project = work / "project"
     project.mkdir()
     (project / "STYLE.md").write_bytes((ROOT / "STYLE.md").read_bytes())
-    scripts = project / ".styles/.pipelines/proof-to-model/blender"
-    shutil.copytree(ROOT / ".styles/.pipelines/proof-to-model/blender", scripts)
+    scripts = project / "runtime/bubo/resources/proof-to-model/blender"
+    shutil.copytree(ROOT / "runtime/bubo/resources/proof-to-model/blender", scripts)
     logs = []
     assertions = 0
 
@@ -219,7 +218,7 @@ File.WriteAllText(Path.ChangeExtension(output, ".consumed.json"), new JsonObject
     manifest = ".opencaw/.cache/tasks/test/proof-to-model/fixture/v1/manifest.json"
 
     def cli(stage, *args, success=True):
-        return command(["dotnet", CLI, stage, "--root", project, "--manifest", manifest,
+        return command(["node", CLI, "proof-to-model", stage, "--root", project, "--manifest", manifest,
                         *args], success=success)
 
     def state():
