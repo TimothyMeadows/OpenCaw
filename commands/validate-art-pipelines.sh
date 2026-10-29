@@ -31,7 +31,11 @@ grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { e
 grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
 for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json proof-to-model/manifest.schema.json proof-to-model/source-set.schema.json proof-to-model/classification.schema.json proof-to-model/proof-set.schema.json proof-to-model/finishing-settings.schema.json proof-to-model/rigid-source-topology.schema.json proof-to-model/finish-budget.schema.json proof-to-model/toolchain.json proof-to-model/toolchain.single-view-diagnostic.json proof-to-model/recipes/static-prop.json proof-to-model/blender/finish.py proof-to-model/blender/review.py proof-to-model/blender/common.py proof-to-model/blender/rigid_finish.py proof-to-model/blender/rigid_source_topology.py code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
-  [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }
+  if [[ "$asset" == proof-to-model/* ]]; then
+    node commands/lib/bubo-runtime.cjs resource "$asset" >/dev/null
+  else
+    [[ -f "$root/$asset" ]] || { echo "Missing art pipeline support asset: $root/$asset" >&2; exit 1; }
+  fi
 done
 
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
@@ -47,8 +51,8 @@ const files = [
   '.styles/.pipelines/code/code-character-observation.schema.json',
   '.styles/.pipelines/code/code-character-evidence-report.schema.json'
 ];
-files.push('.styles/.pipelines/proof-to-model/manifest.schema.json', '.styles/.pipelines/proof-to-model/toolchain.json', '.styles/.pipelines/proof-to-model/recipes/static-prop.json');
-const proofRoot = '.styles/.pipelines/proof-to-model/';
+files.push('runtime/bubo/resources/proof-to-model/manifest.schema.json', 'runtime/bubo/resources/proof-to-model/toolchain.json', 'runtime/bubo/resources/proof-to-model/recipes/static-prop.json');
+const proofRoot = require('path').dirname(require('./commands/lib/bubo-runtime.cjs').resource('proof-to-model/manifest.schema.json')) + '/';
 files.push(...['source-set.schema.json', 'classification.schema.json', 'proof-set.schema.json', 'finishing-settings.schema.json', 'rigid-source-topology.schema.json', 'finish-budget.schema.json', 'toolchain.single-view-diagnostic.json'].map(file => proofRoot + file));
 for (const file of files) JSON.parse(fs.readFileSync(file, 'utf8'));
 const readProof = file => JSON.parse(fs.readFileSync(proofRoot + file, 'utf8'));
@@ -181,11 +185,15 @@ bash commands/validate-media-templates.sh
 
 # MODEL_TO_ANIMATION is a downstream workflow, not another primary pipeline.
 for asset in WORKFLOW.md manifest.schema.json recipe.schema.json motion-package.schema.json blender/motion.py blender/scripts.json engines/threejs-motion.mjs; do
-  [[ -f ".styles/.workflows/model-to-animation/$asset" ]] || { echo "Missing motion workflow asset: $asset" >&2; exit 1; }
+  if [[ "$asset" == WORKFLOW.md ]]; then
+    [[ -f ".styles/.workflows/model-to-animation/$asset" ]] || { echo "Missing motion host contract: $asset" >&2; exit 1; }
+  else
+    node commands/lib/bubo-runtime.cjs resource "model-to-animation/$asset" >/dev/null
+  fi
 done
 "$node_bin" <<'NODE'
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
-const base = '.styles/.workflows/model-to-animation';
+const base = path.dirname(require('./commands/lib/bubo-runtime.cjs').resource('model-to-animation/manifest.schema.json'));
 for (const name of ['manifest.schema.json', 'recipe.schema.json', 'motion-package.schema.json']) {
   const schema = JSON.parse(fs.readFileSync(path.join(base, name), 'utf8'));
   if (!schema.$schema || !schema.properties) throw new Error(`Incomplete motion schema: ${name}`);
@@ -202,11 +210,15 @@ if (JSON.stringify(actual) !== JSON.stringify(Object.keys(scripts.files).sort())
 NODE
 # Composed actions are listed alongside motion as a downstream production path.
 for asset in WORKFLOW.md action-recipe.schema.json action-package.schema.json manifest.schema.json blender/action.py blender/scripts.json engines/threejs-action.mjs; do
-  [[ -f ".styles/.workflows/model-to-action/$asset" ]] || { echo "Missing action workflow asset: $asset" >&2; exit 1; }
+  if [[ "$asset" == WORKFLOW.md ]]; then
+    [[ -f ".styles/.workflows/model-to-action/$asset" ]] || { echo "Missing action host contract: $asset" >&2; exit 1; }
+  else
+    node commands/lib/bubo-runtime.cjs resource "model-to-action/$asset" >/dev/null
+  fi
 done
 "$node_bin" <<'NODE'
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
-const base = '.styles/.workflows/model-to-action';
+const base = path.dirname(require('./commands/lib/bubo-runtime.cjs').resource('model-to-action/manifest.schema.json'));
 for (const name of ['action-recipe.schema.json', 'action-package.schema.json', 'manifest.schema.json']) {
   const schema = JSON.parse(fs.readFileSync(path.join(base, name), 'utf8'));
   if (!schema.$schema || !schema.properties) throw new Error(`Incomplete action schema: ${name}`);

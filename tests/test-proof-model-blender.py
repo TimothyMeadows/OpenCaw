@@ -12,7 +12,7 @@ import unittest
 sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / ".styles/.pipelines/proof-to-model/blender"
+SCRIPTS = ROOT / "runtime/bubo/resources/proof-to-model/blender"
 import shutil
 BLENDER = os.environ.get("BLENDER_EXE") or shutil.which("blender") or r"C:/Program Files/Blender Foundation/Blender 4.5/blender.exe"
 

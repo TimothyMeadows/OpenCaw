@@ -13,5 +13,4 @@ if [[ "$has_root" == false && "$is_help" == false ]]; then
   opencaw_resolve_paths
   set -- "$@" --root "$OPENCAW_PROJECT_ROOT_RESOLVED"
 fi
-command -v dotnet >/dev/null 2>&1 || { echo 'MODEL_TO_ACTION requires the existing .NET10 SDK; nothing was installed.' >&2; exit 1; }
-exec dotnet run --project "$command_dir/lib/model-to-action/ModelToAction.csproj" --no-launch-profile -- "$@" --baseline-root "$command_dir/.."
+exec node "$command_dir/lib/bubo-host-adapter.cjs" model-to-action "$@"

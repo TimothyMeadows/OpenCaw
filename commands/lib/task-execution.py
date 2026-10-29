@@ -57,8 +57,12 @@ def safe_path(root, relative, required=False):
     current = root
     for part in parts:
         current = current / part
-        if current.is_symlink():
-            raise TaskError(f"Symlink paths are not supported: {relative}")
+        try:
+            entry = current.lstat()
+        except (FileNotFoundError, NotADirectoryError):
+            continue
+        if stat.S_ISLNK(entry.st_mode) or getattr(entry, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400):
+            raise TaskError(f"Symlink/reparse paths are not supported: {relative}")
     if required and not current.is_file():
         raise TaskError(f"Missing regular file: {relative}")
     if current.exists() and not (current.is_file() or current.is_dir()):

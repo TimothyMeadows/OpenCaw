@@ -21,6 +21,14 @@ execution = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(execution)
 
 
+def directory_link(link, target):
+    """Exercise a real Windows junction without requiring symlink privilege."""
+    if os.name == "nt":
+        subprocess.run(["node", "-e", "require('fs').symlinkSync(process.argv[1],process.argv[2],'junction')", str(target), str(link)], check=True)
+    else:
+        link.symlink_to(target, target_is_directory=True)
+
+
 class FakeGitHub:
     def __init__(self, root):
         self.root = root
@@ -140,7 +148,7 @@ class IssueRecoveryTests(Fixture):
                 target.mkdir()
                 link = project / component
                 link.parent.mkdir(parents=True, exist_ok=True)
-                link.symlink_to(target, target_is_directory=True)
+                directory_link(link, target)
                 with self.assertRaisesRegex(execution.TaskError, "Symlink"):
                     execution.create_task(project, "blocked", "Blocked", no_issue=True)
                 self.assertEqual(list(target.iterdir()), [])
@@ -298,7 +306,7 @@ class IssueRecoveryTests(Fixture):
     def test_symlinked_operation_directory_is_rejected(self):
         target = self.root / "unrelated"
         target.mkdir()
-        (self.root / ".opencaw/.cache/tasks/work/operations").symlink_to(target, target_is_directory=True)
+        directory_link(self.root / ".opencaw/.cache/tasks/work/operations", target)
         with self.assertRaisesRegex(execution.TaskError, "Symlink"):
             self.create()
         self.assertEqual(list(target.iterdir()), [])
@@ -463,9 +471,19 @@ class CheckpointTests(Fixture):
 
     def test_symlink_evidence_is_rejected(self):
         self.prepare()
-        (self.root / "link.txt").symlink_to(self.root / "evidence.txt")
+        relative = "link.txt"
+        try:
+            (self.root / relative).symlink_to(self.root / "evidence.txt")
+        except OSError as error:
+            if os.name != "nt" or getattr(error, "winerror", None) != 1314:
+                raise
+            target = self.root / "evidence-source"
+            target.mkdir()
+            (target / "evidence.txt").write_bytes((self.root / "evidence.txt").read_bytes())
+            directory_link(self.root / "evidence-link", target)
+            relative = "evidence-link/evidence.txt"
         with self.assertRaisesRegex(execution.TaskError, "Symlink"):
-            self.checkpoint(evidence=["link.txt"])
+            self.checkpoint(evidence=[relative])
 
     def test_omitted_contract_hash_is_rejected(self):
         self.prepare()
@@ -544,8 +562,13 @@ class CheckpointTests(Fixture):
             code = execution.main(["--root", str(self.root), "checkpoint", "work", "--artifact", "artifact.txt", "--evidence", "evidence.txt", "--next-action", "Review evidence."])
         self.assertEqual(code, 0)
         self.assertIn("recorded hashes are not verification verdicts", output.getvalue())
+        bash = "bash"
+        if os.name == "nt":
+            git_runtime = Path(subprocess.check_output(["git", "--exec-path"], text=True).strip()).parents[2]
+            bash = str(git_runtime / "bin/bash.exe")
+            self.assertTrue(Path(bash).is_file(), "Use existing Git Bash, not the Windows WSL launcher.")
         for name in ("create-task-file", "create-task-issue", "record-task-checkpoint", "validate-task-checkpoint"):
-            result = subprocess.run(["bash", str(ROOT / "commands" / f"{name}.sh"), "--help"], capture_output=True, text=True)
+            result = subprocess.run([bash, (ROOT / "commands" / f"{name}.sh").as_posix(), "--help"], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
 
 

@@ -11,7 +11,7 @@ import unittest
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / ".styles/.pipelines/proof-to-model/blender"
+SCRIPTS = ROOT / "runtime/bubo/resources/proof-to-model/blender"
 CHANNELS = ("basecolor", "normal", "ao", "roughness", "metallic")
 INSIDE = "--inside-blender" in sys.argv
 

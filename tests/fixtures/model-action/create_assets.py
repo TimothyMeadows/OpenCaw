@@ -110,7 +110,7 @@ def main():
     original=ROOT/'tests/fixtures/model-animation/create_assets.py'
     old_argv=sys.argv;sys.argv=[str(original),'--','--output',str(output/'raw')]
     runpy.run_path(str(original),run_name='__main__');sys.argv=old_argv
-    sys.path.insert(0,str(ROOT/'.styles/.workflows/model-to-animation/blender'))
+    sys.path.insert(0,str(ROOT/'runtime/bubo/resources/model-to-animation/blender'))
     from core import digest,load_scene,relative
     import authoring
     recipe=json.loads((output/'raw/humanoid-recipe.json').read_text())

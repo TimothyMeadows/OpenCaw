@@ -83,10 +83,20 @@ copy_runtime "$collision/.opencaw"
 printf 'collision\n' > "$collision/.opencaw/.cache"
 expect_failure "$runtime_dir/collision.log" env -u OPENCAW_PROJECT_ROOT bash "$collision/.opencaw/commands/create-host-ai-scaffold.sh"
 [[ ! -e "$collision/AGENTS.md" ]] || fail 'collision wrote bootstrap before validation'
+make_real_link() {
+  node - "$1" "$2" <<'NODE'
+const fs=require('fs'),path=require('path');
+const [targetArg,linkArg]=process.argv.slice(2),target=path.resolve(targetArg),link=path.resolve(linkArg);
+const directory=fs.statSync(target).isDirectory();
+try { fs.symlinkSync(target,link,process.platform==='win32'&&directory?'junction':directory?'dir':'file'); }
+catch(error) { if(process.platform==='win32'&&['EPERM','EACCES'].includes(error.code)) process.exit(77); throw error; }
+if(!fs.lstatSync(link).isSymbolicLink()) throw new Error('Boundary fixture must be a real link, not an emulated copy.');
+NODE
+}
 linked="$runtime_dir/linked-cache"
 mkdir -p "$linked" "$runtime_dir/outside-cache"
 copy_runtime "$linked/.opencaw"
-if ln -s "$runtime_dir/outside-cache" "$linked/.opencaw/.cache" 2>/dev/null; then
+if make_real_link "$runtime_dir/outside-cache" "$linked/.opencaw/.cache" 2>/dev/null; then
   expect_failure "$runtime_dir/link.log" env -u OPENCAW_PROJECT_ROOT bash "$linked/.opencaw/commands/create-host-ai-scaffold.sh"
   [[ ! -e "$runtime_dir/outside-cache/SYSTEM_MEMORY.md" && ! -e "$linked/AGENTS.md" ]] || fail 'symlink escaped cache guard'
 else
@@ -105,7 +115,7 @@ for linked_target in tasks tasks/example-task SYSTEM_MEMORY.md host-AGENTS; do
     SYSTEM_MEMORY.md) target="$unsafe/.opencaw/.cache/SYSTEM_MEMORY.md"; source="$runtime_dir/outside-file.md" ;;
     host-AGENTS) target="$unsafe/AGENTS.md"; source="$runtime_dir/outside-file.md" ;;
   esac
-  if ln -s "$source" "$target" 2>/dev/null; then
+  if make_real_link "$source" "$target" 2>/dev/null; then
     expect_failure "$runtime_dir/descendant-link.log" env -u OPENCAW_PROJECT_ROOT bash "$unsafe/.opencaw/commands/create-host-ai-scaffold.sh"
     [[ "$sentinel_hash" == "$(sha256sum "$runtime_dir/outside-file.md")" ]] || fail 'linked file was changed'
     [[ ! -e "$runtime_dir/outside-cache/TODO.md" && ! -e "$runtime_dir/outside-cache/TASK.md" ]] || fail 'linked task directory was written'

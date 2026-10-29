@@ -1,7 +1,0 @@
-# Action recipe examples
-
-`dance-combo-cast.example.json` is a complete bounded example for a reviewed motion package containing one-second `dance-left`, `dance-right`, `punch-left`, `punch-right`, `kick`, `charge`, `cast` and `idle` clips. All clips are in-place. Punch/kick clips provide a `contact` marker at source time 0.5 seconds; `cast` provides `release` at 0.5 seconds. `hand.cast` must identify a real moving source anchor. The controlled Blender fixture helper authors that actual source package for tests.
-
-The example creates a repeated dance, an overlapping three-hit presentation and a charge/cast/recovery sequence. Source clip IDs, trims, markers, anchor IDs and budgets must match the selected asset. The native compiler rejects absent or ambiguous bindings. Offset addresses use action seconds after the expanded occurrence begins; marker addresses use trimmed source time mapped by playback rate. A fixed target is supplied separately by the host at playback; its review position is a technical preview, without homing or hit authority.
-
-Select model-to-action explicitly after the source model and individual clips are reviewed. No recipe grants source rights, installs a dependency, changes ENGINE.md/STYLE.md, authorizes an attack or records human acceptance. Begin with source inspection and revise only the new staged attempts. Review the complete exported motions and selected-engine effects before recording separate acceptance.

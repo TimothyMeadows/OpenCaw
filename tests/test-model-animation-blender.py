@@ -17,7 +17,7 @@ import re
 
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[1]
-SCRIPTS=ROOT/'.styles/.workflows/model-to-animation/blender'
+SCRIPTS=ROOT/'runtime/bubo/resources/model-to-animation/blender'
 BLENDER=os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe'
 
 

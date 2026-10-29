@@ -10,6 +10,8 @@ The bounded native runner currently supports Windows job objects and Linux with 
 
 ## Inputs
 
+Execution resources, schemas, recipes and technical contracts belong to the pinned `runtime/bubo/resources/model-to-animation/` dependency. OpenCaw retains this policy contract and `commands/model-to-animation.sh`; production invokes the verified prebuilt Bubo CLI. Initialize/build explicitly before native work; never use a sibling checkout or build/install during generation.
+
 - Resolve the project, ENGINE.md and compatible skills. Preserve STYLE.md, architecture, source model identity and applicable task authorization.
 - Supply a repository-local reviewed GLB, explicit rights, profile, recipe, budgets and the existing matching Blender 4.5 LTS installation. Preserve an editable source as provenance when available. Export other authoring formats to the documented native interchange instead of selecting an undocumented importer.
 - Inspect configured asset libraries first; work only on verified project-local copies. A model/clip license and permission to modify/redistribute are separate from a tool license.

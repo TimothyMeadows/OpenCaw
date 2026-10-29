@@ -18,7 +18,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 TASK = ROOT / ".opencaw/.cache/tasks/model-to-animation-design"
 BLENDER = os.environ.get("BLENDER_EXE") or shutil.which("blender") or "C:/Program Files/Blender Foundation/Blender 4.5/blender.exe"
-CLI = ROOT / "commands/lib/model-to-animation/bin/Debug/net10.0/ModelToAnimation.dll"
+CLI = ROOT / "commands/lib/bubo-host-adapter.cjs"
 
 
 def sha(path):
@@ -62,7 +62,7 @@ def main():
         return relative
 
     def command(operation, manifest=None, *args, expected=True):
-        values = ["dotnet", CLI, operation, "--root", project, "--baseline-root", ROOT]
+        values = ["node", CLI, "model-to-animation", operation, "--root", project]
         if manifest:
             values += ["--manifest", manifest]
         values += args

@@ -17,8 +17,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 TASK = ROOT / '.opencaw/.cache/tasks/model-to-action'
 BLENDER = Path(os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe')
-APPHOST = ROOT / 'commands/lib/model-to-action/bin/Debug/net10.0/ModelToAction.exe'
-DLL = APPHOST.with_suffix('.dll')
+ADAPTER = ROOT / 'commands/lib/bubo-host-adapter.cjs'
 
 
 def sha(path):
@@ -26,7 +25,7 @@ def sha(path):
 
 
 def main():
-    if not BLENDER.is_file() or not DLL.is_file():
+    if not BLENDER.is_file() or not ADAPTER.is_file():
         raise SystemExit('BLOCKED: existing Blender4.5 and built action apphost required; no software installed')
     evidence = TASK / 'evidence'
     evidence.mkdir(parents=True, exist_ok=True)
@@ -40,12 +39,12 @@ def main():
         print('PASS ACTUAL:', message, flush=True)
 
     def invoke(args, label, expected=True, timeout=180):
-        result = subprocess.run([str(item) for item in args], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+        result = subprocess.run([str(item) for item in args], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         log = work / (str(len(calls)).zfill(3) + '-' + label + '.log')
-        log.write_bytes(result.stdout)
+        log.write_bytes(result.stdout + b'\nSTDERR:\n' + result.stderr)
         calls.append({'args': [str(item) for item in args], 'exitCode': result.returncode, 'log': str(log.relative_to(ROOT))})
         (work / 'commands.json').write_text(json.dumps(calls, indent=2) + '\n', encoding='utf-8')
-        assert (result.returncode == 0) == expected, label + ' unexpected exit ' + str(result.returncode) + '\n' + result.stdout.decode(errors='replace')[-6000:]
+        assert (result.returncode == 0) == expected, label + ' unexpected exit ' + str(result.returncode) + '\n' + (result.stdout + result.stderr).decode(errors='replace')[-6000:]
         return result
 
     def write(relative, value):
@@ -72,10 +71,10 @@ def main():
               'motionPackageSha256': sha(source_path), 'modelSha256': source['model']['sha256'], 'rigId': source['rig']['id'],
               'clips': [{'id': clip['id'], 'motionSha256': clip['motionSha256']} for clip in source['clips']]}
     source_review = write('.opencaw/.cache/tasks/fixture/source-review.json', review)
-    executable = [APPHOST] if os.name == 'nt' and APPHOST.is_file() else ['dotnet', DLL]
+    executable = ['node', ADAPTER, 'model-to-action']
 
     def command(operation, manifest=None, *extra, expected=True):
-        args = [*executable, operation, '--root', project, '--baseline-root', ROOT]
+        args = [*executable, operation, '--root', project]
         if manifest:
             args += ['--manifest', manifest]
         return invoke([*args, *extra], operation, expected)

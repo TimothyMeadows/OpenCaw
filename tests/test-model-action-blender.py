@@ -18,7 +18,7 @@ sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[1]
 TASK=Path(os.environ.get('OPENCAW_ACTION_TEST_EVIDENCE_ROOT', ROOT/'.opencaw/.cache/tasks/model-to-action')).resolve()
 TASK.relative_to(ROOT)
-SCRIPTS=ROOT/'.styles/.workflows/model-to-action/blender'
+SCRIPTS=ROOT/'runtime/bubo/resources/model-to-action/blender'
 BLENDER=os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe'
 spec=importlib.util.spec_from_file_location('action_fixture',ROOT/'tests/fixtures/model-action/create_assets.py')
 fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)

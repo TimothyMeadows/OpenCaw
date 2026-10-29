@@ -459,22 +459,47 @@ Recommended for teams that want centralized OpenCaw updates while pinning each h
 
 ```bash
 git submodule add https://github.com/<your-org>/OpenCaw .opencaw
-git submodule update --init --recursive
+git submodule update --init --recursive --checkout -- .opencaw
 ```
 
-Update later when your team is ready:
+Update the OpenCaw submodule when your team is ready, then initialize its recorded nested dependencies:
 
 ```bash
-git submodule update --remote
+git submodule update --remote --checkout -- .opencaw
+git -C .opencaw submodule update --init --recursive --checkout -- runtime/bubo
 ```
+
+Review and commit the resulting `.opencaw` gitlink in the host repository. The first command deliberately updates only OpenCaw; the second checks out Bubo at the commit recorded by that OpenCaw revision. Do not run `--remote` against `runtime/bubo` or recursively against nested dependencies.
 
 ## Option 2 — Clone
 
 Use a direct clone when the host repository needs an independent, customized copy:
 
 ```bash
-git clone https://github.com/<your-org>/OpenCaw .opencaw
+git clone --recurse-submodules https://github.com/<your-org>/OpenCaw .opencaw
 ```
+
+For an existing clone, update OpenCaw first and then initialize the nested dependencies at their recorded commits:
+
+```bash
+git -C .opencaw pull --ff-only
+git -C .opencaw submodule update --init --recursive --checkout -- runtime/bubo
+```
+
+### Native runtime prerequisites
+
+Both installation forms pin the standalone Bubo runtime at `.opencaw/runtime/bubo`. Its revision, execution API and resource catalog are recorded in `runtime/bubo.lock.json`. Session startup, memory, engine selection and scaffold creation work before this submodule is initialized or built.
+
+Before using proof-to-model, model-to-animation, model-to-action or read-only Blender scene inspection, initialize and explicitly build the recorded runtime with an existing .NET 10 SDK:
+
+```bash
+bash ./.opencaw/commands/initialize-bubo-runtime.sh
+bash ./.opencaw/commands/build-bubo-runtime.sh
+```
+
+Rebuild after an OpenCaw update changes the Bubo pin. Production commands verify the recorded revision, build identity, API and audited resources before launching the prebuilt CLI. A missing dependency or build gives initialization/build instructions. These commands do not install the SDK, Blender, Python environments, models or packages, accept licenses, generate assets or grant promotion approval; applicable production prerequisites remain separate.
+
+Pre-extraction manifests and review receipts remain historical evidence. Start a new asset version bound to the current runtime and refresh approvals affected by changed execution inputs; preserve the original manifests and receipts.
 
 ## Start the First Session
 
@@ -1307,12 +1332,12 @@ Use `build-proof-to-model-assets` and `./commands/proof-to-model.sh` for `init`,
 
 Approve front, subject-right, back, subject-left, top and bottom together with the originals and proposed hidden structure visible. Preprocessing preserves shared framing, actual alpha, masks and camera intrinsics. Reconstruction submits six separate frames and camera matrices to pinned Pixal3D MV inference; a contact sheet or single image is insufficient. Review renders use the same cameras and an explicit engine-export coordinate transform. Arbitrary source camera assumptions are labeled nominal rather than measured.
 
-Run a subcommand with `--help` for exact arguments. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling project is required.
+Run a subcommand with `--help` for its required inputs; [Bubo command arguments](commands/BUBO_ARGUMENTS.md) documents all supported options and receipt rules. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. OpenCaw passes host policy and evidence to the pinned Bubo runtime; its audited resources live in `runtime/bubo/resources/proof-to-model/`. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. Initialize and build Bubo as described under Install; no sibling checkout or source-run fallback is used.
 
 State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable originals, classification, proof candidates, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof-set selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
 
 Finishing defaults to QuadriFlow. Rigid/articulated assets may explicitly select
-[reviewed per-part HIGH/LOW finishing](.styles/.pipelines/proof-to-model/RIGID_PARTS.md),
+[reviewed per-part HIGH/LOW finishing](runtime/bubo/resources/proof-to-model/RIGID_PARTS.md),
 with real shared bake atlases or verified unchanged materials, pivots and repair
 ancestry, LOD0 limits and a supported native memory policy. A failed solver never
 switches methods automatically.
@@ -1342,7 +1367,7 @@ Rejected or changed inputs return to the affected stage and invalidate dependent
 
 ### Model to animation
 
-`MODEL_TO_ANIMATION` continues from a reviewed model into motion production and selected-engine integration. It composes after PROOF_TO_MODEL, Blender, copied libraries or an explicitly compatible CODE handoff; it does not replace the primary art pipeline or select another engine. Use `build-model-animations` and `model-to-animation.sh` with `--help`. Its contract, schemas, recipes, audited Blender scripts and engine adapter live in `.styles/.workflows/model-to-animation/`.
+`MODEL_TO_ANIMATION` continues from a reviewed model into motion production and selected-engine integration. It composes after PROOF_TO_MODEL, Blender, copied libraries or an explicitly compatible CODE handoff; it does not replace the primary art pipeline or select another engine. Use `build-model-animations` and `model-to-animation.sh` with `--help`. OpenCaw retains its policy contract in `.styles/.workflows/model-to-animation/WORKFLOW.md`; schemas, recipes, audited Blender scripts and engine adapters live in `runtime/bubo/resources/model-to-animation/`.
 
 Start by checking animation readiness. A display mesh may have fused limbs, attached equipment or missing independent wheels and may need modeling repair. Choose a skinned character, articulated mechanism or rigid-object profile. The existing combat-focused rigged-actor/v1 manifest remains available for valid consumers; vehicles and noncombatants do not need fake bones, attacks or combat colliders.
 
@@ -1377,7 +1402,7 @@ Recipes declare clip trims, rates, bounded repetitions, incoming blends and effe
 
 The Three.js presentation adapter plays actual exported actions and owns attached charge effects, bounded particles and fixed-target visual projectiles. Pause freezes the sequence; cancellation, restart and disposal retire old callbacks and release owned resources. The fixed target is captured at action start. Gameplay controls valid targets, movement, collisions, damage, costs and projectile outcomes; animation and VFX callbacks remain presentation signals.
 
-Use the workflow under `.styles/.workflows/model-to-action/` with an existing reviewed motion package, explicit source review and budgets. Initial shared composition uses in-place clips; root-motion actions require an explicitly compatible movement implementation. The primary `STYLE.md` pipeline and `ENGINE.md` selection remain authoritative. Adobe integrations, hidden downloads and automatic acceptance are excluded. Action selection, independent review and human runtime acceptance remain separate from explicit promotion.
+Use the policy contract under `.styles/.workflows/model-to-action/WORKFLOW.md` with an existing reviewed motion package, explicit source review and budgets. Runtime schemas, recipes, audited scripts and engine adapters live in `runtime/bubo/resources/model-to-action/`. Initial shared composition uses in-place clips; root-motion actions require an explicitly compatible movement implementation. The primary `STYLE.md` pipeline and `ENGINE.md` selection remain authoritative. Adobe integrations, hidden downloads and automatic acceptance are excluded. Action selection, independent review and human runtime acceptance remain separate from explicit promotion.
 
 ```mermaid
 flowchart LR
@@ -1492,7 +1517,10 @@ Installed projects use this baseline layout. Root project contracts and the host
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
-│   └── lib/inspect-blender-scene.py  # read-only Blender scene inventory
+│   └── lib/bubo-runtime.cjs          # pinned runtime and audited-resource admission
+├── runtime/
+│   ├── bubo.lock.json               # recorded Bubo revision/API/resource identity
+│   └── bubo/                       # Bubo Git submodule; execution and resources
 ├── assets/                           # reusable test/report assets
 ├── tests/                            # OpenCaw validation suites and fixtures
 └── .cache/                           # durable project context; ignored by baseline Git
@@ -1521,10 +1549,12 @@ Typical flow:
 Example:
 
 ```bash
-git clone https://github.com/<your-org>/OpenCaw
+git clone --recurse-submodules https://github.com/<your-org>/OpenCaw
 cd OpenCaw
 git checkout -b feature/improve-gameplay-review
 ```
+
+After updating a maintainer checkout, run `bash ./commands/initialize-bubo-runtime.sh` to restore recorded nested revisions. Build explicitly with `bash ./commands/build-bubo-runtime.sh` before native workflow checks. Baseline-only checks and scaffold creation do not require a Bubo build.
 
 After making changes:
 

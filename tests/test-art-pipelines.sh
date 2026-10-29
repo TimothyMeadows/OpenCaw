@@ -34,14 +34,14 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 [[ -n "$node_bin" ]] || fail "Node.js is required for finishing-schema regression checks"
 "$node_bin" <<'FINISH_SCHEMA_CASES'
 const fs = require('fs'), vm = require('vm'), assert = require('assert');
-const schemaPath = '.styles/.pipelines/proof-to-model/finishing-settings.schema.json';
+const schemaPath = 'runtime/bubo/resources/proof-to-model/finishing-settings.schema.json';
 const source = fs.readFileSync('commands/validate-art-pipelines.sh', 'utf8').replace(/\r\n/g, '\n');
 const program = source.match(/"\$node_bin" <<'NODE'\n([\s\S]*?)\nNODE/);
 assert(program, 'The actual art schema validator must be exercised.');
 const original = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 function check(schema) {
   const fixtureFs = Object.create(fs);
-  fixtureFs.readFileSync = (file, ...args) => file === schemaPath ? JSON.stringify(schema) : fs.readFileSync(file, ...args);
+  fixtureFs.readFileSync = (file, ...args) => require('path').resolve(file) === require('path').resolve(schemaPath) ? JSON.stringify(schema) : fs.readFileSync(file, ...args);
   vm.runInNewContext(program[1], { require: name => name === 'fs' ? fixtureFs : require(name) }, { timeout: 2000 });
 }
 check(original);

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/TimothyMeadows/Bubo.git",
+  "path": "runtime/bubo",
+  "revision": "63ce839d498534ffaf2862138a5157e6cfbaeda0",
+  "apiVersion": 1,
+  "resourceCatalogSha256": "716f7a0c58740dd1b5d876a051cb143891146fce8b4fb5ada270d80cd3ab6dfc",
+  "buildReceipt": "artifacts/bubo/build-info.json",
+  "trackingIssue": "https://github.com/TimothyMeadows/OpenCaw/issues/143",
+  "acceptedPrerequisite": {
+    "originalMerge": "7881c49429b3303acd7fa3a8675ac81b403ef226",
+    "pullRequest": "https://github.com/TimothyMeadows/Bubo/pull/36",
+    "reviewedHead": "9f0caaef7ebec6ad5bcdcce6fac2202ad9a3201f",
+    "qa": "https://github.com/TimothyMeadows/Bubo/pull/36#issuecomment-6484118164",
+    "compatibilityCorrection": {
+      "pullRequest": "https://github.com/TimothyMeadows/Bubo/pull/37",
+      "reviewedHead": "ca03482189fd13dfae1a5823b6cceab6e6394c2c",
+      "mergedRevision": "63ce839d498534ffaf2862138a5157e6cfbaeda0",
+      "qa": "https://github.com/TimothyMeadows/Bubo/pull/37#issuecomment-6484767245"
+    }
+  }
+}

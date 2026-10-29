@@ -1,6 +1,6 @@
 # Reviewed rigid-part preparation
 
-Read the canonical [rigid-parts contract](../../../.styles/.pipelines/proof-to-model/RIGID_PARTS.md).
+Read the canonical [rigid-parts contract](../../../runtime/bubo/resources/proof-to-model/RIGID_PARTS.md).
 Select this method explicitly through schemaVersion2 finishing settings. It is
 appropriate to rigid/articulated geometry, not an automatic replacement for
 deforming-skin, cloth or subdivision topology.

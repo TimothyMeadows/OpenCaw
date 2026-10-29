@@ -176,6 +176,12 @@ Validation may be enforced with:
 - `./commands/validate-cloud-preferences.sh`
 - `./commands/validate-opencaw.sh`
 
+## Pinned Bubo execution
+
+`initialize-bubo-runtime.sh` checks out the recorded recursive dependency without building or installing. `build-bubo-runtime.sh [Release|Debug]` explicitly uses an existing .NET 10 SDK and Bubo's build script, then verifies the result. Production `proof-to-model.sh`, `model-to-animation.sh`, `model-to-action.sh` and `inspect-blender-scene.sh` use one revision/API/build/resource verifier and prebuilt Bubo CLI. No source or sibling fallback is allowed. Missing initialization/build is actionable and does not block ordinary scaffold/memory/policy startup. `test-bubo-runtime.sh` runs explicitly built upstream executable fixtures; it is separate from production.
+
+`commands/lib/style-contract.cjs` is the shared host style/pipeline/library validator used by public commands and runtime adapters. Each invocation validates current policy bytes and resolves explicit prompt overrides before primary selection. It never probes an optional library during validation or startup and never caches a validation/review verdict.
+
 ## Engine-aware entry points
 
 Engine-bearing commands consume `commands/resolve-engine.sh` or the shared `commands/lib/engine-contract.cjs` contract. Guard producers before writes and native/browser launches. Keep read-only historical artifact validation available. Engine selection, art pipeline selection, platform applicability and installed tool prerequisites are separate checks. Resolvers return deterministic JSON and incompatibility reasons with nonzero status. Native tooling guidance never claims execution when a prerequisite is unavailable.

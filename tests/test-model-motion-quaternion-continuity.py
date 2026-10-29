@@ -188,8 +188,8 @@ def native_case(output, scripts, action_scripts):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path)
-    parser.add_argument('--scripts-dir',type=Path,default=ROOT/'.styles/.workflows/model-to-animation/blender')
-    parser.add_argument('--action-scripts-dir',type=Path,default=ROOT/'.styles/.workflows/model-to-action/blender')
+    parser.add_argument('--scripts-dir',type=Path,default=ROOT/'runtime/bubo/resources/model-to-animation/blender')
+    parser.add_argument('--action-scripts-dir',type=Path,default=ROOT/'runtime/bubo/resources/model-to-action/blender')
     parser.add_argument('--blender-case',action='store_true')
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else None)
     if args.blender_case:

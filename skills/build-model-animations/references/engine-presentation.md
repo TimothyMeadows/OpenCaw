@@ -8,7 +8,7 @@ Ordinary vehicle movement uses speed, acceleration and turn parameters. Wheel ro
 
 Effects consume stable anchors and semantic state. Exhaust, trails, dust, spray and wakes depend on environment/context. Declare local/world space, lifetime, emission/overdraw/light budgets, quality tiers and reduced-motion/flash controls. Coordinate optional camera/audio/haptic layers through existing feedback ownership; do not create them implicitly.
 
-The executable Three.js adapter accepts host-owned locked APIs, actual animations, a canonical effective-engine receipt and a visual child beneath a separate movement root. It supports bounded native point/material effects and parameter articulation. Read `.styles/.workflows/model-to-animation/engines/README.md` for exact supported fields and limitations, including translation extraction and explicit specialized handling for rotating extracted roots.
+The executable Three.js adapter accepts host-owned locked APIs, actual animations, a canonical effective-engine receipt and a visual child beneath a separate movement root. It supports bounded native point/material effects and parameter articulation. Read `runtime/bubo/resources/model-to-animation/engines/README.md` for exact supported fields and limitations, including translation extraction and explicit specialized handling for rotating extracted roots.
 
 Use compatible Babylon.js, Unity, Unreal or Godot animation/material/VFX owners for their actual native artifacts. Do not install plugins or switch ENGINE.md to satisfy a requested feature. Phaser's2D selection requires an explicitly chosen sprite/pre-rendered handoff. Browser proof can cover a web target; it cannot certify native UI, gameplay feel, physical haptics or an unavailable engine.
 

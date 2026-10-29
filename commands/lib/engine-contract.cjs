@@ -104,10 +104,17 @@ function prototypeEngines(root) {
 }
 function productionEngines(root) {
   const found = new Set(); let visited = 0;
+  // Only this baseline's pinned execution dependency is tooling evidence. A
+  // host's own runtime/bubo (or another runtime project) still selects an engine.
+  const dependency = path.join(BASE, 'runtime', 'bubo');
+  const isDependency = dir => process.platform === 'win32'
+    ? path.resolve(dir).toLowerCase() === dependency.toLowerCase()
+    : path.resolve(dir) === dependency;
   // Directory entries are single components; excluding the installed baseline
   // also excludes its private cache and historical engine fixtures.
   const excluded = new Set(['.git', '.opencaw', '.local', '.engine', '.styles', '.architecture', '.roles', 'skills', 'commands', 'tests', 'prototypes', 'node_modules', 'Library', 'Temp', 'bin', 'obj']);
   function visit(dir, depth) {
+    if (isDependency(dir)) return;
     if (depth > 12 || ++visited > 20000) fail('Existing engine discovery exceeded its bound; narrow the project root or migrate engine evidence explicitly.');
     for (const id of existingEngines(dir)) found.add(id);
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

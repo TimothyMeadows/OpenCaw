@@ -26,7 +26,7 @@ For model-to-animation production, hand the reviewed model to `build-model-anima
 
 ## Guardrails
 
-- No Docker, AssetForge, AssetFurnace, Bubo checkout, or sibling application dependency. Native process guards are not an OS sandbox.
+- Use the exact initialized and explicitly built `runtime/bubo` dependency through OpenCaw's verified launcher. No sibling checkout or source-run fallback is allowed. Native process guards are not an OS sandbox.
 - No threshold matte fallback, placeholder stages, automatic human approval, hidden downloads, silent pipeline changes or unreviewed promotion.
 - Keep stage state under `.opencaw/.cache/tasks/<task>/`, candidates under `.art-staging/proof-to-model/`, tools under ignored `.local/tools/proof-to-model/`, and reviewed runtime packages under `assets/models/`.
 - Preserve failed attempts and immutable originals, hashes, model/tool/script/recipe identity and logs. An exhausted finishing budget requires an actual human decision and a current hash-bound `--finish-budget` receipt for exactly one more attempt; never reset counters or manufacture approval. Distinguish simulated-process tests from live engine and Blender acceptance.
