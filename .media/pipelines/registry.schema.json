@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/media-pipeline-registry-v1.json",
+  "title": "Independent media production domains",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "domains"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "domains": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["AUDIO", "MUSIC", "VOICE"],
+      "properties": {
+        "AUDIO": { "$ref": "#/$defs/domain" },
+        "MUSIC": { "$ref": "#/$defs/domain" },
+        "VOICE": { "$ref": "#/$defs/domain" }
+      }
+    }
+  },
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aliases", "contract", "declaration", "template", "modalities", "implementation"],
+      "properties": {
+        "aliases": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "contract": { "type": "string", "pattern": "^[A-Z]+\\.md$" },
+        "declaration": { "type": "string", "pattern": "^[a-z]+/PIPELINE\\.md$" },
+        "template": { "type": "string", "pattern": "^[a-z]+/CONTRACT\\.md$" },
+        "modalities": {
+          "type": "object", "minProperties": 1,
+          "additionalProperties": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        },
+        "implementation": {
+          "type": "object", "additionalProperties": false, "required": ["status", "entryPoint"],
+          "properties": {
+            "status": { "enum": ["declared", "implemented"] },
+            "entryPoint": { "type": ["string", "null"], "pattern": "^commands/[a-z-]+\\.sh$" }
+          },
+          "allOf": [
+            { "if": { "properties": { "status": { "const": "declared" } } }, "then": { "properties": { "entryPoint": { "type": "null" } } } },
+            { "if": { "properties": { "status": { "const": "implemented" } } }, "then": { "properties": { "entryPoint": { "type": "string" } } } }
+          ]
+        }
+      }
+    }
+  }
+}

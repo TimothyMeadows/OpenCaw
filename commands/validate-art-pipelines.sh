@@ -5,7 +5,9 @@ root=".styles/.pipelines"
 [[ -d "$root" ]] || { echo "Missing art pipeline directory: $root" >&2; exit 1; }
 [[ -f "$root/INDEX.md" ]] || { echo "Missing art pipeline index." >&2; exit 1; }
 [[ ! -e ".styles/.gpu" ]] || { echo "Legacy .styles/.gpu directory must not exist." >&2; exit 1; }
-[[ ! -e ".media" ]] || { echo "Legacy .media directory must not exist." >&2; exit 1; }
+for legacy in CLOUD_SESSION.md COMFYUI_LOCAL.md INDEX.md media-generation-manifest.schema.json model-packs.json toolchain.json; do
+  [[ ! -e ".media/$legacy" ]] || { echo "Legacy .media asset must not exist: $legacy" >&2; exit 1; }
+done
 
 declare -A paths=(
   [CLOUD]="cloud/PIPELINE.md"

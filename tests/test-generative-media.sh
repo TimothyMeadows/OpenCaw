@@ -26,7 +26,11 @@ done
 for asset in .styles/.pipelines/INDEX.md .styles/.pipelines/cloud/PIPELINE.md .styles/.pipelines/local/PIPELINE.md .styles/.pipelines/_shared/media-generation-manifest.schema.json runtime/bubo.lock.json; do
   [[ -f "$asset" ]] || fail "missing media integration asset: $asset"
 done
-[[ ! -e .styles/.gpu && ! -e .media ]] || fail 'retired alternate media trees still exist'
+[[ ! -e .styles/.gpu ]] || fail 'retired alternate GPU tree still exists'
+[[ -f .media/pipelines/registry.json ]] || fail 'independent media domain registry is missing'
+for legacy in CLOUD_SESSION.md COMFYUI_LOCAL.md INDEX.md media-generation-manifest.schema.json model-packs.json toolchain.json; do
+  [[ ! -e ".media/$legacy" ]] || fail "retired alternate media asset still exists: $legacy"
+done
 for role in arts/papercraft-art-director arts/sound-designer computer-science/generative-media-pipeline-engineer; do
   [[ -f ".roles/$role/ROLE.md" ]] || fail "missing role $role"
   bash commands/resolve-role.sh "${role#*/}" >/dev/null

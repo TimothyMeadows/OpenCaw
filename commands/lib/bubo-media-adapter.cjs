@@ -67,6 +67,10 @@ function bounded(options,key,fallback,maximum) {
   if (!Number.isSafeInteger(value) || value<1 || value>maximum) fail('Invalid finite --'+key+' bound.');
   return value;
 }
+function executionBudgets(options) {
+  return {timeoutSeconds:bounded(options,'timeout',1800,86400),maxLogBytes:bounded(options,'max-log-bytes',16777216,1073741824),
+    ...(options.has('max-private-bytes')?{maxPrivateBytes:bounded(options,'max-private-bytes',1,Number.MAX_SAFE_INTEGER)}:{})};
+}
 
 function sharedPath(root,approvalSha256) {
   if (!SHA.test(approvalSha256)) fail('Invalid acceptance approval identity.');
@@ -273,8 +277,7 @@ function contextFor(operation,options,info) {
   const context={schemaVersion:'bubo-host-context/v1',projectRoot:root,task,
     roots:{state:stateRoot,staging:relative(staging),tools:[relative(toolsRoot),relative(downloads)],inputs,outputs:receiptOutput?[receiptOutput]:[],mediaState},
     policy,references:[...references.values()],tools:[...tools.values()],
-    budgets:{timeoutSeconds:bounded(options,'timeout',1800,86400),maxLogBytes:bounded(options,'max-log-bytes',16777216,1073741824),
-      ...(options.has('max-private-bytes')?{maxPrivateBytes:bounded(options,'max-private-bytes',1,Number.MAX_SAFE_INTEGER)}:{})},
+    budgets:executionBudgets(options),
     permissions:{provisioning:operation==='setup'&&options.get('execute')==='true',promotion:false}};
   // Media CLI admission takes task ownership from the context/request, not a
   // --task argument (the shared CLI rejects that flag for media operations).
@@ -377,7 +380,7 @@ async function invoke(operation,options) {
   return {...result,hostMediaProvenance:provenance};
 }
 
-module.exports={parse,contextFor,invoke,validateMedia,bindSharedState,exportProvenance};
+module.exports={parse,contextFor,invoke,validateMedia,bindSharedState,exportProvenance,executionBudgets};
 if (require.main===module) {
   const [operation,...values]=process.argv.slice(2);
   if (!operation || ['help','--help','-h'].includes(operation) || values.includes('--help'))

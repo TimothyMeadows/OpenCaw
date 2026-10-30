@@ -193,6 +193,14 @@ Cloud/local media policy and shared provenance schemas live in:
 
 Direct LOCAL execution uses the pinned, explicitly built `./runtime/bubo` dependency. Its media catalog and platform locks own exact model/tool identities; do not duplicate those pins in OpenCaw. Use `./commands/inspect-local-media-host.sh` for read-only discovery and `./commands/bubo-media.sh <setup|inspect|generate>` for explicit task-bound requests. Discovery must distinguish declared capabilities, receipt presence and verified installed content; it never loads models or provisions software. `inspect --load true` is a separately selected zero-sample load/unload diagnostic.
 
+### Independent audio, music and voice domains
+
+Route SFX, game/effect sounds and ambience to `AUDIO`, music to `MUSIC`, and spoken voice to `VOICE`. Their declarations and shared lifecycle live under `./.media/pipelines/`; read the matching domain declaration and the optional host `../AUDIO.md`, `../MUSIC.md` or `../VOICE.md` for that work. These are independent production domains, never extra mutually exclusive visual STYLE choices. Mixed work keeps separate named domain contexts and asset/review state.
+
+Use `./commands/resolve-media-pipeline.sh --modality MODALITY` for deterministic routing, or `--all --visual` to load all domains alongside the existing visual selection. Missing unrelated domain contracts remain optional. Generate only the requested domain contract with `generate-media-pipeline-contract.sh DOMAIN`; startup does not create these files. A valid contract, declared capability or installation receipt does not prove executable readiness: retain reported unavailable prerequisites and `nativeReadiness: unverified` until the relevant checks run.
+
+MEDIA.md remains the shared provider, authorization and provenance authority. Automatic domain routing never selects CLOUD/LOCAL or changes STYLE.md/ENGINE.md. Generation-only audio needs no fabricated visual style or engine; selected-engine handoff and promotion still require compatible target evidence. Independent context loading does not authorize simultaneous GPU inference. Bubo retains native GPU/process ownership and one physically shared approval/attempt ledger across domains and tasks. Read `./.media/pipelines/LIFECYCLE.md` for immutable versions, review freshness and separate promotion gates.
+
 ### When `../MEDIA.md` exists
 
 - Read it only for image, music, sound-effect, voice, or media-pipeline work.
