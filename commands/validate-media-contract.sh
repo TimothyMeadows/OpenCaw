@@ -54,6 +54,13 @@ done
 if printf '%s\n' "${selected[@]:-}" | grep -qx 'LOCAL'; then
   grep -Eiq 'ask the user to choose|require the user to choose' "$media_file" || { echo "Hybrid MEDIA.md lacks an explicit pipeline choice gate." >&2; status=1; }
   grep -Eiq 'never (switch or )?fall back.*silently|never.*silently.*fall back' "$media_file" || { echo "Hybrid MEDIA.md lacks a no-silent-fallback rule." >&2; status=1; }
+  if grep -Eiq 'comfyui|comfy-cli|use-comfyui-local-generation|run-comfyui-workflow' "$media_file"; then
+    echo 'The current LOCAL contract selects a retired execution integration. Generate a Bubo LOCAL contract; retain historical receipts unchanged.' >&2
+    status=1
+  fi
+  for modality in image music 'sound.effect|sfx' voice; do
+    grep -Eiq "$modality" "$media_file" || { echo "LOCAL MEDIA.md lacks independent modality coverage: $modality" >&2; status=1; }
+  done
 fi
 
 if grep -Eiq '(api[_ -]?key|access[_ -]?token|hf[_ -]?token)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_/-]{12,}' "$media_file"; then

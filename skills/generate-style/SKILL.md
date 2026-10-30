@@ -10,7 +10,7 @@ Use when `../STYLE.md` is missing or when the user wants to regenerate it after 
 ## Workflow
 1. If `../STYLE.md` is missing, ask the user which templates from `./.styles/` apply unless the user already named the desired style. Default the art pipeline to `PROOF_TO_MODEL` unless the user names another one.
 2. Support multiple templates for mixed art-direction repositories.
-3. Normalize `imagegen` to `CLOUD`, `comfyui` to `LOCAL`, `proof-to-model`, `proof to model`, or `2d-to-3d` to `PROOF_TO_MODEL`, `threejs` to `CODE`, and `blender`, `blend`, or `bpy` to `BLENDER`. Record exactly one primary and repeatable allowed alternatives.
+3. Normalize `imagegen` to `CLOUD`, use canonical `LOCAL` for direct Bubo generation, normalize `proof-to-model`, `proof to model`, or `2d-to-3d` to `PROOF_TO_MODEL`, `threejs` to `CODE`, and `blender`, `blend`, or `bpy` to `BLENDER`. Record exactly one primary and repeatable allowed alternatives.
 4. Add repeatable optional external library roots only when the user explicitly configures them. Preserve existing entries during regeneration unless the user replaces or clears them; never prompt for them during startup or initial setup.
 5. Generate `../STYLE.md` from the selected style and pipeline templates using concise read directives by default.
 6. Use inline mode only when the user explicitly asks for fully embedded template content.
@@ -27,6 +27,7 @@ Use when `../STYLE.md` is missing or when the user wants to regenerate it after 
 - Do not silently select a different pipeline when the chosen one is unavailable.
 - Do not use a task-local override to rewrite `STYLE.md`.
 - Do not invent, require, or probe an external asset-library path when none is configured.
+- LOCAL selection configures policy only. Use `use-bubo-local-generation` for separate readiness, authorized setup and bounded execution; keep exact model/tool pins in Bubo and preserve existing media budgets/reviews.
 
 ## Commands
 - `./commands/generate-style.sh "<STYLE1>" ["STYLE2" ...]`

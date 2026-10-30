@@ -30,7 +30,7 @@ grep -Fq 'Blender 4.5 LTS' "$root/blender/PIPELINE.md" || { echo "BLENDER contra
 grep -Eiq 'immutable source|preserve.*source' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks immutable-source protection." >&2; exit 1; }
 grep -Eiq 'never install|do not install' "$root/blender/PIPELINE.md" || { echo "BLENDER contract lacks the no-install boundary." >&2; exit 1; }
 
-for asset in _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json proof-to-model/manifest.schema.json proof-to-model/source-set.schema.json proof-to-model/classification.schema.json proof-to-model/proof-set.schema.json proof-to-model/finishing-settings.schema.json proof-to-model/rigid-source-topology.schema.json proof-to-model/finish-budget.schema.json proof-to-model/toolchain.json proof-to-model/toolchain.single-view-diagnostic.json proof-to-model/recipes/static-prop.json proof-to-model/blender/finish.py proof-to-model/blender/review.py proof-to-model/blender/common.py proof-to-model/blender/rigid_finish.py proof-to-model/blender/rigid_source_topology.py code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
+for asset in _shared/media-generation-manifest.schema.json proof-to-model/manifest.schema.json proof-to-model/source-set.schema.json proof-to-model/classification.schema.json proof-to-model/proof-set.schema.json proof-to-model/finishing-settings.schema.json proof-to-model/rigid-source-topology.schema.json proof-to-model/finish-budget.schema.json proof-to-model/toolchain.json proof-to-model/toolchain.single-view-diagnostic.json proof-to-model/recipes/static-prop.json proof-to-model/blender/finish.py proof-to-model/blender/review.py proof-to-model/blender/common.py proof-to-model/blender/rigid_finish.py proof-to-model/blender/rigid_source_topology.py code/code-model-manifest.schema.json code/code-character-profile.schema.json code/code-character-observation.schema.json code/code-character-evidence-report.schema.json; do
   if [[ "$asset" == proof-to-model/* ]]; then
     node commands/lib/bubo-runtime.cjs resource "$asset" >/dev/null
   else
@@ -44,8 +44,6 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 const fs = require('fs');
 const files = [
   '.styles/.pipelines/_shared/media-generation-manifest.schema.json',
-  '.styles/.pipelines/local/toolchain.json',
-  '.styles/.pipelines/local/model-packs.json',
   '.styles/.pipelines/code/code-model-manifest.schema.json',
   '.styles/.pipelines/code/code-character-profile.schema.json',
   '.styles/.pipelines/code/code-character-observation.schema.json',
@@ -168,16 +166,16 @@ for (const [flag, value] of [['--pixal3d-weights','mv'], ['--num-views','6'], ['
 if (mv.models.filter(model => /\.gguf$/.test(model.path) && !/\/birefnet\.gguf$/.test(model.path)).length !== 9 || mv.models.some(model => model.licenseAccepted !== false || /_sv\.gguf$/.test(model.path))) throw new Error('Default MV requires nine explicit unaccepted model pins plus its explicit matting dependency.');
 if (mv.models.filter(model => /_mv\.gguf$/.test(model.path)).length !== 4) throw new Error('MV flow inventory is incomplete.');
 if (!Number.isInteger(readProof('recipes/static-prop.json').proofPreparation.maxSetRevisions)) throw new Error('Proof preparation requires an explicit revision budget.');
-const code = JSON.parse(fs.readFileSync(files[3], 'utf8'));
+const code = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-model-manifest.schema.json', 'utf8'));
 const required = ['schemaVersion','modelId','intent','pipelineSelection','inputs','target','renderer','runtime','budgets','reviewPolicy','passes'];
 for (const key of required) if (!code.required.includes(key)) throw new Error(`Code model schema omits ${key}`);
-const character = JSON.parse(fs.readFileSync(files[4], 'utf8'));
+const character = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-profile.schema.json', 'utf8'));
 const characterRequired = ['schemaVersion','characterId','codeModel','intent','silhouette','structure','motion','budgets','reviewPolicy','gates'];
 for (const key of characterRequired) if (!character.required.includes(key)) throw new Error(`Code character schema omits ${key}`);
 if (character.properties.schemaVersion.const !== 'opencaw-code-character/v1') throw new Error('Code character schema version is invalid.');
-const observation = JSON.parse(fs.readFileSync(files[5], 'utf8'));
+const observation = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-observation.schema.json', 'utf8'));
 if (observation.properties.schemaVersion.const !== 'opencaw-code-character-observation/v1') throw new Error('Code character observation schema version is invalid.');
-const evidence = JSON.parse(fs.readFileSync(files[6], 'utf8'));
+const evidence = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-evidence-report.schema.json', 'utf8'));
 if (evidence.properties.schemaVersion.const !== 'opencaw-code-character-evidence/v1') throw new Error('Code character evidence schema version is invalid.');
 NODE
 

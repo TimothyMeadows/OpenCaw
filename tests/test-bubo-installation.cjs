@@ -13,7 +13,7 @@ assert(args.length === 0 || (args.length === 1 && args[0] === '--real-runtime'),
 const realMode = args.length === 1;
 const base = path.resolve(__dirname, '..');
 const cache = path.basename(base) === '.opencaw' ? path.join(base, '.cache') : path.join(base, '.opencaw/.cache');
-const evidence = path.join(cache, 'tasks/opencaw-integrate-bubo-runtime/evidence/installation');
+const evidence = path.join(cache, 'tasks/opencaw-retire-comfyui/evidence/installation');
 fs.mkdirSync(evidence, { recursive: true });
 const fixture = fs.mkdtempSync(path.join(evidence, realMode ? 'fixture-real-' : 'fixture-'));
 const environment = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: path.join(fixture, 'gitconfig'),
@@ -109,6 +109,12 @@ function realRuntime() {
     const identity = JSON.parse(admitted.stdout);
     equal(identity.revision, revision, `${form}: admitted CLI reports the recorded revision`);
     equal(identity.build, receipt.capabilities.build, `${form}: observed live capability build agrees with the original build receipt`);
+    const liveMedia = JSON.parse(command(path.join(copiedBundle, executable), ['capabilities', '--api-version', '1'], copiedBundle).stdout);
+    equal(liveMedia.mediaBackends.map(item => [item.id, item.modality]).sort(), [
+      ['flux-schnell', 'image'], ['stable-audio-open', 'sfx'], ['ace-step-turbo', 'music'],
+      ['qwen3-tts-customvoice', 'preset-speech'], ['qwen3-tts-base', 'consented-cloning']
+    ].sort(), `${form}: actual prebuilt CLI advertises all five selected backends without loading models`);
+    equal(runtime(baseline, ['resource', 'media/catalog.json']).status, 0, `${form}: recorded source admits the pinned media catalog`);
     function changed(name, mutate, expected, label) {
       const full = path.join(copiedBundle, name), original = fs.existsSync(full) ? fs.readFileSync(full) : null;
       const mode = original === null ? null : fs.statSync(full).mode & 0o777;
@@ -130,13 +136,15 @@ function realRuntime() {
     changed('resources/catalog.json', bytes => Buffer.concat([bytes, Buffer.from('\n')]), /Published Bubo resource catalog changed/, 'published resource catalog tamper');
     const resource = Object.keys(JSON.parse(fs.readFileSync(path.join(copiedBundle, 'resources/catalog.json'), 'utf8')).files).sort()[0];
     changed(resource, bytes => Buffer.concat([bytes, Buffer.from('\nfixture tamper\n')]), /Published Bubo audited resource changed/, 'published audited resource tamper');
+    changed('resources/media/catalog.json', bytes => Buffer.concat([bytes, Buffer.from('\n')]), /Published Bubo audited resource changed/, 'published media catalog tamper');
+    changed('resources/media/voice/worker.py', bytes => Buffer.concat([bytes, Buffer.from('\n# owned nonexecuted tamper\n')]), /Published Bubo audited resource changed/, 'published voice worker tamper');
     changed('Bubo.Host.dll', bytes => Buffer.concat([bytes, Buffer.from([0])]), /Bubo built artifact changed: Bubo\.Host\.dll/, 'runtime assembly tamper');
     changed(executable, bytes => Buffer.concat([bytes, Buffer.from([0])]), /Bubo built artifact changed: bubo(?:\.exe)?/, 'apphost tamper');
     for (const config of ['bubo.runtimeconfig.json', 'bubo.deps.json']) changed(config, bytes => Buffer.concat([bytes, Buffer.from('\n')]), /Bubo built artifact changed:/, config + ' tamper');
     changed('unexpected-fixture.dll', () => Buffer.from('Reject the inventory before attempting to load this fixture.'), /Unexpected or missing Bubo runtime assembly/, 'unexpected runtime assembly');
     changed('build-info.json', modifyReceipt(value => { value.capabilities.build.cliSha256 = '0'.repeat(64); }), /live capability\/build identity differs/, 'receipt disagreement with actual prebuilt capabilities');
     equal(git(copiedDependency, 'status', '--porcelain', '--untracked-files=no'), '', `${form}: isolated build checks preserve pinned tracked source files`);
-    forms.push({ form, revision, cliSha256: identity.build.cliSha256, copiedFiles: files.length, rejectedCases: 11 });
+    forms.push({ form, revision, cliSha256: identity.build.cliSha256, copiedFiles: files.length, rejectedCases: 13 });
   }
   for (const file of files) assert.equal(digest(path.join(bundle, file.name)), file.sha256, 'Actual input bundle was modified: ' + file.name);
   check(true, 'Every original published bundle file retains its initial hash after isolated mutations');
@@ -145,7 +153,7 @@ function realRuntime() {
     assertions: observations.length, platform: process.platform, revision, resourceCatalogSha256: lock.resourceCatalogSha256,
     nativeBuilds: 0, executedCommands: ['prebuilt capabilities --api-version 1'], networkProtocolsAllowed: ['file'],
     forms, rejectionEvidence, observations }, null, 2) + '\n');
-  console.log(`Real Bubo build admission tests passed (${observations.length} assertions; 22 isolated rejection cases; actual prebuilt capabilities; no builds).`);
+  console.log(`Real Bubo build admission tests passed (${observations.length} assertions; 26 isolated rejection cases; actual prebuilt capabilities; no builds/models).`);
 }
 
 let completed = false;
@@ -159,7 +167,15 @@ try {
   write(bubo, 'dev/browser/package.json', JSON.stringify({ devDependencies: { three: 'fixture-only' } }));
   write(bubo, 'resources/proof-to-model/manifest.schema.json', '{"fixture":"resource admission only"}\n');
   const resourceKey = 'resources/proof-to-model/manifest.schema.json';
-  write(bubo, 'resources/catalog.json', JSON.stringify({ schemaVersion: 1, files: { [resourceKey]: digest(path.join(bubo, resourceKey)) } }, null, 2));
+  const mediaResource = 'resources/media/catalog.json', voiceResource = 'resources/media/voice/worker.py';
+  write(bubo, mediaResource, JSON.stringify({ schemaVersion: 'owned-media-catalog-fixture/v1', backends: [
+    { id: 'flux-schnell', modality: 'image' }, { id: 'stable-audio-open', modality: 'sfx' },
+    { id: 'ace-step-turbo', modality: 'music' }, { id: 'qwen3-tts-customvoice', modality: 'preset-speech' },
+    { id: 'qwen3-tts-base', modality: 'consented-cloning' }
+  ], fixture: 'OWNED metadata; no native execution or model-quality evidence' }));
+  write(bubo, voiceResource, '# OWNED NONEXECUTABLE fixture; never imported or launched\n');
+  write(bubo, 'resources/catalog.json', JSON.stringify({ schemaVersion: 1, files: Object.fromEntries(
+    [resourceKey, mediaResource, voiceResource].map(name => [name, digest(path.join(bubo, name))])) }, null, 2));
   const pinned = commit(bubo, 'Pinned offline dependency fixture');
   const source = path.join(fixture, 'opencaw-source'); init(source);
   for (const file of ['commands/lib/bubo-runtime.cjs', 'commands/lib/bubo-host-adapter.cjs', 'commands/lib/style-contract.cjs',
@@ -167,6 +183,10 @@ try {
     'commands/model-to-animation.sh', 'commands/model-to-action.sh',
     'commands/lib/platform-common.sh', 'commands/initialize-bubo-runtime.sh', 'commands/resolve-opencaw-paths.sh',
     'commands/create-host-ai-scaffold.sh', '.gitignore']) {
+    const destination = path.join(source, file); fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.copyFileSync(path.join(base, file), destination);
+  }
+  fs.cpSync(path.join(base, 'commands/lib'), path.join(source, 'commands/lib'), { recursive: true });
+  for (const file of ['commands/bubo-media.sh', 'commands/install-bubo-media.sh', 'commands/inspect-local-media-host.sh']) {
     const destination = path.join(source, file); fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.copyFileSync(path.join(base, file), destination);
   }
   fs.cpSync(path.join(base, '.engine'), path.join(source, '.engine'), { recursive: true });
@@ -213,6 +233,13 @@ try {
       check(production.status === 1 && /not initialized.*submodule update --init --recursive --checkout runtime\/bubo/.test(production.stderr)
         && !/STYLE\.md|not built|Missing value|Cannot find module/.test(production.stderr), `${form}: real ${workflow} adapter reports dependency initialization before policy or build work`);
     }
+    for (const operation of ['setup', 'inspect', 'generate']) {
+      const help = command(bash, [path.join(baseline, 'commands/bubo-media.sh'), operation, '--help'], baseline);
+      check(help.status === 0 && ['setup', 'inspect', 'generate', '--manifest'].every(word => help.stdout.includes(word)), `${form}: media ${operation} help remains available before initialization or policy setup`);
+      const production = command(process.execPath, [path.join(baseline, 'commands/lib/bubo-media-adapter.cjs'), operation, '--root', host, '--task', 'fixture', '--manifest', 'missing.json'], baseline, true);
+      check(production.status === 1 && /not initialized.*submodule update --init --recursive --checkout runtime\/bubo/.test(production.stderr)
+        && !/Cannot find module|MEDIA\.md|Missing manifest/.test(production.stderr), `${form}: actual media ${operation} reports the missing dependency before policy or state work`);
+    }
     check(!fs.existsSync(path.join(baseline, '.cache')), `${form}: help and rejected production adapters create no durable task or policy state`);
     shell(baseline, 'create-host-ai-scaffold.sh');
     for (const name of ['SYSTEM_MEMORY', 'MEMORY', 'REPO_MAP', 'RULES', 'DEBUG']) {
@@ -233,6 +260,8 @@ try {
     equal(git(path.join(baseline, 'runtime/bubo'), 'rev-parse', 'HEAD'), pinned, `${form}: recursive initialization selects the recorded gitlink rather than newer upstream HEAD`);
     const admitted = runtime(baseline, ['resource', 'proof-to-model/manifest.schema.json']);
     equal(admitted.status, 0, `${form}: actual resource admission succeeds after recorded recursive initialization`);
+    equal(runtime(baseline, ['resource', 'media/catalog.json']).status, 0, `${form}: recursive initialization admits exact media catalog metadata`);
+    equal(runtime(baseline, ['resource', 'media/voice/worker.py']).status, 0, `${form}: source resource admission resolves audited voice worker bytes without executing them`);
     const unbuilt = runtime(baseline, ['verify']);
     check(unbuilt.status === 1 && /not built.*build-bubo-runtime\.sh explicitly/.test(unbuilt.stderr), `${form}: native launch admission requires an explicit build`);
     check(!fs.existsSync(path.join(baseline, 'runtime/bubo/artifacts')), `${form}: failed native admission performs no build or installation`);

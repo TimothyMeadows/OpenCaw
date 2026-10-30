@@ -5,7 +5,7 @@ OpenCaw separates visual language from the method used to produce it. Every gene
 Primary art pipelines selectable in `STYLE.md`:
 
 - `CLOUD` - session-provided image generation with explicit cost, provenance, staging, and review controls.
-- `LOCAL` - loopback-only ComfyUI image and audio generation using reviewed local GPU tooling.
+- `LOCAL` - direct offline Bubo image, SFX, music, preset speech and consented cloning with explicit setup, verified installations and shared GPU ownership.
 - `PROOF_TO_MODEL` - original-only anatomy/structure classification, reviewed six-view proofs, pinned native multi-view reconstruction, Blender finishing and reviewed runtime packages.
 - `CODE` - authored procedural Three.js models, with linked character profiles, isolated visual review, and calibrated runtime evidence for characters and creatures.
 - `BLENDER` - authored Blender 4.5 LTS scenes, assets, renders, and exports with immutable-source and review controls.
@@ -18,7 +18,7 @@ Pipeline contracts:
 - `code/PIPELINE.md`
 - `blender/PIPELINE.md`
 
-Shared generated-media provenance lives under `_shared/`. Pipeline-specific schemas, manifests, and reusable assets remain beside the pipeline that owns them.
+Shared generated-media provenance lives under `_shared/`. LOCAL host policy remains under `local/`; exact model/tool pins, platform locks and execution resources belong only to the pinned `runtime/bubo` dependency. Other pipeline-specific schemas, manifests and reusable assets remain beside their owner.
 
 `PROOF_TO_MODEL` is the default when style generation does not name a pipeline. A current user prompt may explicitly select any registered pipeline for one task without rewriting `STYLE.md`. Never switch pipelines silently after work begins.
 

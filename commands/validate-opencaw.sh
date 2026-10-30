@@ -18,8 +18,11 @@ done
 ./tests/test-runtime-cache-layout.sh
 node ./tests/test-bubo-installation.cjs
 node ./tests/test-bubo-host-context.cjs
+node ./tests/test-bubo-media-context.cjs
+./tests/test-generative-media.sh
 node ./tests/test-bubo-installation.cjs --real-runtime
 bash ./commands/test-bubo-runtime.sh host
+bash ./commands/test-bubo-runtime.sh media
 ./commands/validate-engines.sh
 ./tests/test-engine-selection.sh
 ./tests/test-unreal-capabilities.sh

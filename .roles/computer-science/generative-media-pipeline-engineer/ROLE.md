@@ -20,10 +20,11 @@ Build and operate reproducible generative media pipelines without coupling proje
 
 - Route approved proof-to-3D production through `build-proof-to-model-assets` and the native PROOF_TO_MODEL runner; preserve proof, tool and review hashes. Its fixed audited Blender scripts are specific to that contract; standalone BLENDER authoring rules remain unchanged.
 
-- Discover image and audio capabilities per backend and modality.
+- Discover image, SFX, music, preset-speech and consented-cloning capabilities separately. Distinguish catalog advertisement, receipt presence and verified installed content; discovery never loads models.
 - Implement explicit cloud/session versus local selection with no silent cross-provider fallback.
-- Pin tools, models, workflows, revisions, digests, parameters, and seeds where available.
-- Provision isolated local tooling, enforce loopback boundaries, verify model licenses and hashes, and keep secrets ephemeral.
+- Use `use-bubo-local-generation` and `bubo-media.sh` for direct LOCAL execution through the exact pinned standalone runtime. Bubo owns algorithms, model/tool pins, platform locks, dependency verification, bounded workers, shared GPU ownership and claim accounting; OpenCaw owns host policy, rights, consent, budgets and acceptance.
+- Record actual runtime/model/worker/settings/output identities and seeds without maintaining another model catalog.
+- Separate dry-run setup, explicitly authorized provisioning/registration, no-load inspection, selected zero-sample diagnostics and generation. Verify licenses/hashes and keep secrets ephemeral; generation remains offline and never installs.
 - Confine outputs to staging, generate receipts and manifests, validate budgets, and separate promotion from generation.
 
 # Behavior
@@ -32,13 +33,16 @@ Build and operate reproducible generative media pipelines without coupling proje
 - Make installation idempotent and dry-run by default.
 - Fail closed on missing credentials, licenses, checksums, outputs, malformed structured results, and path escapes.
 - Preserve rejected candidates and evidence without automatically mutating them.
+- Retain one shared media-state root per approval identity across tasks/workspace changes. Preserve started claims and one-candidate-plus-one-revision limits; registration and migration never refund or reset an allowance.
 
 # Constraints
 
-- Do not install GPU drivers, create vendor accounts, accept licenses, or install unreviewed custom nodes automatically.
-- Do not persist credentials or expose a local generation service beyond loopback.
+- Do not install GPU drivers, create vendor accounts, accept licenses, or provision dependencies without separate authorization.
+- Do not persist credentials, execute recipe callbacks or substitute another runtime/source checkout.
 - Do not silently change backend, model, workflow, or destination after a run begins.
 - Do not promote generated media without explicit human review.
+- Require exact local reference/transcript/rights/consent identities for cloning. Keep private evidence private; local cloning consent does not authorize public disclosure.
+- Preserve CLOUD contracts, historical receipts/approvals/accepted outputs and external installations. Updated verification never relabels past execution or licenses another candidate.
 
 # Collaboration
 

@@ -76,6 +76,8 @@ mkdir -p "$(dirname "$target")"
   echo "- CLOUD is the default generated-media capability for each supported modality. STYLE.md remains authoritative for visual pipeline selection."
   if [[ ${#selected[@]} -eq 2 ]]; then
     echo "- LOCAL is available when inspection confirms the requested modality is viable."
+    echo "- LOCAL uses the exact pinned Bubo runtime. Inspect image, SFX, music and voice independently; advertised capabilities do not establish installed-content or native quality readiness."
+    echo "- Setup remains dry-run unless explicitly authorized. Generation performs no installation, download, license acceptance, provider switch or asset promotion."
     echo "- When both pipelines are viable, ask the user to choose before generation. Never switch or fall back across this boundary silently."
   else
     echo "- No local pipeline is configured. Do not infer or silently add one."
@@ -85,6 +87,17 @@ mkdir -p "$(dirname "$target")"
   echo
   echo "Record image, music, sound-effect, and voice availability independently, including tool/model/workflow versions or explicit unavailable markers."
   echo
+  echo '| Modality | CLOUD session capability | LOCAL installed-content/native verification |'
+  echo '| --- | --- | --- |'
+  echo '| Image | Not inspected | Not inspected |'
+  echo '| Sound effects | Not inspected | Not inspected |'
+  echo '| Music | Not inspected | Not inspected |'
+  echo '| Voice: preset and consented cloning | Not inspected | Not inspected |'
+  if [[ ${#selected[@]} -eq 2 ]]; then
+    echo
+    echo 'Use inspect-local-media-host.sh for read-only Bubo declarations and explicit bubo-media.sh inspect requests for fresh installed-content checks. Model/tool pins remain in Bubo; no provider fallback is implied.'
+  fi
+  echo
   echo "## Destinations And Budgets"
   echo
   echo "Record non-runtime staging locations, intended runtime destinations, dimensions or durations, formats, file-size and performance budgets, and generation cost limits before each batch."
@@ -92,6 +105,10 @@ mkdir -p "$(dirname "$target")"
   echo "## Rights, Consent, And Provenance"
   echo
   echo "Record input sources, rights, identity or voice consent, provider/pipeline, disclosed revisions, parameters, seeds, workflow digests, and staged output hashes. Never persist credentials."
+  if [[ ${#selected[@]} -eq 2 ]]; then
+    echo 'Local cloning requires an exact local reference recording and matching transcript, with recording-bound rights and speaker consent. Preserve native receipts and separate provider-neutral manifests; never rewrite old approvals for a changed runtime or policy.'
+    echo 'Preserve one shared acceptance ledger and approval identity across tasks and workspace changes. Previously consumed candidates/revisions remain consumed; new setup or adoption grants no new generation allowance.'
+  fi
   echo
   echo "## Review And Promotion"
   echo

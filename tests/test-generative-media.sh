@@ -4,10 +4,8 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 runtime_dir="$(mktemp -d "$repo_root/tests/.pipeline-media-runtime-XXXXXX")"
-export OPENCAW_TEST_MODE=1
 cleanup() { case "$runtime_dir" in "$repo_root"/tests/.pipeline-media-runtime-*) rm -rf -- "$runtime_dir" ;; esac; }
 trap cleanup EXIT
-
 fail() { echo "FAIL: $*" >&2; exit 1; }
 contains_exact_line() {
   awk -v expected="$1" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$2"
@@ -17,167 +15,94 @@ expect_failure() {
   set +e; "$@" >"$log" 2>&1; local status=$?; set -e
   [[ $status -ne 0 ]] || fail "command unexpectedly succeeded: $*"
 }
+node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
+[[ -n "$node_bin" ]] || fail 'Node.js is required for owned media contract fixtures'
 
-echo "[1/8] validating styles, roles, skills, and bindings"
+echo "[1/8] validating styles, roles, skills, and Bubo bindings"
 for style in LAYERED_PAPERCRAFT PAPER_DIORAMA POPUP_STORYBOOK; do
   [[ -f ".styles/$style.md" ]] || fail "missing style $style"
   contains_exact_line "- $style" .styles/INDEX.md || fail "$style is not indexed"
 done
-for asset in \
-  .styles/.pipelines/INDEX.md \
-  .styles/.pipelines/cloud/PIPELINE.md \
-  .styles/.pipelines/local/PIPELINE.md \
-  .styles/.pipelines/_shared/media-generation-manifest.schema.json \
-  .styles/.pipelines/local/toolchain.json \
-  .styles/.pipelines/local/model-packs.json; do
-  [[ -f "$asset" ]] || fail "missing pipeline-owned media asset: $asset"
+for asset in .styles/.pipelines/INDEX.md .styles/.pipelines/cloud/PIPELINE.md .styles/.pipelines/local/PIPELINE.md .styles/.pipelines/_shared/media-generation-manifest.schema.json runtime/bubo.lock.json; do
+  [[ -f "$asset" ]] || fail "missing media integration asset: $asset"
 done
-[[ ! -e ".styles/.gpu" ]] || fail "legacy pipeline tree still exists"
-[[ ! -e ".media" ]] || fail "legacy .media directory still exists"
+[[ ! -e .styles/.gpu && ! -e .media ]] || fail 'retired alternate media trees still exist'
 for role in arts/papercraft-art-director arts/sound-designer computer-science/generative-media-pipeline-engineer; do
   [[ -f ".roles/$role/ROLE.md" ]] || fail "missing role $role"
   bash commands/resolve-role.sh "${role#*/}" >/dev/null
 done
-bash commands/resolve-role.sh paper-art-director >/dev/null
-bash commands/resolve-role.sh audio-designer >/dev/null
-bash commands/resolve-role.sh media-pipeline-engineer >/dev/null
-for skill in plan-generative-media-pipeline use-comfyui-local-generation produce-generative-audio validate-generated-media; do
+for alias in paper-art-director audio-designer media-pipeline-engineer; do bash commands/resolve-role.sh "$alias" >/dev/null; done
+for skill in plan-generative-media-pipeline use-bubo-local-generation produce-generative-audio validate-generated-media; do
   [[ -f "skills/$skill/SKILL.md" ]] || fail "missing skill $skill"
   grep -Fq "\$$skill" "skills/$skill/agents/openai.yaml" || fail "$skill metadata lacks its invocation"
-  for section in "When to use" "Workflow" "Output" "Guardrails"; do contains_exact_line "## $section" "skills/$skill/SKILL.md" || fail "$skill is missing $section"; done
+  for section in 'When to use' Workflow Output Guardrails; do contains_exact_line "## $section" "skills/$skill/SKILL.md" || fail "$skill is missing $section"; done
 done
 bash commands/validate-role-skill-map.sh
 
-echo "[2/8] generating cloud-only and hybrid contracts"
+echo "[2/8] preserving CLOUD and explicit hybrid policy"
 bash commands/generate-media-contract.sh --output "$runtime_dir/cloud/MEDIA.md" CLOUD
 bash commands/validate-media-contract.sh "$runtime_dir/cloud/MEDIA.md"
-! grep -q '^- LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail "cloud-only contract configured local"
+! grep -q '^- LOCAL' "$runtime_dir/cloud/MEDIA.md" || fail 'cloud-only contract configured local'
 bash commands/generate-media-contract.sh --output "$runtime_dir/hybrid/MEDIA.md" CLOUD LOCAL
 bash commands/validate-media-contract.sh "$runtime_dir/hybrid/MEDIA.md"
 bash commands/generate-media-contract.sh --inline --output "$runtime_dir/inline/MEDIA.md" CLOUD LOCAL
 awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$runtime_dir/inline/MEDIA.md" > "$runtime_dir/inline/MEDIA-crlf.md"
 bash commands/validate-media-contract.sh "$runtime_dir/inline/MEDIA-crlf.md"
-grep -Fq '.styles/.pipelines/cloud/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the cloud pipeline path"
-grep -Fq '.styles/.pipelines/local/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted the local pipeline path"
-! grep -Fq '.media/' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract retained a stale .media path"
-grep -Eiq 'ask the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted user choice"
-grep -Eiq 'never switch or fall back.*silently' "$runtime_dir/hybrid/MEDIA.md" || fail "hybrid contract omitted fallback boundary"
+grep -Fq '.styles/.pipelines/cloud/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail 'hybrid contract omitted CLOUD'
+grep -Fq '.styles/.pipelines/local/PIPELINE.md' "$runtime_dir/hybrid/MEDIA.md" || fail 'hybrid contract omitted LOCAL'
+! grep -Fq '.media/' "$runtime_dir/hybrid/MEDIA.md" || fail 'hybrid contract retained stale path'
+grep -Eiq 'ask the user to choose|require the user to choose' "$runtime_dir/hybrid/MEDIA.md" || fail 'hybrid omitted explicit choice'
+grep -Eiq 'never (switch or )?fall back.*silently|never.*silently.*fall back' "$runtime_dir/hybrid/MEDIA.md" || fail 'hybrid omitted fallback boundary'
 expect_failure "$runtime_dir/backend-order.log" bash commands/generate-media-contract.sh --output "$runtime_dir/bad.md" LOCAL CLOUD
 expect_failure "$runtime_dir/blender-media.log" bash commands/generate-media-contract.sh --output "$runtime_dir/blender-media.md" BLENDER
 cp "$runtime_dir/hybrid/MEDIA.md" "$runtime_dir/missing-choice.md"
-sed -i '/ask the user to choose/d' "$runtime_dir/missing-choice.md"
+sed -i '/ask the user to choose\|require the user to choose/d' "$runtime_dir/missing-choice.md"
 expect_failure "$runtime_dir/missing-choice.log" bash commands/validate-media-contract.sh "$runtime_dir/missing-choice.md"
 
-echo "[3/8] checking command help and dry-run behavior"
-for command in generate-media-contract validate-media-contract install-comfyui-local install-comfyui-models inspect-local-media-host run-comfyui-workflow validate-media-generation-manifest; do
+echo "[3/8] keeping public command help independent of setup and generation"
+for command in generate-media-contract validate-media-contract bubo-media install-bubo-media inspect-local-media-host validate-media-generation-manifest; do
   bash "commands/$command.sh" --help >/dev/null || fail "$command --help failed"
 done
-for platform in windows linux macos; do
-  OPENCAW_PLATFORM_OVERRIDE="$platform" bash commands/install-comfyui-local.sh --workspace "$runtime_dir/install-$platform" >"$runtime_dir/install-$platform.log"
-  grep -q 'mode: dry-run' "$runtime_dir/install-$platform.log" || fail "$platform installer was not a dry-run"
+for operation in setup inspect generate; do bash commands/bubo-media.sh "$operation" --help >/dev/null; done
+
+echo "[4/8] asserting active implementation retirement without touching external installations"
+# These are explicit retirement assertions, not compatibility command aliases.
+for retired in commands/install-comfyui-local.sh commands/install-comfyui-models.sh commands/run-comfyui-workflow.sh skills/use-comfyui-local-generation .styles/.pipelines/local/toolchain.json .styles/.pipelines/local/model-packs.json tests/fixtures/media/fake-comfy.cjs; do
+  [[ ! -e "$retired" ]] || fail "active retired integration remains: $retired"
 done
-bash commands/install-comfyui-models.sh --pack all --workspace "$runtime_dir/models" >"$runtime_dir/models-dry-run.log"
-grep -q 'ead426278b49030e9da5df862994f25ce94ab2ee4df38b556ddddb3db093bf72' "$runtime_dir/models-dry-run.log" || fail "FLUX checksum missing"
-grep -q 'stability-community-license' "$runtime_dir/models-dry-run.log" || fail "audio license missing"
 
-echo "[4/8] enforcing hardware, disk, license, credential, and checksum gates"
-large_disk=999999999999
-large_vram=999999999999
-expect_failure "$runtime_dir/disk.log" env OPENCAW_TEST_DISK_BYTES=1 OPENCAW_TEST_GPU_KIND=nvidia OPENCAW_TEST_VRAM_BYTES="$large_vram" bash commands/install-comfyui-models.sh --pack flux-schnell-fp8 --workspace "$runtime_dir/models" --execute
-grep -q 'Insufficient disk space' "$runtime_dir/disk.log" || fail "disk gate was not reported"
-expect_failure "$runtime_dir/vram.log" env OPENCAW_TEST_DISK_BYTES="$large_disk" OPENCAW_TEST_GPU_KIND=nvidia OPENCAW_TEST_VRAM_BYTES=1 bash commands/install-comfyui-models.sh --pack flux-schnell-fp8 --workspace "$runtime_dir/models" --execute
-grep -q 'Insufficient VRAM' "$runtime_dir/vram.log" || fail "VRAM gate was not reported"
-expect_failure "$runtime_dir/hardware.log" env OPENCAW_TEST_DISK_BYTES="$large_disk" OPENCAW_TEST_GPU_KIND=unsupported bash commands/install-comfyui-models.sh --pack flux-schnell-fp8 --workspace "$runtime_dir/models" --execute
-grep -q 'Unsupported local generation hardware' "$runtime_dir/hardware.log" || fail "unsupported hardware was not reported"
-expect_failure "$runtime_dir/license.log" env OPENCAW_TEST_DISK_BYTES="$large_disk" OPENCAW_TEST_GPU_KIND=nvidia OPENCAW_TEST_VRAM_BYTES="$large_vram" bash commands/install-comfyui-models.sh --pack flux-schnell-fp8 --workspace "$runtime_dir/models" --execute
-grep -q 'License acceptance required' "$runtime_dir/license.log" || fail "license gate was not reported"
-expect_failure "$runtime_dir/credential.log" env -u HF_API_TOKEN OPENCAW_COMFY_BIN=/bin/true OPENCAW_TEST_DISK_BYTES="$large_disk" OPENCAW_TEST_GPU_KIND=nvidia OPENCAW_TEST_VRAM_BYTES="$large_vram" bash commands/install-comfyui-models.sh --pack stable-audio-open --workspace "$runtime_dir/models" --accept-license stability-community-license --accept-license apache-2.0 --execute
-grep -q 'HF_API_TOKEN is required' "$runtime_dir/credential.log" || fail "credential gate was not reported"
-mkdir -p "$runtime_dir/bad-model/models/checkpoints"
-printf 'wrong bytes\n' > "$runtime_dir/bad-model/models/checkpoints/flux1-schnell-fp8.safetensors"
-expect_failure "$runtime_dir/checksum.log" env OPENCAW_TEST_DISK_BYTES="$large_disk" OPENCAW_TEST_GPU_KIND=nvidia OPENCAW_TEST_VRAM_BYTES="$large_vram" bash commands/install-comfyui-models.sh --pack flux-schnell-fp8 --workspace "$runtime_dir/bad-model" --accept-license apache-2.0 --execute
-grep -q 'Checksum mismatch' "$runtime_dir/checksum.log" || fail "checksum gate was not reported"
+echo "[5/8] exercising owned pure host-context, shared-budget and provenance fixtures"
+"$node_bin" tests/test-bubo-media-context.cjs
 
-echo "[5/8] exercising isolated package managers and idempotent tool installation"
-fake_tools="$runtime_dir/fake-tools"
-mkdir -p "$fake_tools"
-cat > "$fake_tools/fake-comfy" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-if [[ "${1:-}" == "--version" ]]; then echo 'comfy-cli version 1.12.0'; exit 0; fi
-workspace=''
-while [[ $# -gt 0 ]]; do if [[ "$1" == "--workspace" ]]; then workspace="$2"; shift 2; else shift; fi; done
-[[ -z "$workspace" ]] || { mkdir -p "$workspace"; touch "$workspace/main.py"; }
-EOF
-cat > "$fake_tools/fake-python" <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-if [[ "\${1:-}" == "-c" ]]; then echo '3.13'; exit 0; fi
-if [[ "\${1:-}" == "-m" && "\${2:-}" == "venv" ]]; then
-  target="\$3"
-  mkdir -p "\$target/bin" "\$target/Scripts"
-  cp "$fake_tools/fake-python" "\$target/bin/python"
-  cp "$fake_tools/fake-python" "\$target/Scripts/python.exe"
-  cp "$fake_tools/fake-comfy" "\$target/bin/comfy"
-  cp "$fake_tools/fake-comfy" "\$target/Scripts/comfy.exe"
-  chmod +x "\$target/bin/python" "\$target/Scripts/python.exe" "\$target/bin/comfy" "\$target/Scripts/comfy.exe"
-  exit 0
+echo "[6/8] inspecting readiness without loading models or mutating the host"
+mkdir -p "$runtime_dir/discovery"
+bash commands/inspect-local-media-host.sh --root "$runtime_dir/discovery" --workspace .opencaw/.cache/bubo-media --json > "$runtime_dir/discovery.json"
+discovery_for_node="$runtime_dir/discovery.json"
+project_for_node="$runtime_dir/discovery"
+if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+  discovery_for_node="$(wslpath -w "$discovery_for_node")"; project_for_node="$(wslpath -w "$project_for_node")"
 fi
-exit 0
-EOF
-chmod +x "$fake_tools/fake-python" "$fake_tools/fake-comfy"
-cat > "$fake_tools/winget" <<'EOF'
-#!/usr/bin/env bash
-printf 'winget %s\n' "$*" >> "${OPENCAW_PACKAGE_LOG:?}"
-EOF
-cat > "$fake_tools/brew" <<'EOF'
-#!/usr/bin/env bash
-printf 'brew %s\n' "$*" >> "${OPENCAW_PACKAGE_LOG:?}"
-EOF
-cat > "$fake_tools/apt-get" <<'EOF'
-#!/usr/bin/env bash
-printf 'apt-get %s\n' "$*" >> "${OPENCAW_PACKAGE_LOG:?}"
-EOF
-cat > "$fake_tools/sudo" <<'EOF'
-#!/usr/bin/env bash
-exec "$@"
-EOF
-chmod +x "$fake_tools/winget" "$fake_tools/brew" "$fake_tools/apt-get" "$fake_tools/sudo"
-package_log="$runtime_dir/package-managers.log"
-for platform in windows macos linux; do
-  env PATH="$fake_tools:$PATH" OPENCAW_PLATFORM_OVERRIDE="$platform" OPENCAW_PYTHON_BIN="$fake_tools/fake-python" OPENCAW_TEST_MISSING_FFMPEG=1 OPENCAW_PACKAGE_LOG="$package_log" bash commands/install-comfyui-local.sh --workspace "$runtime_dir/package-$platform" --execute >"$runtime_dir/package-$platform.log"
+"$node_bin" - "$discovery_for_node" "$project_for_node" <<'NODE'
+const fs=require('fs'),assert=require('assert/strict');
+const doc=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+assert.equal(doc.schemaVersion,'opencaw-local-media-host/v1');assert.equal(doc.pipeline,'LOCAL');
+for(const field of ['generation','modelLoading','installation','externalInstallationsInspected'])assert.equal(doc[field],false,field+' must not occur in discovery');
+for(const modality of ['image','sfx','music','voice']){
+  assert.equal(doc.modalities[modality].ready,false,'advertisement/receipt presence cannot establish native readiness');
+  assert(Array.isArray(doc.modalities[modality].backends),'separate backend identities remain available');
+}
+assert(!Object.hasOwn(doc,'comfyUI')&&!doc.tools?.comfyCli,'retired external execution must not be probed');
+assert.deepEqual(fs.readdirSync(process.argv[3]),[],'read-only discovery creates no host/cache/install state');
+console.log('PASS: four-modality readiness remains separate from installed/native verification.');
+NODE
+for operation in setup inspect generate; do
+  expect_failure "$runtime_dir/missing-$operation.log" bash commands/bubo-media.sh "$operation" --root "$runtime_dir/discovery" --task owned --manifest missing.json
+  [[ ! -e "$runtime_dir/discovery/.opencaw" ]] || fail 'rejected media dispatch created durable state'
 done
-grep -Fq 'winget install --id Gyan.FFmpeg' "$package_log" || fail "Windows package-manager fixture was not exercised"
-grep -Fq 'brew install ffmpeg' "$package_log" || fail "macOS package-manager fixture was not exercised"
-grep -Fq 'apt-get install -y ffmpeg' "$package_log" || fail "Linux package-manager fixture was not exercised"
-env PATH="$fake_tools:$PATH" OPENCAW_PACKAGE_LOG="$package_log" OPENCAW_TEST_MISSING_FFMPEG=1 OPENCAW_PLATFORM_OVERRIDE=linux OPENCAW_PYTHON_BIN="$fake_tools/fake-python" bash commands/install-comfyui-local.sh --workspace "$runtime_dir/isolated" --execute >"$runtime_dir/install-first.log"
-env PATH="$fake_tools:$PATH" OPENCAW_PACKAGE_LOG="$package_log" OPENCAW_TEST_MISSING_FFMPEG=1 OPENCAW_PLATFORM_OVERRIDE=linux OPENCAW_PYTHON_BIN="$fake_tools/fake-python" bash commands/install-comfyui-local.sh --workspace "$runtime_dir/isolated" --execute >"$runtime_dir/install-second.log"
-[[ -x "$runtime_dir/isolated/.opencaw/bin/comfy" && -f "$runtime_dir/isolated/main.py" ]] || fail "isolated install fixture was incomplete"
-grep -q 'already exists' "$runtime_dir/install-second.log" || fail "second install was not idempotent"
-mkdir -p "$runtime_dir/isolated/models/checkpoints" "$runtime_dir/isolated/models/text_encoders"
-touch "$runtime_dir/isolated/models/checkpoints/flux1-schnell-fp8.safetensors"
-touch "$runtime_dir/isolated/models/checkpoints/stable-audio-open-1.0.safetensors"
-touch "$runtime_dir/isolated/models/text_encoders/t5-base.safetensors"
-OPENCAW_PLATFORM_OVERRIDE=linux bash commands/inspect-local-media-host.sh --workspace "$runtime_dir/isolated" --json > "$runtime_dir/inspect.json"
-[[ "$(grep -c '"ready": true' "$runtime_dir/inspect.json")" -eq 2 ]] || fail "host inspection drifted from model-pack destinations"
-
-echo "[6/8] running workflows through a fake structured comfy-cli"
-fake_comfy="$repo_root/tests/fixtures/media/fake-comfy.cjs"
-mkdir -p "$runtime_dir/workflows"
-for name in success malformed failed node-error timeout missing-output malformed-download; do printf '{}\n' > "$runtime_dir/workflows/$name.json"; done
-OPENCAW_ASSUME_SERVER_RUNNING=1 OPENCAW_TEST_COMFY_SCRIPT="$fake_comfy" bash commands/run-comfyui-workflow.sh --workflow "$runtime_dir/workflows/success.json" --output-dir "$runtime_dir/staging-success" --workspace "$runtime_dir/comfy" --timeout 10
-[[ -f "$runtime_dir/staging-success/candidate.bin" && -f "$runtime_dir/staging-success/opencaw-run-receipt.json" ]] || fail "successful workflow lacks staged output or receipt"
-grep -q 'pending-human-review' "$runtime_dir/staging-success/opencaw-run-receipt.json" || fail "receipt promoted output automatically"
-expected_hash="$(sha256sum "$runtime_dir/staging-success/candidate.bin" | awk '{print $1}')"
-grep -q "$expected_hash" "$runtime_dir/staging-success/opencaw-run-receipt.json" || fail "receipt hash mismatch"
-for name in malformed failed node-error missing-output malformed-download; do
-  expect_failure "$runtime_dir/$name.log" env OPENCAW_ASSUME_SERVER_RUNNING=1 OPENCAW_TEST_COMFY_SCRIPT="$fake_comfy" bash commands/run-comfyui-workflow.sh --workflow "$runtime_dir/workflows/$name.json" --output-dir "$runtime_dir/staging-$name" --workspace "$runtime_dir/comfy" --timeout 10
-done
-expect_failure "$runtime_dir/timeout.log" env OPENCAW_ASSUME_SERVER_RUNNING=1 OPENCAW_TEST_COMFY_SCRIPT="$fake_comfy" bash commands/run-comfyui-workflow.sh --workflow "$runtime_dir/workflows/timeout.json" --output-dir "$runtime_dir/staging-timeout" --workspace "$runtime_dir/comfy" --timeout 1
-grep -q 'timeout' "$runtime_dir/timeout.log" || fail "wall-clock timeout was not reported"
-expect_failure "$runtime_dir/path.log" env OPENCAW_ASSUME_SERVER_RUNNING=1 OPENCAW_TEST_COMFY_SCRIPT="$fake_comfy" bash commands/run-comfyui-workflow.sh --workflow "$runtime_dir/workflows/success.json" --output-dir / --workspace "$runtime_dir/comfy"
 
 echo "[7/8] validating image, music, SFX, and voice manifests"
+# Schema-only synthetic fixtures retain historical provider names and review
+# states. They execute no provider and establish no media quality or approval.
 for modality in image music sfx voice; do
   dir="$runtime_dir/manifests/$modality"; mkdir -p "$dir"; printf '%s candidate\n' "$modality" > "$dir/candidate.bin"; hash="$(sha256sum "$dir/candidate.bin" | awk '{print $1}')"
   status=staged; review=pending; reviewer='{"unavailable":true,"reason":"review pending"}'; reviewed='{"unavailable":true,"reason":"review pending"}'; rejection=''

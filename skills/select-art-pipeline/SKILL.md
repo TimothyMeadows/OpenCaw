@@ -9,7 +9,7 @@ engines: [AGNOSTIC]
 ## When to use
 
 - Starting any visual or art-production request governed by `STYLE.md`.
-- A prompt explicitly requests proof-to-model assets, image generation, local ComfyUI, code-first Three.js models, or Blender production.
+- A prompt explicitly requests proof-to-model assets, image generation, direct Bubo LOCAL generation, code-first Three.js models, or Blender production.
 - CSS/SVG interface-only work follows style guidance independently; do not start reconstruction or resolve a retired vector pipeline.
 - Explaining which pipeline is active without changing the repository contract.
 
@@ -22,6 +22,7 @@ engines: [AGNOSTIC]
 5. Read the resolved pipeline contract under `.styles/.pipelines/` and follow it together with the selected art-style template.
 6. For `CLOUD` or `LOCAL` image generation, also read `MEDIA.md`. Existing-proof `PROOF_TO_MODEL`, `CODE`, and `BLENDER` do not require `MEDIA.md`; read it whenever cloud/local generated inputs are in scope. Route PROOF_TO_MODEL to `build-proof-to-model-assets`; never implicitly invoke a generator.
 7. If the selected capability is unavailable or fails, stop and report the failure.
+8. Route LOCAL generation to `use-bubo-local-generation` through the pinned Bubo runtime. Selection alone never authorizes setup, model loading, generation, an additional candidate/revision allowance or runtime promotion. Audio uses MEDIA policy independently of this visual selection workflow.
 
 ## Output
 

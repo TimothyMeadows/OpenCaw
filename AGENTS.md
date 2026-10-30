@@ -131,7 +131,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDE
 ### Pipeline responsibilities
 
 - `CLOUD`: use compatible generation exposed by the active session with explicit budgets, non-runtime staging, provenance, and human review.
-- `LOCAL`: use pinned loopback-only ComfyUI image/audio execution on local GPU resources with license and checksum gates.
+- `LOCAL`: use direct offline Bubo image, SFX, music, preset-speech and consented-cloning execution on local GPU resources through `use-bubo-local-generation` and `bubo-media.sh`. Bubo owns model/tool pins, dependency verification, bounded workers and shared GPU ownership; OpenCaw owns policy, rights, consent, budgets and reviews. Setup is a separate explicitly authorized operation.
 - `PROOF_TO_MODEL`: classify/research immutable original sources first, prepare and obtain human approval of six consistent views, then run native per-view preprocessing, pinned Pixal3D multi-view reconstruction and Blender 4.5 LTS finishing with immutable ancestry, independent review and separate human promotion; use `build-proof-to-model-assets`.
 - `CODE`: author host-native Three.js TypeScript/JavaScript models; do not use downloaded/generated mesh assets or a model library as the primary implementation.
 - `BLENDER`: author Blender 4.5 LTS scenes, assets, renders, and runtime exports through immutable working-copy, validation, staging, and human-review controls.
@@ -185,11 +185,13 @@ The optional generative media contract for the host repository is:
 
 - `../MEDIA.md`
 
-Cloud/local media contracts, shared provenance schemas, and pinned local manifests live in:
+Cloud/local media policy and shared provenance schemas live in:
 
 - `./.styles/.pipelines/cloud/`
 - `./.styles/.pipelines/local/`
 - `./.styles/.pipelines/_shared/`
+
+Direct LOCAL execution uses the pinned, explicitly built `./runtime/bubo` dependency. Its media catalog and platform locks own exact model/tool identities; do not duplicate those pins in OpenCaw. Use `./commands/inspect-local-media-host.sh` for read-only discovery and `./commands/bubo-media.sh <setup|inspect|generate>` for explicit task-bound requests. Discovery must distinguish declared capabilities, receipt presence and verified installed content; it never loads models or provisions software. `inspect --load true` is a separately selected zero-sample load/unload diagnostic.
 
 ### When `../MEDIA.md` exists
 
@@ -209,10 +211,13 @@ Cloud/local media contracts, shared provenance schemas, and pinned local manifes
 ### Generation and promotion boundaries
 
 - Never switch or fall back between `CLOUD` and `LOCAL` silently. Report a selected-pipeline failure and request direction.
+- For LOCAL, keep setup dry-run unless explicitly authorized with `--execute`; generation never installs, downloads, accepts licenses or changes provider/device/precision. Images require actual STYLE selection evidence; audio requires MEDIA policy without an invented style or engine.
+- Retain one shared acceptance-state root per approval identity across tasks and workspace changes. Preserve started attempts, candidate/revision consumption and rejected evidence; a one-candidate-plus-one-revision allowance is never reset by registration, migration or a new workspace.
 - Keep generated outputs in a non-runtime staging location until human review is recorded.
 - Record versioned generation manifests with explicit unavailable markers when a provider does not disclose a model, workflow, parameter, or seed.
 - Require input rights and applicable identity or voice consent, hash staged outputs, validate runtime budgets, and record acceptance or rejection reasons.
 - Keep promotion separate from generation. Never persist credentials, accept licenses for the user, or promote an unreviewed candidate.
+- Preserve historical manifests/receipts and external installations. Retiring a LOCAL adapter grants no permission to probe, alter or uninstall external tools, rewrite old approvals, regenerate accepted outputs or disclose private voice inputs/outputs.
 
 ## Role casting
 
