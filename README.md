@@ -65,6 +65,7 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
   - [Brainstorm, Task, Goal, and Gauntlet](#brainstorm-task-goal-and-gauntlet)
   - [Task, Issue, and PR Delivery](#task-issue-and-pr-delivery)
   - [Memory v2](#memory-v2)
+  - [Audio, Music, and Voice Pipelines](#audio-music-and-voice-pipelines)
   - [Art Pipelines and Generative Media](#art-pipelines-and-generative-media)
   - [Validation](#validation)
   - [Repository Layout](#repository-layout)
@@ -82,14 +83,18 @@ Use OpenCaw to take a game concept toward a playable, reviewed result, or to imp
 | Game design | Player decisions, core loops, progression, economies, difficulty, and balance hypotheses | Design briefs and observed playtest results |
 | Gameplay and worlds | Movement, combat, physics, actors, level systems, persistence, and engine integration | Tests and representative playable scenarios |
 | Game UI and feedback | HUD synchronization, screen/input ownership, controller focus, accessibility, camera, VFX, audio cues, and haptics | Layout/input checks and supported-device testing |
-| Art and assets | Visual direction, 2D proofs, native proof-to-model production, model-to-animation, Blender authoring, and runtime handoff | Source ancestry, technical budgets, complete motion review, independent reviews, and human acceptance |
-| Audio | Music, ambience, sound effects, and voice through explicitly selected tools | Rights, provenance, listening review, and runtime budgets |
+| Art and assets | Visual direction, 2D proofs, native proof-to-model production, model-to-animation/action composition, Blender authoring, and runtime handoff | Source ancestry, technical budgets, complete motion review, independent reviews, and human acceptance |
+| Sound effects and ambience | AUDIO pipeline for game events and environmental sound | Rights, technical validation, complete listening review, and loop/target evidence |
+| Music | MUSIC pipeline for instrumental tracks and supplied-lyric songs | Exact lyric rights, full-track/vocal review, and runtime budgets |
+| Speech | VOICE pipeline for preset speech and consented local-reference cloning | Reference-bound consent, spoken-content review, and separate disclosure/distribution rights |
 | QA and performance | Gameplay regressions, scene budgets, lifecycle cleanup, profiling, and target-platform builds | Actual engine/device results, with blocked checks stated |
 | Game services and delivery | Multiplayer integration, databases, backend services, security, CI/CD, and release preparation | Service/integration tests and reviewed delivery evidence |
 
 Engine-specific workflows cover **Three.js, Babylon.js, Phaser, Unity, Unreal, and Godot**. Each project selects one in `ENGINE.md`; an unconfigured project defaults to Three.js only when existing game evidence does not conflict. Three.js supplies rendering; physics and networking require explicit project choices. Engine-agnostic design and QA skills remain reusable across engines.
 
 `STYLE.md` selects visual direction and the art pipeline. **PROOF_TO_MODEL** is the default: classify original sources, approve six consistent views, reconstruct them natively and finish in Blender, then review before runtime promotion. CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. The CODE pipeline is specific to Three.js.
+
+**AUDIO, MUSIC, and VOICE are independent production pipelines.** Load them together and alongside the visual workflow without changing its selection. Each provides planning, immutable asset versions, validation, human review, and separate runtime promotion. See [Audio, Music, and Voice Pipelines](#audio-music-and-voice-pipelines) for routing and setup.
 
 OpenCaw supplies guidance and executable workflows. Actual production needs the selected engine, packages, platform SDKs, art tools, and any chosen media capabilities. Dependencies, model licenses, generation budgets, and runtime asset acceptance remain explicit decisions. A structural validation pass does not establish gameplay quality or production readiness.
 
@@ -570,6 +575,7 @@ OpenCaw separates reusable baseline behavior from host-project state.
 ├── .engine/
 ├── .roles/
 ├── .styles/
+├── .media/               # independent media pipeline declarations and schemas
 ├── skills/
 ├── commands/
 ├── assets/
@@ -586,6 +592,9 @@ OpenCaw separates reusable baseline behavior from host-project state.
 ├── ARCHITECTURE.md
 ├── STYLE.md
 ├── MEDIA.md                 # optional
+├── AUDIO.md                 # optional SFX/ambience workflow
+├── MUSIC.md                 # optional instrumental/song workflow
+├── VOICE.md                 # optional speech/cloning workflow
 ├── BRAINSTORM.md            # optional discovery state
 ├── BRAINSTORM_SUMMARY.md    # optional exit index
 └── .opencaw/
@@ -618,8 +627,13 @@ OpenCaw uses concise host-level contracts so agents do not have to rediscover fo
 | Architecture | `ARCHITECTURE.md` | `.architecture/` | Technology, boundaries, data, deployment, and engineering conventions |
 | Visual style and art pipeline | `STYLE.md` | `.styles/*.md`, `.styles/.pipelines/` | Visual language plus one primary production path and supported alternatives |
 | Cloud/local media execution | `MEDIA.md` | `.styles/.pipelines/cloud/`, `.styles/.pipelines/local/` | Capability, provenance, staging, budgets, and promotion policy for generated media |
+| Sound effects and ambience | Optional `AUDIO.md` | `.media/pipelines/audio/` | Independent sound brief, validation, listening review, and target handoff |
+| Instrumental and supplied-lyric music | Optional `MUSIC.md` | `.media/pipelines/music/` | Track intent, exact lyrics/rights, full-track review, and target handoff |
+| Preset speech and consented cloning | Optional `VOICE.md` | `.media/pipelines/voice/` | Spoken content, local reference/consent, disclosure, and target handoff |
 
 When a required architecture or style contract is missing, OpenCaw asks which templates apply and supports composing more than one. Default generation uses concise read directives rather than copying entire templates into the host file. Inline generation is opt-in.
+
+The three media-domain contracts are optional and independent; configure only the workflows the project needs. They use shared `MEDIA.md` execution policy without selecting a visual style. Generation planning does not require an engine; selected-engine handoff requires current target evidence.
 
 ### Architecture frameworks
 
@@ -792,8 +806,12 @@ $design-game-systems
 | Game UI and feedback | `build-game-ui`, `build-gameplay-runtime`, `build-accessible-motion-systems`, `create-game-vfx` | Plan input ownership, HUD synchronization, readable feedback, accessibility, and device-specific haptics |
 | Selected-engine implementation | `threejs-build-scenes`, `babylonjs-integrate-physics`, `phaserjs-build-tilemaps`, `unity-build-ui`, `unreal-build-gameplay-framework`, `godot-run-tooling` | Use only the features compatible with ENGINE.md and explicitly selected project dependencies |
 | Art and runtime assets | `build-proof-to-model-assets`, `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `tcg-art-direction` | Produce and review assets with ancestry, budgets, handoff evidence, and human acceptance |
+| Model motion and actions | `build-model-animations`, `build-model-actions` | Create reviewed clips and compound actions with selected-engine presentation and separate gameplay authority |
 | Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
 | Generative media | `plan-generative-media-pipeline`, `use-bubo-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
+| Sound effects and ambience | `build-audio-assets` | Run the independent AUDIO lifecycle, including complete listening and loop review |
+| Instrumental and songs | `build-music-assets` | Run MUSIC with exact supplied lyrics/rights and full-track review |
+| Preset and cloned speech | `build-voice-assets` | Run VOICE with reference/purpose-bound consent and separate output disclosure |
 | Game QA and performance | `test-playable-games`, `optimize-web-games`, `profile-application-performance` | Verify representative play and measure declared budgets on the relevant runtime |
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Verify browser games and web builds; native UI requires native evidence |
 | Game services and tools | `solution-build`, `test-dotnet`, `database-cli-query`, `build-game-production-tools` | Build and test supporting services, persistence, and production tooling |
@@ -848,6 +866,8 @@ Or run the command directly:
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
 | Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `inspect-local-media-host.sh`, `install-bubo-media.sh`, `bubo-media.sh`, `validate-media-generation-manifest.sh` |
+| Independent media contracts | `generate-media-pipeline-contract.sh`, `validate-media-pipeline-contract.sh`, `resolve-media-pipeline.sh` |
+| AUDIO, MUSIC, and VOICE workflows | `audio-pipeline.sh`, `music-pipeline.sh`, `voice-pipeline.sh` |
 | Native proof-to-model assets | `proof-to-model.sh` |
 | Native model-to-animation production | `model-to-animation.sh` |
 | Native model-to-action composition | `model-to-action.sh` |
@@ -1186,11 +1206,42 @@ Useful commands:
 
 OpenCaw proactively records only verified, stable, reusable facts. It does not store secrets, identities, personal paths, guesses, raw logs, or transient task chatter. Replacement and purge workflows archive prior knowledge before removing it.
 
+## Audio, Music, and Voice Pipelines
+
+Use three separate production workflows for sound, music, and speech. Ordinary audio/SFX/ambience requests route to AUDIO, music to MUSIC, and spoken voice to VOICE. A mixed request keeps separate assets and reviews, even when they share a task or human asset name.
+
+| Pipeline | Supported work | Optional host contract | Skill and command |
+| --- | --- | --- | --- |
+| [AUDIO](.media/pipelines/audio/PIPELINE.md) | Game sound effects and ambience | `AUDIO.md` | [`build-audio-assets`](skills/build-audio-assets/SKILL.md), `audio-pipeline.sh` |
+| [MUSIC](.media/pipelines/music/PIPELINE.md) | Instrumental tracks and supplied-lyric songs | `MUSIC.md` | [`build-music-assets`](skills/build-music-assets/SKILL.md), `music-pipeline.sh` |
+| [VOICE](.media/pipelines/voice/PIPELINE.md) | Preset speech and consented local-reference cloning | `VOICE.md` | [`build-voice-assets`](skills/build-voice-assets/SKILL.md), `voice-pipeline.sh` |
+
+All three can load together with CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER without changing `STYLE.md`; visual workflows retain their engine/tool prerequisites. Workflow loading, planning, and review are independent; Bubo serializes LOCAL GPU execution, including proof reconstruction. Media approvals retain one physical shared media-state root across tasks and domains. Proof/model workflows keep their own approval and attempt ancestry. Parallel loading creates no generation allowance or permission for simultaneous GPU inference.
+
+For a host project that needs all three workflows, run from its project root:
+
+```bash
+bash .opencaw/commands/generate-media-pipeline-contract.sh AUDIO
+bash .opencaw/commands/generate-media-pipeline-contract.sh MUSIC
+bash .opencaw/commands/generate-media-pipeline-contract.sh VOICE
+bash .opencaw/commands/resolve-media-pipeline.sh --all --visual
+```
+
+Omit contract-generation commands for unused domains. Contract generation defaults to concise read directives; `--inline` embeds the declaration. `validate-media-pipeline-contract.sh DOMAIN` checks a configured contract. Resolution reports missing optional domains without creating files, installing tools, or loading models. Its `nativeReadiness` remains `unverified`: a valid contract, advertised capability, or receipt does not verify installed content. `MEDIA.md` separately controls provider availability, budgets, rights, staging, and promotion; configuring a domain does not select CLOUD or LOCAL.
+
+Each pipeline command supports `brief`, `init`, `revise`, `status`, `doctor`, `setup-plan`, `generate`, `import`, `validate`, `review`, `handoff`, `promote`, and `recover`. Use its `--help` for current arguments. The shared lifecycle provides:
+
+- **Immutable versions and provenance:** exact inputs, settings, native run/build/catalogue ancestry, output hashes, retained failures, and task/domain/asset/version state under `.opencaw/.cache/tasks/<task>/media/`. Changed inputs, rights, consent, or policy invalidate affected evidence; LOCAL admission rechecks bound evidence after waiting for GPU ownership. A revision preserves its parent and never resets an exhausted allowance.
+- **Explicit execution:** setup planning is dry-run; generation requires current authorization, installation/license evidence, finite budgets, and a matching provider. LOCAL uses the verified Bubo runtime. CLOUD outputs require actual session provenance import; these commands do not run unattended CLOUD generation or silently fall back. Unavailable technical analysis keeps imported outputs staged and blocks handoff.
+- **Complete content review:** SFX/ambience needs whole-output listening and any claimed loop seam; music needs full-track review and every supplied line when applicable; voice needs full spoken-text, pronunciation, artifact, and preset/reference-match review. Technical measurements do not establish those judgments.
+- **Private voice and lyrics:** exact supplied lyrics retain their rights evidence. Cloning requires local reference audio, matching transcript, rights, reference-bound consent, and purpose-bound local-use evidence. Local or QA consent grants no public disclosure or runtime distribution; cloned outputs need separate disclosure evidence. Private inputs and generated QA speech stay local.
+- **Separate runtime delivery:** `handoff` requires current technical/content review, selected-engine playback/load/dispose evidence, format/budget compatibility, and distribution rights. Explicit `promote` publishes exact authorized bytes into a fresh owned directory; `recover` preserves prior intent and failures without overwriting another asset. Generation never promotes automatically.
+
+LOCAL SFX/ambience uses the supported SFX backend; unsupported long ambience is rejected rather than tiled or trimmed. MUSIC keeps ACE-Step's optional planning language model disabled. VOICE keeps preset speech and local cloning as distinct profiles; CLOUD cloning is unavailable under the supported local-only reference consent. These workflows do not add automatic editing, mastering, seamless loops, or a portable engine player.
+
+Read the [media pipeline guide](docs/MEDIA_PIPELINES.md) for same-task command examples and THREEJS/UNITY handoff requirements, the [shared lifecycle](.media/pipelines/LIFECYCLE.md) for ownership/recovery boundaries, and the [media catalog](.media/pipelines/INDEX.md) for declarations and schemas.
+
 ## Art Pipelines and Generative Media
-
-Audio production domains load independently alongside the visual primary: AUDIO covers SFX/ambience, MUSIC covers music and VOICE covers speech. Use `resolve-media-pipeline.sh --all --visual` for separate named contexts and configure only the optional domain contracts needed by the project. Provider choice remains in MEDIA.md; independent loading does not permit concurrent GPU inference or new generation allowances.
-
-AUDIO uses `build-audio-assets`/`audio-pipeline.sh`, MUSIC uses `build-music-assets`/`music-pipeline.sh`, and VOICE uses `build-voice-assets`/`voice-pipeline.sh`; each command has `--help`. Independent workflows provide strict briefs, native provenance, complete content review and separate target/promotion gates. MUSIC preserves exact supplied lyrics/rights with planning disabled; VOICE separates local cloning consent/purpose from public disclosure and distribution. Explicit promotion privately prepares exact copies, preserves failures and supports owned recovery without overlapping packages. Read the [media pipeline guide](docs/MEDIA_PIPELINES.md) for configuration and lifecycle boundaries.
 
 OpenCaw separates visual direction from production method. Asset-production tasks combine an art style with one resolved art pipeline:
 
@@ -1204,8 +1255,8 @@ The five primary art pipelines selectable in `STYLE.md` are:
 
 | Pipeline | Primary output | Boundary |
 | --- | --- | --- |
-| `CLOUD` | Session-supported generated images/audio | Token or cost budget, staging, provenance, human review |
-| `LOCAL` | Direct Bubo images, SFX, music, preset speech and consented cloning | Verified pinned runtime/installations, local GPU ownership, rights/consent, shared budgets and human review |
+| `CLOUD` | Session-supported generated images | Token or cost budget, staging, provenance, human review |
+| `LOCAL` | Direct Bubo image generation | Verified pinned runtime/installations, local GPU ownership, rights/consent, shared budgets and human review |
 | `PROOF_TO_MODEL` | Source classification, approved six-view proofs, native Pixal3D MV, Blender finishing | Immutable originals, hashed ancestry, independent review and human acceptance |
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
 | `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
@@ -1279,7 +1330,7 @@ Direct LOCAL execution uses the exact pinned, explicitly built Bubo runtime. Ope
 
 Discovery is read-only and works when the runtime is missing or unbuilt. An advertised capability, a receipt on disk and fully verified installed content are distinct states. Discovery never loads models or provisions software. Windows CUDA native acceptance and Linux fixture/dependency support must be reported separately; neither a lockfile nor a synthetic fixture proves native media quality.
 
-Local command examples are relative to the OpenCaw installation; replace the project path and reviewed manifests:
+For sound production, use the independent domain workflows above. These lower-level LOCAL setup/execution examples are relative to the OpenCaw installation; replace the project path and reviewed manifests:
 
 ```bash
 ./commands/inspect-local-media-host.sh --root /absolute/project --json
@@ -1298,9 +1349,9 @@ Local command examples are relative to the OpenCaw installation; replace the pro
 
 Acceptance-bearing requests require their retained explicit `--media-state` for both inspection and generation. An image task overriding a different STYLE primary also supplies current task-bound LOCAL evidence with `--selection`; audio rejects this visual option.
 
-The default workspace is `.opencaw/.cache/bubo-media`; custom workspace and shared-state roots must remain project-cache children. Task state stays under `.opencaw/.cache/tasks/<task>/bubo-media`. Bind each acceptance approval to one retained shared media-state root across tasks and workspace changes. Preserve existing started claims and candidate/revision allowances, including one-candidate-plus-one-revision limits; registration or migration never resets them.
+The default workspace is `.opencaw/.cache/bubo-media`; custom workspace and shared-state roots must remain project-cache children. Native execution state stays under `.opencaw/.cache/tasks/<task>/bubo-media`, separately from domain workflow state under `.opencaw/.cache/tasks/<task>/media/`. Bind each acceptance approval to one retained shared media-state root across tasks and workspace changes. Preserve existing started claims and candidate/revision allowances, including one-candidate-plus-one-revision limits; registration or migration never resets them.
 
-Generated outputs remain staged with pending human review. Preserve native dispatch/results/settings/build ancestry and separate provider-neutral manifests per output. Listen to complete audio for content and declared preset/reference match; cloning consent for local QA does not authorize public reference/clone disclosure. Runtime promotion is a separate authorized action and has no operation in this execution path. CLOUD behavior, historical receipts/approvals, accepted/rejected outputs and external installations remain preserved; do not probe or uninstall external tools during migration.
+Generated outputs remain staged with pending human review. Preserve native dispatch/results/settings/build ancestry and separate provider-neutral manifests per output. Listen to complete audio for content and declared preset/reference match; cloning consent for local QA does not authorize public reference/clone disclosure. `bubo-media.sh` has no promotion operation; the independent media workflows provide separate guarded `handoff`, `promote`, and `recover` commands. CLOUD behavior, historical receipts/approvals, accepted/rejected outputs and external installations remain preserved; do not probe or uninstall external tools during migration.
 
 The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
 
@@ -1476,7 +1527,7 @@ The deterministic destination is `assets/models/<library-id>/<source-relative-pa
 
 ## Validation
 
-OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and generative-media assets.
+OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and visual/AUDIO/MUSIC/VOICE workflows.
 
 Run the complete suite:
 
@@ -1519,6 +1570,8 @@ The integrated suite verifies, among other things:
 - style catalog and contract structure
 - optional external asset-library preservation, read-only inventory, copy-first confinement, source immutability, and copied-file hash evidence
 - pinned media toolchains, model packs, workflows, checksums, and manifests
+- independent media routing/contracts and clone/submodule hosts loading AUDIO/MUSIC/VOICE with every visual primary
+- immutable cross-domain state/review isolation, shared approval binding, native ownership/cancellation, voice consent/disclosure, and target/promotion/recovery barriers
 - Memory v2 isolation, tagged writes, replacement, migration, retrieval, purge, cleanup, and map freshness
 - Brainstorm path isolation, sticky lifecycle state, branch/element validation, summary hashing, graph rendering, and delivery-creation guards
 - Gauntlet scaffold isolation, real commit/ref and live-GitHub binding, fresh-critic evidence, one-to-one hash ledgers, transactional progress events, authorized remediation, human-merge integration, and final promotion gates
@@ -1540,11 +1593,15 @@ Installed projects use this baseline layout. Root project contracts and the host
 │   ├── arts/blender-production-artist/ # Blender production owner
 │   └── arts/technical-3d-artist/     # rigged runtime-art handoff owner
 ├── .styles/                          # style templates
-│   └── .pipelines/                   # CLOUD, LOCAL, PROOF_TO_MODEL, CODE model/character, and BLENDER contracts/assets
+│   ├── .pipelines/                   # CLOUD, LOCAL, PROOF_TO_MODEL, CODE model/character, and BLENDER contracts/assets
+│   └── .workflows/                   # downstream MODEL_TO_ANIMATION and MODEL_TO_ACTION
+├── .media/
+│   └── pipelines/                    # AUDIO, MUSIC, VOICE contracts, registry, schemas, and examples
 ├── skills/                           # reusable reasoning workflows
 │   └── EXTERNAL_SOURCES.md           # capability boundaries and dispositions
 ├── commands/                         # deterministic scripts
 │   └── lib/bubo-runtime.cjs          # pinned runtime and audited-resource admission
+├── docs/                             # detailed workflow guides, including MEDIA_PIPELINES.md
 ├── runtime/
 │   ├── bubo.lock.json               # recorded Bubo revision/API/resource identity
 │   └── bubo/                       # Bubo Git submodule; execution and resources
