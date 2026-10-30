@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "opencaw-voice-runtime-evidence/v1",
+  "task": "active-task",
+  "engine": {
+    "engine": "THREEJS",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "outputs": [
+    {
+      "path": "inputs/actual-staged-output.wav",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "spatialization": "2d",
+  "loopIntent": false,
+  "playbackReviewed": true,
+  "loadDisposeReviewed": true,
+  "sourceEvidence": {
+    "path": "inputs/actual-engine-playback-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

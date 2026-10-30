@@ -1,0 +1,697 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/voice-brief-v1.json",
+  "title": "VOICE preset speech and local consented-cloning brief",
+  "description": "The CLI additionally checks current evidence/source hashes, canonical case-insensitive distinct private identities, exact ordered reference/purpose/consent bindings, native approval scope and aggregate budgets. Examples/schema grant no authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "purpose",
+    "provider",
+    "spatialization",
+    "loopIntent",
+    "request",
+    "technical"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-voice-brief/v1"
+    },
+    "kind": {
+      "enum": [
+        "preset-speech",
+        "consented-cloning"
+      ]
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+    },
+    "provider": {
+      "enum": [
+        "LOCAL",
+        "CLOUD"
+      ]
+    },
+    "spatialization": {
+      "enum": [
+        "2d",
+        "3d"
+      ]
+    },
+    "loopIntent": {
+      "const": false
+    },
+    "localUse": {
+      "$ref": "#/$defs/identity"
+    },
+    "historicalRoot": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Existing canonical current-project-confined original root for LOCAL import only; untouched original context.projectRoot and neutral wrapper must match. Never authorizes generation."
+    },
+    "request": {
+      "type": "object"
+    },
+    "technical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxPeak",
+        "maxClippedFraction",
+        "maxSilentFraction"
+      ],
+      "properties": {
+        "maxPeak": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "maxClippedFraction": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maxSilentFraction": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "LOCAL"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "request": {
+            "$ref": "#/$defs/localRequest"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "CLOUD"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "kind": {
+            "const": "preset-speech"
+          },
+          "request": {
+            "$ref": "#/$defs/cloudRequest"
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "localUse"
+              ]
+            },
+            {
+              "required": [
+                "historicalRoot"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "preset-speech"
+          },
+          "provider": {
+            "const": "LOCAL"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "localUse"
+          ]
+        },
+        "properties": {
+          "request": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "voice": {
+                      "properties": {
+                        "preset": {
+                          "type": "string"
+                        },
+                        "reference": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "acceptance": {
+                "properties": {
+                  "case": {
+                    "const": "preset-speech"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "consented-cloning"
+          },
+          "provider": {
+            "const": "LOCAL"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "localUse"
+        ],
+        "properties": {
+          "request": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": {
+                    "voice": {
+                      "properties": {
+                        "preset": {
+                          "type": "null"
+                        },
+                        "expression": {
+                          "const": ""
+                        },
+                        "reference": {
+                          "$ref": "#/$defs/reference"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "acceptance": {
+                "properties": {
+                  "case": {
+                    "const": "consented-cloning"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audio",
+        "transcript",
+        "rights",
+        "consent"
+      ],
+      "properties": {
+        "audio": {
+          "$ref": "#/$defs/identity"
+        },
+        "transcript": {
+          "$ref": "#/$defs/identity"
+        },
+        "rights": {
+          "$ref": "#/$defs/identity"
+        },
+        "consent": {
+          "$ref": "#/$defs/identity"
+        }
+      }
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximumNewTokens",
+        "doSample",
+        "temperature",
+        "topK",
+        "topP",
+        "repetitionPenalty",
+        "subtalkerDoSample",
+        "subtalkerTemperature",
+        "subtalkerTopK",
+        "subtalkerTopP"
+      ],
+      "properties": {
+        "maximumNewTokens": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 2048
+        },
+        "doSample": {
+          "const": true
+        },
+        "temperature": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 2
+        },
+        "topK": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "topP": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "repetitionPenalty": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "subtalkerDoSample": {
+          "const": true
+        },
+        "subtalkerTemperature": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 2
+        },
+        "subtalkerTopK": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "subtalkerTopP": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "localVoice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "preset",
+        "expression",
+        "sampling",
+        "reference"
+      ],
+      "properties": {
+        "language": {
+          "enum": [
+            "chinese",
+            "english",
+            "french",
+            "german",
+            "italian",
+            "japanese",
+            "korean",
+            "portuguese",
+            "russian",
+            "spanish"
+          ]
+        },
+        "preset": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "aiden",
+            "dylan",
+            "eric",
+            "ono_anna",
+            "ryan",
+            "serena",
+            "sohee",
+            "uncle_fu",
+            "vivian",
+            null
+          ]
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000]*$"
+        },
+        "sampling": {
+          "$ref": "#/$defs/sampling"
+        },
+        "reference": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reference"
+            }
+          ]
+        }
+      }
+    },
+    "cloudVoice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "preset",
+        "expression"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "preset": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "pattern": "^[^\\u0000]*$"
+        }
+      }
+    },
+    "localItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "prompt",
+        "negativePrompt",
+        "seed",
+        "loopCandidate",
+        "voice"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$",
+          "description": "Exact nonempty spoken text; runtime also enforces at most4096 UTF-8 bytes."
+        },
+        "negativePrompt": {
+          "const": ""
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "loopCandidate": {
+          "const": false
+        },
+        "voice": {
+          "$ref": "#/$defs/localVoice"
+        }
+      }
+    },
+    "cloudItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "prompt",
+        "voice"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$",
+          "description": "Exact supplied spoken text; provider-native controls are not invented."
+        },
+        "voice": {
+          "$ref": "#/$defs/cloudVoice"
+        }
+      }
+    },
+    "localBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximumOutputs",
+        "maximumBytesPerOutput",
+        "maximumTotalBytes",
+        "maximumPixels",
+        "maximumAudioSeconds"
+      ],
+      "properties": {
+        "maximumOutputs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "maximumBytesPerOutput": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 268435456
+        },
+        "maximumTotalBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1073741824
+        },
+        "maximumPixels": {
+          "type": "integer",
+          "minimum": 4096,
+          "maximum": 4194304
+        },
+        "maximumAudioSeconds": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 120
+        }
+      }
+    },
+    "cloudBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximumOutputs",
+        "maximumBytesPerOutput",
+        "maximumTotalBytes",
+        "maximumAudioSeconds"
+      ],
+      "properties": {
+        "maximumOutputs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "maximumBytesPerOutput": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 268435456
+        },
+        "maximumTotalBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1073741824
+        },
+        "maximumAudioSeconds": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 120
+        }
+      }
+    },
+    "localRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rights",
+        "installation",
+        "settings",
+        "budget",
+        "items"
+      ],
+      "properties": {
+        "rights": {
+          "$ref": "#/$defs/identity"
+        },
+        "installation": {
+          "$ref": "#/$defs/identity"
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "device",
+            "precision",
+            "offload"
+          ],
+          "properties": {
+            "device": {
+              "const": "cuda:0"
+            },
+            "precision": {
+              "const": "bfloat16"
+            },
+            "offload": {
+              "const": "none"
+            }
+          }
+        },
+        "budget": {
+          "$ref": "#/$defs/localBudget"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/localItem"
+          }
+        },
+        "acceptance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "case",
+            "kind",
+            "approval"
+          ],
+          "properties": {
+            "case": {
+              "enum": [
+                "preset-speech",
+                "consented-cloning"
+              ]
+            },
+            "kind": {
+              "enum": [
+                "candidate",
+                "revision"
+              ]
+            },
+            "approval": {
+              "$ref": "#/$defs/identity"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "acceptance"
+            ]
+          },
+          "then": {
+            "properties": {
+              "items": {
+                "maxItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "cloudRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rights",
+        "budget",
+        "items"
+      ],
+      "properties": {
+        "rights": {
+          "$ref": "#/$defs/identity"
+        },
+        "budget": {
+          "$ref": "#/$defs/cloudBudget"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/cloudItem"
+          }
+        }
+      }
+    }
+  }
+}

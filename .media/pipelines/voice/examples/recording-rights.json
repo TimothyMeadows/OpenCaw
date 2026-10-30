@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "bubo-voice-reference-rights/v1",
+  "task": "active-task",
+  "owner": "Example only; replace with actual recording owner evidence",
+  "audio": {
+    "path": "inputs/actual-private-reference.wav",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "transcript": {
+    "path": "inputs/actual-private-transcript.txt",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "recordingRightsConfirmed": true
+}

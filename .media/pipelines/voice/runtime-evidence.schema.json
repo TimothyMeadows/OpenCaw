@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/voice-runtime-evidence-v1.json",
+  "title": "Actual selected-engine VOICE target evidence",
+  "description": "Engine identity and complete output/source bindings are revalidated against current host state. Metadata is not actual playback review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "task",
+    "engine",
+    "outputs",
+    "spatialization",
+    "loopIntent",
+    "playbackReviewed",
+    "loadDisposeReviewed",
+    "sourceEvidence"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-voice-runtime-evidence/v1"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "sha256"
+      ],
+      "properties": {
+        "engine": {
+          "enum": [
+            "THREEJS",
+            "BABYLONJS",
+            "PHASERJS",
+            "UNITY",
+            "UNREAL",
+            "GODOT"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/identity"
+      },
+      "description": "Complete ordered current output identities; no missing, extra or duplicate output."
+    },
+    "spatialization": {
+      "enum": [
+        "2d",
+        "3d"
+      ]
+    },
+    "loopIntent": {
+      "const": false
+    },
+    "playbackReviewed": {
+      "const": true
+    },
+    "loadDisposeReviewed": {
+      "const": true
+    },
+    "sourceEvidence": {
+      "$ref": "#/$defs/identity"
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

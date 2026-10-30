@@ -21,7 +21,7 @@
         "instrumental": ["instrumental-music"],
         "supplied-lyrics": ["song", "supplied-lyric", "lyric-song"]
       },
-      "implementation": { "status": "declared", "entryPoint": null }
+      "implementation": { "status": "implemented", "entryPoint": "commands/music-pipeline.sh" }
     },
     "VOICE": {
       "aliases": ["voice", "voice-pipeline", "speech"],
@@ -32,7 +32,7 @@
         "preset-speech": ["preset", "tts"],
         "consented-cloning": ["voice-clone", "cloning", "clone"]
       },
-      "implementation": { "status": "declared", "entryPoint": null }
+      "implementation": { "status": "implemented", "entryPoint": "commands/voice-pipeline.sh" }
     }
   }
 }

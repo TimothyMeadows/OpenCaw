@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "opencaw-voice-brief/v1",
+  "kind": "preset-speech",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "provider": "CLOUD",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "request": {
+    "rights": {
+      "path": "inputs/actual-prompt-rights.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "budget": {
+      "maximumOutputs": 1,
+      "maximumBytesPerOutput": 16777216,
+      "maximumTotalBytes": 16777216,
+      "maximumAudioSeconds": 30
+    },
+    "items": [
+      {
+        "id": "line-1",
+        "prompt": "A fictional lantern shines beside the gate.",
+        "voice": {
+          "language": "provider-declared-language",
+          "preset": "provider-declared-preset",
+          "expression": ""
+        }
+      }
+    ]
+  },
+  "technical": {
+    "maxPeak": 1,
+    "maxClippedFraction": 0,
+    "maxSilentFraction": 0.9
+  }
+}

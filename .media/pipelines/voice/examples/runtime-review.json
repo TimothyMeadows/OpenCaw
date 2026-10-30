@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "opencaw-media-review/v1",
+  "assetSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "outputs": [],
+  "kind": "runtime",
+  "verdict": "rejected",
+  "reviewer": "Example only; no human listening occurred",
+  "reason": "Replace only after current selected-engine review, separate distribution and applicable cloned-output disclosure",
+  "sourceEvidence": {
+    "path": "inputs/actual-human-listening-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "criteria": {
+    "targetPlaybackReviewed": false,
+    "loadDisposeReviewed": false,
+    "spatializationReviewed": false
+  },
+  "engine": {
+    "engine": "THREEJS",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "target": {
+    "directory": "assets/voice/reviewed-line-v1",
+    "codecs": [
+      "wav"
+    ],
+    "sampleRates": [
+      24000
+    ],
+    "channels": [
+      1
+    ],
+    "maxOutputBytes": 16777216,
+    "maxAudioSeconds": 30,
+    "spatialization": "2d",
+    "loopIntent": false
+  },
+  "rightsEvidence": {
+    "path": "inputs/actual-distribution.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "targetEvidence": {
+    "path": "inputs/actual-runtime-evidence.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "disclosureEvidence": {
+    "path": "inputs/actual-disclosure.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

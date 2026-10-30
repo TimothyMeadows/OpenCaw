@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "opencaw-voice-distribution/v1",
+  "task": "active-task",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "rightsConfirmed": true,
+  "publicDisclosureConfirmed": true,
+  "sourceEvidence": {
+    "path": "inputs/actual-distribution-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}
