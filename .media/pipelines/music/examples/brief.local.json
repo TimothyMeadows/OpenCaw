@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "opencaw-music-brief/v1",
+  "kind": "instrumental",
+  "purpose": "Example only: a calm instrumental exploration cue",
+  "provider": "LOCAL",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "request": {
+    "rights": {"path": "inputs/actual-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "installation": {"path": ".opencaw/.cache/bubo-media/installations/actual-music.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "settings": {"device": "cuda:0", "precision": "bfloat16", "offload": "none"},
+    "budget": {"maximumOutputs": 1, "maximumBytesPerOutput": 33554432, "maximumTotalBytes": 33554432, "maximumPixels": 4096, "maximumAudioSeconds": 20},
+    "items": [{"id": "exploration", "prompt": "Calm exploration instrumental with soft piano, warm strings, a gentle opening and a resolved ending", "negativePrompt": "", "seed": 1204, "steps": 8, "guidance": 1, "seconds": 20, "loopCandidate": false, "music": {"mode": "instrumental", "lyrics": "", "vocalLanguage": "unknown", "bpm": null, "keyScale": "C major", "timeSignature": "4", "shift": 3}}]
+  },
+  "technical": {"maxPeak": null, "maxClippedFraction": null, "maxSilentFraction": null}
+}

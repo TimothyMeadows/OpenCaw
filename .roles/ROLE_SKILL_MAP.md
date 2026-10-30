@@ -494,6 +494,7 @@ Skills:
 - `plan-generative-media-pipeline`
 - `produce-generative-audio`
 - `build-audio-assets`
+- `build-music-assets`
 - `validate-generated-media`
 - `plan-hybrid-game-assets`
 
@@ -505,6 +506,7 @@ Commands:
 - `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/audio-pipeline.sh`
+- `commands/music-pipeline.sh`
 - `commands/resolve-media-pipeline.sh`
 
 ### arts/technical-3d-artist
@@ -627,6 +629,7 @@ Skills:
 - `use-bubo-local-generation`
 - `produce-generative-audio`
 - `build-audio-assets`
+- `build-music-assets`
 - `validate-generated-media`
 - `dependency-audit-dotnet`
 
@@ -642,6 +645,7 @@ Commands:
 - `commands/validate-media-generation-manifest.sh`
 - `commands/dependency-check.sh`
 - `commands/audio-pipeline.sh`
+- `commands/music-pipeline.sh`
 - `commands/resolve-media-pipeline.sh`
 
 ### computer-science/autonomous-optimization-architect
@@ -990,6 +994,7 @@ Skills:
 - `use-bubo-local-generation`
 - `produce-generative-audio`
 - `build-audio-assets`
+- `build-music-assets`
 - `validate-generated-media`
 - `audit-untrusted-agent-source`
 - `verify-and-explain`
@@ -1009,6 +1014,7 @@ Commands:
 - `commands/validate-media-templates.sh`
 - `commands/proof-to-model.sh`
 - `commands/audio-pipeline.sh`
+- `commands/music-pipeline.sh`
 - `commands/resolve-media-pipeline.sh`
 
 ### computer-science/git-workflow-master

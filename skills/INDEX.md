@@ -95,6 +95,7 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 - `use-bubo-local-generation` - Inspect, explicitly provision/register, and run direct Bubo LOCAL images, SFX, music, preset speech and consented cloning with shared budgets, staged provenance and separate human review.
 - `produce-generative-audio` - Produce reviewed music, sound-effect, ambience, and voice candidates.
 - `build-audio-assets` - Run the independent SFX/ambience AUDIO lifecycle with bounded native requests, exact listening/loop review and separately authorized runtime promotion.
+- `build-music-assets` - Run independent instrumental and supplied-lyric MUSIC production with exact lyrics/rights, disabled planning, complete track/line/loop review and separate target/promotion gates.
 - `validate-generated-media` - Validate manifests, hashes, exact coverage, budgets, provenance, and review status before promotion.
 - `create-game-vfx` - Design readable effect families with timing, accessibility, and runtime budgets.
 - `optimize-web-games` - Profile and improve browser-game frame time, memory, loading, and asset churn.

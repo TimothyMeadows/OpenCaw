@@ -21,7 +21,7 @@
         "instrumental": ["instrumental-music"],
         "supplied-lyrics": ["song", "supplied-lyric", "lyric-song"]
       },
-      "implementation": { "status": "declared", "entryPoint": null }
+      "implementation": { "status": "implemented", "entryPoint": "commands/music-pipeline.sh" }
     },
     "VOICE": {
       "aliases": ["voice", "voice-pipeline", "speech"],

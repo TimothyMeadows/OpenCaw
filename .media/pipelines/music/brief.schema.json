@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/music-brief-v1.json",
+  "title": "MUSIC instrumental and supplied-lyric brief",
+  "description": "The command additionally checks current evidence hashes, item order/mode/loop consistency, aggregate budgets and exact lyric rights. This schema grants no execution or review permission.",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "purpose", "provider", "spatialization", "loopIntent", "request", "technical"],
+  "properties": {
+    "schemaVersion": {"const": "opencaw-music-brief/v1"},
+    "kind": {"enum": ["instrumental", "supplied-lyrics"]},
+    "purpose": {"type": "string", "minLength": 1, "maxLength": 1024},
+    "provider": {"enum": ["LOCAL", "CLOUD"]},
+    "spatialization": {"enum": ["2d", "3d"]},
+    "loopIntent": {"type": "boolean"},
+    "lyricsRights": {"$ref": "#/$defs/identity"},
+    "historicalRoot": {"type": "string", "minLength": 1, "description": "Existing canonical current-project-confined original root for LOCAL import only; raw original context.projectRoot must match. New generation is forbidden."},
+    "request": {"type": "object"},
+    "technical": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maxPeak", "maxClippedFraction", "maxSilentFraction"],
+      "properties": {
+        "maxPeak": {"type": ["number", "null"], "minimum": 0},
+        "maxClippedFraction": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "maxSilentFraction": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"provider": {"const": "LOCAL"}}}, "then": {"properties": {"request": {"$ref": "#/$defs/localRequest"}}}},
+    {"if": {"properties": {"provider": {"const": "CLOUD"}}}, "then": {"properties": {"request": {"$ref": "#/$defs/cloudRequest"}}, "not": {"required": ["historicalRoot"]}}},
+    {"if": {"properties": {"kind": {"const": "instrumental"}}}, "then": {"not": {"required": ["lyricsRights"]}, "properties": {"request": {"properties": {"items": {"items": {"properties": {"music": {"properties": {"mode": {"const": "instrumental"}, "lyrics": {"const": ""}, "vocalLanguage": {"const": "unknown"}}}}}}, "acceptance": {"properties": {"case": {"const": "instrumental"}}}}}}}},
+    {"if": {"properties": {"kind": {"const": "supplied-lyrics"}}}, "then": {"required": ["lyricsRights"], "properties": {"request": {"properties": {"items": {"items": {"properties": {"music": {"properties": {"mode": {"const": "supplied-lyrics"}, "lyrics": {"minLength": 1, "pattern": "\\S"}, "vocalLanguage": {"not": {"const": "unknown"}}}}}}}, "acceptance": {"properties": {"case": {"const": "supplied-lyrics"}}}}}}}}
+  ],
+  "$defs": {
+    "identity": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "music": {
+      "type": "object", "additionalProperties": false, "required": ["mode", "lyrics", "vocalLanguage", "bpm", "keyScale", "timeSignature", "shift"],
+      "properties": {
+        "mode": {"enum": ["instrumental", "supplied-lyrics"]},
+        "lyrics": {"type": "string", "maxLength": 4096, "pattern": "^[^\\u0000]*$"},
+        "vocalLanguage": {"enum": ["ar", "az", "bg", "bn", "ca", "cs", "da", "de", "el", "en", "es", "fa", "fi", "fr", "he", "hi", "hr", "ht", "hu", "id", "is", "it", "ja", "ko", "la", "lt", "ms", "ne", "nl", "no", "pa", "pl", "pt", "ro", "ru", "sa", "sk", "sr", "sv", "sw", "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "yue", "zh", "unknown"]},
+        "bpm": {"type": ["integer", "null"], "minimum": 30, "maximum": 300},
+        "keyScale": {"type": "string", "pattern": "^$|^[A-Ga-g](#|[Bb])? ([Mm][Aa][Jj][Oo][Rr]|[Mm][Ii][Nn][Oo][Rr])$"},
+        "timeSignature": {"enum": ["", "2", "3", "4", "6"]},
+        "shift": {"type": "number", "minimum": 1, "maximum": 5}
+      }
+    },
+    "localItem": {
+      "type": "object", "additionalProperties": false, "required": ["id", "prompt", "negativePrompt", "seed", "steps", "guidance", "seconds", "loopCandidate", "music"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"},
+        "prompt": {"type": "string", "minLength": 1, "maxLength": 512},
+        "negativePrompt": {"const": ""},
+        "seed": {"type": "integer", "minimum": 0, "maximum": 2147483647},
+        "steps": {"type": "integer", "minimum": 1, "maximum": 8},
+        "guidance": {"const": 1},
+        "seconds": {"type": "integer", "minimum": 10, "maximum": 600},
+        "loopCandidate": {"type": "boolean"},
+        "music": {"$ref": "#/$defs/music"}
+      }
+    },
+    "cloudItem": {
+      "type": "object", "additionalProperties": false, "required": ["id", "prompt", "seconds", "music"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"},
+        "prompt": {"type": "string", "minLength": 1, "maxLength": 512},
+        "seconds": {"type": "integer", "minimum": 10, "maximum": 600},
+        "music": {"$ref": "#/$defs/music"}
+      }
+    },
+    "localBudget": {
+      "type": "object", "additionalProperties": false, "required": ["maximumOutputs", "maximumBytesPerOutput", "maximumTotalBytes", "maximumPixels", "maximumAudioSeconds"],
+      "properties": {
+        "maximumOutputs": {"type": "integer", "minimum": 1, "maximum": 4},
+        "maximumBytesPerOutput": {"type": "integer", "minimum": 1024, "maximum": 268435456},
+        "maximumTotalBytes": {"type": "integer", "minimum": 1024, "maximum": 1073741824},
+        "maximumPixels": {"type": "integer", "minimum": 4096, "maximum": 4194304},
+        "maximumAudioSeconds": {"type": "number", "minimum": 0.25, "maximum": 600}
+      }
+    },
+    "cloudBudget": {
+      "type": "object", "additionalProperties": false, "required": ["maximumOutputs", "maximumBytesPerOutput", "maximumTotalBytes", "maximumAudioSeconds"],
+      "properties": {
+        "maximumOutputs": {"type": "integer", "minimum": 1, "maximum": 4},
+        "maximumBytesPerOutput": {"type": "integer", "minimum": 1024, "maximum": 268435456},
+        "maximumTotalBytes": {"type": "integer", "minimum": 1024, "maximum": 1073741824},
+        "maximumAudioSeconds": {"type": "number", "minimum": 0.25, "maximum": 600}
+      }
+    },
+    "localRequest": {
+      "type": "object", "additionalProperties": false, "required": ["rights", "installation", "settings", "budget", "items"],
+      "properties": {
+        "rights": {"$ref": "#/$defs/identity"}, "installation": {"$ref": "#/$defs/identity"},
+        "settings": {"type": "object", "additionalProperties": false, "required": ["device", "precision", "offload"], "properties": {"device": {"const": "cuda:0"}, "precision": {"const": "bfloat16"}, "offload": {"const": "none"}}},
+        "budget": {"$ref": "#/$defs/localBudget"},
+        "items": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"$ref": "#/$defs/localItem"}},
+        "acceptance": {"type": "object", "additionalProperties": false, "required": ["case", "kind", "approval"], "properties": {"case": {"enum": ["instrumental", "supplied-lyrics"]}, "kind": {"enum": ["candidate", "revision"]}, "approval": {"$ref": "#/$defs/identity"}}}
+      },
+      "allOf": [{"if": {"required": ["acceptance"]}, "then": {"properties": {"items": {"maxItems": 1}}}}]
+    },
+    "cloudRequest": {
+      "type": "object", "additionalProperties": false, "required": ["rights", "budget", "items"],
+      "properties": {
+        "rights": {"$ref": "#/$defs/identity"}, "budget": {"$ref": "#/$defs/cloudBudget"},
+        "items": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"$ref": "#/$defs/cloudItem"}}
+      }
+    }
+  }
+}

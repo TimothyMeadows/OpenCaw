@@ -13,7 +13,7 @@ Ordinary audio/SFX/ambience work routes to AUDIO; music routes to MUSIC; spoken 
 
 ## Configure and inspect
 
-The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. AUDIO now supplies its complete command workflow; MUSIC and VOICE remain declarations until their domain implementations are delivered. Resolve configuration and readiness separately: a valid contract or model receipt does not certify an executable installation or successful generation.
+The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. AUDIO and MUSIC supply their complete command workflows; VOICE remains declared until its domain implementation is delivered. Resolve configuration and readiness separately: a valid contract or model receipt does not certify an executable installation or successful generation.
 
 Host contracts remain optional. Loading a project does not create all three contracts or require a Bubo build, MEDIA.md, STYLE.md or ENGINE.md for unrelated nonvisual planning. A requested domain can be configured explicitly. Missing unrelated domains leave other contexts usable. Generation requires current applicable domain and MEDIA/provider policy; an actual engine handoff also requires compatible engine ownership and target evidence.
 
@@ -69,6 +69,14 @@ Examples and the strict brief schema live beside the AUDIO contract. LOCAL SFX a
 Complete exact-output listening, any claimed loop seam, current distribution rights and actual selected-engine playback/load/dispose evidence remain separate gates. `promote` requires an additional exact authorization and writes deterministic `000.<codec>`, `001.<codec>` files beneath its fresh authorized target directory. Private provenance stays in task state. `recover` preserves failed preparation and can finish the receipt for an already published exact directory without copying again. A corrupted event or uncertain ownership lock remains an explicit diagnostic; recovery never discards history automatically.
 
 Read-only status exposes `promotionState`, `promotionNeedsRecovery` and `publicationObserved`. A failed completion receipt can leave an already published directory: status reports that observation while keeping `promotion: false` until exact owned recovery completes. Do not treat a failed command as proof that no runtime write occurred.
+
+### Instrumental and supplied-lyric music
+
+Use `build-music-assets`, `music-pipeline.sh --help` and the [MUSIC contract/examples](../.media/pipelines/music/PIPELINE.md). The same lifecycle commands apply. Choose `instrumental` or `supplied-lyrics` explicitly; exact supplied UTF8 lyrics and scoped lyric-rights evidence remain bound to each requested item. LOCAL ACE-Step Turbo supports whole-second10..600 tracks,1..8 steps, guidance1 and an explicit int32 seed, using cuda:0/bfloat16/none. Unsupported planning, invented lyrics, mastering/stems/editing and provider fallback are errors.
+
+The shared evidence validator retains native48000Hz stereo frames and raw amplitudes. MUSIC additionally verifies exact native conditioning/settings, disabled planning and normalization, and measured cleanup. Metadata proves neither audible singing nor musical quality. Review the entire track, intended vocal content, every supplied line and any claimed loop seam. Current selected-engine playback/load/disposal and separate distribution rights must pass before separately authorized promotion. Historical tracks remain imports with their original source/runtime/attempt identities, current human review pending and no new allowance.
+
+## Shared execution and state
 
 State is task-owned under `.opencaw/.cache/tasks/<task>/media/<audio|music|voice>/`. Each asset version retains its original brief, input and policy references, and any resulting native execution identity and staged outputs. Changes create new versions; affected reviews become stale. Native request/output IDs are collision-safe across domains and versions even when human asset names match. All domains still use the approval's physically shared native attempt ledger.
 

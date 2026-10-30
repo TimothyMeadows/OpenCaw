@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "opencaw-music-lyrics-rights/v1",
+  "task": "replace-with-current-task",
+  "purpose": "Replace with the exact song brief purpose",
+  "lyrics": [{"itemId": "song", "lyricsSha256": "0000000000000000000000000000000000000000000000000000000000000000"}],
+  "rightsConfirmed": true,
+  "generationAllowed": false,
+  "sourceEvidence": {"path": "inputs/actual-lyrics-permission-source.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
+}

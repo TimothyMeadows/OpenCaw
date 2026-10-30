@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Music Assets"
+  short_description: "Create reviewed instrumental and supplied-lyric tracks"
+  default_prompt: "Use $build-music-assets to create and review traceable instrumental or supplied-lyric candidates through the independent MUSIC pipeline, preserving exact lyric rights, explicit provider, full-track listening, loop and promotion gates."
