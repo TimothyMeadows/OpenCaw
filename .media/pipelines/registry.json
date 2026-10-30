@@ -10,7 +10,7 @@
         "sfx": ["sound-effect", "sound-effects"],
         "ambience": ["ambient", "ambiance"]
       },
-      "implementation": { "status": "declared", "entryPoint": null }
+      "implementation": { "status": "implemented", "entryPoint": "commands/audio-pipeline.sh" }
     },
     "MUSIC": {
       "aliases": ["music", "music-pipeline"],

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Audio Assets"
+  short_description: "Create reviewed game sound effects and ambience"
+  default_prompt: "Use $build-audio-assets to create and review traceable game sound-effect or ambience candidates through the independent AUDIO pipeline, preserving explicit provider, listening, loop and promotion gates."

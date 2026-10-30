@@ -73,8 +73,11 @@ async function main() {
   check(prepared.every(x=>x.mediaState===mediaState),'Every domain retains the same physical shared attempt ledger');
   check(prepared.every(x=>x.finalOutput===x.request.outputDirectory+'/'+x.request.requestId),'Native final output correctly includes native-appended requestId');
   check(state.status(options(assets[0])).stage==='planned','Initialization creates planning state without outputs or inference');
-  check(state.status(options(assets[0])).executionAvailable===false,'Configured contracts do not fabricate executable domain readiness');
-  await assert.rejects(state.dispatch({...options(assets[0])}),/unavailable/);observations.push('Domain execution rejects before dispatch until its implementation exists');
+  check(state.status(options(assets[0])).executionAvailable===(contracts.registry().domains.AUDIO.implementation.status==='implemented'),'Configured domain execution readiness follows its actual declaration without certifying native readiness');
+  fs.unlinkSync(path.join(root,'MEDIA.md'));
+  const unavailableAsset=initialize('AUDIO','no-provider','no provider');
+  await assert.rejects(state.dispatch({...options(unavailableAsset)}),/unavailable/);observations.push('Domain execution without shared provider policy rejects before dispatch');
+  write('MEDIA.md',media);
   for(const controls of [{timeout:0},{timeout:86401},{'max-log-bytes':0},{'max-private-bytes':Number.MAX_SAFE_INTEGER+1},{'max-private-bytes':Infinity}]) {
     await assert.rejects(state.dispatch({...options(assets[0]),controls}),/Invalid finite/);observations.push('Invalid finite dispatch control is rejected before native start');
   }
@@ -106,6 +109,7 @@ async function main() {
   fs.writeFileSync(path.join(root,'inputs/rights.json'),originalRights);
   const selected=candidate(assets[0]);
   check(state.status(options(assets[0])).contentReview==='pending','Importing provenance never accepts human content review');
+  rejects(()=>request(assets[0]),/already owns/,'An imported candidate blocks new native generation in the same immutable version before any claim');
   rejects(()=>state.recordCandidate({...options(assets[0]),manifest:selected.manifestFile,provider:'CLOUD'}),/already exists/,'A second candidate cannot overwrite one version');
   rejects(()=>state.admitHandoff(options(assets[0])),/technical/,'Handoff is ineligible without actual current technical evidence');
   technical(assets[0],selected);review(assets[0],selected);

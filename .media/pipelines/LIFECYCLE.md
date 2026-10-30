@@ -6,6 +6,8 @@ This contract defines the shared foundation. Domain declarations can be loaded b
 
 The foundation's handoff and promotion primitives produce guarded admission plans. They do not copy files into runtime assets. A domain executor must perform a separately authorized write only after that admission; do not describe an admission plan as a completed promotion.
 
+The shared `media-pipeline-promotion.cjs` executor now supplies that separate write for implemented domain commands. It requires a trusted synchronous current-domain validation callback, serializes version/destination ownership, prepares private exact-hash copies and publishes a fresh directory. It records promotion intent, completion and failures. Explicit recovery rechecks all current prerequisites and may recognize an exact owned published directory without recopying; foreign/partial/changed destinations are rejected. Locks and malformed state are preserved for inspection, not reset automatically. Runtime receipts remain private, while status rehashes the published output inventory.
+
 ## Ownership
 
 OpenCaw owns domain routing, host policy, task state, input rights and consent, staged-asset ancestry, review and runtime promotion. LOCAL execution stays behind the verified [Bubo media adapter](../../commands/bubo-media.sh). The pinned Bubo dependency owns model and tool identities, installation verification, synthesis, native process limits, cancellation, GPU ownership and atomic generation-attempt accounting. This layer creates no separate inference implementation or attempt allocator.

@@ -13,7 +13,7 @@ Ordinary audio/SFX/ambience work routes to AUDIO; music routes to MUSIC; spoken 
 
 ## Configure and inspect
 
-The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. Its initial declarations report `executionAvailable: false` until each domain's complete production workflow is delivered. Resolve configuration and readiness separately; a valid contract or model receipt does not certify an executable installation or successful generation.
+The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. AUDIO now supplies its complete command workflow; MUSIC and VOICE remain declarations until their domain implementations are delivered. Resolve configuration and readiness separately: a valid contract or model receipt does not certify an executable installation or successful generation.
 
 Host contracts remain optional. Loading a project does not create all three contracts or require a Bubo build, MEDIA.md, STYLE.md or ENGINE.md for unrelated nonvisual planning. A requested domain can be configured explicitly. Missing unrelated domains leave other contexts usable. Generation requires current applicable domain and MEDIA/provider policy; an actual engine handoff also requires compatible engine ownership and target evidence.
 
@@ -53,7 +53,22 @@ The canonical modalities are `sfx`, `ambience`, `instrumental`, `supplied-lyrics
 
 The [shared lifecycle](../.media/pipelines/LIFECYCLE.md) defines planning, read-only status, setup planning, generation/provenance import, technical validation, exact-output human review, target handoff and separate promotion. Domain workflows add their own brief fields and supported controls to those boundaries.
 
-The foundation's handoff and promotion APIs validate prerequisites and return admission plans; they do not write runtime assets. Complete domain commands supply their own separately authorized executor.
+The foundation's handoff and promotion admission APIs return guarded plans. The separate shared promotion executor performs only an explicitly authorized domain command: private staged copying, current domain-policy revalidation and publication into a fresh version directory. It retains exact ownership, source/target hashes and intent/completion/failure history; explicit recovery recognizes only the same authorized bytes and cannot adopt or overwrite foreign files. Existing ownership locks require inspection rather than automatic deletion.
+
+### SFX and ambience
+
+Use `build-audio-assets` and the [AUDIO contract](../.media/pipelines/audio/PIPELINE.md). The command supports `brief`, `init`, `revise`, `status`, `doctor`, `setup-plan`, `generate`, `import`, `validate`, `review`, `handoff`, `promote` and `recover`:
+
+```bash
+bash .opencaw/commands/audio-pipeline.sh --help
+bash .opencaw/commands/audio-pipeline.sh brief --brief path/to/audio-brief.json
+```
+
+Examples and the strict brief schema live beside the AUDIO contract. LOCAL SFX and ambience use the same supported native SFX capability. Unsupported long ambience or controls fail; no implicit tiling, trimming, normalization or provider fallback occurs. CLOUD is an explicit provenance-import path when no unattended session generation capability is available. Missing authoritative technical analysis keeps imported work ineligible for handoff.
+
+Complete exact-output listening, any claimed loop seam, current distribution rights and actual selected-engine playback/load/dispose evidence remain separate gates. `promote` requires an additional exact authorization and writes deterministic `000.<codec>`, `001.<codec>` files beneath its fresh authorized target directory. Private provenance stays in task state. `recover` preserves failed preparation and can finish the receipt for an already published exact directory without copying again. A corrupted event or uncertain ownership lock remains an explicit diagnostic; recovery never discards history automatically.
+
+Read-only status exposes `promotionState`, `promotionNeedsRecovery` and `publicationObserved`. A failed completion receipt can leave an already published directory: status reports that observation while keeping `promotion: false` until exact owned recovery completes. Do not treat a failed command as proof that no runtime write occurred.
 
 State is task-owned under `.opencaw/.cache/tasks/<task>/media/<audio|music|voice>/`. Each asset version retains its original brief, input and policy references, and any resulting native execution identity and staged outputs. Changes create new versions; affected reviews become stale. Native request/output IDs are collision-safe across domains and versions even when human asset names match. All domains still use the approval's physically shared native attempt ledger.
 

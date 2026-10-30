@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "opencaw-audio-brief/v1",
+  "kind": "ambience",
+  "purpose": "Example only: import a separately authorized session-provided ambience",
+  "provider": "CLOUD",
+  "spatialization": "2d",
+  "loopIntent": true,
+  "request": {
+    "rights": {"path": "inputs/actual-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "budget": {"maximumOutputs": 1, "maximumBytesPerOutput": 4194304, "maximumTotalBytes": 4194304, "maximumAudioSeconds": 8},
+    "items": [{"id": "ambience", "prompt": "Soft forest ambience with distant leaves and birds", "seconds": 8}]
+  },
+  "technical": {"maxPeak": null, "maxClippedFraction": null, "maxSilentFraction": null}
+}

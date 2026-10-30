@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/audio-brief-v1.json",
+  "title": "AUDIO SFX and ambience brief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "purpose", "provider", "spatialization", "loopIntent", "request", "technical"],
+  "properties": {
+    "schemaVersion": {"const": "opencaw-audio-brief/v1"},
+    "kind": {"enum": ["sfx", "ambience"]},
+    "purpose": {"type": "string", "minLength": 1, "maxLength": 1024},
+    "provider": {"enum": ["LOCAL", "CLOUD"]},
+    "spatialization": {"enum": ["2d", "3d"]},
+    "loopIntent": {"type": "boolean"},
+    "historicalRoot": {"type": "string", "minLength": 1, "description": "Optional existing current-project-confined original root for LOCAL import only; raw original context.projectRoot must match. New generation is forbidden."},
+    "request": {"type": "object"},
+    "technical": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maxPeak", "maxClippedFraction", "maxSilentFraction"],
+      "properties": {
+        "maxPeak": {"type": ["number", "null"], "minimum": 0},
+        "maxClippedFraction": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "maxSilentFraction": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"provider": {"const": "LOCAL"}}}, "then": {"properties": {"request": {"$ref": "#/$defs/localRequest"}}}},
+    {"if": {"properties": {"provider": {"const": "CLOUD"}}}, "then": {"properties": {"request": {"$ref": "#/$defs/cloudRequest"}}, "not": {"required": ["historicalRoot"]}}}
+  ],
+  "$defs": {
+    "identity": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+    },
+    "localItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "prompt", "negativePrompt", "seed", "steps", "guidance", "seconds", "loopCandidate"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"},
+        "prompt": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "negativePrompt": {"type": "string", "maxLength": 4096},
+        "seed": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "steps": {"type": "integer", "minimum": 1, "maximum": 200},
+        "guidance": {"type": "number", "minimum": 1, "maximum": 12},
+        "seconds": {"type": "number", "minimum": 0.25, "maximum": 47},
+        "loopCandidate": {"type": "boolean"}
+      },
+      "allOf": [{"if": {"properties": {"guidance": {"maximum": 1}}}, "then": {"properties": {"negativePrompt": {"const": ""}}}}]
+    },
+    "localBudget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximumOutputs", "maximumBytesPerOutput", "maximumTotalBytes", "maximumPixels", "maximumAudioSeconds"],
+      "properties": {
+        "maximumOutputs": {"type": "integer", "minimum": 1, "maximum": 4},
+        "maximumBytesPerOutput": {"type": "integer", "minimum": 1024, "maximum": 268435456},
+        "maximumTotalBytes": {"type": "integer", "minimum": 1024, "maximum": 1073741824},
+        "maximumPixels": {"type": "integer", "minimum": 4096, "maximum": 4194304},
+        "maximumAudioSeconds": {"type": "number", "minimum": 0.25, "maximum": 600}
+      }
+    },
+    "cloudBudget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximumOutputs", "maximumBytesPerOutput", "maximumTotalBytes", "maximumAudioSeconds"],
+      "properties": {
+        "maximumOutputs": {"type": "integer", "minimum": 1, "maximum": 4},
+        "maximumBytesPerOutput": {"type": "integer", "minimum": 1024, "maximum": 268435456},
+        "maximumTotalBytes": {"type": "integer", "minimum": 1024, "maximum": 1073741824},
+        "maximumAudioSeconds": {"type": "number", "minimum": 0.25, "maximum": 600}
+      }
+    },
+    "localRequest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rights", "installation", "settings", "budget", "items"],
+      "properties": {
+        "rights": {"$ref": "#/$defs/identity"}, "installation": {"$ref": "#/$defs/identity"},
+        "settings": {"type": "object", "additionalProperties": false, "required": ["device", "precision", "offload"], "properties": {"device": {"const": "cuda:0"}, "precision": {"enum": ["float16", "float32"]}, "offload": {"const": "none"}}},
+        "budget": {"$ref": "#/$defs/localBudget"},
+        "items": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"$ref": "#/$defs/localItem"}},
+        "acceptance": {"type": "object", "additionalProperties": false, "required": ["case", "kind", "approval"], "properties": {"case": {"const": "sfx"}, "kind": {"enum": ["candidate", "revision"]}, "approval": {"$ref": "#/$defs/identity"}}}
+      }
+    },
+    "cloudRequest": {
+      "type": "object", "additionalProperties": false, "required": ["rights", "budget", "items"],
+      "properties": {
+        "rights": {"$ref": "#/$defs/identity"}, "budget": {"$ref": "#/$defs/cloudBudget"},
+        "items": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["id", "prompt", "seconds"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"}, "prompt": {"type": "string", "minLength": 1, "maxLength": 4096}, "seconds": {"type": "number", "minimum": 0.25, "maximum": 600}}}}
+      }
+    }
+  }
+}

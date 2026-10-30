@@ -296,12 +296,21 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
       || native.promotion!==false || native.humanReview!=='pending' || !Array.isArray(native.outputs) || native.outputs.length!==request.items.length)
     fail('Only successful staged native generation can produce host provenance.');
   const identity=file=>({path:relative(file),sha256:runtime.hash(file)});
+  const buildReceiptFile=runtime.projectPath(info.root,info.pinned.buildReceipt);
+  const buildReceipt=document(buildReceiptFile,8388608),buildBytes=fs.readFileSync(buildReceiptFile);
+  if (buildReceipt.schemaVersion!=='bubo-build/v1' || buildReceipt.sourceRevision!==info.pinned.revision || buildReceipt.sourceDirty!==false
+      || canonical(buildReceipt.capabilities?.build)!==canonical(info.capability?.build)
+      || (info.receipt && canonical(buildReceipt)!==canonical(info.receipt)) || canonical(JSON.parse(buildBytes.toString('utf8')))!==canonical(buildReceipt))
+    fail('Verified runtime source revision/build receipt changed before provenance publication.');
+  const buildSnapshot=runtime.projectPath(root,path.join(dispatch,'source-build-info.json'));
+  const sourceRevisionEvidence={path:relative(buildSnapshot),sha256:digest(buildBytes)};
   const resultFile=runtime.projectPath(root,path.join(dispatch,'result.json')), contextFile=runtime.projectPath(root,path.join(dispatch,'host-context.json'));
   if (canonical(document(resultFile,8388608))!==canonical(result)
       || canonical(document(contextFile,8388608))!==canonical(prepared.context)
       || runtime.hash(contextFile)!==result.hostContextSha256)
     fail('Native result/context ancestry differs from this dispatch.');
   if (!info.capability?.build || canonical(result.runtime)!==canonical(info.capability.build)
+      || canonical(native.runtimeBuild)!==canonical(result.runtime)
       || native.backend!==request.backend || native.requestPath!==prepared.manifest)
     fail('Native runtime/backend/request ancestry differs.');
   const nativeFile=runtime.projectPath(root,prepared.stateRoot+'/media/'+request.requestId+'/manifest.json');
@@ -310,8 +319,13 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
   if (runtime.hash(source)!==native.requestSha256) fail('Source request changed before provenance publication.');
   const catalogFile=runtime.projectPath(info.folder,'resources/media/catalog.json');
   const catalogHash=info.catalog?.files?.['resources/media/catalog.json'];
-  if (!SHA.test(catalogHash||'') || runtime.hash(catalogFile)!==catalogHash) fail('Pinned media catalog changed before provenance export.');
+  if (!SHA.test(catalogHash||'') || runtime.hash(catalogFile)!==catalogHash || native.catalogSha256!==catalogHash) fail('Pinned media catalog changed before provenance export.');
   const catalog=document(catalogFile);
+  const catalogBytes=fs.readFileSync(catalogFile);
+  if(digest(catalogBytes)!==catalogHash || canonical(JSON.parse(catalogBytes.toString('utf8')))!==canonical(catalog))
+    fail('Pinned model catalogue changed during provenance preparation.');
+  const catalogSnapshot=runtime.projectPath(root,path.join(dispatch,'source-media-catalog.json'));
+  const modelCatalog={path:relative(catalogSnapshot),sha256:catalogHash};
   const definition=catalog.backends?.find(value=>value.id===request.backend);
   if (!definition || !Array.isArray(definition.files) || !definition.files.length) fail('Selected backend lacks pinned model provenance.');
   const modelFiles=definition.files.map(file=>({path:file.path,sha256:file.sha256,revision:file.revision,repository:file.repository}));
@@ -341,8 +355,8 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
       generation:{prompt:item.prompt,negativePrompt:item.negativePrompt||unavailable('No negative prompt selected.'),seed:item.seed,
         parameters:{requested:item,actual:output.actual,nativeManifest:identity(nativeFile),nativeResult:identity(resultFile),
           hostContext:identity(contextFile),nativeSettings:settings,sourceRequest:identity(source),
-          installation:request.installation,rights:request.rights,acceptanceClaim:native.acceptanceClaim||null,
-          runtime:{revision:info.pinned.revision,resourceCatalogSha256:info.pinned.resourceCatalogSha256,build:result.runtime},
+          installation:request.installation,rights:request.rights,acceptanceClaim:native.acceptanceClaim||null,modelCatalog,
+          runtime:{revision:info.pinned.revision,resourceCatalogSha256:info.pinned.resourceCatalogSha256,build:result.runtime,sourceRevisionEvidence},
           execution:native.actualSettings,timing:native.timing,cleanup:native.cleanup}},
       inputs:[{description:item.voice?.reference?'Authorized local voice reference and supplied transcript':'Authorized prompt and generation inputs',
         source:item.voice?.reference?.audio.path||request.rights.path,rights:'sha256:'+request.rights.sha256,consent:item.voice?.reference?'confirmed':'not-applicable'}],
@@ -354,13 +368,16 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
     pending.push({destination,manifest});
   }
   // Validate every output and all ancestry before publishing any neutral row.
+  fs.writeFileSync(buildSnapshot,buildBytes,{flag:'wx'});
+  fs.writeFileSync(catalogSnapshot,catalogBytes,{flag:'wx'});
   for (const {destination,manifest} of pending) {
     fs.writeFileSync(destination,JSON.stringify(manifest,null,2)+'\n',{flag:'wx'}); outputs.push(relative(destination));
   }
   return outputs;
 }
 
-async function invoke(operation,options) {
+async function invoke(operation,options,{emit=true}={}) {
+  if (typeof emit!=='boolean') fail('Media result emission must be explicitly boolean.');
   const started=performance.now(), info=runtime.verified(), admitted=performance.now();
   const prepared=contextFor(operation,options,info);
   prepared.timings={runtimeAdmissionMilliseconds:admitted-started,hostPolicyMilliseconds:performance.now()-admitted};
@@ -376,7 +393,7 @@ async function invoke(operation,options) {
     if (entries.length!==1) fail('Ambiguous owned media dispatch receipt.');
     provenance=exportProvenance(prepared,result,info,path.join(directory,entries[0]));
   }
-  console.log(JSON.stringify({...result.data,hostMediaProvenance:provenance}));
+  if (emit) console.log(JSON.stringify({...result.data,hostMediaProvenance:provenance}));
   return {...result,hostMediaProvenance:provenance};
 }
 
