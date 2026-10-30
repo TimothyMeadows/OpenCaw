@@ -30,3 +30,10 @@ The six source packs informed the requested capability inventory; no source code
 ## Migration
 
 Move legacy browser-engine architecture selection into ENGINE.md and retain software-structure templates separately. Never silently reinterpret a conflicting existing engine. Old skill names build-threejs-code-models, build-threejs-code-characters and review-threejs-code-characters resolve through compatibility aliases to their threejs-prefixed names; commands and artifact schemas retain their names. CODE remains Three.js-specific. No legacy test asset is restored.
+
+
+## Native packages for web engines
+
+THREEJS, BABYLONJS and PHASERJS declare `runtimeKind: web` and automatically select .NET 10 MAUI HybridWebView packaging for Windows, macOS (Mac Catalyst), Android and iOS. Any future registered web engine uses that same metadata-derived capability. MAUI remains a packaging host, never another game engine or visual pipeline. Native engines retain their own exporters.
+
+Use `commands/web-game-package.sh` and read `docs/WEB_GAME_PACKAGING.md` in this installation. Resolution only declares the capability with unverified native readiness; explicit initialization, web-build sync, compatible SDK/workloads, signing and actual target QA precede release. Linux and TV are excluded. Linux users may independently try the Windows package with Wine or Proton, without a compatibility guarantee.

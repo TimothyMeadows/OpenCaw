@@ -36,6 +36,9 @@ bash ./commands/test-bubo-runtime.sh host
 bash ./commands/test-bubo-runtime.sh media
 ./commands/validate-engines.sh
 ./tests/test-engine-selection.sh
+node ./tests/test-maui-engine-selection.cjs
+node ./tests/test-web-game-packaging.cjs
+node ./tests/test-web-game-package-transactions.cjs
 ./tests/test-unreal-capabilities.sh
 ./tests/test-unity-capabilities.sh
 ./tests/test-unity-service-contracts.sh

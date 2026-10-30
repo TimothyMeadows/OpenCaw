@@ -57,6 +57,7 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
   - [Repository Layering](#repository-layering)
   - [Engine, Architecture, Style, and Media Contracts](#engine-architecture-style-and-media-contracts)
   - [Game Engine Selection](#game-engine-selection)
+  - [Native Web-Game Packaging](#native-web-game-packaging)
   - [Roles](#roles)
   - [Role, Skill, and Command Bindings](#role-skill-and-command-bindings)
   - [Skills](#skills)
@@ -88,9 +89,12 @@ Use OpenCaw to take a game concept toward a playable, reviewed result, or to imp
 | Music | MUSIC pipeline for instrumental tracks and supplied-lyric songs | Exact lyric rights, full-track/vocal review, and runtime budgets |
 | Speech | VOICE pipeline for preset speech and consented local-reference cloning | Reference-bound consent, spoken-content review, and separate disclosure/distribution rights |
 | QA and performance | Gameplay regressions, scene budgets, lifecycle cleanup, profiling, and target-platform builds | Actual engine/device results, with blocked checks stated |
+| Native web-game packaging | Automatic MAUI profile for Three.js, Babylon.js and Phaser; Windows, macOS, Android and iOS packages | Native builds, signatures and actual target QA |
 | Game services and delivery | Multiplayer integration, databases, backend services, security, CI/CD, and release preparation | Service/integration tests and reviewed delivery evidence |
 
 Engine-specific workflows cover **Three.js, Babylon.js, Phaser, Unity, Unreal, and Godot**. Each project selects one in `ENGINE.md`; an unconfigured project defaults to Three.js only when existing game evidence does not conflict. Three.js supplies rendering; physics and networking require explicit project choices. Engine-agnostic design and QA skills remain reusable across engines.
+
+**Web engines automatically select .NET MAUI packaging.** Three.js, Babylon.js and Phaser keep their JavaScript gameplay and can package a local static build for Windows, macOS, Android and iOS. Native engines retain their own exporters. See [Native Web-Game Packaging](#native-web-game-packaging).
 
 `STYLE.md` selects visual direction and the art pipeline. **PROOF_TO_MODEL** is the default: classify original sources, approve six consistent views, reconstruct them natively and finish in Blender, then review before runtime promotion. CLOUD, LOCAL, CODE, and BLENDER remain explicit alternatives. The CODE pipeline is specific to Three.js.
 
@@ -624,6 +628,7 @@ OpenCaw uses concise host-level contracts so agents do not have to rediscover fo
 | Contract | Host file | Template source | Purpose |
 | --- | --- | --- | --- |
 | Game engine | `ENGINE.md` | `.engine/` | One game engine, engine-owned languages, prerequisites, and compatible capabilities |
+| Native web-game packaging | `web-game-package.json` after explicit initialization | `.packaging/maui/` | Engine-selected MAUI host, versioned web snapshot and explicit native build/package |
 | Architecture | `ARCHITECTURE.md` | `.architecture/` | Technology, boundaries, data, deployment, and engineering conventions |
 | Visual style and art pipeline | `STYLE.md` | `.styles/*.md`, `.styles/.pipelines/` | Visual language plus one primary production path and supported alternatives |
 | Cloud/local media execution | `MEDIA.md` | `.styles/.pipelines/cloud/`, `.styles/.pipelines/local/` | Capability, provenance, staging, budgets, and promotion policy for generated media |
@@ -700,6 +705,33 @@ Unity production adds dedicated 2D content, localization, rendering, native Edit
 The Three.js CODE pipeline requires THREEJS. Selecting Unity never changes art contracts or installs Three.js. Host packages, matching Editors, SDKs, licensing and optional physics/networking packages remain explicit prerequisites. Engine guidance requires no additional AI model, paid middleware, or hosted service; selected asset-generation pipelines have their own dependencies. Unity code follows its Editor's supported C# environment; Godot preserves GDScript/C# choice and version-specific export restrictions.
 
 Use `design-game-systems` for loops, player decisions, progression and evidence-based balance, and `build-game-ui` for layouts, navigation, modal input ownership and HUD synchronization. `print-gameplay-system-brief.sh --focus design|ui|feedback` creates focused briefs; `validate-gameplay-review.sh --profile general|design|ui|feedback REPORT.md` checks report structure and preserves blocked/not-run results. Gameplay feedback coordinates presentation; haptic feedback means tactile output. Browser tests may inspect a Unity web build, but native UI and physically felt vibration require their actual devices and runtimes.
+
+
+## Native Web-Game Packaging
+
+Three.js, Babylon.js and Phaser automatically select the **MAUI** packaging profile through engine metadata. Existing read-directive engine contracts pick up the capability automatically; inline definitions still need explicit regeneration after shared-definition changes. Startup does not generate a native host or install tools. MAUI hosts the built static game in a local `HybridWebView` and keeps gameplay in JavaScript. Unity, Unreal and Godot use their native exporters.
+
+| Target | Build machine | Outputs |
+| --- | --- | --- |
+| Windows | Windows with .NET 10, MAUI Windows and Windows SDK | Application folder or MSIX |
+| macOS | Mac with matching Xcode/Mac Catalyst tools | `.app` or `.pkg` |
+| Android | Windows or Mac with matching Android SDK/JDK | APK or AAB |
+| iOS | Mac with matching Xcode and provisioning | Device IPA |
+
+Build the game's static distribution with its existing locked toolchain before running `sync`. From an installed host project root:
+
+```bash
+bash .opencaw/commands/web-game-package.sh doctor --target WINDOWS
+bash .opencaw/commands/web-game-package.sh init \
+  --app-id com.example.mygame --title "My Game" --web-root dist
+bash .opencaw/commands/web-game-package.sh sync
+bash .opencaw/commands/web-game-package.sh plan --target WINDOWS --format folder
+bash .opencaw/commands/web-game-package.sh package --target WINDOWS --format folder
+```
+
+Use `build` for compilation and `package` for distribution artifacts. Configure identity/version and static entry in `web-game-package.json`; keep native source under `platforms/maui`. Sync records exact web/native/configuration identities, rejects unsafe or foreign paths and retains prior assets/receipts in durable project cache. Changed inputs require explicit resync. Interrupted initialization/staging uses an owned journal and explicit `recover`. Native execution is bounded, and unavailable prerequisites remain explicit.
+
+Use `package-web-games` and the [complete packaging/release workflow](docs/WEB_GAME_PACKAGING.md) for other targets, signing and target QA. No command installs workloads or submits to stores. Signing credentials, store accounts, actual device tests and publication authorization remain separate. Native WebView support for WebGL/WebGPU, WASM, input and audio needs actual game testing. Linux and TVs are excluded; Wine/Proton compatibility with Windows output is unverified.
 
 ## Roles
 
@@ -809,6 +841,7 @@ $design-game-systems
 | Model motion and actions | `build-model-animations`, `build-model-actions` | Create reviewed clips and compound actions with selected-engine presentation and separate gameplay authority |
 | Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
 | Generative media | `plan-generative-media-pipeline`, `use-bubo-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
+| Native web-game packaging | `package-web-games` | Prepare four-platform MAUI packages and release evidence |
 | Sound effects and ambience | `build-audio-assets` | Run the independent AUDIO lifecycle, including complete listening and loop review |
 | Instrumental and songs | `build-music-assets` | Run MUSIC with exact supplied lyrics/rights and full-track review |
 | Preset and cloned speech | `build-voice-assets` | Run VOICE with reference/purpose-bound consent and separate output disclosure |
@@ -849,6 +882,7 @@ Or run the command directly:
 | Group | Commands |
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Native web-game packaging | `web-game-package.sh` |
 | Engine selection and compatibility | `generate-engine.sh`, `validate-engine-contract.sh`, `resolve-engine.sh`, `resolve-skill.sh`, `resolve-role-capabilities.sh`, `validate-engines.sh` |
 | Gameplay design, UI, and feedback | `print-gameplay-system-brief.sh`, `validate-gameplay-review.sh` |
 | Brainstorm discovery | `brainstorm-mode.sh`, `validate-brainstorm.sh`, `show-brainstorm.sh` |

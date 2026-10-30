@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="OpenCawGame.props" Condition="Exists('OpenCawGame.props')" />
+  <Import Project="$(OpenCawSigningProps)" Condition="'$(OpenCawSigningProps)' != '' And Exists('$(OpenCawSigningProps)')" />
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(TargetFrameworks)' == '' And $([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TargetFrameworks)' == '' And $([MSBuild]::IsOSPlatform('osx'))">net10.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TargetFrameworks)' == ''">net10.0-android</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OpenCaw.GameHost</RootNamespace>
+    <AssemblyName>GameHost</AssemblyName>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <MauiVersion>10.0.20</MauiVersion>
+    <ApplicationTitle Condition="'$(ApplicationTitle)' == ''">GameHost</ApplicationTitle>
+    <ApplicationId Condition="'$(ApplicationId)' == ''">com.opencaw.gamehost</ApplicationId>
+    <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0.0</ApplicationDisplayVersion>
+    <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
+    <OpenCawDefaultFile Condition="'$(OpenCawDefaultFile)' == ''">index.html</OpenCawDefaultFile>
+    <PublishAot>false</PublishAot>
+    <TrimMode>partial</TrimMode>
+    <MauiHybridWebViewSupported>true</MauiHybridWebViewSupported>
+    <WindowsPackageType Condition="'$(WindowsPackageType)' == ''">None</WindowsPackageType>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    <PublishTrimmed Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">false</PublishTrimmed>
+    <CodesignEntitlements Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">Platforms/MacCatalyst/Entitlements.plist</CodesignEntitlements>
+  </PropertyGroup>
+  <ItemGroup>
+    <MauiIcon Include="Resources/AppIcon/appicon.svg" ForegroundFile="Resources/AppIcon/appiconfg.svg" Color="#10141C" />
+    <MauiSplashScreen Include="Resources/Splash/splash.svg" Color="#10141C" BaseSize="128,128" />
+    <MauiAsset Include="Resources/Raw/**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <AssemblyMetadata Include="OpenCawDefaultFile" Value="$(OpenCawDefaultFile)" />
+  </ItemGroup>
+  <Target Name="CheckOpenCawGameConfiguration" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('OpenCawGame.props')" Text="Run the OpenCaw web-game packaging init command before building this template." />
+    <Error Condition="'$(OpenCawSigningProps)' != '' And !Exists('$(OpenCawSigningProps)')" Text="The explicitly selected signing property file is missing." />
+    <Error Condition="'$(PublishAot)' == 'true' Or '$(TrimMode)' == 'full'" Text="This .NET 10 HybridWebView host requires partial trimming and no Native AOT." />
+    <Error Condition="!Exists('Resources/Raw/wwwroot/$(OpenCawDefaultFile)')" Text="The packaged web entry is missing. Build the game and run web-game-package.sh sync." />
+  </Target>
+</Project>

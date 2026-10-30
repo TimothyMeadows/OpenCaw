@@ -402,3 +402,9 @@ This engine definition owns engine APIs and engine-owned language requirements. 
 ## Major-version boundary
 
 Use the host lockfile and matching Phaser documentation. Phaser 4 exists alongside Phaser 3 projects; pipelines and FX from Phaser 3 must not be assumed compatible with Phaser 4 render nodes and filters. Never copy Phaser 2 examples into modern projects.
+
+## Native web-game packaging
+
+This web engine automatically selects the MAUI packaging profile through the engine registry. Keep the game in its host-locked JavaScript/TypeScript toolchain and supply its static production HTML/JS/CSS/assets to the local .NET 10 HybridWebView host. MAUI packages the web build; it does not replace this engine or select an art pipeline.
+
+Use `commands/web-game-package.sh` and read `docs/WEB_GAME_PACKAGING.md` in the shared OpenCaw installation. Official targets are Windows, macOS through Mac Catalyst, Android and iOS. Selection performs no installation, scaffold, restore, build, signing or publication. Explicitly initialize/sync the host, inspect prerequisites, then build/package on a compatible host with project-specific identity and signing. Keep runtime/device testing and external store release separate. Linux and TV are not native targets; Wine/Proton compatibility of the Windows build remains unverified until actually tested.

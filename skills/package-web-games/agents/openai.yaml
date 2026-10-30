@@ -1,0 +1,4 @@
+interface:
+  display_name: "Package Web Games"
+  short_description: "Package web games for four native MAUI platforms"
+  default_prompt: "Use $package-web-games to prepare and verify a native package for this web-engine game."

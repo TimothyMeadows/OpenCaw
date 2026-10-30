@@ -1,0 +1,8 @@
+bin/
+obj/
+*.user
+*.pfx
+*.p12
+*.mobileprovision
+*.signing.props
+OpenCawSigning.props
