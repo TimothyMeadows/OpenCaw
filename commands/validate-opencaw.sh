@@ -19,6 +19,8 @@ done
 node ./tests/test-bubo-installation.cjs
 node ./tests/test-bubo-host-context.cjs
 node ./tests/test-bubo-media-context.cjs
+node ./tests/test-media-pipeline-contract.cjs
+node ./tests/test-media-pipeline-state.cjs
 ./tests/test-generative-media.sh
 node ./tests/test-bubo-installation.cjs --real-runtime
 bash ./commands/test-bubo-runtime.sh host

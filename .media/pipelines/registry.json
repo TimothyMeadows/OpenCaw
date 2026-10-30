@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "domains": {
+    "AUDIO": {
+      "aliases": ["audio", "audio-pipeline", "sound-effects"],
+      "contract": "AUDIO.md",
+      "declaration": "audio/PIPELINE.md",
+      "template": "audio/CONTRACT.md",
+      "modalities": {
+        "sfx": ["sound-effect", "sound-effects"],
+        "ambience": ["ambient", "ambiance"]
+      },
+      "implementation": { "status": "declared", "entryPoint": null }
+    },
+    "MUSIC": {
+      "aliases": ["music", "music-pipeline"],
+      "contract": "MUSIC.md",
+      "declaration": "music/PIPELINE.md",
+      "template": "music/CONTRACT.md",
+      "modalities": {
+        "instrumental": ["instrumental-music"],
+        "supplied-lyrics": ["song", "supplied-lyric", "lyric-song"]
+      },
+      "implementation": { "status": "declared", "entryPoint": null }
+    },
+    "VOICE": {
+      "aliases": ["voice", "voice-pipeline", "speech"],
+      "contract": "VOICE.md",
+      "declaration": "voice/PIPELINE.md",
+      "template": "voice/CONTRACT.md",
+      "modalities": {
+        "preset-speech": ["preset", "tts"],
+        "consented-cloning": ["voice-clone", "cloning", "clone"]
+      },
+      "implementation": { "status": "declared", "entryPoint": null }
+    }
+  }
+}

@@ -15,7 +15,7 @@ engines: [AGNOSTIC]
 ## Workflow
 
 1. Read `MEDIA.md` when it exists and read `STYLE.md` for visual work.
-2. For images, resolve `CLOUD` or `LOCAL` through `STYLE.md` or an explicit task prompt. For music, sound effects, and voice, use `MEDIA.md` independently of visual style.
+2. For images, resolve `CLOUD` or `LOCAL` through `STYLE.md` or an explicit task prompt. Route SFX/ambience to AUDIO, music to MUSIC and speech to VOICE with `resolve-media-pipeline.sh --modality MODALITY`; read only the applicable optional domain contract and `.media/pipelines/` declaration. These domains load independently alongside visual selection and each other. Missing unrelated contracts stay optional; declared/configured domains do not certify executable or native readiness. For nonvisual generation, use `MEDIA.md` without inventing visual style or engine selection.
 3. Discover capabilities per modality. If both cloud/session and local are viable, require an explicit choice; do not infer a fallback.
    For LOCAL, inspect the verified Bubo catalog separately for image, SFX, music, preset speech and consented cloning. Distinguish advertised capability, receipt presence and verified installation; never load a model during discovery. Exact model/tool pins remain in Bubo.
 4. Generate or update `MEDIA.md` with selected pipelines, versions, destinations, budgets, rights, consent, provenance, review, and promotion rules.

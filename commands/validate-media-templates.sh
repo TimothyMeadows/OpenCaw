@@ -3,7 +3,9 @@ set -euo pipefail
 
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required to validate media templates." >&2; exit 1; }
-[[ ! -e ".media" ]] || { echo "Legacy .media directory must not exist." >&2; exit 1; }
+for legacy in CLOUD_SESSION.md COMFYUI_LOCAL.md INDEX.md media-generation-manifest.schema.json model-packs.json toolchain.json; do
+  [[ ! -e ".media/$legacy" ]] || { echo "Legacy .media asset must not exist: $legacy" >&2; exit 1; }
+done
 [[ ! -e ".styles/.gpu" ]] || { echo "Legacy .styles/.gpu directory must not exist." >&2; exit 1; }
 
 for asset in cloud/PIPELINE.md local/PIPELINE.md _shared/media-generation-manifest.schema.json; do

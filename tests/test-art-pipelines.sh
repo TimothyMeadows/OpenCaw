@@ -162,7 +162,9 @@ for (const [label, mutate] of negatives) {
 console.log(`Finishing schema checks passed: 2 valid arrangements and ${negatives.length} malformed schemas rejected.`);
 FINISH_SCHEMA_CASES
 [[ ! -e .styles/.gpu ]] || fail "legacy pipeline tree exists"
-[[ ! -e .media ]] || fail "legacy media tree exists"
+for legacy in CLOUD_SESSION.md COMFYUI_LOCAL.md INDEX.md media-generation-manifest.schema.json model-packs.json toolchain.json; do
+  [[ ! -e ".media/$legacy" ]] || fail "legacy media asset exists: $legacy"
+done
 [[ ! -e .styles/.pipelines/css3 ]] || fail "retired CSS3 directory exists"
 [[ ! -e commands/print-css-art-token-template.sh ]] || fail "retired token command exists"
 for retired in CSS CSS3 vector css-vector; do
