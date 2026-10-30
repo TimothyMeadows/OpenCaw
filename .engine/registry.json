@@ -26,7 +26,8 @@
         "threejs-build-code-models",
         "threejs-build-code-characters",
         "threejs-review-code-characters"
-      ]
+      ],
+      "runtimeKind": "web"
     },
     "BABYLONJS": {
       "definition": "BABYLONJS.md",
@@ -51,7 +52,8 @@
         "babylonjs-build-materials",
         "babylonjs-build-ui",
         "babylonjs-build-audio"
-      ]
+      ],
+      "runtimeKind": "web"
     },
     "PHASERJS": {
       "definition": "PHASERJS.md",
@@ -74,7 +76,8 @@
         "phaserjs-animate-sprites",
         "phaserjs-build-ui",
         "phaserjs-build-audio"
-      ]
+      ],
+      "runtimeKind": "web"
     },
     "UNITY": {
       "definition": "UNITY.md",
@@ -108,7 +111,8 @@
         "unity-integrate-voice-chat",
         "unity-integrate-purchases",
         "unity-integrate-ads"
-      ]
+      ],
+      "runtimeKind": "native"
     },
     "UNREAL": {
       "definition": "UNREAL.md",
@@ -147,7 +151,8 @@
         "unreal-build-worlds",
         "unreal-build-procedural-content",
         "unreal-build-save-systems"
-      ]
+      ],
+      "runtimeKind": "native"
     },
     "GODOT": {
       "definition": "GODOT.md",
@@ -172,7 +177,8 @@
         "godot-build-audio",
         "godot-build-multiplayer",
         "godot-run-tooling"
-      ]
+      ],
+      "runtimeKind": "native"
     }
   },
   "skillAliases": {

@@ -419,3 +419,9 @@ When generating Babylon.js code:
 ## Engine contract ownership
 
 This engine definition owns engine APIs and engine-owned language requirements. ARCHITECTURE.md owns software structure; STYLE.md owns art production. Resolve ENGINE.md before selecting feature skills. Use host-locked versions and explicit project dependencies; do not install packages or use implicit CDNs. Engine selection never selects an art pipeline. Browser QA requires an actual browser build. Native backend services retain their own architecture.
+
+## Native web-game packaging
+
+This web engine automatically selects the MAUI packaging profile through the engine registry. Keep the game in its host-locked JavaScript/TypeScript toolchain and supply its static production HTML/JS/CSS/assets to the local .NET 10 HybridWebView host. MAUI packages the web build; it does not replace this engine or select an art pipeline.
+
+Use `commands/web-game-package.sh` and read `docs/WEB_GAME_PACKAGING.md` in the shared OpenCaw installation. Official targets are Windows, macOS through Mac Catalyst, Android and iOS. Selection performs no installation, scaffold, restore, build, signing or publication. Explicitly initialize/sync the host, inspect prerequisites, then build/package on a compatible host with project-specific identity and signing. Keep runtime/device testing and external store release separate. Linux and TV are not native targets; Wine/Proton compatibility of the Windows build remains unverified until actually tested.

@@ -57,6 +57,9 @@ jobs:
           bash commands/validate-readme.sh
           bash commands/validate-art-pipelines.sh
           node tests/test-engine-selection.cjs
+          node tests/test-maui-engine-selection.cjs
+          node tests/test-web-game-packaging.cjs
+          node tests/test-web-game-package-transactions.cjs
       - name: Actual managed Linux cancellation and native group cleanup
         if: runner.os == 'Linux'
         run: python3 tests/test-bubo-cancellation.py
