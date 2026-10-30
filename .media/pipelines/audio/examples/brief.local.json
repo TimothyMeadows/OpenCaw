@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "opencaw-audio-brief/v1",
+  "kind": "sfx",
+  "purpose": "Example only: a short mechanical latch for a game interaction",
+  "provider": "LOCAL",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "request": {
+    "rights": {"path": "inputs/actual-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "installation": {"path": ".opencaw/.cache/bubo-media/installations/actual-sfx.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "settings": {"device": "cuda:0", "precision": "float16", "offload": "none"},
+    "budget": {"maximumOutputs": 1, "maximumBytesPerOutput": 4194304, "maximumTotalBytes": 4194304, "maximumPixels": 4096, "maximumAudioSeconds": 4},
+    "items": [{"id": "latch", "prompt": "A metallic latch click and clunk with a short spring rattle, no speech or music", "negativePrompt": "", "seed": 1204, "steps": 100, "guidance": 7, "seconds": 4, "loopCandidate": false}]
+  },
+  "technical": {"maxPeak": null, "maxClippedFraction": null, "maxSilentFraction": null}
+}

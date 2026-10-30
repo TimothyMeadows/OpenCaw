@@ -290,13 +290,16 @@ for (const roots of [{ installationRoot: workspace + '/downloads/wrong-install' 
   rejects(() => prepare({ ...provision, ...roots }, [], 'setup'), /Provisioning|installation|download|separate/i);
 
 // Host provenance preserves native evidence and leaves review/promotion pending.
+info.pinned.buildReceipt='artifacts/bubo/build-info.json';
+info.receipt={schemaVersion:'bubo-build/v1',sourceRevision:info.pinned.revision,sourceDirty:false,capabilities:info.capability};
+write(bundle+'/build-info.json',info.receipt);
 const provenancePrepared = prepare();
 const outputPath = write(base.outputDirectory + '/000.owned', 'OWNED output bytes, no decoded media or quality evidence');
 const settingsPath = write(base.outputDirectory + '/000.settings.json', { fixture: true, effectiveSeed: 123 });
 const catalogPath = write(bundle + '/resources/media/catalog.json', { backends: [{ id: base.backend, files: [{ path: 'owned-model.bin', sha256: '3'.repeat(64), revision: '4'.repeat(40), repository: 'owned-fixture', license: 'OWNED' }] }] });
 info.catalog = { files: { 'resources/media/catalog.json': identity(catalogPath).sha256 } };
 const native = { status: 'generated-staged', backend: base.backend, requestPath: manifest, promotion: false, humanReview: 'pending', requestSha256: runtime.hash(path.join(root, manifest)), completedAt: '2026-01-01T00:00:00Z', workerSourceSha256: '5'.repeat(64),
-  actualSettings: { fixture: true }, timing: { fixtureOnly: true }, cleanup: { fixtureOnly: true },
+  actualSettings: { fixture: true }, timing: { fixtureOnly: true }, cleanup: { fixtureOnly: true },runtimeBuild:info.capability.build,catalogSha256:info.catalog.files['resources/media/catalog.json'],
   outputs: [{ id: base.items[0].id, path: outputPath, sha256: identity(outputPath).sha256, bytes: fs.statSync(path.join(root, outputPath)).size, sampleRate: 24000, humanReview: 'pending', promotion: false, actual: { nativeMetadata: identity(settingsPath) } }] };
 const nativePath = write(stateRoot + '/media/' + base.requestId + '/manifest.json', native);
 const dispatch = dir(stateRoot + '/dispatch/owned/bubo-host/owned');
@@ -325,6 +328,10 @@ write(outputPath, originalOutput);
 write(settingsPath, { fixture: 'changed' });
 rejects(() => adapter.exportProvenance(provenancePrepared, result, info, dispatch), /settings ancestry changed/);
 write(settingsPath, { fixture: true, effectiveSeed: 123 });
+const buildReceiptBytes=fs.readFileSync(path.join(root,bundle+'/build-info.json'));
+write(bundle+'/build-info.json',{...info.receipt,sourceRevision:'f'.repeat(40)});
+rejects(()=>adapter.exportProvenance(provenancePrepared,result,info,dispatch),/source revision\/build receipt changed/,'Contradictory source revision evidence is rejected before neutral publication');
+fs.writeFileSync(path.join(root,bundle+'/build-info.json'),buildReceiptBytes);
 const exported = adapter.exportProvenance(provenancePrepared, result, info, dispatch);
 check(exported.length === 1 && !path.isAbsolute(exported[0]), 'Export returns canonical project-relative neutral manifest');
 const neutral = JSON.parse(fs.readFileSync(path.join(root, exported[0]), 'utf8'));
@@ -333,6 +340,13 @@ check(neutral.review.status === 'pending' && neutral.outputs[0].status === 'stag
 for (const [key, source] of [['nativeManifest', nativePath], ['nativeResult', dispatch + '/result.json'], ['hostContext', dispatch + '/host-context.json'], ['nativeSettings', settingsPath], ['sourceRequest', manifest]])
   check(neutral.generation.parameters[key].sha256 === identity(source).sha256, 'Neutral ancestry retains exact ' + key);
 check(neutral.generation.parameters.runtime.revision === info.pinned.revision && neutral.generation.parameters.runtime.resourceCatalogSha256 === info.pinned.resourceCatalogSha256, 'Runtime and resource identities are explicit');
+const revisionEvidence=neutral.generation.parameters.runtime.sourceRevisionEvidence;
+check(identity(revisionEvidence.path).sha256===revisionEvidence.sha256&&fs.readFileSync(path.join(root,revisionEvidence.path)).equals(buildReceiptBytes),'Source revision evidence is an exact immutable snapshot of the verified build receipt');
+const modelCatalog=neutral.generation.parameters.modelCatalog;
+check(identity(modelCatalog.path).sha256===modelCatalog.sha256&&modelCatalog.sha256===info.catalog.files['resources/media/catalog.json'],'Model provenance retains an exact immutable snapshot of the verified pinned catalogue');
+write(bundle+'/build-info.json',{...info.receipt,sourceRevision:'f'.repeat(40)});
+check(identity(revisionEvidence.path).sha256===revisionEvidence.sha256,'Later build receipt changes do not relabel or invalidate the retained source snapshot');
+fs.writeFileSync(path.join(root,bundle+'/build-info.json'),buildReceiptBytes);
 for (const [name, sha] of preserved) check(identity(name).sha256 === sha, 'Export leaves native evidence unchanged: ' + name);
 const exportBytes = fs.readFileSync(path.join(root, exported[0]));
 rejects(() => adapter.exportProvenance(provenancePrepared, result, info, dispatch), /EEXIST/);

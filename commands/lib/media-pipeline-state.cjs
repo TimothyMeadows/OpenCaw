@@ -120,7 +120,7 @@ function load(options) {
       if (files[index] !== expected) fail('Incomplete or unexpected lifecycle event; inspect retained state.');
       const name = directory+'/events/'+files[index], event = document(root,name);
       if (event.schemaVersion !== 'opencaw-media-event/v1' || event.sequence !== index+1 || event.assetSha256 !== ref.sha256
-          || event.previousSha256 !== previous || !['dispatch-started','dispatch-failed','dispatch-returned','candidate','technical','review'].includes(event.kind))
+          || event.previousSha256 !== previous || !['dispatch-started','dispatch-failed','dispatch-returned','candidate','technical','review','promotion-started','promotion-completed','promotion-failed'].includes(event.kind))
         fail('Lifecycle event chain or asset identity changed.');
       previous = identity(root,name).sha256; events.push(event);
     }
@@ -150,6 +150,16 @@ function observe(state) {
     try { identity(root,event.data.request); for (const ref of [...(event.data.provenance || []),...(event.data.controlReferences || [])]) identity(root,ref); }
     catch { stale.push('native-request-or-returned-provenance-changed'); }
   }
+  const promoted=latest(state,'promotion-completed');
+  if (promoted) for (const ref of promoted.data.runtimeOutputs || []) {
+    try { identity(root,ref); } catch { stale.push('promoted-output-changed'); }
+  }
+  if (promoted) {
+    try {
+      const directory=runtime.projectPath(root,promoted.data.runtimeDirectory);
+      equal(fs.readdirSync(directory).sort(),promoted.data.runtimeOutputs.map(ref=>path.posix.basename(ref.path)).sort(),'Promoted directory contents changed.');
+    } catch { stale.push('promoted-directory-changed'); }
+  }
   const fingerprint = digest({assetSha256:state.identity.sha256,policySha256:context?.policySha256 || null,candidate:candidate?.data || null});
   return {context,stale:[...new Set(stale)],candidate,fingerprint};
 }
@@ -163,6 +173,7 @@ function append(state,kind,data) {
   const sequence = state.events.length+1;
   const record = {schemaVersion:'opencaw-media-event/v1',sequence,assetSha256:state.identity.sha256,previousSha256:previous,kind,data,recordedAt:new Date().toISOString()};
   put(state.root,state.directory+'/events/'+String(sequence).padStart(6,'0')+'.json',record);
+  state.events.push(record);
   return record;
 }
 function mutate(options,action) {
@@ -171,17 +182,21 @@ function mutate(options,action) {
 }
 function status(options) {
   const state = load(options), observed = observe(state), content = latest(state,'review',data=>data.kind==='content');
-  const technical = latest(state,'technical');
+  const technical = latest(state,'technical'), promoted=latest(state,'promotion-completed');
+  const promotionStarted=latest(state,'promotion-started'),promotionFailed=latest(state,'promotion-failed');
   return {schemaVersion:1,stateFile:state.stateFile,domain:state.asset.domain,modality:state.asset.modality,
     asset:state.asset.asset,version:state.asset.version,nativeRequestId:state.asset.nativeRequestId,
     assetSha256:observed.fingerprint,configured:observed.context?.configured || false,
     executionAvailable:observed.context?.executionAvailable || false,stale:observed.stale,
-    stage:observed.stale.length?'stale':observed.candidate?'staged':latest(state,'dispatch-started')?'dispatch-recorded':'planned',
+    stage:observed.stale.length?'stale':promoted?'promoted':observed.candidate?'staged':latest(state,'dispatch-started')?'dispatch-recorded':'planned',
     executionOrigin:observed.candidate?.data.origin || null,sourceRunIds:observed.candidate?.data.sourceRunIds || [],
     nativeDispatchRequestId:latest(state,'dispatch-started')?state.asset.nativeRequestId:null,
     technical:observed.stale.length && technical?'stale':technical?.data.status || 'pending',
     contentReview:observed.stale.length && content?'stale':content?.data.verdict || 'pending',
-    eventCount:state.events.length,promotion:false};
+    promotionState:observed.stale.length && promotionStarted?'stale':promoted?'completed':promotionStarted?'recovery-required':'not-started',
+    promotionNeedsRecovery:Boolean(promotionStarted && !promoted),
+    publicationObserved:Boolean(promoted || promotionFailed?.data.published),
+    eventCount:state.events.length,promotion:Boolean(promoted && !observed.stale.length)};
 }
 function cacheChild(root,name,label) {
   const full=runtime.projectPath(root,name), cache=runtime.projectPath(root,CACHE);
@@ -190,6 +205,7 @@ function cacheChild(root,name,label) {
 }
 function nativeRequest(options) {
   const state=load(options), observed=fresh(state), {root,asset}=state;
+  if (observed.candidate) fail('This version already owns an imported or generated candidate; initialize a new version instead of starting another attempt.');
   if (options.provider !== 'LOCAL') fail('Native dispatch requires explicit LOCAL; CLOUD import is separate and never falls back.');
   if (!observed.context.media) fail('Shared MEDIA policy is required before dispatch preparation.');
   require('./bubo-media-adapter.cjs').validateMedia(runtime.projectPath(root,observed.context.media.path));
@@ -239,7 +255,7 @@ async function dispatch(options) {
   });
   try {
     const result=await adapter.invoke('generate',adapter.parse(['--root',initial.root,'--task',initial.asset.task,'--manifest',manifest,
-      '--workspace',prepared.workspace,'--media-state',prepared.mediaState,'--media',prepared.media,...controlArguments]));
+      '--workspace',prepared.workspace,'--media-state',prepared.mediaState,'--media',prepared.media,...controlArguments]),{emit:false});
     if (result.status!=='succeeded' || !Array.isArray(result.hostMediaProvenance) || !result.hostMediaProvenance.length)
       fail('Successful native dispatch requires complete retained host provenance.');
     mutate(options,state=>append(state,'dispatch-returned',{request:identity(state.root,manifest),status:result.status,
@@ -348,8 +364,13 @@ function admitHandoff(options) {
       || target.channels.some(channels=>!Number.isSafeInteger(channels)||channels<=0)
       || target.codecs.some(codec=>!['wav','ogg','mp3','flac','opus','m4a','webm','aiff'].includes(codec))) fail('Target format/budgets contain unsupported or invalid values.');
   const destination=runtime.projectPath(state.root,target.directory), assets=runtime.projectPath(state.root,'assets');
+  if(target.directory!==relative(state.root,destination))fail('Runtime destination requires a canonical project-relative slash path.');
   if (!runtime.within(assets,destination) || runtime.samePath(assets,destination)) fail('Runtime destination must be a scoped assets child.');
-  if (fs.existsSync(destination)) fail('Runtime destination already exists; overwriting is not authorized.');
+  if (fs.existsSync(destination)) {
+    const started=latest(state,'promotion-started');
+    if (options._promotionRecovery!==true || !started || started.data.assetSha256!==observed.fingerprint
+        || canonical(started.data.target)!==canonical(target)) fail('Runtime destination already exists; overwriting is not authorized.');
+  }
   if (!Array.isArray(technical.measurements) || technical.measurements.length!==observed.candidate.data.outputs.length) fail('Actual output measurements are required for runtime admission.');
   let totalBytes=0,totalSeconds=0;
   for (const [index,output] of observed.candidate.data.outputs.entries()) {
@@ -377,5 +398,17 @@ function admitPromotion(options) {
   // Foundation supplies admission only. Domain workflows own explicit atomic copying.
   return {...plan,authorization,sourceEvidence,promotion:false,admitted:true};
 }
+function promotionTransaction(options,action) {
+  return mutate(options,(state)=>{
+    const plan=admitPromotion({...options,_promotionRecovery:true});
+    return action({state,plan,
+      revalidate:()=>admitPromotion({...options,_promotionRecovery:true}),
+      record:(kind,data)=>{
+        if (!['promotion-started','promotion-completed','promotion-failed'].includes(kind)) fail('Unsupported promotion event.');
+        return append(state,kind,{...data,assetSha256:plan.assetSha256,authorization:plan.authorization,
+          sourceEvidence:plan.sourceEvidence,target:plan.target,outputs:plan.outputs});
+      }});
+  });
+}
 module.exports={init,load,status,nativeId,statePath,nativeRequest,dispatch,recordCandidate,recordTechnical,recordReview,
-  admitHandoff,admitPromotion,engineIdentity,identity};
+  admitHandoff,admitPromotion,engineIdentity,identity,promotionTransaction};

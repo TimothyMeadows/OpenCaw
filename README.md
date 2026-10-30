@@ -1188,6 +1188,10 @@ OpenCaw proactively records only verified, stable, reusable facts. It does not s
 
 ## Art Pipelines and Generative Media
 
+Audio production domains load independently alongside the visual primary: AUDIO covers SFX/ambience, MUSIC covers music and VOICE covers speech. Use `resolve-media-pipeline.sh --all --visual` for separate named contexts and configure only the optional domain contracts needed by the project. Provider choice remains in MEDIA.md; independent loading does not permit concurrent GPU inference or new generation allowances.
+
+The AUDIO workflow is available through `build-audio-assets` and `audio-pipeline.sh --help`, with strict briefs, native provenance, complete listening/loop review and separate target/promotion gates. Explicit promotion privately prepares exact copies, preserves failures and supports owned recovery without overwriting existing assets. MUSIC and VOICE retain their declarations until their full domain workflows are delivered. Read the [media pipeline guide](docs/MEDIA_PIPELINES.md) for configuration and lifecycle boundaries.
+
 OpenCaw separates visual direction from production method. Asset-production tasks combine an art style with one resolved art pipeline:
 
 1. Choose one or more art styles for composition, color, shape, lighting, motion, and review guidance.

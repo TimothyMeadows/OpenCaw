@@ -21,6 +21,9 @@ node ./tests/test-bubo-host-context.cjs
 node ./tests/test-bubo-media-context.cjs
 node ./tests/test-media-pipeline-contract.cjs
 node ./tests/test-media-pipeline-state.cjs
+node ./tests/test-audio-pipeline-spec.cjs
+node ./tests/test-audio-pipeline-cli.cjs
+node ./tests/test-media-pipeline-promotion.cjs
 ./tests/test-generative-media.sh
 node ./tests/test-bubo-installation.cjs --real-runtime
 bash ./commands/test-bubo-runtime.sh host

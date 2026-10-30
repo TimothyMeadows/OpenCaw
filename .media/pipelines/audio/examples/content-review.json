@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "opencaw-media-review/v1",
+  "assetSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "outputs": [],
+  "kind": "content",
+  "verdict": "rejected",
+  "reviewer": "Example only; no human listening has occurred",
+  "reason": "Replace only after actual complete listening and a source-backed verdict",
+  "sourceEvidence": {"path": "inputs/actual-listening-source.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "criteria": {"listenedEntireOutput": false, "matchesBrief": false, "unwantedSpeechMusicAbsent": false, "artifactsAcceptable": false, "headTailAccepted": false, "loopSeamReviewed": false}
+}

@@ -14,7 +14,7 @@ Provider selection comes from MEDIA.md and explicit task authorization. AUDIO se
 
 ## Brief Requirements
 
-Record effect/environment, duration, variation, spatialization/loop intent and finite output/runtime budgets. Use supported SFX controls; do not silently tile or trim long ambience. MUSIC and VOICE are separately loadable domains.
+Record effect/environment, duration, variation, explicit LOCAL/CLOUD provider, spatialization/loop intent and finite output/runtime budgets in an opencaw-audio-brief/v1 brief. Use supported SFX controls and native maximum* budget/seconds names; do not silently tile, trim, normalize or downmix long ambience. MUSIC and VOICE are separately loadable domains. CLOUD execution is import-only unless a compatible session capability is separately selected.
 
 ## State And Ancestry
 
@@ -22,6 +22,6 @@ Keep immutable task/domain/asset/version state and exact input/request/settings/
 
 ## Review And Promotion
 
-Require complete exact-output human listening and separate loop review when claimed. Technical evidence does not establish acoustic quality. Promotion requires current technical/content/target evidence and explicit promotion authorization. Preserve rejected/superseded evidence; generation and source merges do not promote assets.
+Require complete exact-output human listening and separate loop review when claimed. Native hash-bound measurements establish technical observations, not acoustic quality; unavailable LUFS/loop/memory measures remain explicit. Promotion requires current technical/content/target evidence, separately scoped distribution rights and explicit promotion authorization. Preserve rejected/superseded evidence; generation and source merges do not promote assets.
 
 {{DEFINITION}}

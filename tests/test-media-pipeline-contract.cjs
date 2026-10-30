@@ -68,7 +68,7 @@ try {
     const initialHash = runtime.hash(path.join(root, domain + '.md')), repeated = contracts.generate({root,domain,inline:true});
     check(!repeated.created && runtime.hash(path.join(root, domain + '.md')) === initialHash, 'idempotent contract ' + domain);
     check(cli('validate',[domain]).domain === domain, 'actual validation ' + domain);
-    check(contracts.resolve({root,domain}).configured && !contracts.resolve({root,domain}).executionAvailable, 'configured declaration has no executable workflow ' + domain);
+    check(contracts.resolve({root,domain}).configured && !contracts.resolve({root,domain}).executionAvailable, 'configured domain without MEDIA is not executable ' + domain);
   }
   check(!fs.existsSync(path.join(root,'MEDIA.md')) && !fs.existsSync(path.join(root,'ENGINE.md')) && !fs.existsSync(path.join(root,'STYLE.md')), 'configuration invents no shared provider/engine/style contract');
   const initial = contracts.resolveAll({root});
@@ -115,6 +115,8 @@ try {
   // Real cloned-baseline module placement, no native dependency needed.
   for (const file of ['media-pipeline-contract.cjs','bubo-runtime.cjs','style-contract.cjs','engine-contract.cjs']) copy('commands/lib/'+file,'.opencaw/commands/lib/'+file);
   copy('.media/pipelines/registry.json','.opencaw/.media/pipelines/registry.json');
+  for (const definition of Object.values(contracts.registry().domains))
+    if (definition.implementation.status==='implemented') copy(definition.implementation.entryPoint,'.opencaw/'+definition.implementation.entryPoint);
   for (const domain of contracts.DOMAINS) for (const file of ['PIPELINE.md','CONTRACT.md']) copy('.media/pipelines/'+domain.toLowerCase()+'/'+file,'.opencaw/.media/pipelines/'+domain.toLowerCase()+'/'+file);
   const host = require(path.join(root,'.opencaw/commands/lib/media-pipeline-contract.cjs'));
   const hostAudio = host.resolve({root,domain:'AUDIO'}), hostMusic = host.resolve({root,domain:'MUSIC'});

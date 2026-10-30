@@ -14,6 +14,8 @@ engines: [AGNOSTIC]
 
 ## Workflow
 
+For SFX and ambience, route to `build-audio-assets` and `audio-pipeline.sh`; retain this entry point for modality dispatch and existing compatible media workflows. AUDIO has its own brief, immutable lifecycle, technical/listening/loop review and separate target/promotion boundaries, independent from MUSIC, VOICE and visual selection. Never fall back to a direct or different-provider workflow when a selected domain operation fails.
+
 1. Confirm the selected backend and audio capability in `MEDIA.md`. For LOCAL, use `use-bubo-local-generation` through `bubo-media.sh`; read Bubo's media API for exact formats/settings and intrinsic decoder behavior. Setup, zero-sample diagnostics and generation are separate operations.
 2. Define purpose, duration/bounds, structure, loop intent, variants, sample rate, channels, loudness, peaks, file size and runtime target. Direct Bubo LOCAL distinguishes SFX, instrumental/supplied-lyric music, preset speech and consented cloning. Voice uses explicit autoregressive token/time/byte ceilings rather than a fixed requested duration or diffusion controls; unsupported settings must fail.
 3. Record source rights and obtain explicit identity or voice consent where applicable. Cloning requires exact local reference audio/transcript identities and reference-bound rights/consent; reject remote reference URLs. Keep transcripts/conditioning private and separate local-use consent from public audio disclosure.
