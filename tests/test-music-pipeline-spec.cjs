@@ -48,7 +48,7 @@ function fixture(brief=base,{mutateSource=()=>{},mutateNative=()=>{},mutateNeutr
   const modelDigest=sha(JSON.stringify(runtime.canonical(modelFiles.map(({path,sha256,revision,repository})=>({path,sha256,revision,repository})))));
   const outputs=request.items.map(item=>{
     const metadata=settings(item);mutateMetadata(metadata);const nativeMetadata=identity(write(prefix+'/'+item.id+'.settings.json',metadata));
-    const output=write(prefix+'/'+item.id+'.wav','Owned synthetic nonaudio bytes: no acoustic claim');
+    const output=write(prefix+'/'+item.id+'.wav','Owned synthetic nonaudio bytes: no acoustic claim; run/item='+prefix+'/'+item.id);
     return {id:item.id,path:output,sha256:identity(output).sha256,bytes:fs.statSync(path.join(root,output)).size,sampleRate:48000,channels:2,frames:item.seconds*48000,peak:1.4,rms:0.2,clippedFraction:0.03,silentFraction:0.1,
       requested:item,actual:{seed:item.seed,steps:item.steps,guidance:1,scheduler:'ode/euler',nativeMetadata},humanReview:'pending',promotion:false};
   });
@@ -116,6 +116,15 @@ try{
   check(spec.validateTechnicalReport(report,context)===report,'Current music report revalidates actual complete ancestry and metadata');
   const vocalReport=spec.technical(fixture(vocal));check(vocalReport.status==='passed'&&vocalReport.measurements[0].music.lyricsSha256===sha(vocal.request.items[0].music.lyrics),'Actual supplied text/settings and disabled planning are bound to measured song metadata');
   check(spec.technical(fixture(two)).measurements.length===2,'Technical provenance covers complete variant batch');
+  const firstRun=fixture(two),secondRun=fixture(two);
+  check(spec.technical(firstRun).status==='passed'&&spec.technical(secondRun).status==='passed','Two separate complete native runs retain valid requests/results/metadata for both requested music item IDs');
+  const crossRun=(firstIndex,secondIndex)=>({...firstRun,candidate:{provider:'LOCAL',
+    manifests:[firstRun.candidate.manifests[firstIndex],secondRun.candidate.manifests[secondIndex]],
+    outputs:[firstRun.candidate.outputs[firstIndex],secondRun.candidate.outputs[secondIndex]]}});
+  check(spec.technical(crossRun(0,1)).status==='passed','A complete original A/B wrapper selection across valid full native runs retains exact requested item coverage');
+  const repeatedItem=crossRun(0,0);
+  check(repeatedItem.candidate.outputs[0].path!==repeatedItem.candidate.outputs[1].path&&repeatedItem.candidate.outputs[0].sha256!==repeatedItem.candidate.outputs[1].sha256,'Repeated A selection uses distinct actual fixture run paths and byte hashes rather than a duplicated path or forged receipt');
+  rejects(()=>spec.technical(repeatedItem),/duplicate|coverage|requested item/i,'Two valid full native A/B runs cannot substitute distinct A/A outputs for the requested complete A/B item set');
   check(spec.technical(fixture(base,{mutateSource:r=>Object.assign(r.items[0],{width:null,height:null,voice:null})})).status==='passed','Native absent optional controls serialized as null retain exact semantics');
   const omittedNegative=fixture(base,{mutateSource:r=>delete r.items[0].negativePrompt,mutateNative:n=>n.outputs[0].requested.negativePrompt=''});
   check(spec.technical(omittedNegative).status==='passed','Original raw GenerationItem JSON may omit negativePrompt while the native requested record serializes its documented empty default');

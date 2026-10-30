@@ -159,13 +159,14 @@ function technical(spec,context){
     }
   }
   if(mapped.size!==candidate.outputs.length||candidate.outputs.length!==checked.request.items.length)fail('Provenance does not cover exactly the complete requested candidate set.');
-  let total=0;
+  let total=0;const coveredItems=new Set();
   for(const output of candidate.outputs){
     readIdentity(root,output);const match=mapped.get(output.path);if(!match||match.measured.sha256!==output.sha256)fail('Candidate/native measurements differ.');
     const actual=match.measured,bytes=fs.statSync(runtime.projectPath(root,output.path)).size;
     if(actual.bytes!==bytes||actual.sampleRate!==spec.sampleRate||actual.channels!==spec.channels||!Number.isSafeInteger(actual.frames)||actual.frames<=0||!Number.isFinite(actual.peak)||actual.peak<0||!Number.isFinite(actual.rms)||actual.rms<0||!Number.isFinite(actual.clippedFraction)||actual.clippedFraction<0||actual.clippedFraction>1||!Number.isFinite(actual.silentFraction)||actual.silentFraction<0||actual.silentFraction>1)fail('Actual native measured audio format/counters are invalid.');
     const requested=checked.request.items.find(item=>item.id===actual.id);
-    if(!requested)fail('Measured native item differs from this audio brief.');same(spec.normalizeItem(actual.requested),requested,'Measured native request');
+    if(!requested||coveredItems.has(actual.id))fail('Native output coverage requires each requested item exactly once; duplicate or missing item identity.');
+    coveredItems.add(actual.id);same(spec.normalizeItem(actual.requested),requested,'Measured native request');
     const observed=spec.validateObserved(actual,requested,{root,brief:checked,reference:ref=>report.references.push(ref),read,readIdentity,originalIdentity,same,fields,number,text,typed,nested});
     const durationSeconds=actual.frames/actual.sampleRate;total+=bytes;
     const measurement={path:output.path,sha256:output.sha256,bytes,durationSeconds,sampleRate:actual.sampleRate,channels:actual.channels,frames:actual.frames,peak:actual.peak,rms:actual.rms,clippedFraction:actual.clippedFraction,silentFraction:actual.silentFraction,amplitudePreserved:true,...observed};
@@ -174,6 +175,7 @@ function technical(spec,context){
     check(actual.id+'-bytes',bytes<=checked.request.budget.maximumBytesPerOutput,'Actual per-output bytes stay within explicit native budget.');
     for(const [policy,key] of [['maxPeak','peak'],['maxClippedFraction','clippedFraction'],['maxSilentFraction','silentFraction']])check(actual.id+'-'+key,checked.technical[policy]===null||actual[key]<=checked.technical[policy],`Reported native ${key}=${actual[key]}; explicit threshold=${checked.technical[policy]===null?'observe only':checked.technical[policy]}. No normalization or repair applied.`);
   }
+  if(coveredItems.size!==checked.request.items.length)fail('Native output coverage omits a requested item.');
   check('total-output-budget',candidate.outputs.length<=checked.request.budget.maximumOutputs&&total<=checked.request.budget.maximumTotalBytes,'Current complete output count and total bytes fit the explicit batch budget.');
   report.references=[...new Map(report.references.map(ref=>[ref.path,ref])).values()];return report;
 }
