@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/voice-distribution-v1.json",
+  "title": "Separate VOICE runtime distribution/public-disclosure grant",
+  "description": "Source-backed assertion only. Runtime rehashes all nested sources and exact task/purpose/item/output bindings; a schema match is not actual human permission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "task",
+    "purpose",
+    "rightsConfirmed",
+    "publicDisclosureConfirmed",
+    "sourceEvidence"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-voice-distribution/v1"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+    },
+    "rightsConfirmed": {
+      "const": true
+    },
+    "publicDisclosureConfirmed": {
+      "const": true
+    },
+    "sourceEvidence": {
+      "$ref": "#/$defs/identity"
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

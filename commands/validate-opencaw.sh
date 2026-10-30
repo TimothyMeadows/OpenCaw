@@ -25,6 +25,9 @@ node ./tests/test-audio-pipeline-spec.cjs
 node ./tests/test-audio-pipeline-cli.cjs
 node ./tests/test-music-pipeline-spec.cjs
 node ./tests/test-music-pipeline-cli.cjs
+node ./tests/test-voice-pipeline-spec.cjs
+node ./tests/test-voice-pipeline-cli.cjs
+node ./tests/test-media-pipeline-generation-guards.cjs
 node ./tests/test-media-pipeline-promotion.cjs
 ./tests/test-generative-media.sh
 node ./tests/test-bubo-installation.cjs --real-runtime

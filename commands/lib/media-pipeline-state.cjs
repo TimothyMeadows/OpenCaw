@@ -40,17 +40,24 @@ function identity(root, value) {
   return result;
 }
 function equal(left, right, message) { if (canonical(left) !== canonical(right)) fail(message); }
-function typedReferences(root,value) {
+function typedReferences(root,value,mapper) {
+  if (mapper!==undefined && typeof mapper!=='function') fail('Typed evidence mapper must be a trusted function.');
   const found=new Map(); let nodes=0;
-  function visit(item,depth=0) {
+  function visit(item,depth=0,trail=[]) {
     if (++nodes>8192 || depth>32) fail('Typed evidence nesting bound exceeded.');
-    if (Array.isArray(item)) { for (const child of item) visit(child,depth+1); return; }
+    if (Array.isArray(item)) { for (const [index,child] of item.entries()) visit(child,depth+1,[...trail,index]); return; }
     if (!item || typeof item!=='object') return;
     if (typeof item.path==='string' && Object.hasOwn(item,'sha256')) {
-      const ref=identity(root,item);found.set(ref.path,ref);
+      // A compiled domain may resolve documented historical reference fields.
+      // Raw input bytes and declared hashes remain immutable; every mapped
+      // identity still passes the normal project confinement/hash guard.
+      const original={path:item.path,sha256:item.sha256};
+      const mapped=mapper?mapper({...original},[...trail]):original;
+      if (!mapped || mapped.sha256!==original.sha256) fail('Typed evidence mapping must preserve the declared hash.');
+      const ref=identity(root,mapped);found.set(ref.path,ref);
       if (found.size>128) fail('Typed evidence reference bound exceeded.');
     }
-    for (const child of Object.values(item)) visit(child,depth+1);
+    for (const [key,child] of Object.entries(item)) visit(child,depth+1,[...trail,key]);
   }
   visit(value);return [...found.values()];
 }
@@ -87,7 +94,7 @@ function init(options) {
   if (!context.modality) fail('An explicit supported modality is required for an asset.');
   identity(root, `${CACHE}/tasks/${task}/TASK.md`);
   const brief = identity(root, options.brief), briefValue=document(root,brief.path);
-  const references = [...new Map([...(options.references || []).map(value => identity(root,value)),...typedReferences(root,briefValue)].map(ref=>[ref.path,ref])).values()];
+  const references = [...new Map([...(options.references || []).map(value => identity(root,value)),...typedReferences(root,briefValue,options.referenceMapper)].map(ref=>[ref.path,ref])).values()];
   if (references.length > 128) fail('Too many asset references.');
   const parent = options.parent ? identity(root,options.parent) : null;
   if (parent) {
@@ -151,6 +158,9 @@ function observe(state) {
     catch { stale.push('native-request-or-returned-provenance-changed'); }
   }
   const promoted=latest(state,'promotion-completed');
+  for(const ref of latest(state,'dispatch-started')?.data.policyReferences||[]){
+    try{identity(root,ref);}catch{stale.push('dispatch-policy-changed');}
+  }
   if (promoted) for (const ref of promoted.data.runtimeOutputs || []) {
     try { identity(root,ref); } catch { stale.push('promoted-output-changed'); }
   }
@@ -232,7 +242,7 @@ function nativeRequest(options) {
     finalOutput:relative(root,finalOutput),nativeState:relative(root,nativeState),media:observed.context.media.path};
 }
 async function dispatch(options) {
-  if (Object.keys(options).some(key=>!['root','stateFile','provider','request','workspace','mediaState','controls'].includes(key))) fail('Unknown or protected dispatch option; use the documented controls whitelist.');
+  if (Object.keys(options).some(key=>!['root','stateFile','provider','request','workspace','mediaState','controls','policyReferences'].includes(key))) fail('Unknown or protected dispatch option; use the documented controls whitelist.');
   const controls=options.controls || {};
   if (typeof controls!=='object' || Array.isArray(controls)
       || Object.keys(controls).some(key=>!['timeout','max-log-bytes','max-private-bytes','platform-modules'].includes(key))) fail('Unknown or protected dispatch control.');
@@ -243,6 +253,17 @@ async function dispatch(options) {
   }
   const parsedControls=adapter.parse(controlArguments), budgets=adapter.executionBudgets(parsedControls);
   const initial=load(options), context=fresh(initial).context;
+  const suppliedPolicies=options.policyReferences||[];
+  if(!Array.isArray(suppliedPolicies)||suppliedPolicies.length>128)fail('Bounded domain generation policy identities are required.');
+  const policyInputs=[initial.identity,initial.asset.brief,...initial.asset.references,
+    ...(context.contract?[context.contract]:[]),...(context.media?[context.media]:[]),...suppliedPolicies];
+  for(const [name,sha256] of [[context.definition?.declaration,context.definition?.declarationSha256],
+      [context.definition?.template,context.definition?.templateSha256]]){
+    if(name){const file=path.join(runtime.BASE,'.media/pipelines',name);if(runtime.within(initial.root,file))policyInputs.push({path:relative(initial.root,file),sha256});}
+  }
+  if(context.entryPoint){const file=path.join(runtime.BASE,context.entryPoint.path);if(runtime.within(initial.root,file))policyInputs.push({path:relative(initial.root,file),sha256:context.entryPoint.sha256});}
+  const policyReferences=[...new Map(policyInputs.map(ref=>{const value=identity(initial.root,ref);return [process.platform==='win32'?value.path.toLowerCase():value.path,value];})).values()];
+  if(policyReferences.length>256)fail('Combined generation policy reference bound exceeded.');
   const controlReferences=controls['platform-modules']?[identity(initial.root,controls['platform-modules'])]:[];
   if (!context.executionAvailable) fail('Selected domain execution is unavailable; its domain workflow is not implemented.');
   const prepared=nativeRequest(options);
@@ -251,11 +272,11 @@ async function dispatch(options) {
     if (latest(state,'dispatch-started')) fail('This version already started dispatch.');
     manifest=state.directory+'/native-request.json';put(state.root,manifest,prepared.request);
     append(state,'dispatch-started',{request:identity(state.root,manifest),provider:'LOCAL',workspace:prepared.workspace,mediaState:prepared.mediaState,
-      controls,budgets,controlReferences});
+      controls,budgets,controlReferences,policyReferences});
   });
   try {
     const result=await adapter.invoke('generate',adapter.parse(['--root',initial.root,'--task',initial.asset.task,'--manifest',manifest,
-      '--workspace',prepared.workspace,'--media-state',prepared.mediaState,'--media',prepared.media,...controlArguments]),{emit:false});
+      '--workspace',prepared.workspace,'--media-state',prepared.mediaState,'--media',prepared.media,...controlArguments]),{emit:false,policyReferences});
     if (result.status!=='succeeded' || !Array.isArray(result.hostMediaProvenance) || !result.hostMediaProvenance.length)
       fail('Successful native dispatch requires complete retained host provenance.');
     mutate(options,state=>append(state,'dispatch-returned',{request:identity(state.root,manifest),status:result.status,
@@ -298,7 +319,7 @@ function recordCandidate(options) {
         if (!value.runId.startsWith(state.asset.nativeRequestId+'-')) fail('Native candidate names another run identity.');
         equal(value.generation.parameters.sourceRequest,started.data.request,'Native candidate names a different source request.');
       }
-      sourceRunIds.push(value.runId);references.push(...typedReferences(state.root,value));
+      sourceRunIds.push(value.runId);references.push(...typedReferences(state.root,value,options.referenceMapper));
       for (const output of value.outputs) {
         if (output.status!=='staged') fail('Only unpromoted staged outputs can be imported.');
         const ref=identity(state.root,{path:output.stagedPath,sha256:output.sha256}), file=runtime.projectPath(state.root,ref.path);

@@ -93,7 +93,9 @@ function bindSharedState(prepared) {
   return file;
 }
 
-function contextFor(operation,options,info) {
+function contextFor(operation,options,info,{policyReferences=[]}={}) {
+  if(!Array.isArray(policyReferences)||policyReferences.length>256)fail('Bounded internal generation policy references are required.');
+  if(policyReferences.length&&operation!=='generate')fail('Extra policy references apply only to generation.');
   if (!['setup','inspect','generate'].includes(operation)) fail('Unsupported media operation; promotion is separate.');
   if (!(options instanceof Map)) fail('Media options must be parsed.');
   for (const key of options.keys()) if (!FLAGS.has(key)) fail('Unknown or protected media option: --'+key);
@@ -274,6 +276,14 @@ function contextFor(operation,options,info) {
     if ([workspaceFull,state,mediaStateFull].some(value=>overlap(published,value))) fail('Workspace/state cannot overlap the Bubo dependency.');
     inputs.push(relative(published));
   }
+  // Host-only purpose/consent assertions must survive native ownership waits.
+  // These references add freshness requirements, never execution authority.
+  for(const value of policyReferences){
+    if(!value||Object.keys(value).sort().join(',')!=='path,sha256')fail('Exact internal policy identity required.');
+    const file=scoped(value.path),rel=relative(file),key=process.platform==='win32'?rel.toLowerCase():rel;
+    if([...tools.values()].some(tool=>runtime.samePath(tool.path,file)))fail('Policy evidence cannot alias an executable or module.');
+    typedReference(value,references.get(key)?.kind||'policy');
+  }
   const context={schemaVersion:'bubo-host-context/v1',projectRoot:root,task,
     roots:{state:stateRoot,staging:relative(staging),tools:[relative(toolsRoot),relative(downloads)],inputs,outputs:receiptOutput?[receiptOutput]:[],mediaState},
     policy,references:[...references.values()],tools:[...tools.values()],
@@ -376,10 +386,10 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
   return outputs;
 }
 
-async function invoke(operation,options,{emit=true}={}) {
+async function invoke(operation,options,{emit=true,policyReferences=[]}={}) {
   if (typeof emit!=='boolean') fail('Media result emission must be explicitly boolean.');
   const started=performance.now(), info=runtime.verified(), admitted=performance.now();
-  const prepared=contextFor(operation,options,info);
+  const prepared=contextFor(operation,options,info,{policyReferences});
   prepared.timings={runtimeAdmissionMilliseconds:admitted-started,hostPolicyMilliseconds:performance.now()-admitted};
   const binding=bindSharedState(prepared);
   if (binding) prepared.context.references.push({path:path.relative(prepared.root,binding).split(path.sep).join('/'),sha256:runtime.hash(binding),kind:'policy'});

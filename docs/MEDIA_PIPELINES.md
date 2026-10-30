@@ -13,7 +13,7 @@ Ordinary audio/SFX/ambience work routes to AUDIO; music routes to MUSIC; spoken 
 
 ## Configure and inspect
 
-The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. AUDIO and MUSIC supply their complete command workflows; VOICE remains declared until its domain implementation is delivered. Resolve configuration and readiness separately: a valid contract or model receipt does not certify an executable installation or successful generation.
+The shared foundation supplies domain declarations, optional contract generation/validation and independent context resolution. AUDIO, MUSIC and VOICE supply their complete command workflows. Resolve configuration and readiness separately: a valid contract or model receipt does not certify an executable installation or successful generation.
 
 Host contracts remain optional. Loading a project does not create all three contracts or require a Bubo build, MEDIA.md, STYLE.md or ENGINE.md for unrelated nonvisual planning. A requested domain can be configured explicitly. Missing unrelated domains leave other contexts usable. Generation requires current applicable domain and MEDIA/provider policy; an actual engine handoff also requires compatible engine ownership and target evidence.
 
@@ -86,7 +86,13 @@ Full listening review remains necessary for actual content. SFX/ambience, music 
 
 ## Voice and permissions
 
+Use `build-voice-assets`, `voice-pipeline.sh --help` and the [VOICE contract/examples](../.media/pipelines/voice/PIPELINE.md). Choose preset speech or cloning explicitly. LOCAL uses the verified CustomVoice/Base profile, explicit supported language/preset and bounded autoregressive sampling; diffusion, fixed requested seconds, loops and editing controls are unsupported. Native24000Hz mono metrics retain the declared intrinsic decoder clamp and unmodified output bytes. Metadata does not establish spoken-text, pronunciation or speaker/preset quality; review the complete output.
+
+Cloning additionally requires native task/reference-bound local consent and a separate host local-use record binding the actual purpose and complete reference set. A QA-only scope needs its matching existing bounded native acceptance case. Target promotion requires current distribution/public-use evidence; cloned outputs need a distinct exact-output/reference-bound disclosure grant. Setup and local QA acceptance never supply those grants. CLOUD preset provenance may be staged without authoritative technical acceptance; CLOUD cloning/upload is unavailable under these local-only records.
+
 Voice cloning requires local audio, a matching transcript, rights and recording-bound consent for the requested use. Changed reference bytes, transcript or consent invalidate affected acceptance. Keep private recordings, conditioning, transcripts, generated QA audio and identifying hashes local; public tracking should use a nonidentifying summary. Consent to local QA does not authorize public disclosure or runtime distribution.
+
+Host-only use/lyric permission records and sources travel into the native context as internal immutable policy references. Bubo's existing freshness checks reject changed registered bytes after a wait for ownership. The guard preserves native reference roles, process/GPU limits and shared attempt identity; no public option can replace expected hashes. Unrelated domain contracts remain independent.
 
 Contract/task/Goal creation grants no installation, license acceptance, fresh generation budget, private disclosure or asset promotion. Preserve the existing approval identity, physical shared state root and started candidate/revision history across tasks and workspaces. Historical accepted outputs remain historical and do not become new synthesis or listening evidence when imported.
 

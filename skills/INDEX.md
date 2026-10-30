@@ -96,6 +96,7 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 - `produce-generative-audio` - Produce reviewed music, sound-effect, ambience, and voice candidates.
 - `build-audio-assets` - Run the independent SFX/ambience AUDIO lifecycle with bounded native requests, exact listening/loop review and separately authorized runtime promotion.
 - `build-music-assets` - Run independent instrumental and supplied-lyric MUSIC production with exact lyrics/rights, disabled planning, complete track/line/loop review and separate target/promotion gates.
+- `build-voice-assets` - Run independent preset/cloning VOICE production with exact local references, purpose-bound consent, complete spoken-content review and separate output disclosure/target/promotion gates.
 - `validate-generated-media` - Validate manifests, hashes, exact coverage, budgets, provenance, and review status before promotion.
 - `create-game-vfx` - Design readable effect families with timing, accessibility, and runtime budgets.
 - `optimize-web-games` - Profile and improve browser-game frame time, memory, loading, and asset churn.

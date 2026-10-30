@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "opencaw-voice-brief/v1",
+  "kind": "consented-cloning",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "provider": "LOCAL",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "request": {
+    "rights": {
+      "path": "inputs/actual-prompt-rights.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "installation": {
+      "path": "inputs/actual-cloning-installation.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "settings": {
+      "device": "cuda:0",
+      "precision": "bfloat16",
+      "offload": "none"
+    },
+    "budget": {
+      "maximumOutputs": 1,
+      "maximumBytesPerOutput": 16777216,
+      "maximumTotalBytes": 16777216,
+      "maximumPixels": 4096,
+      "maximumAudioSeconds": 30
+    },
+    "items": [
+      {
+        "id": "line-1",
+        "prompt": "A fictional lantern shines beside the gate.",
+        "negativePrompt": "",
+        "seed": 17,
+        "loopCandidate": false,
+        "voice": {
+          "language": "english",
+          "preset": null,
+          "expression": "",
+          "sampling": {
+            "maximumNewTokens": 512,
+            "doSample": true,
+            "temperature": 0.9,
+            "topK": 50,
+            "topP": 1,
+            "repetitionPenalty": 1.05,
+            "subtalkerDoSample": true,
+            "subtalkerTemperature": 0.9,
+            "subtalkerTopK": 50,
+            "subtalkerTopP": 1
+          },
+          "reference": {
+            "audio": {
+              "path": "inputs/actual-private-reference.wav",
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "transcript": {
+              "path": "inputs/actual-private-transcript.txt",
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "rights": {
+              "path": "inputs/actual-recording-rights.json",
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "consent": {
+              "path": "inputs/actual-native-consent.json",
+              "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "technical": {
+    "maxPeak": 1,
+    "maxClippedFraction": 0,
+    "maxSilentFraction": 0.9
+  },
+  "localUse": {
+    "path": "inputs/actual-local-use.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

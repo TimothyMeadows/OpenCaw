@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/voice-review-v1.json",
+  "title": "Current VOICE human content or runtime review",
+  "description": "Current exact fingerprint/output set and actual human/permission sources are checked by the CLI. Accepted cloned runtime additionally requires disclosureEvidence. Rejected examples grant no acceptance.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "assetSha256",
+        "outputs",
+        "kind",
+        "verdict",
+        "reviewer",
+        "reason",
+        "sourceEvidence",
+        "criteria"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "opencaw-media-review/v1"
+        },
+        "assetSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/identity"
+          }
+        },
+        "kind": {
+          "const": "content"
+        },
+        "verdict": {
+          "enum": [
+            "accepted",
+            "rejected"
+          ]
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "sourceEvidence": {
+          "$ref": "#/$defs/identity"
+        },
+        "criteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "listenedEntireOutput",
+            "spokenTextReviewed",
+            "pronunciationReviewed",
+            "artifactsAcceptable",
+            "presetOrReferenceMatchReviewed"
+          ],
+          "properties": {
+            "listenedEntireOutput": {
+              "type": "boolean"
+            },
+            "spokenTextReviewed": {
+              "type": "boolean"
+            },
+            "pronunciationReviewed": {
+              "type": "boolean"
+            },
+            "artifactsAcceptable": {
+              "type": "boolean"
+            },
+            "presetOrReferenceMatchReviewed": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "verdict": {
+                "const": "accepted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "criteria": {
+                "properties": {
+                  "listenedEntireOutput": {
+                    "const": true
+                  },
+                  "spokenTextReviewed": {
+                    "const": true
+                  },
+                  "pronunciationReviewed": {
+                    "const": true
+                  },
+                  "artifactsAcceptable": {
+                    "const": true
+                  },
+                  "presetOrReferenceMatchReviewed": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "assetSha256",
+        "outputs",
+        "kind",
+        "verdict",
+        "reviewer",
+        "reason",
+        "sourceEvidence",
+        "criteria",
+        "engine",
+        "target"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "opencaw-media-review/v1"
+        },
+        "assetSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/identity"
+          }
+        },
+        "kind": {
+          "const": "runtime"
+        },
+        "verdict": {
+          "enum": [
+            "accepted",
+            "rejected"
+          ]
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+        },
+        "sourceEvidence": {
+          "$ref": "#/$defs/identity"
+        },
+        "criteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "targetPlaybackReviewed",
+            "loadDisposeReviewed",
+            "spatializationReviewed"
+          ],
+          "properties": {
+            "targetPlaybackReviewed": {
+              "type": "boolean"
+            },
+            "loadDisposeReviewed": {
+              "type": "boolean"
+            },
+            "spatializationReviewed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "engine",
+            "sha256"
+          ],
+          "properties": {
+            "engine": {
+              "enum": [
+                "THREEJS",
+                "BABYLONJS",
+                "PHASERJS",
+                "UNITY",
+                "UNREAL",
+                "GODOT"
+              ]
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "directory",
+            "codecs",
+            "sampleRates",
+            "channels",
+            "maxOutputBytes",
+            "maxAudioSeconds",
+            "spatialization",
+            "loopIntent"
+          ],
+          "properties": {
+            "directory": {
+              "type": "string",
+              "pattern": "^assets/[^/]+(?:/[^/]+)*$"
+            },
+            "codecs": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "wav",
+                  "ogg",
+                  "mp3",
+                  "flac",
+                  "m4a",
+                  "opus"
+                ]
+              }
+            },
+            "sampleRates": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "channels": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 32
+              }
+            },
+            "maxOutputBytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxAudioSeconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "spatialization": {
+              "enum": [
+                "2d",
+                "3d"
+              ]
+            },
+            "loopIntent": {
+              "const": false
+            }
+          }
+        },
+        "rightsEvidence": {
+          "$ref": "#/$defs/identity"
+        },
+        "targetEvidence": {
+          "$ref": "#/$defs/identity"
+        },
+        "disclosureEvidence": {
+          "$ref": "#/$defs/identity"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "verdict": {
+                "const": "accepted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "criteria": {
+                "properties": {
+                  "targetPlaybackReviewed": {
+                    "const": true
+                  },
+                  "loadDisposeReviewed": {
+                    "const": true
+                  },
+                  "spatializationReviewed": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "verdict": {
+                "const": "accepted"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "rightsEvidence",
+              "targetEvidence"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

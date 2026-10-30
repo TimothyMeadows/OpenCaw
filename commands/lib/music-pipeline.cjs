@@ -157,4 +157,10 @@ function validateRuntimeReview(review,context){
   if(target.schemaVersion!=='opencaw-music-runtime-evidence/v1'||target.task!==record.task||target.spatialization!==context.brief.spatialization||target.loopIntent!==context.brief.loopIntent||target.playbackReviewed!==true||target.loadDisposeReviewed!==true||(target.loopIntent&&target.loopSeamReviewed!==true))fail('Actual current selected-engine playback/load/dispose evidence is required.');
   same(target.engine,review.engine,'Runtime target engine');same(target.outputs,review.outputs,'Runtime target output set');readIdentity(root,target.sourceEvidence);nested(root,target);return review;
 }
-module.exports={domain,modalities,backend,backends:[backend],validateBrief,request,technical,validateTechnicalReport,validateReview,validateRuntimeReview};
+function generationReferences(brief,context){
+  request(brief,context);
+  if(brief.kind!=='supplied-lyrics')return [];
+  const record=read(context.root,brief.lyricsRights).value;
+  return [brief.lyricsRights,record.sourceEvidence].map(ref=>({...ref}));
+}
+module.exports={domain,modalities,backend,backends:[backend],validateBrief,request,generationReferences,technical,validateTechnicalReport,validateReview,validateRuntimeReview};

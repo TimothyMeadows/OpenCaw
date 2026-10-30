@@ -32,7 +32,7 @@
         "preset-speech": ["preset", "tts"],
         "consented-cloning": ["voice-clone", "cloning", "clone"]
       },
-      "implementation": { "status": "declared", "entryPoint": null }
+      "implementation": { "status": "implemented", "entryPoint": "commands/voice-pipeline.sh" }
     }
   }
 }
