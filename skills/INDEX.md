@@ -92,7 +92,7 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 - `prepare-rigged-runtime-actors` - Prepare validated rigged character and monster packages for runtime integration and representative gameplay proof.
 - `plan-hybrid-game-assets` - Plan coherent asset pipelines across runtime-native, rendered, and generated media.
 - `plan-generative-media-pipeline` - Plan reproducible cloud/session and local media generation with explicit selection and promotion gates.
-- `use-comfyui-local-generation` - Provision and run pinned local image and audio workflows through official ComfyUI tooling.
+- `use-bubo-local-generation` - Inspect, explicitly provision/register, and run direct Bubo LOCAL images, SFX, music, preset speech and consented cloning with shared budgets, staged provenance and separate human review.
 - `produce-generative-audio` - Produce reviewed music, sound-effect, ambience, and voice candidates.
 - `validate-generated-media` - Validate manifests, hashes, exact coverage, budgets, provenance, and review status before promotion.
 - `create-game-vfx` - Design readable effect families with timing, accessibility, and runtime budgets.

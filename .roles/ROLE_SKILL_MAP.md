@@ -60,7 +60,7 @@ Skills:
 - `source-licensed-visual-assets`
 - `audit-reference-originality`
 - `plan-generative-media-pipeline`
-- `use-comfyui-local-generation`
+- `use-bubo-local-generation`
 - `validate-generated-media`
 - `prepare-rigged-runtime-actors`
 - `prepare-game-art-handoff`
@@ -111,7 +111,7 @@ Commands:
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/validate-rigged-actor-manifest.sh`
 - `commands/print-blender-production-brief.sh`
@@ -317,7 +317,7 @@ Skills:
 - `audit-reference-originality`
 - `maintain-art-style-contract`
 - `plan-generative-media-pipeline`
-- `use-comfyui-local-generation`
+- `use-bubo-local-generation`
 - `validate-generated-media`
 - `create-game-art-sheets`
 - `prepare-game-art-handoff`
@@ -333,7 +333,7 @@ Commands:
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
@@ -406,7 +406,7 @@ Skills:
 
 - `maintain-art-style-contract`
 - `plan-generative-media-pipeline`
-- `use-comfyui-local-generation`
+- `use-bubo-local-generation`
 - `validate-generated-media`
 - `plan-hybrid-game-assets`
 - `prepare-game-art-handoff`
@@ -419,7 +419,7 @@ Commands:
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
@@ -501,7 +501,7 @@ Commands:
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 
 ### arts/technical-3d-artist
@@ -621,7 +621,7 @@ Skills:
 - `adapt-external-agent-skills`
 - `verify-and-explain`
 - `plan-generative-media-pipeline`
-- `use-comfyui-local-generation`
+- `use-bubo-local-generation`
 - `produce-generative-audio`
 - `validate-generated-media`
 - `dependency-audit-dotnet`
@@ -632,10 +632,9 @@ Commands:
 - `commands/validate-skill-safety.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
-- `commands/install-comfyui-local.sh`
-- `commands/install-comfyui-models.sh`
+- `commands/install-bubo-media.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/dependency-check.sh`
 
@@ -982,7 +981,7 @@ Skills:
 - `build-model-animations`
 - `select-art-pipeline`
 - `plan-generative-media-pipeline`
-- `use-comfyui-local-generation`
+- `use-bubo-local-generation`
 - `produce-generative-audio`
 - `validate-generated-media`
 - `audit-untrusted-agent-source`
@@ -996,10 +995,9 @@ Commands:
 - `commands/resolve-art-pipeline.sh`
 - `commands/generate-media-contract.sh`
 - `commands/validate-media-contract.sh`
-- `commands/install-comfyui-local.sh`
-- `commands/install-comfyui-models.sh`
+- `commands/install-bubo-media.sh`
 - `commands/inspect-local-media-host.sh`
-- `commands/run-comfyui-workflow.sh`
+- `commands/bubo-media.sh`
 - `commands/validate-media-generation-manifest.sh`
 - `commands/validate-media-templates.sh`
 - `commands/proof-to-model.sh`

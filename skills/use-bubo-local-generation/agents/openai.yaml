@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Bubo Local Generation"
+  short_description: "Run direct Bubo LOCAL media with review gates"
+  default_prompt: "Use $use-bubo-local-generation to inspect readiness, prepare authorized setup, and run a bounded Bubo LOCAL media request with staged provenance and separate human review."

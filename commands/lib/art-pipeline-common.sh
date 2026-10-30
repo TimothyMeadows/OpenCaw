@@ -7,7 +7,8 @@ art_pipeline_normalize() {
   normalized="${normalized^^}"
   case "$normalized" in
     CLOUD|IMAGEGEN|IMAGE_GEN) printf '%s\n' 'CLOUD' ;;
-    LOCAL|COMFYUI|COMFY_UI) printf '%s\n' 'LOCAL' ;;
+    LOCAL) printf '%s\n' 'LOCAL' ;;
+    COMFYUI|COMFY_UI) echo 'ComfyUI execution is retired. Select LOCAL explicitly for pinned Bubo execution; historical receipts remain valid history.' >&2; return 1 ;;
     PROOF_TO_MODEL|2D_TO_3D) printf '%s\n' 'PROOF_TO_MODEL' ;;
     CSS|CSS3|CSS_VECTOR|VECTOR) echo 'CSS3 is retired. Select PROOF_TO_MODEL for 2D-to-3D assets, or CODE/BLENDER explicitly; regenerate STYLE.md with --pipeline PROOF_TO_MODEL. CSS/SVG interface work remains available outside art pipelines.' >&2; return 1 ;;
     CODE|THREE|THREEJS|THREE_JS) printf '%s\n' 'CODE' ;;

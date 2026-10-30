@@ -35,6 +35,8 @@ jobs:
         shell: bash
         run: |
           node tests/test-bubo-host-context.cjs
+          node tests/test-bubo-media-context.cjs
+          bash tests/test-generative-media.sh
           node tests/test-bubo-installation.cjs
           node tests/test-bubo-installation.cjs --real-runtime
           bash tests/test-opencaw-layout.sh
@@ -49,4 +51,6 @@ jobs:
         run: python3 tests/test-bubo-cancellation.py
       - name: Host-owned job boundary executable assertions
         shell: bash
-        run: bash commands/test-bubo-runtime.sh host
+        run: |
+          bash commands/test-bubo-runtime.sh host
+          bash commands/test-bubo-runtime.sh media

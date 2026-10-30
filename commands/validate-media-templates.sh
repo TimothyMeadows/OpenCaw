@@ -6,33 +6,22 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 [[ ! -e ".media" ]] || { echo "Legacy .media directory must not exist." >&2; exit 1; }
 [[ ! -e ".styles/.gpu" ]] || { echo "Legacy .styles/.gpu directory must not exist." >&2; exit 1; }
 
-for asset in cloud/PIPELINE.md local/PIPELINE.md _shared/media-generation-manifest.schema.json local/toolchain.json local/model-packs.json; do
+for asset in cloud/PIPELINE.md local/PIPELINE.md _shared/media-generation-manifest.schema.json; do
   [[ -f ".styles/.pipelines/$asset" ]] || { echo "Missing generated-media pipeline asset: .styles/.pipelines/$asset" >&2; exit 1; }
 done
 
 "$node_bin" <<'NODE'
 const fs=require('fs');
-for(const file of ['.styles/.pipelines/local/toolchain.json','.styles/.pipelines/local/model-packs.json','.styles/.pipelines/_shared/media-generation-manifest.schema.json']){
-  try { JSON.parse(fs.readFileSync(file,'utf8')); } catch(e){ console.error(`Invalid JSON in ${file}: ${e.message}`); process.exit(1); }
-}
-const t=JSON.parse(fs.readFileSync('.styles/.pipelines/local/toolchain.json','utf8'));
-if(t.comfyCli.version!=='1.12.0'||t.comfyUI.version!=='0.28.0') throw new Error('Local media toolchain versions are not pinned.');
-if(!/^\d+\.\d+\.\d+$/.test(t.comfyCli.version)||!/^\d+\.\d+\.\d+$/.test(t.comfyUI.version)) throw new Error('Toolchain versions must be exact semantic versions.');
-const packs=JSON.parse(fs.readFileSync('.styles/.pipelines/local/model-packs.json','utf8')).packs;
-for(const [name,p] of Object.entries(packs)){
-  if(!p.licenses.length||!p.files.length||!p.workflow) throw new Error(`${name} is incomplete`);
-  if(!Number.isInteger(p.minimumVramBytes)||p.minimumVramBytes<=0) throw new Error(`${name} has no VRAM viability floor`);
-  const destinations=new Set();
-  for(const x of [...p.files,p.workflow]){
-    if(!/^[a-f0-9]{64}$/.test(x.sha256)||!Number.isInteger(x.sizeBytes)||x.sizeBytes<=0||!x.revision) throw new Error(`${name} has unpinned content`);
-    if(!/^[a-f0-9]{40}$/.test(x.revision)||!x.source.includes(x.revision)) throw new Error(`${name} source is not revision-pinned`);
-    if(!/^https:\/\/(huggingface\.co|raw\.githubusercontent\.com)\//.test(x.source)) throw new Error(`${name} uses an unreviewed source host`);
-    if(pathIsUnsafe(x.destination)||destinations.has(x.destination)) throw new Error(`${name} has an unsafe or duplicate destination`);
-    destinations.add(x.destination);
-  }
-  if(p.workflow.coreNodesOnly!==true) throw new Error(`${name} workflow is not marked core-only`);
-}
-function pathIsUnsafe(value){ return typeof value!=='string'||value.startsWith('/')||value.startsWith('\\')||value.split(/[\\/]/).includes('..'); }
+for(const file of ['commands/bubo-media.sh','commands/install-bubo-media.sh','commands/inspect-local-media-host.sh','commands/lib/bubo-media-adapter.cjs','commands/lib/bubo-media-host.cjs','skills/use-bubo-local-generation/SKILL.md'])
+  if(!fs.statSync(file).isFile()) throw new Error(`Missing Bubo LOCAL host entrypoint: ${file}`);
+for(const file of ['commands/install-comfyui-local.sh','commands/install-comfyui-models.sh','commands/run-comfyui-workflow.sh','.styles/.pipelines/local/toolchain.json','.styles/.pipelines/local/model-packs.json','skills/use-comfyui-local-generation/SKILL.md'])
+  if(fs.existsSync(file)) throw new Error(`Retired active integration remains: ${file}`);
+const lock=JSON.parse(fs.readFileSync('runtime/bubo.lock.json','utf8'));
+if(lock.schemaVersion!==1||lock.path!=='runtime/bubo'||lock.apiVersion!==1||!/^[a-f0-9]{40}$/.test(lock.revision)||!/^[a-f0-9]{64}$/.test(lock.resourceCatalogSha256)) throw new Error('Invalid pinned Bubo media execution boundary.');
+// Policy validation remains usable before dependency initialization. Native
+// production separately verifies the exact source/build/catalog on every call.
+const policy=fs.readFileSync('.styles/.pipelines/local/PIPELINE.md','utf8');
+if(!/Bubo/.test(policy)) throw new Error('LOCAL policy does not identify the pinned runtime.');
 const schema=JSON.parse(fs.readFileSync('.styles/.pipelines/_shared/media-generation-manifest.schema.json','utf8'));
 for(const field of ['backend','modality','model','workflow','generation','inputs','outputs','runtime','review']) if(!schema.required.includes(field)) throw new Error(`Manifest schema omits ${field}`);
 NODE

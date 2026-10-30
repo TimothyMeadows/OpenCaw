@@ -6,7 +6,8 @@ case "${1:-}" in
   proof-to-model) project='runtime/proof-to-model/Tests/RuntimeTests' ;;
   model-to-animation) project='runtime/model-to-animation/Tests/RuntimeTests' ;;
   model-to-action) project='runtime/model-to-action/Tests/RuntimeTests' ;;
-  *) echo 'Use test-bubo-runtime.sh host|proof-to-model|model-to-animation|model-to-action [Release|Debug]. Explicitly build Bubo first.' >&2; exit 1 ;;
+  media) project='media/Tests/Media.Tests' ;;
+  *) echo 'Use test-bubo-runtime.sh host|proof-to-model|model-to-animation|model-to-action|media [Release|Debug]. Explicitly build Bubo first.' >&2; exit 1 ;;
 esac
 configuration="${2:-Release}"
 [[ "$configuration" == Release || "$configuration" == Debug ]] || { echo 'Invalid build configuration.' >&2; exit 1; }

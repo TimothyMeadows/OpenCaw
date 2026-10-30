@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "repository": "https://github.com/TimothyMeadows/Bubo.git",
   "path": "runtime/bubo",
-  "revision": "63ce839d498534ffaf2862138a5157e6cfbaeda0",
+  "revision": "4836addb44234dd7d93fe8d5982a706e7b6e2e0c",
   "apiVersion": 1,
-  "resourceCatalogSha256": "716f7a0c58740dd1b5d876a051cb143891146fce8b4fb5ada270d80cd3ab6dfc",
+  "resourceCatalogSha256": "4bd6ead00e0601c3bc0a4b17b5ca3e708a91566a22caa17867f1c56fbf771491",
   "buildReceipt": "artifacts/bubo/build-info.json",
-  "trackingIssue": "https://github.com/TimothyMeadows/OpenCaw/issues/143",
+  "trackingIssue": "https://github.com/TimothyMeadows/OpenCaw/issues/147",
   "acceptedPrerequisite": {
     "originalMerge": "7881c49429b3303acd7fa3a8675ac81b403ef226",
     "pullRequest": "https://github.com/TimothyMeadows/Bubo/pull/36",
@@ -17,6 +17,17 @@
       "reviewedHead": "ca03482189fd13dfae1a5823b6cceab6e6394c2c",
       "mergedRevision": "63ce839d498534ffaf2862138a5157e6cfbaeda0",
       "qa": "https://github.com/TimothyMeadows/Bubo/pull/37#issuecomment-6484767245"
+    },
+    "mediaIntegration": {
+      "pullRequest": "https://github.com/TimothyMeadows/Bubo/pull/40",
+      "reviewedHead": "c2dfcfe7a846965365736d961250ac817ced331b",
+      "mergedRevision": "4836addb44234dd7d93fe8d5982a706e7b6e2e0c",
+      "qa": "https://github.com/TimothyMeadows/Bubo/pull/40#issuecomment-6512661928",
+      "requiredCi": 40985372109,
+      "earlierAcceptedMediaMerges": [
+        "3d2e1bd19c9b1fad89402c0e644c12bd4f0b7681",
+        "f7ee4d042f8aac09530fb35ecdcacfff9c4c086d"
+      ]
     }
   }
 }

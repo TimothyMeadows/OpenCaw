@@ -658,7 +658,7 @@ Select a different primary pipeline or advertise project-supported alternatives 
 ./commands/generate-style.sh --pipeline BLENDER --allow-pipeline PROOF_TO_MODEL "CEL_SHADED_COMIC"
 ```
 
-Friendly names such as `imagegen`, `comfyui`, `proof-to-model` (also `proof to model` and `2d-to-3d`), `threejs`, and `blender` normalize to `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDER`. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
+Friendly names such as `imagegen`, `proof-to-model` (also `proof to model` and `2d-to-3d`), `threejs`, and `blender` normalize to `CLOUD`, `PROOF_TO_MODEL`, `CODE`, and `BLENDER`. Canonical `LOCAL` selects direct Bubo generation. The complete style catalog is indexed in `.styles/INDEX.md`; pipeline contracts are indexed in `.styles/.pipelines/INDEX.md`.
 
 ## Game Engine Selection
 
@@ -793,7 +793,7 @@ $design-game-systems
 | Selected-engine implementation | `threejs-build-scenes`, `babylonjs-integrate-physics`, `phaserjs-build-tilemaps`, `unity-build-ui`, `unreal-build-gameplay-framework`, `godot-run-tooling` | Use only the features compatible with ENGINE.md and explicitly selected project dependencies |
 | Art and runtime assets | `build-proof-to-model-assets`, `direct-blender-production`, `review-blender-deliverables`, `prepare-rigged-runtime-actors`, `tcg-art-direction` | Produce and review assets with ancestry, budgets, handoff evidence, and human acceptance |
 | Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
-| Generative media | `plan-generative-media-pipeline`, `use-comfyui-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
+| Generative media | `plan-generative-media-pipeline`, `use-bubo-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
 | Game QA and performance | `test-playable-games`, `optimize-web-games`, `profile-application-performance` | Verify representative play and measure declared budgets on the relevant runtime |
 | Browser QA | `playwright-e2e-tests`, `playwright-browser-discovery`, `playwright-test-refinement`, `playwright-reporting` | Verify browser games and web builds; native UI requires native evidence |
 | Game services and tools | `solution-build`, `test-dotnet`, `database-cli-query`, `build-game-production-tools` | Build and test supporting services, persistence, and production tooling |
@@ -847,7 +847,7 @@ Or run the command directly:
 | Browser QA | `playwright-install.sh`, `playwright-test.sh`, `playwright-capture-page.sh`, `playwright-report-summary.sh`, `playwright-artifact-index.sh` |
 | Security and dependencies | `security-scan.sh`, `audit-agent-source.sh` |
 | Databases | `install-database-cli-tools.sh`, `database-cli-query.sh` |
-| Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `install-comfyui-local.sh`, `install-comfyui-models.sh`, `inspect-local-media-host.sh`, `run-comfyui-workflow.sh`, `validate-media-generation-manifest.sh` |
+| Generative media | `generate-media-contract.sh`, `validate-media-contract.sh`, `inspect-local-media-host.sh`, `install-bubo-media.sh`, `bubo-media.sh`, `validate-media-generation-manifest.sh` |
 | Native proof-to-model assets | `proof-to-model.sh` |
 | Native model-to-animation production | `model-to-animation.sh` |
 | Native model-to-action composition | `model-to-action.sh` |
@@ -1201,7 +1201,7 @@ The five primary art pipelines selectable in `STYLE.md` are:
 | Pipeline | Primary output | Boundary |
 | --- | --- | --- |
 | `CLOUD` | Session-supported generated images/audio | Token or cost budget, staging, provenance, human review |
-| `LOCAL` | Loopback-only ComfyUI images/audio | Local GPU, pinned tools/models, licenses, checksums |
+| `LOCAL` | Direct Bubo images, SFX, music, preset speech and consented cloning | Verified pinned runtime/installations, local GPU ownership, rights/consent, shared budgets and human review |
 | `PROOF_TO_MODEL` | Source classification, approved six-view proofs, native Pixal3D MV, Blender finishing | Immutable originals, hashed ancestry, independent review and human acceptance |
 | `CODE` | Authored Three.js TypeScript/JavaScript models | No downloaded/generated mesh or model-library loading as the primary implementation |
 | `BLENDER` | Authored Blender 4.5 LTS scenes, assets, renders, and exports | Immutable source, repository-confined working copy, explicit validation, staging, and human review |
@@ -1224,8 +1224,6 @@ Primary pipeline contracts and owned assets live under:
 ├── _shared/media-generation-manifest.schema.json
 ├── cloud/PIPELINE.md
 ├── local/PIPELINE.md
-├── local/toolchain.json
-├── local/model-packs.json
 ├── proof-to-model/PIPELINE.md
 ├── proof-to-model/manifest.schema.json
 ├── code/PIPELINE.md
@@ -1238,7 +1236,7 @@ Primary pipeline contracts and owned assets live under:
 
 Legacy media-configuration directories are prohibited. Primary art-pipeline assets belong to their owners under `.styles/.pipelines/`; downstream motion and action assets live in their own directories under `.styles/.workflows/`.
 
-An explicit prompt such as “use imagegen for this illustration,” “use local ComfyUI,” “reconstruct this approved proof,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`. CSS/SVG game-interface work remains supported separately; it is not a registered art pipeline:
+An explicit prompt such as “use imagegen for this illustration,” “use direct Bubo LOCAL generation,” “reconstruct this approved proof,” “build this as a Three.js code model,” or “author this in Blender” overrides the primary pipeline for that request only. It may select any registered pipeline even when it is not listed as an allowed project alternative. Resolve and record that decision without rewriting `STYLE.md`. CSS/SVG game-interface work remains supported separately; it is not a registered art pipeline:
 
 ```bash
 ./commands/resolve-art-pipeline.sh --override imagegen \
@@ -1265,15 +1263,40 @@ Cloud/local media guardrails include:
 - hashed outputs and workflow receipts
 - explicit acceptance, rejection, and promotion state
 
-Local commands:
+Direct LOCAL execution uses the exact pinned, explicitly built Bubo runtime. OpenCaw supplies actual MEDIA policy, typed rights/license/consent references, project-confined roots and finite budgets; Bubo owns the model/tool catalog, dependency verification, workers and shared GPU lease. Exact model versions and supported settings live in [Bubo's media API](runtime/bubo/docs/MEDIA.md), without another OpenCaw model catalog.
+
+| Capability | Bubo backend | Request distinction |
+| --- | --- | --- |
+| Images | `flux-schnell` | Actual STYLE and LOCAL selection evidence |
+| Sound effects | `stable-audio-open` | Explicit duration; loop intent requires review |
+| Music | `ace-step-turbo` | Instrumental or supplied lyrics; no planning LM |
+| Preset speech | `qwen3-tts-customvoice` | Explicit supported language, preset and expression |
+| Consented cloning | `qwen3-tts-base` | Exact local audio/transcript/rights/consent; no preset or expression |
+
+Discovery is read-only and works when the runtime is missing or unbuilt. An advertised capability, a receipt on disk and fully verified installed content are distinct states. Discovery never loads models or provisions software. Windows CUDA native acceptance and Linux fixture/dependency support must be reported separately; neither a lockfile nor a synthetic fixture proves native media quality.
+
+Local command examples are relative to the OpenCaw installation; replace the project path and reviewed manifests:
 
 ```bash
-./commands/inspect-local-media-host.sh --json
-./commands/install-comfyui-local.sh --help
-./commands/install-comfyui-models.sh --help
-./commands/run-comfyui-workflow.sh --help
+./commands/inspect-local-media-host.sh --root /absolute/project --json
+./commands/install-bubo-media.sh --root /absolute/project --task media-task \
+  --manifest .opencaw/.cache/tasks/media-task/setup.json
+./commands/bubo-media.sh inspect --root /absolute/project --task media-task \
+  --manifest .opencaw/.cache/tasks/media-task/request.json \
+  --media-state .opencaw/.cache/shared-media
+./commands/bubo-media.sh generate --root /absolute/project --task media-task \
+  --manifest .opencaw/.cache/tasks/media-task/request.json \
+  --media-state .opencaw/.cache/shared-media
 ./commands/validate-media-generation-manifest.sh --help
 ```
+
+`install-bubo-media.sh` delegates to `bubo-media.sh setup` and defaults to dry-run. Provisioning a fresh installation and registering an existing one use distinct Bubo manifest schemas. `--execute` applies only to explicit setup authorization; it never accepts terms or authorizes generation or promotion. Ordinary `inspect` verifies without loading models. Select `inspect --load true` separately for a zero-sample load/unload diagnostic. Generation never installs, downloads or silently changes provider, device or precision.
+
+Acceptance-bearing requests require their retained explicit `--media-state` for both inspection and generation. An image task overriding a different STYLE primary also supplies current task-bound LOCAL evidence with `--selection`; audio rejects this visual option.
+
+The default workspace is `.opencaw/.cache/bubo-media`; custom workspace and shared-state roots must remain project-cache children. Task state stays under `.opencaw/.cache/tasks/<task>/bubo-media`. Bind each acceptance approval to one retained shared media-state root across tasks and workspace changes. Preserve existing started claims and candidate/revision allowances, including one-candidate-plus-one-revision limits; registration or migration never resets them.
+
+Generated outputs remain staged with pending human review. Preserve native dispatch/results/settings/build ancestry and separate provider-neutral manifests per output. Listen to complete audio for content and declared preset/reference match; cloning consent for local QA does not authorize public reference/clone disclosure. Runtime promotion is a separate authorized action and has no operation in this execution path. CLOUD behavior, historical receipts/approvals, accepted/rejected outputs and external installations remain preserved; do not probe or uninstall external tools during migration.
 
 The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
 

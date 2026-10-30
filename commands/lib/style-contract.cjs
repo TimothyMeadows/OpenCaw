@@ -12,7 +12,8 @@ const regular = file => fs.existsSync(file) && fs.statSync(file).isFile();
 const contract = pipeline => '.styles/.pipelines/' + contracts[pipeline] + '/PIPELINE.md';
 function normalize(raw) {
   const value = raw.replace(/[- ]/g, '_').toUpperCase();
-  const aliases = { IMAGEGEN: 'CLOUD', IMAGE_GEN: 'CLOUD', COMFYUI: 'LOCAL', COMFY_UI: 'LOCAL', '2D_TO_3D': 'PROOF_TO_MODEL', THREE: 'CODE', THREEJS: 'CODE', THREE_JS: 'CODE', BLEND: 'BLENDER', BPY: 'BLENDER' };
+  const aliases = { IMAGEGEN: 'CLOUD', IMAGE_GEN: 'CLOUD', '2D_TO_3D': 'PROOF_TO_MODEL', THREE: 'CODE', THREEJS: 'CODE', THREE_JS: 'CODE', BLEND: 'BLENDER', BPY: 'BLENDER' };
+  if (['COMFYUI', 'COMFY_UI'].includes(value)) fail('ComfyUI execution is retired. Select LOCAL explicitly for pinned Bubo execution; historical receipts remain valid history.');
   if (['CSS', 'CSS3', 'CSS_VECTOR', 'VECTOR'].includes(value)) fail('CSS3 is retired. Select PROOF_TO_MODEL for 2D-to-3D assets, or CODE/BLENDER explicitly; regenerate STYLE.md with --pipeline PROOF_TO_MODEL. CSS/SVG interface work remains available outside art pipelines.');
   if (Object.hasOwn(contracts, value)) return value;
   if (Object.hasOwn(aliases, value)) return aliases[value];

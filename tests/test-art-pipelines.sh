@@ -194,7 +194,7 @@ project_command bash commands/generate-style.sh --pipeline 'proof to model' CEL_
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
 
 
-for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'proof-to-model PROOF_TO_MODEL' '2d-to-3d PROOF_TO_MODEL' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
+for pair in 'imagegen CLOUD' 'LOCAL LOCAL' 'proof-to-model PROOF_TO_MODEL' '2d-to-3d PROOF_TO_MODEL' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
   read -r alias expected <<< "$pair"
   project_command bash commands/generate-style.sh --pipeline "$alias" CEL_SHADED_COMIC >/dev/null
   project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
@@ -206,7 +206,11 @@ for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'proof-to-model PROOF_TO_MODEL' '2d
   ' "$project/STYLE.md" || fail "$alias did not normalize to $expected"
 done
 
-project_command bash commands/generate-style.sh --pipeline PROOF_TO_MODEL --allow-pipeline imagegen --allow-pipeline comfyui --allow-pipeline threejs --allow-pipeline blender CEL_SHADED_COMIC >/dev/null
+for retired in comfyui comfy_ui; do
+  expect_failure "$runtime_dir/retired-local-$retired.log" bash commands/generate-style.sh --pipeline "$retired" CEL_SHADED_COMIC
+  expect_failure "$runtime_dir/retired-local-override-$retired.log" bash commands/resolve-art-pipeline.sh --override "$retired"
+done
+project_command bash commands/generate-style.sh --pipeline PROOF_TO_MODEL --allow-pipeline imagegen --allow-pipeline LOCAL --allow-pipeline threejs --allow-pipeline blender CEL_SHADED_COMIC >/dev/null
 for pipeline in PROOF_TO_MODEL CLOUD LOCAL CODE BLENDER; do contains_exact_line "- $pipeline" "$project/STYLE.md" || fail "allowed list omits $pipeline"; done
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
 project_command bash commands/generate-style.sh --inline --pipeline CODE --allow-pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
@@ -227,7 +231,7 @@ expect_failure "$runtime_dir/missing-directive.log" bash commands/validate-style
 
 echo "[3/6] resolving task-only prompt overrides without changing STYLE.md"
 style_before="$(sha256sum "$project/STYLE.md" | awk '{print $1}')"
-for pair in 'imagegen CLOUD' 'comfyui LOCAL' 'proof-to-model PROOF_TO_MODEL' '2d-to-3d PROOF_TO_MODEL' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
+for pair in 'imagegen CLOUD' 'LOCAL LOCAL' 'proof-to-model PROOF_TO_MODEL' '2d-to-3d PROOF_TO_MODEL' 'threejs CODE' 'blender BLENDER' 'blend BLENDER' 'bpy BLENDER'; do
   read -r alias expected <<< "$pair"
   output="$(project_command bash commands/resolve-art-pipeline.sh --style "$project/STYLE.md" --override "$alias" --json)"
   grep -Fq "\"pipeline\": \"$expected\"" <<< "$output" || fail "override $alias did not resolve to $expected"

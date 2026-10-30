@@ -14,11 +14,11 @@ engines: [AGNOSTIC]
 
 ## Workflow
 
-1. Validate the generation manifest structure, explicit unavailable markers, staged paths, and hashes.
+1. Validate the generation manifest structure, explicit unavailable markers, staged paths and hashes. For direct Bubo LOCAL, retain the provider-neutral manifest plus exact native output/settings, installation, build and host-policy ancestry.
 2. Compare delivered files against the planned matrix for exact names, states, variants, dimensions, durations, and destinations.
 3. Review images in contact sheets at full, thumbnail, grayscale, and representative runtime scale.
 4. Review audio in a listen-through sheet for duration, loudness, peaks, silence, loop boundaries, artifacts, and semantic fit.
-5. Check rights, consent, provenance, tool and model revisions, workflow digest, parameters, seed, and runtime budgets.
+5. Check rights, consent, provenance, tool and model revisions, workflow digest, parameters, seed and runtime budgets. For LOCAL, compare actual execution/settings and measured cleanup with the request; preserve failed/rejected attempts and confirm shared approval-state/candidate consumption has not reset across tasks or workspace changes. Use Bubo's catalog/API for model identities rather than duplicating pins here.
 6. Record each candidate as accepted or rejected with reasons; promote only accepted, human-reviewed outputs in a separate action.
 
 ## Output
@@ -33,3 +33,4 @@ engines: [AGNOSTIC]
 - Do not silently repair or replace rejected artifacts.
 - Do not accept a visually or aurally plausible file when coverage, geometry, budget, or provenance fails.
 - Do not promote staged outputs without an explicit human review status.
+- Keep historical CLOUD/LOCAL manifests and receipts unchanged. New runtime or policy verification does not relabel earlier outputs as newly executed or authorize another candidate, private voice disclosure or promotion.

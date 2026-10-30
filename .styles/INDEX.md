@@ -41,7 +41,7 @@ Use one or more of these with exactly one primary art pipeline when generating `
 Pipeline contracts and their owned assets live under `.styles/.pipelines/` and are selected alongside, but independently from, the art style:
 
 - `CLOUD` uses active session-supported image/audio generation.
-- `LOCAL` uses pinned loopback-only ComfyUI image/audio generation.
+- `LOCAL` uses direct offline Bubo image, SFX, music, preset-speech and consented-cloning generation with explicit setup, shared budgets and separate human review.
 - `PROOF_TO_MODEL` turns approved 2D proofs into staged, finished 3D assets using native Pixal3D and Blender 4.5 LTS.
 - `CODE` authors procedural Three.js TypeScript/JavaScript models.
 - `BLENDER` authors Blender 4.5 LTS scenes, assets, renders, and runtime exports.
@@ -55,7 +55,7 @@ This motion pipeline follows model creation and keeps the primary `STYLE.md` pip
 
 Action composition follows individual clip production. Use `build-model-actions` and `model-to-action.sh`; its implementation lives under `.styles/.workflows/model-to-action/`. It preserves the primary pipeline and engine, and requires its own sequence review and runtime acceptance.
 
-See [.styles/.pipelines/INDEX.md](.pipelines/INDEX.md) for primary and downstream contracts, shared provenance, local manifests, code-model schemas and Blender production boundaries.
+See [.styles/.pipelines/INDEX.md](.pipelines/INDEX.md) for primary and downstream contracts, shared provenance, LOCAL policy, code-model schemas and Blender production boundaries.
 
 ## Optional External Asset Libraries
 

@@ -17,9 +17,11 @@ engines: [AGNOSTIC]
 1. Read `MEDIA.md` when it exists and read `STYLE.md` for visual work.
 2. For images, resolve `CLOUD` or `LOCAL` through `STYLE.md` or an explicit task prompt. For music, sound effects, and voice, use `MEDIA.md` independently of visual style.
 3. Discover capabilities per modality. If both cloud/session and local are viable, require an explicit choice; do not infer a fallback.
+   For LOCAL, inspect the verified Bubo catalog separately for image, SFX, music, preset speech and consented cloning. Distinguish advertised capability, receipt presence and verified installation; never load a model during discovery. Exact model/tool pins remain in Bubo.
 4. Generate or update `MEDIA.md` with selected pipelines, versions, destinations, budgets, rights, consent, provenance, review, and promotion rules.
 5. Define a deterministic batch plan, naming scheme, staging location, manifest location, comparison format, and rejection criteria.
 6. Keep promotion separate from generation and require a recorded human review verdict.
+7. For LOCAL, use `use-bubo-local-generation` and the task-bound `bubo-media.sh` setup/inspect/generate boundary. Plan explicit setup authorization independently of generation, retain one shared media-state root per approval identity, and preserve every started candidate/revision claim across tasks and workspace changes. A one-candidate-plus-one-revision allowance is never replenished by migration or registration.
 
 ## Output
 
@@ -34,3 +36,4 @@ engines: [AGNOSTIC]
 - Do not require `MEDIA.md` for existing-proof `PROOF_TO_MODEL`, `CODE`, or ordinary `BLENDER` work; read it whenever cloud/local generated inputs are in scope.
 - Do not treat generated candidates as approved runtime assets.
 - Do not proceed when input rights or required identity and voice consent are unclear.
+- Do not rewrite historical receipts/approvals, regenerate accepted outputs, alter external installations or treat local cloning consent as public disclosure permission.
