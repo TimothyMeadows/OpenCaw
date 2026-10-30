@@ -38,6 +38,73 @@ function targetLock(root,plan,action) {
     return action();
   }finally{fs.closeSync(fd);fs.unlinkSync(file);}
 }
+function claimKey(root,directory) {
+  const resolved=relative(root,runtime.projectPath(root,directory));
+  const key=process.platform==='win32'?resolved.toLowerCase():resolved;
+  if(resolved!==directory||!key.startsWith('assets/'))fail('Promotion ownership target must be canonical.');
+  return key;
+}
+function claimOwner(state,plan) {
+  return {schemaVersion:'opencaw-media-target-claim/v1',state:state.identity,assetSha256:plan.assetSha256,
+    target:plan.target,authorization:plan.authorization,sourceEvidence:plan.sourceEvidence};
+}
+function overlapping(left,right){return left===right||left.startsWith(right+'/')||right.startsWith(left+'/');}
+function registerTarget(state,plan) {
+  const {root}=state,key=claimKey(root,plan.target.directory),owner=claimOwner(state,plan);
+  const directory=runtime.projectPath(root,'.opencaw/.cache/media-promotions/claims');
+  fs.mkdirSync(directory,{recursive:true});runtime.components(directory);
+  const lock=runtime.projectPath(root,'.opencaw/.cache/media-promotions/.ownership-lock');let fd;
+  for(let attempt=0;attempt<101;attempt++){
+    try{fd=fs.openSync(lock,'wx');break;}catch(error){
+      if(error.code!=='EEXIST')throw error;
+      if(attempt===100)fail('Promotion ownership registry is busy; inspect its retained lock before retry.');
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,10);
+    }
+  }
+  try{
+    fs.writeFileSync(fd,JSON.stringify({pid:process.pid,state:state.stateFile,createdAt:new Date().toISOString()})+'\n');fs.fsyncSync(fd);
+    const entries=fs.readdirSync(directory).sort();if(entries.length>16384)fail('Promotion ownership registry exceeds its bound.');
+    const known=new Set();let exact=false;
+    for(const name of entries){
+      if(!/^[a-f0-9]{64}\.json$/.test(name))fail('Unexpected promotion ownership claim; reconcile retained state.');
+      const file=runtime.projectPath(root,relative(root,directory)+'/'+name),stat=fs.statSync(file);
+      if(!stat.isFile()||stat.size>1048576)fail('Invalid promotion ownership claim.');
+      const claim=JSON.parse(fs.readFileSync(file,'utf8'));
+      if(!claim||Object.keys(claim).sort().join(',')!=='assetSha256,authorization,schemaVersion,sourceEvidence,state,target'||claim.schemaVersion!=='opencaw-media-target-claim/v1'||!/^[a-f0-9]{64}$/.test(claim.assetSha256||''))fail('Malformed promotion ownership claim.');
+      lifecycle.identity(root,claim.state);
+      const prior=lifecycle.load({root,stateFile:claim.state.path}),priorKey=claimKey(root,claim.target?.directory);
+      if(name!==crypto.createHash('sha256').update(priorKey).digest('hex')+'.json')fail('Promotion ownership claim key differs from its target.');
+      for(const ref of [claim.authorization,claim.sourceEvidence])if(!ref||typeof ref.path!=='string'||!/^[a-f0-9]{64}$/.test(ref.sha256||'')||relative(root,runtime.projectPath(root,ref.path))!==ref.path)fail('Malformed ownership source identity.');
+      const intent=latest(prior,'promotion-started')||latest(prior,'promotion-completed');
+      if(intent)same(claim,claimOwner(prior,intent.data),'Retained ownership claim differs from its promotion intent.');
+      known.add(prior.stateFile);
+      if(overlapping(key,priorKey)){
+        same(claim,owner,'Runtime target overlaps another reserved/owned asset package; nothing was changed.');exact=true;
+      }
+    }
+    // Pre-claim revisions may have retained intents/completions. They continue
+    // to own their packages even if their content/policy is now stale. Inspect
+    // only canonical lifecycle records, never media or private reference bytes.
+    const tasks=runtime.projectPath(root,'.opencaw/.cache/tasks');let visited=0;
+    const children=folder=>{
+      runtime.components(folder);const names=fs.readdirSync(folder);if((visited+=names.length)>65536)fail('Historical promotion ownership scan exceeds its bound.');
+      return names.map(name=>path.join(folder,name)).filter(file=>{runtime.components(file);return fs.statSync(file).isDirectory();});
+    };
+    for(const task of children(tasks))for(const domain of ['audio','music','voice']){
+      const media=path.join(task,'media',domain);runtime.components(media);if(!fs.existsSync(media))continue;
+      for(const asset of children(media))for(const version of children(asset)){
+        const file=path.join(version,'asset.json');runtime.components(file);if(!fs.existsSync(file))continue;
+        const name=relative(root,file);if(known.has(name))continue;
+        const prior=lifecycle.load({root,stateFile:name}),intent=latest(prior,'promotion-started')||latest(prior,'promotion-completed');if(!intent)continue;
+        if(overlapping(key,claimKey(root,intent.data.target?.directory)))same(claimOwner(prior,intent.data),owner,'Runtime target overlaps retained historical promotion ownership; explicit reconciliation is required.');
+      }
+    }
+    if(!exact){
+      const file=path.join(directory,crypto.createHash('sha256').update(key).digest('hex')+'.json'),claimFd=fs.openSync(file,'wx');
+      try{fs.writeFileSync(claimFd,JSON.stringify(owner,null,2)+'\n');fs.fsyncSync(claimFd);}finally{fs.closeSync(claimFd);}
+    }
+  }finally{fs.closeSync(fd);fs.unlinkSync(lock);}
+}
 function verifyOwner(event,plan) {
   if(event.data.assetSha256!==plan.assetSha256)fail('Promotion intent names a different asset version.');
   same(event.data.authorization,plan.authorization,'Promotion intent used a different authorization; retain it for review.');
@@ -56,6 +123,7 @@ function execute(options,recovering) {
     const {state,plan}=transaction,{root}=state;
     validatePolicy({...options,root},plan);
     return targetLock(root,plan,()=>{
+      registerTarget(state,plan);
       const completed=latest(state,'promotion-completed'),started=latest(state,'promotion-started');
       if(completed){
         verifyOwner(completed,plan);const runtimeOutputs=ownedDirectory(root,plan);

@@ -65,6 +65,39 @@ async function main(){
   check(result.runtimeOutputs.every((output,index)=>ref(output.path).sha256===ordinary.outputs[index].sha256),'Published runtime files match every exact authorized source');
   check(promotion.promote(args(ordinary)).alreadyPromoted,'Identical completed promotion is idempotent without copying again');
   check(events(ordinary,'promotion-started').length===1&&events(ordinary,'promotion-completed').length===1,'Idempotent repeat creates no second publication history');
+  const packageOwner=make('package-owner');promotion.promote(args(packageOwner));
+  const packageChild=make('package-child',{destination:packageOwner.target.directory+'/child'});
+  rejects(()=>promotion.promote(args(packageChild)),/overlaps/,'A second asset cannot publish inside another completed immutable package');
+  check(state.status(packageOwner).promotion&&!fs.existsSync(path.join(root,packageChild.target.directory)),'Rejected nested promotion preserves the original package and its fresh completion');
+  if(process.platform==='win32'){
+    const caseChild=make('case-child',{destination:packageOwner.target.directory.toUpperCase()+'/child'});
+    rejects(()=>promotion.promote(args(caseChild)),/overlaps/,'Windows case variants cannot bypass ancestor package ownership');
+  }
+  const orphan=make('orphan-claim'),open=fs.openSync;
+  const firstIntent=path.join(root,path.dirname(orphan.stateFile),'events','000005.json');
+  try{fs.openSync=(file,...values)=>{if(file===firstIntent)throw new Error('Owned interruption before intent');return open(file,...values);};
+    rejects(()=>promotion.promote(args(orphan)),/interruption before intent/,'An interrupted event write retains its already registered orphan target claim');
+  }finally{fs.openSync=open;}
+  check(events(orphan,'promotion-started').length===0,'Orphan ownership does not invent a persisted intent');
+  const orphanChild=make('orphan-child',{destination:orphan.target.directory+'/child'});
+  rejects(()=>promotion.promote(args(orphanChild)),/overlaps/,'A pre-intent orphan claim still excludes another nested owner');
+  check(promotion.promote(args(orphan)).promotion,'Only the exact original owner can continue its pre-intent reservation');
+  const deepReservation=make('deep-reservation',{destination:'assets/audio/reserved-parent/child'}),originalCopy=fs.copyFileSync;
+  try{fs.copyFileSync=()=>{throw new Error('Owned reserved preparation failure');};assert.throws(()=>promotion.promote(args(deepReservation)));}finally{fs.copyFileSync=originalCopy;}
+  const ancestor=make('reserved-ancestor',{destination:'assets/audio/reserved-parent'});
+  rejects(()=>promotion.promote(args(ancestor)),/overlaps/,'An interrupted descendant reservation excludes a later ancestor target');
+  check(!fs.existsSync(path.join(root,ancestor.target.directory)),'Reservation conflict creates no runtime parent or partial package');
+  check(promotion.recover(args(deepReservation)).promotion,'Original descendant owner can explicitly recover its retained reservation');
+  const legacy=make('legacy-package');
+  state.promotionTransaction(legacy,transaction=>{
+    transaction.record('promotion-started',{transactionId:'owned-preclaim-fixture'});
+    fs.mkdirSync(path.join(root,legacy.target.directory),{recursive:true});
+    fs.copyFileSync(path.join(root,legacy.outputs[0].path),path.join(root,legacy.target.directory,'000.wav'));
+    transaction.record('promotion-completed',{transactionId:'owned-preclaim-fixture',runtimeDirectory:legacy.target.directory,runtimeOutputs:[ref(legacy.target.directory+'/000.wav')]});
+  });
+  const legacyChild=make('legacy-child',{destination:legacy.target.directory+'/child'});
+  rejects(()=>promotion.promote(args(legacyChild)),/historical promotion ownership/,'A retained pre-claim completion still excludes nested ownership');
+  check(promotion.recover(args(legacy)).alreadyPromoted&&state.status(legacy).promotion,'Exact validated historical ownership can be registered without copying or rewriting old events');
   write(ordinary.target.directory+'/extra.txt','Unrelated bytes');
   check(state.status(ordinary).stale.includes('promoted-directory-changed'),'Unexpected runtime directory contents invalidate current promotion status');
   rejects(()=>promotion.recover(args(ordinary)),/stale/,'Recovery never adopts a modified completed runtime package');
@@ -136,6 +169,12 @@ async function main(){
   check(ref(sameTarget+'/000.wav').sha256===winner.outputs[0].sha256,'Concurrent loser never overwrites winner bytes');
   const same=make('same-version'),simultaneous=await Promise.all([childPromote(same),childPromote(same)]);
   check(simultaneous.some(x=>x.code===0)&&events(same,'promotion-completed').length===1,'Same-version concurrent publication completes once, with exclusive ownership or exact idempotence');
+  const nestedParent=make('concurrent-parent',{destination:'assets/audio/concurrent-package'}),nestedChild=make('concurrent-child',{destination:'assets/audio/concurrent-package/child'});
+  const nestedRace=await Promise.all([childPromote(nestedParent),childPromote(nestedChild)]);
+  check(nestedRace.filter(x=>x.code===0).length===1&&nestedRace.filter(x=>x.code===2).length===1,'Actual concurrent ancestor/descendant reservations have exactly one owner');
+  check(state.status(nestedRace[0].code===0?nestedParent:nestedChild).promotion,'Concurrent nested loser cannot stale the winning package');
+  const siblings=await Promise.all([childPromote(make('sibling-left')),childPromote(make('sibling-right'))]);
+  check(siblings.every(x=>x.code===0),'Distinct sibling packages can publish concurrently through short registry registration');
 
   const aliased=make('alias-target');fs.mkdirSync(path.join(root,'borrowed'),{recursive:true});
   try{fs.symlinkSync(path.join(root,'borrowed'),path.join(root,'assets','linked'),process.platform==='win32'?'junction':'dir');
@@ -144,6 +183,13 @@ async function main(){
     write('inputs/alias-runtime.json',payload);state.recordReview({...aliased,review:'inputs/alias-runtime.json'});
     rejects(()=>promotion.promote(args(aliased)),/symbolic|junction/,'Promotion rejects a linked target ancestor before copying');
   }catch(error){if(error.code!=='EPERM')throw error;observations.push('SKIP: link fixture unavailable on this host');}
+  const corrupt=make('corrupt-claim-guard'),badClaim='.opencaw/.cache/media-promotions/claims/'+('f'.repeat(64))+'.json';
+  write(badClaim,{schemaVersion:'unrecognized'});
+  rejects(()=>promotion.promote(args(corrupt)),/Malformed promotion ownership claim/,'Malformed persisted ownership fails closed before runtime writes');
+  const validClaim=JSON.parse(fs.readFileSync(path.join(root,'.opencaw/.cache/media-promotions/claims',crypto.createHash('sha256').update(orphan.target.directory).digest('hex')+'.json'),'utf8'));
+  validClaim.state.path='.opencaw/.cache/tasks/missing-owner/media/audio/missing/v1/asset.json';write(badClaim,validClaim);
+  rejects(()=>promotion.promote(args(corrupt)),/ENOENT|regular file/,'An unresolvable ownership source cannot be silently discarded');
+  check(!fs.existsSync(path.join(root,corrupt.target.directory)),'Invalid ownership registry creates no runtime output');
   const report={assertions:observations.length,observations,root,limits:['Owned fixture byte copying and metadata only','Synthetic review/assertion fixtures are not actual acoustic/rights/user acceptance','No models, generation, external installs or real runtime asset promotion']};
   fs.writeFileSync(path.join(root,'results.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({assertions:observations.length,evidence:path.join(root,'results.json'),limits:report.limits}));
 }
