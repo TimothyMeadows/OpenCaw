@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opencaw.dev/schemas/voice-disclosure-v1.json",
+  "title": "Separate cloned-output VOICE disclosure grant",
+  "description": "Source-backed assertion only. Runtime rehashes all nested sources and exact task/purpose/item/output bindings; a schema match is not actual human permission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "task",
+    "purpose",
+    "outputs",
+    "references",
+    "disclosureAllowed",
+    "sourceEvidence"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "opencaw-voice-disclosure/v1"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/identity"
+      },
+      "description": "Complete ordered current output identities; no missing, extra or duplicate output."
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "itemId",
+          "audio",
+          "transcript",
+          "rights",
+          "consent"
+        ],
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+          },
+          "audio": {
+            "$ref": "#/$defs/identity"
+          },
+          "transcript": {
+            "$ref": "#/$defs/identity"
+          },
+          "rights": {
+            "$ref": "#/$defs/identity"
+          },
+          "consent": {
+            "$ref": "#/$defs/identity"
+          }
+        }
+      },
+      "description": "Complete ordered current cloning item/reference set, matched and rehashed by the command."
+    },
+    "disclosureAllowed": {
+      "const": true
+    },
+    "sourceEvidence": {
+      "$ref": "#/$defs/identity"
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

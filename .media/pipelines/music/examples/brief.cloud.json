@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "opencaw-music-brief/v1",
+  "kind": "supplied-lyrics",
+  "purpose": "Example only: import a separately authorized supplied-lyric song",
+  "provider": "CLOUD",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "lyricsRights": {"path": "inputs/actual-lyrics-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "request": {
+    "rights": {"path": "inputs/actual-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "budget": {"maximumOutputs": 1, "maximumBytesPerOutput": 33554432, "maximumTotalBytes": 33554432, "maximumAudioSeconds": 20},
+    "items": [{"id": "song", "prompt": "A gentle folk song with clear English singing and acoustic guitar", "seconds": 20, "music": {"mode": "supplied-lyrics", "lyrics": "We follow morning through the trees\nAnd carry daylight on the breeze", "vocalLanguage": "en", "bpm": null, "keyScale": "", "timeSignature": "", "shift": 3}}]
+  },
+  "technical": {"maxPeak": null, "maxClippedFraction": null, "maxSilentFraction": null}
+}

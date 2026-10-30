@@ -1,19 +1,43 @@
 # VOICE production pipeline
 
-## Scope
+## Scope and entry point
 
-VOICE owns preset speech and consented local-reference cloning. AUDIO owns SFX/ambience; MUSIC owns music. All can load with visual workflows without changing one another's selection or inventing a visual style/engine prerequisite for generation-only speech.
+VOICE owns preset speech and locally consented cloning. AUDIO owns effects/ambience and MUSIC owns tracks; none is a runtime dependency of VOICE. Read shared MEDIA.md and optional VOICE.md, then use `commands/voice-pipeline.sh --help` and `skills/build-voice-assets/`. Generation-only speech needs no invented STYLE or ENGINE. Runtime handoff requires the actual selected engine and compatible target evidence.
 
-## Foundation readiness
+The shared command supplies brief/init/revise/status/doctor, dry-run setup planning, explicit generation or provenance import, technical validation, human content/runtime review and separately authorized promotion/recovery. Status/doctor loads no model and installs nothing. A valid contract, installation receipt or declared capability does not establish executable readiness. Never change provider, backend, device, precision or workflow implicitly.
 
-This declaration and its optional VOICE.md contract are available. The complete domain production command is not implemented in this foundation revision; the dedicated voice task extends this declaration and registers its entry point. Resolution or configuration grants no speech generation, recording access or consent.
+## Explicit briefs and native profiles
 
-## Production requirements
+Use [brief.schema.json](brief.schema.json) and [examples/README.md](examples/README.md). Declare kind, exact purpose, explicit LOCAL/CLOUD provider, spatialization, `loopIntent:false`, finite output/time budgets and technical thresholds (or explicit null for unavailable thresholds). Preserve exact spoken text, language and native autoregressive controls. Durations are measured outputs bounded by `maximumAudioSeconds`; they are not requested fixed-duration synthesis controls.
 
-- Bind exact spoken text/language, preset or reference identity, supported settings and finite autoregressive token/time/byte limits.
-- Before cloning dispatch require local reference audio, matching transcript, source rights and explicit reference-hash-bound consent covering the actual purpose. Reject remote references, changed inputs and stale/unbound consent.
-- Use explicit MEDIA.md provider/setup/generation policy and the existing verified Bubo boundary. Preserve shared native approval roots, started claims, immutable reference/conditioning/output ancestry and private evidence.
-- Listen to the full exact output for text, pronunciation, artifacts and declared preset/reference match. Consent and technical fixtures do not certify a speaker match or content quality.
-- Local QA consent grants no public disclosure or distribution. Keep private references, transcripts, generated QA media and identifying hashes out of public reports/shared memory. Target/distribution acceptance and explicit promotion remain separate.
+LOCAL selects `qwen3-tts-customvoice` for `preset-speech` or `qwen3-tts-base` for `consented-cloning`, solely from the validated kind. The coordinator owns backend selection, version-specific request IDs and output paths. A request carries current typed prompt rights/installation evidence, explicit `cuda:0`/`bfloat16`/`none`, native maximum* budgets and 1..4 items. Each item has id, prompt, empty negativePrompt, nonnegative int32 seed, `loopCandidate:false` and voice. No diffusion steps/guidance, fixed seconds, dimensions or music controls are accepted.
 
-Follow the shared lifecycle and bounded native GPU/process ownership. VOICE has no AUDIO/MUSIC runtime dependency; no provider fallback or synthetic consent is allowed.
+All ten sampling controls are explicit: maximumNewTokens 3..2048; both sampling flags true; temperatures greater than zero through 2; topK values 1..200; topP values greater than zero through 1; repetitionPenalty 1..2. LOCAL languages/presets are those of the verified native VoiceOptions contract. Preset speech has a supported preset, an expression of at most 512 characters and reference:null. Cloning has preset:null, empty expression and four typed reference identities. Do not translate unsupported provider controls into native settings.
+
+CLOUD supports preset-speech provenance-import planning only: explicit provider-declared language/preset/expression with no native sampler, installation, reference or catalogue claims. There is no unattended CLOUD generation adapter. CLOUD cloning is unavailable because native reference consent is local-only; reject it before reading reference inputs. Do not upload private input or silently switch to LOCAL. Missing authoritative CLOUD analysis remains unavailable and blocks handoff/promotion.
+
+## Private reference admission and purpose
+
+Cloning references are canonical current-project-relative regular files: audio (1 byte..20 MiB M4A/WAV), exact nonempty strict UTF-8 transcript (at most 16 KiB and 4096 characters, no NUL), native recording rights and native speaker consent. Their paths are distinct ignoring case on every platform. Remote/absolute/data/escaping paths, symlinks and mutable-state/output overlap are rejected. Rehash all four plus the consent's recorded source evidence. That source is a fifth distinct canonical local identity; the recording or a self-referencing consent file cannot substitute for the human source.
+
+Native `bubo-voice-reference-rights/v1` and `bubo-voice-consent/v1` retain their original schemas, exact task/recording/transcript bindings and local scopes. Native consent alone has no host-purpose binding. The brief's typed `localUse` identifies an [opencaw-voice-local-use/v1](local-use.schema.json) assertion for the complete ordered item/reference set, exact task/purpose, matching native scope and actual source evidence. Fresh generation requires current task, `generationAllowed:true`, actual native authority and prompt generation rights. QA-only native scope additionally needs the matching consented-cloning acceptance case, candidate/revision and existing bounded approval; no host assertion upgrades a native scope or allowance.
+
+Historical import preserves original request/context/task/native consent without granting new synthesis. An assertion with original task and `generationAllowed:false` may support scoped read-only import. Optional LOCAL historicalRoot is import-only: an existing directory strictly beneath the current project, equal to untouched original context.projectRoot and the neutral wrapper. Native item/reference/consent fields preserve original-root-relative identities and are remapped only for reading; new localUse/disclosure/source/output identities are current-project-relative. It cannot retarget cross-machine paths or authorize a new request.
+
+## Ancestry and technical observations
+
+Immutable task/domain/asset/version state lives under `.opencaw/.cache/tasks/<task>/media/voice/`; private inputs, original transcripts/recordings, conditioning, generated speech and their identifying hashes stay local. Preserve native request/context/result/manifest, observed source/build/catalogue/worker/model/codec identities, exact sampling/text/reference/output hashes, rejected reviews and started/failed attempts. Revisions retain ancestry. Never duplicate Bubo's maintained model pins or replenish the one physically shared approval-bound attempt ledger by changing domain, task or workspace.
+
+Technical validation rehashes the complete ancestry and exact-once item/output coverage; human review binds the exact ordered current output set. It checks 24000 Hz mono raw FLOAT WAV measurements, bytes/frames/duration, peak/RMS/clipping/silence, actual text/language/preset/expression/sampling, per-item RNG, EOS termination, nontruncation and token/code-frame accounting. Raw output has no host postprocessing; the native decoder's intrinsic [-1,1] clamp remains disclosed and preserved. Native voice cleanup must measure zero ending allocated and reserved counters. Aggregate driver memory, acoustic speech fidelity and listening quality remain unavailable without actual evidence.
+
+Cloning metadata binds all four original reference digests and the native supported decode profile: local self-contained decoding, mono float32 conversion/resampling, no denoise, trim or normalization, no x-vector-only mode and disclosed upstream reference-prefix removal. The native worker owns verification of private decoded bytes. Do not invent a derived path, reread actual private reference media for source QA or equate metadata with successful acoustic speaker matching.
+
+## Content, disclosure and runtime promotion
+
+Content acceptance needs an actual human source, reviewer/reason, current asset fingerprint and complete exact output set. Require listenedEntireOutput, spokenTextReviewed, pronunciationReviewed, artifactsAcceptable and presetOrReferenceMatchReviewed. Metadata matching, historical listening and synthetic test assertions are not current human acceptance.
+
+Runtime acceptance independently requires targetPlaybackReviewed, loadDisposeReviewed and spatializationReviewed, exact current selected-engine evidence and matching finite format/time/byte budgets. [opencaw-voice-distribution/v1](distribution.schema.json) binds task/purpose, rightsConfirmed, publicDisclosureConfirmed and source evidence. [opencaw-voice-runtime-evidence/v1](runtime-evidence.schema.json) binds current engine, outputs, spatialization, `loopIntent:false`, actual playback/load/dispose and source evidence.
+
+Cloned outputs also require a separate typed review.disclosureEvidence using [opencaw-voice-disclosure/v1](disclosure.schema.json): exact current ordered outputs and item/reference set, task/purpose, disclosureAllowed and actual source grant. Local generation or QA consent does not permit public cloned-output disclosure. A new explicit grant may cover existing QA outputs without rewriting their original consent. Reuse of a human source is valid only when its actual scope supports each assertion; a file hash cannot establish that scope. Rehash all nested permission/human/target sources at handoff and promotion.
+
+Handoff prepares an admission plan and copies nothing. Promotion/recovery separately requires exact current output/target authorization, current technical/content/runtime evidence and no-overwrite ownership controls. Preserve intent/failure/recovery history. Source delivery and synthetic examples grant no recording access, installation, generation, consent, listening acceptance, public disclosure or runtime promotion. Automatic transcription, editing/denoise/trim, lip-sync, looping, impersonation permissions and unsupported provider controls are outside this workflow.

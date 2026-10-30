@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "bubo-voice-consent/v1",
+  "task": "active-task",
+  "speaker": "Example only; no real speaker consent granted",
+  "audio": {
+    "path": "inputs/actual-private-reference.wav",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "transcript": {
+    "path": "inputs/actual-private-transcript.txt",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "speakerRightsConfirmed": true,
+  "consentGranted": true,
+  "scope": "local-voice-cloning",
+  "sourceEvidence": {
+    "path": "inputs/actual-independent-local-consent-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

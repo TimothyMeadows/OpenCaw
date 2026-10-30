@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Native VOICE recording-rights assertion",
+  "description": "Exact native schema, never a grant inferred from a template. All native bindings and the independent source consent identity are rechecked; host purpose uses a separate localUse assertion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "task",
+    "owner",
+    "audio",
+    "transcript",
+    "recordingRightsConfirmed"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "bubo-voice-reference-rights/v1"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000]*$"
+    },
+    "audio": {
+      "$ref": "#/$defs/identity"
+    },
+    "transcript": {
+      "$ref": "#/$defs/identity"
+    },
+    "recordingRightsConfirmed": {
+      "const": true
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*[:\\\\\\u0000])(?!(?:.*?/)?\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "description": "Canonical current-project-relative regular file; runtime additionally rejects symlinks, escaping paths, stale hashes and mutable state/output overlap."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

@@ -121,6 +121,9 @@ function checkSpec(spec) {
       || ['validateBrief','request','technical','validateTechnicalReport','validateReview','validateRuntimeReview'].some(name=>typeof spec[name]!=='function'))
     fail('Selected domain workflow is unavailable or incomplete in this revision.');
 }
+function referenceMapper(spec,root,brief,document) {
+  return typeof spec.mapReference==='function'?(ref,trail)=>spec.mapReference(ref,trail,{document,root,brief}):undefined;
+}
 async function run(spec,values) {
   checkSpec(spec);
   const {operation,options}=parse(values);
@@ -144,6 +147,7 @@ async function run(spec,values) {
       || (brief.provider==='LOCAL'?workspace+'/staging/'+spec.domain.toLowerCase():'.art-staging/media/'+spec.domain.toLowerCase());
     const result=lifecycle.init({root,task,asset,version:options.version,domain:spec.domain,modality:brief.kind,brief:options.brief,stagingRoot,
       contract:options.contract || prior?.asset.selection?.contract,media:options.media || prior?.asset.selection?.media,
+      referenceMapper:referenceMapper(spec,root,brief,'brief'),
       ...(prior?{parent:lifecycle.identity(root,prior.stateFile)}:{})});
     return {schemaVersion:1,domain:spec.domain,stateFile:result.stateFile,status:lifecycle.status({root,stateFile:result.stateFile}),generation:false};
   }
@@ -188,8 +192,9 @@ async function run(spec,values) {
     if(selected==='CLOUD')fail('CLOUD generation requires a separately available authorized session capability. Import its real provenance; no LOCAL fallback was performed.');
     required(options,'workspace','media-state');
     const request=spec.request(context.brief,{root,asset:context.state.asset});
-    const result=await lifecycle.dispatch({...stateOptions,provider:selected,request,workspace:options.workspace,mediaState:options['media-state'],controls:controls(options)});
-    lifecycle.recordCandidate({...stateOptions,provider:selected,manifests:result.hostMediaProvenance});
+    const policyReferences=typeof spec.generationReferences==='function'?spec.generationReferences(context.brief,{root,asset:context.state.asset}):[];
+    const result=await lifecycle.dispatch({...stateOptions,provider:selected,request,workspace:options.workspace,mediaState:options['media-state'],controls:controls(options),policyReferences});
+    lifecycle.recordCandidate({...stateOptions,provider:selected,manifests:result.hostMediaProvenance,referenceMapper:referenceMapper(spec,root,context.brief,'neutral')});
     return {schemaVersion:1,domain:spec.domain,status:'staged',stateFile:context.state.stateFile,
       provenance:result.hostMediaProvenance,assetStatus:lifecycle.status(stateOptions),promotion:false};
   }
@@ -198,7 +203,7 @@ async function run(spec,values) {
     if(Boolean(options.manifest)===Boolean(options.manifests))fail('Select exactly one --manifest or --manifests JSON-array file.');
     const manifests=options.manifests?read(root,options.manifests,{array:true}):[options.manifest];
     if(!manifests.length || manifests.length>128 || manifests.some(name=>typeof name!=='string'))fail('Expected a bounded array of manifest paths.');
-    lifecycle.recordCandidate({...stateOptions,provider:selected,manifests,origin:options.origin});
+    lifecycle.recordCandidate({...stateOptions,provider:selected,manifests,origin:options.origin,referenceMapper:referenceMapper(spec,root,context.brief,'neutral')});
     return {schemaVersion:1,domain:spec.domain,status:'staged',stateFile:context.state.stateFile,assetStatus:lifecycle.status(stateOptions),promotion:false};
   }
   if(operation==='validate') {

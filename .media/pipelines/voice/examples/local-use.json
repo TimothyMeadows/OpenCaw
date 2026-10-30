@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "opencaw-voice-local-use/v1",
+  "task": "active-task",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "scope": "local-voice-cloning",
+  "references": [
+    {
+      "itemId": "line-1",
+      "audio": {
+        "path": "inputs/actual-private-reference.wav",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transcript": {
+        "path": "inputs/actual-private-transcript.txt",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "rights": {
+        "path": "inputs/actual-recording-rights.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "consent": {
+        "path": "inputs/actual-native-consent.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "generationAllowed": false,
+  "sourceEvidence": {
+    "path": "inputs/actual-purpose-bound-local-use-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

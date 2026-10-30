@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Voice Assets"
+  short_description: "Stage speech with consent and disclosure evidence"
+  default_prompt: "Use $build-voice-assets to stage preset speech or locally consented cloning, preserving private reference ancestry, exact spoken-text review and separate disclosure and promotion gates."

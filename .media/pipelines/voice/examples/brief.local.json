@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "opencaw-voice-brief/v1",
+  "kind": "preset-speech",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "provider": "LOCAL",
+  "spatialization": "2d",
+  "loopIntent": false,
+  "request": {
+    "rights": {
+      "path": "inputs/actual-prompt-rights.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "installation": {
+      "path": "inputs/actual-preset-installation.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "settings": {
+      "device": "cuda:0",
+      "precision": "bfloat16",
+      "offload": "none"
+    },
+    "budget": {
+      "maximumOutputs": 1,
+      "maximumBytesPerOutput": 16777216,
+      "maximumTotalBytes": 16777216,
+      "maximumPixels": 4096,
+      "maximumAudioSeconds": 30
+    },
+    "items": [
+      {
+        "id": "line-1",
+        "prompt": "A fictional lantern shines beside the gate.",
+        "negativePrompt": "",
+        "seed": 17,
+        "loopCandidate": false,
+        "voice": {
+          "language": "english",
+          "preset": "ryan",
+          "expression": "Calm and clear.",
+          "sampling": {
+            "maximumNewTokens": 512,
+            "doSample": true,
+            "temperature": 0.9,
+            "topK": 50,
+            "topP": 1,
+            "repetitionPenalty": 1.05,
+            "subtalkerDoSample": true,
+            "subtalkerTemperature": 0.9,
+            "subtalkerTopK": 50,
+            "subtalkerTopP": 1
+          },
+          "reference": null
+        }
+      }
+    ]
+  },
+  "technical": {
+    "maxPeak": 1,
+    "maxClippedFraction": 0,
+    "maxSilentFraction": 0.9
+  }
+}

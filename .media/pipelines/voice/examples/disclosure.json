@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "opencaw-voice-disclosure/v1",
+  "task": "active-task",
+  "purpose": "Example only: owned fictional sample; requires current scoped permission",
+  "outputs": [
+    {
+      "path": "inputs/actual-staged-output.wav",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "references": [
+    {
+      "itemId": "line-1",
+      "audio": {
+        "path": "inputs/actual-private-reference.wav",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transcript": {
+        "path": "inputs/actual-private-transcript.txt",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "rights": {
+        "path": "inputs/actual-recording-rights.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "consent": {
+        "path": "inputs/actual-native-consent.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "disclosureAllowed": true,
+  "sourceEvidence": {
+    "path": "inputs/actual-cloned-output-disclosure-source.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

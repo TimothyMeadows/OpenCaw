@@ -64,6 +64,20 @@ function review(asset,selected,kind='content',suffix='',extra={}) {
 }
 async function main() {
   const assets=['AUDIO','MUSIC','VOICE'].map(domain=>initialize(domain));
+  const historical=ref(write('inputs/history-only/source.wav','Owned historical nonaudio bytes'));
+  const historicalBrief=write('inputs/historical-brief.json',{source:{path:'original/source.wav',sha256:historical.sha256}});
+  const historicalBytes=fs.readFileSync(path.join(root,historicalBrief));
+  const mapper=(value,trail)=>{
+    check(JSON.stringify(trail)===JSON.stringify(['source']),'Trusted typed mapper receives the exact structural trail');
+    value.path=historical.path;return value;
+  };
+  const mapped=initialize('VOICE','historical-map','historical mapped',{brief:historicalBrief,referenceMapper:mapper});
+  check(JSON.stringify(mapped.asset.references)===JSON.stringify([historical]),'Historical mapping stores the confined original identity in freshness state');
+  check(fs.readFileSync(path.join(root,historicalBrief)).equals(historicalBytes),'Mapping never rewrites raw brief bytes or identities');
+  rejects(()=>initialize('VOICE','map-skip','map skip',{brief:historicalBrief,referenceMapper:()=>undefined}),/preserve the declared hash/,'A mapper cannot skip an input reference');
+  rejects(()=>initialize('VOICE','map-hash','map hash',{brief:historicalBrief,referenceMapper:()=>({...historical,sha256:'0'.repeat(64)})}),/preserve the declared hash/,'A mapper cannot replace a declared reference hash');
+  rejects(()=>initialize('VOICE','map-escape','map escape',{brief:historicalBrief,referenceMapper:value=>({...value,path:'../outside.wav'})}),/traversal|relative|escape|project/i,'Mapped references still pass project confinement');
+  rejects(()=>initialize('VOICE','map-json','map JSON',{brief:historicalBrief,referenceMapper:'input module'}),/trusted function/,'JSON values cannot select a reference mapper');
   check(new Set(assets.map(x=>x.stateFile)).size===3,'Same human asset names have independent domain state paths');
   check(new Set(assets.map(x=>x.asset.nativeRequestId)).size===3,'Same names have distinct domain-owned native request IDs');
   for(const asset of assets)check(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(asset.asset.nativeRequestId),'Native identity remains within supported 80-character syntax');

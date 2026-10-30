@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "opencaw-media-review/v1",
+  "assetSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "outputs": [],
+  "kind": "runtime",
+  "verdict": "rejected",
+  "reviewer": "Example only; no target playback review has occurred",
+  "reason": "Replace only with current selected-engine runtime evidence and separate distribution rights",
+  "sourceEvidence": {"path": "inputs/actual-runtime-review-source.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "criteria": {"targetPlaybackReviewed": false, "loadDisposeReviewed": false, "spatializationReviewed": false, "loopSeamReviewed": false},
+  "engine": {"engine": "THREEJS", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "target": {"directory": "assets/music/song-v1", "codecs": ["wav"], "sampleRates": [48000], "channels": [2], "maxOutputBytes": 33554432, "maxAudioSeconds": 20, "spatialization": "2d", "loopIntent": false},
+  "rightsEvidence": {"path": "inputs/actual-distribution-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+  "targetEvidence": {"path": "inputs/actual-target-evidence.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
+}
