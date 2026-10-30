@@ -1,6 +1,6 @@
 # Independent media pipelines
 
-Load audio, music and voice workflows alongside the selected visual pipeline. Their contexts are independent, so a task can plan an effect, a soundtrack and speech without changing STYLE.md or another media domain's selection.
+Load audio, music and voice workflows alongside any registered visual primary: CLOUD, LOCAL, PROOF_TO_MODEL, CODE or BLENDER. Their contexts are independent, so a task can plan an effect, a soundtrack and speech without changing STYLE.md or another media domain's selection. The visual workflow retains its own prerequisites; CODE still requires THREEJS.
 
 | Work | Domain | Optional host contract |
 | --- | --- | --- |
@@ -49,6 +49,36 @@ Commands return JSON. Aggregate resolution returns `contexts.visual`, `contexts.
 
 The canonical modalities are `sfx`, `ambience`, `instrumental`, `supplied-lyrics`, `preset-speech` and `consented-cloning`. For example, `--domain AUDIO --modality supplied-lyrics` fails rather than changing the requested domain. Explicit `--root`, `--contract` or `--media` paths are checked; a missing explicitly selected file is an error, while absent optional defaults are reported without creating them.
 
+## One task, three independent assets
+
+For an existing `town-square` task, prepare three valid domain briefs with their actual rights, source references, explicit provider and finite budgets. The following initialization commands load no model and grant no generation allowance. They intentionally reuse the human asset name `arrival`; the domain remains part of each immutable identity:
+
+```bash
+bash .opencaw/commands/audio-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-sfx.json --workspace .opencaw/.cache/media-production
+bash .opencaw/commands/music-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-music.json --workspace .opencaw/.cache/media-production
+bash .opencaw/commands/voice-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-speech.json --workspace .opencaw/.cache/media-production
+```
+
+Read each JSON result's `stateFile` into its own `AUDIO_STATE`, `MUSIC_STATE` or `VOICE_STATE` variable. Use those exact project-relative paths; do not guess the hashed folders. Each state belongs to its domain even though the task, asset name and staging workspace match. The visual selection is unchanged. Status, planning and reviews can proceed independently; model execution still follows shared native ownership.
+
+Only after separate LOCAL generation authorization, set `APPROVED_MEDIA_STATE` to that approval's already bound shared media-state root. Use the same physical root for image, SFX, music and speech cases covered by that media approval; never allocate one per domain or revision. For example:
+
+```bash
+bash .opencaw/commands/audio-pipeline.sh generate --state "$AUDIO_STATE" --provider LOCAL --workspace .opencaw/.cache/media-production --media-state "$APPROVED_MEDIA_STATE"
+```
+
+The MUSIC and VOICE commands take their own state with the same approved media-state root. Their brief's explicit provider must match the command. Missing installation, license, rights, consent or remaining allowance stops the requested operation. CLOUD uses separately selected available session generation and actual provenance import; these commands do not replace an unavailable provider. Existing compatible outputs can be imported with their original run ancestry, without claiming new synthesis or a fresh listening verdict.
+
+After generation or import, run each asset's `validate`, then record its actual full-content review and separate runtime review with `review`. For example, AUDIO uses `audio-pipeline.sh review --state "$AUDIO_STATE" --review inputs/arrival-sfx-content-review.json`; MUSIC and VOICE use their own review files and criteria. `handoff --state ...` returns a guarded plan, not a runtime copy. Only a separately authorized `promote --state ... --authorization ...` publishes exact accepted bytes into its fresh target directory.
+
+Revise only the affected asset, retaining its previous state as ancestry:
+
+```bash
+bash .opencaw/commands/audio-pipeline.sh revise --state "$AUDIO_STATE" --version v2 --brief inputs/arrival-sfx-v2.json
+```
+
+Use the returned new state for subsequent work. A revision neither erases failed attempts nor replenishes an exhausted candidate/revision allowance. Domain-specific changes invalidate their dependent evidence; shared MEDIA policy or shared source changes invalidate every affected consumer. Another domain's unchanged review cannot approve this revision.
+
 ## Work with staged assets
 
 The [shared lifecycle](../.media/pipelines/LIFECYCLE.md) defines planning, read-only status, setup planning, generation/provenance import, technical validation, exact-output human review, target handoff and separate promotion. Domain workflows add their own brief fields and supported controls to those boundaries.
@@ -80,7 +110,7 @@ The shared evidence validator retains native48000Hz stereo frames and raw amplit
 
 State is task-owned under `.opencaw/.cache/tasks/<task>/media/<audio|music|voice>/`. Each asset version retains its original brief, input and policy references, and any resulting native execution identity and staged outputs. Changes create new versions; affected reviews become stale. Native request/output IDs are collision-safe across domains and versions even when human asset names match. All domains still use the approval's physically shared native attempt ledger.
 
-LOCAL work uses the pinned, explicitly built Bubo runtime through the existing media adapter. Bubo owns exact model/tool pins, verified installation, synthesis, bounded workers and GPU ownership. Independent context loading does not grant simultaneous GPU inference. Status and ordinary discovery load no model and download nothing. Setup is dry-run unless separately authorized; generation cannot install dependencies or change provider silently.
+LOCAL work uses the pinned, explicitly built Bubo runtime through the existing media adapter. Bubo owns exact model/tool pins, verified installation, synthesis, bounded workers and GPU ownership. Independent context loading does not grant simultaneous GPU inference: proof reconstruction and LOCAL image/audio generation share native GPU exclusion. The six-case media acceptance ledger covers LOCAL image, SFX, instrumental, supplied-lyric, preset-speech and cloning cases under their original media approval. Proof/model workflows retain their own existing approval and attempt records; those records are not moved into the media ledger. Status and ordinary discovery load no model and download nothing. Setup is dry-run unless separately authorized; generation cannot install dependencies or change provider silently.
 
 Full listening review remains necessary for actual content. SFX/ambience, music and speech use different content checks; technical metrics cannot certify wanted effects, audible supplied lyrics, speaker resemblance or seamless looping. Keep generated originals intact and disclose clipping/silence rather than hiding them with normalization. Runtime promotion requires current technical, human and target acceptance plus explicit authorization.
 
@@ -95,6 +125,36 @@ Voice cloning requires local audio, a matching transcript, rights and recording-
 Host-only use/lyric permission records and sources travel into the native context as internal immutable policy references. Bubo's existing freshness checks reject changed registered bytes after a wait for ownership. The guard preserves native reference roles, process/GPU limits and shared attempt identity; no public option can replace expected hashes. Unrelated domain contracts remain independent.
 
 Contract/task/Goal creation grants no installation, license acceptance, fresh generation budget, private disclosure or asset promotion. Preserve the existing approval identity, physical shared state root and started candidate/revision history across tasks and workspaces. Historical accepted outputs remain historical and do not become new synthesis or listening evidence when imported.
+
+## Selected-engine handoff
+
+Generation planning does not require a fabricated engine. Handoff and promotion do require the actual selected engine, current exact output set, distribution rights and target evidence. Resolve that host's engine and obtain the lifecycle's current review identity, which binds its engine contract, definition and registry:
+
+```bash
+bash .opencaw/commands/resolve-engine.sh
+node -e "console.log(JSON.stringify(require('./.opencaw/commands/lib/media-pipeline-state.cjs').engineIdentity(process.cwd()), null, 2))"
+```
+
+Copy neither an example's zero hash nor an earlier engine identity into an accepted review. A changed engine identity requires refreshed runtime acceptance. The runtime review binds `assetSha256`, all ordered `outputs`, `engine`, `target`, and typed human, distribution and target-evidence sources. Applicable cloned-output disclosure remains an additional gate.
+
+The following are example bounds for one unchanged LOCAL output, not decoder guarantees or generation authorizations. `maxOutputBytes` and `maxAudioSeconds` limit the aggregate candidate, so a multi-output version needs explicit totals. Spatialization must match the brief; VOICE never accepts loop intent.
+
+| Candidate | Target format | Example aggregate limits | Intent |
+| --- | --- | --- | --- |
+| Four-second SFX | `codecs: ["wav"]`, `sampleRates: [44100]`, `channels: [2]` | `maxOutputBytes: 4194304`, `maxAudioSeconds: 4` | `spatialization: "2d"`, `loopIntent: false` |
+| Twenty-second instrumental | `codecs: ["wav"]`, `sampleRates: [48000]`, `channels: [2]` | `maxOutputBytes: 33554432`, `maxAudioSeconds: 20` | `spatialization: "2d"`, `loopIntent: false` |
+| Speech within a thirty-second target budget | `codecs: ["wav"]`, `sampleRates: [24000]`, `channels: [1]` | `maxOutputBytes: 16777216`, `maxAudioSeconds: 30` | `spatialization: "2d"`, `loopIntent: false` |
+
+The host admits declared `wav`, `ogg`, `mp3`, `flac`, `opus`, `m4a`, `webm` or `aiff` targets only when actual technical measurements and the selected target evidence agree. This format list adds no encoder, transcoding stage or target-platform support. LOCAL native originals remain WAV. An unsupported import/decoder or spatialization profile stays blocked; do not silently convert, downmix or alter the original.
+
+| Host's selected owner | Required actual target observations |
+| --- | --- |
+| [THREEJS audio service](../.engine/THREEJS.md#audio) | Browser/device identity, actual decode and complete playback, user-gesture unlock and suspend/resume, separate music/ambience/SFX/voice routing, and the declared 2D or positional-listener behavior. Exercise pause, cancellation/restart and scene teardown; verify owned sources/nodes/listeners are stopped or released without affecting another asset. |
+| [UNITY audio owner](../skills/unity-build-audio/SKILL.md) in a UNITY host | Resolve the compatible owner in that host; preserve its locked Editor, package and player target. Record actual clip import, mixer/voice budgets, 2D/3D configuration and complete audible player playback. Exercise interruption, pooled reuse, scene unload, pause/resume and resource ownership on representative devices. Editor/headless success or a browser build alone cannot certify native playback. |
+
+The UNITY example does not select UNITY in a THREEJS project or install an Editor, middleware or package. Other engines retain their compatible owners. These workflows produce staged assets and evidence contracts, not a portable engine player. Engine-owned audio scheduling, cleanup, accessibility cues and load/dispose behavior must be implemented and reviewed in the host. Playback callbacks never authorize damage, targeting, movement or other gameplay outcomes.
+
+Record actual target source evidence in the domain's runtime form: `opencaw-audio-runtime-evidence/v1`, `opencaw-music-runtime-evidence/v1` or `opencaw-voice-runtime-evidence/v1`. It binds task, current engine identity, exact outputs, spatialization, loop intent, playback/load-dispose observations and a typed source. AUDIO/MUSIC loop intent additionally requires actual seam review. Synthetic forms, a waveform, a successful API call or the admission examples above cannot certify those observations. If the selected browser/player, importer or listening evidence is unavailable, retain an explicit blocked/not-run result and keep handoff/promotion blocked while planning and staged content review continue.
 
 ## Failure and unavailable states
 

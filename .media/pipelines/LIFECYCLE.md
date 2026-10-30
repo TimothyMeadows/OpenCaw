@@ -2,7 +2,7 @@
 
 AUDIO, MUSIC and VOICE share host lifecycle rules while keeping their contracts, asset versions and reviews independent. Their domain declarations are indexed in [INDEX.md](INDEX.md). Visual production keeps its existing STYLE.md selection and workflow state.
 
-This contract defines the shared foundation. Domain declarations can be loaded before their full production commands are available. A declaration, valid host contract or registered model does not establish executable workflow readiness; inspect the resolved context's `executionAvailable` and `unavailableReasons` fields. The initial foundation declarations report execution unavailable.
+This contract defines the shared lifecycle for the implemented AUDIO, MUSIC and VOICE workflows. A declaration, valid host contract or registered model does not establish native executable readiness; inspect the resolved context's `executionAvailable`, `unavailableReasons` and separate `nativeReadiness` fields. Optional missing contracts remain absent until explicitly configured, without blocking unrelated contexts or creating provider/engine/style selections.
 
 The foundation's handoff and promotion primitives produce guarded admission plans. They do not copy files into runtime assets. A domain executor must perform a separately authorized write only after that admission; do not describe an admission plan as a completed promotion.
 
@@ -16,7 +16,7 @@ Generation also retains immutable asset/brief/selected-contract references and d
 
 OpenCaw owns domain routing, host policy, task state, input rights and consent, staged-asset ancestry, review and runtime promotion. LOCAL execution stays behind the verified [Bubo media adapter](../../commands/bubo-media.sh). The pinned Bubo dependency owns model and tool identities, installation verification, synthesis, native process limits, cancellation, GPU ownership and atomic generation-attempt accounting. This layer creates no separate inference implementation or attempt allocator.
 
-Loading visual, AUDIO, MUSIC and VOICE contexts together does not permit simultaneous GPU inference. A domain-local state directory must never become a separate native approval ledger. Keep the same physical shared media-state root for an approval identity across tasks, domains, revisions, restarts and workspace changes.
+Loading visual, AUDIO, MUSIC and VOICE contexts together does not permit simultaneous GPU inference. Proof reconstruction and LOCAL media use shared native GPU exclusion. The six-case LOCAL-media acceptance ledger covers image, SFX, instrumental, supplied-lyric, preset-speech and cloning cases under their original media approval; proof/model workflows keep their own existing approval/attempt records. A domain-local state directory must never become a separate media approval ledger. Keep the same physical shared media-state root for a media approval identity across tasks, domains, revisions, restarts and workspace changes.
 
 ## Identity and storage
 
@@ -33,6 +33,8 @@ Do not overwrite originals, used request identities, generation receipts, failed
 ## Policy and freshness
 
 The selected domain context binds its declaration and host contract, applicable shared MEDIA.md policy and supported modality. A domain's identity must not depend on another domain's declaration or contract. A VOICE-only change therefore does not invalidate an unrelated AUDIO review. Changes to shared MEDIA/provider policy invalidate all affected consumers.
+
+A mixed task retains separate asset states and content/runtime reviews even when all domains use the same human asset name. A failed or cancelled run in one namespace retains its started attempt and does not become another domain's candidate. Use the [same-task example](../../docs/MEDIA_PIPELINES.md#one-task-three-independent-assets); immutable versions preserve prior failures and reviews rather than resetting them.
 
 Retain explicit file references and hashes for the brief, rights, supplied lyrics, local voice reference/transcript/consent and other applicable inputs. Revalidate current bytes and policy before downstream operations. A hash proves identity, not the truth of a rights assertion, speaker consent or acoustic judgment. Never rewrite historical approvals to make them current.
 
@@ -75,11 +77,13 @@ Use `status.assetSha256` for a technical report, review or promotion authorizati
 
 `init` also binds a project-confined non-runtime `stagingRoot` (default `.art-staging/media/<domain>`), optional explicit `contract`/`media` selections and typed references nested in its brief. A LOCAL workflow supplies its workspace staging child explicitly. Candidate bytes must stay beneath that declared root. Typed brief, provenance, technical and review references are rehashed with the outputs; mutating a referenced file cannot preserve an old review merely by leaving its containing JSON unchanged.
 
+Historical VOICE imports preserve original-root-relative native recording/transcript/rights/consent identities in raw brief/provenance bytes. A trusted compiled mapper resolves only those documented structural fields under the explicitly declared historical child; current host wrappers, permission sources and outputs remain current-project-relative. Mapped identities still retain their declared hashes and normal confinement/nesting/count guards. No CLI or JSON field can supply a mapper, skip references or replace expected hashes; historical import grants no fresh generation authority.
+
 `recordCandidate` accepts one `manifest` or the complete ordered `manifests` array emitted by a native batch. After this version starts LOCAL dispatch, only its exact successfully returned provenance, original source-request identity and native output subtree can become its candidate; another asset's output and a provider switch are rejected. LOCAL import without this version's dispatch requires explicit `origin: historical-import` or `external-import`. Status retains `executionOrigin`, original `sourceRunIds` and a distinct `nativeDispatchRequestId`, which is null for import-only history. The version-owned `nativeRequestId` is not a claim that an imported output was newly generated.
 
 Promotion authorization requires an exact typed `{path, sha256}` `sourceEvidence`, which is returned in the admitted plan. A plain source path is insufficient: the assertion's current bytes must remain bound before a later executor performs any runtime write.
 
-Shared `dispatch` accepts only its documented top-level inputs plus a `controls` object. Supported control keys are `timeout`, `max-log-bytes`, `max-private-bytes` and `platform-modules`; they retain the existing adapter's finite bounds and exact flag values. Selected platform-module manifest bytes are retained with dispatch evidence. Protected setup/API/provider-state switches and unknown controls are rejected, rather than ignored or passed through. Bubo still owns native process and module verification.
+Shared `dispatch` accepts its documented inputs, a bounded trusted internal `policyReferences` list and a `controls` object. Policy references come from compiled host/domain code, not a public CLI override or native DTO field. Supported control keys are `timeout`, `max-log-bytes`, `max-private-bytes` and `platform-modules`; they retain the existing adapter's finite bounds and exact flag values. Selected platform-module manifest bytes are retained with dispatch evidence. Protected setup/API/provider-state switches and unknown controls are rejected, rather than ignored or passed through. Bubo still owns native process and module verification.
 
 The native output base is `<workspace>/staging/<domain>`; native admission appends the version's owned request ID. Domain-specific output ownership must not change `mediaState` into a new per-domain budget root. The foundation APIs enforce host workflow admission; they do not claim an OS sandbox or independently verify a listener's judgment.
 
@@ -90,6 +94,8 @@ Listen to the complete candidate. AUDIO review covers the intended event or ambi
 Technical reports preserve native amplitudes and disclose clipping, silence and unsupported measurements. Do not silently normalize, trim, splice, tile, repair or loop generated originals. Any authorized derivative retains its source ancestry and requires the reviews affected by that change.
 
 Promotion must recheck current hashes, rights/consent, policy, reviews, target limits and explicit authorization. Reject path traversal, aliases, symlinks/junctions, changed bytes, stale evidence and unauthorized overwrite. Missing engine-specific evidence leaves promotion blocked while planning or staged review remains usable. Audio playback never owns authoritative gameplay damage, targeting, collision or action outcomes.
+
+Runtime review binds the current lifecycle engine identity, complete ordered output set and exact target. Target codecs, sample rates and channel counts must match measured candidate bytes; `maxOutputBytes` and `maxAudioSeconds` bound aggregate candidate totals. Spatialization and applicable loop intent must match the brief. Require actual target playback and load/dispose evidence, independent distribution rights and applicable loop-seam review; VOICE also retains its public-use and cloned-output disclosure gates. Browser/device or native-player ownership is supplied by the selected host, as in the [THREEJS and UNITY handoff examples](../../docs/MEDIA_PIPELINES.md#selected-engine-handoff). No generic manifest or synthetic fixture substitutes for target playback, and admission never installs an engine player or promotes files automatically.
 
 ## Voice privacy
 
