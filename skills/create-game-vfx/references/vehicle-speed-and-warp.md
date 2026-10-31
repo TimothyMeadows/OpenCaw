@@ -6,6 +6,6 @@ Ordinary movement uses bounded continuous intensity curves; warp has enter, sust
 
 Use event IDs plus actor generation and simulation revision to reject stale/duplicate events. Assign one presentation clock, pause behavior, expiration and cancellation owner. Despawn, pooling, focus/scene exit and prediction rejection clear owned listeners, effects and pending callbacks. A respawned actor cannot inherit the previous actor's warp or death effect.
 
-Select actual engine primitives through compatible feature owners. Core GLB animation channels do not instantiate Niagara, Unity ParticleSystem or Godot GPUParticles3D. Three.js point/mesh/material effects may be sufficient without another particle dependency. Do not silently install middleware or assume bitwise deterministic GPU particle replay.
+Select actual engine primitives through compatible feature owners. Core GLB animation channels do not instantiate Niagara, Unity ParticleSystem or Godot GPUParticles3D. Three.js particle production uses the selected three.quarks owner and bounded host-locked integration; particle-free mesh/material effects remain available for their own purposes. Do not silently install middleware or assume bitwise deterministic GPU particle replay.
 
 Verify actual target playback, bounded counts and costs under repeated acceleration, boost, warp enter/cancel/exit, pause and pooled reuse. Low-quality/reduced-motion settings retain essential gameplay cues. A sidecar or Blender preview cannot establish runtime effect appearance, motion comfort or performance.

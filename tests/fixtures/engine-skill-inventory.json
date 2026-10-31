@@ -7,7 +7,8 @@
     "threejs-build-ui",
     "threejs-build-code-models",
     "threejs-build-code-characters",
-    "threejs-review-code-characters"
+    "threejs-review-code-characters",
+    "threejs-build-particles"
   ],
   "BABYLONJS": [
     "babylonjs-build-scenes",

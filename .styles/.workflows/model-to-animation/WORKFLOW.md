@@ -73,4 +73,4 @@ Require actual Blender fixtures for native authoring/export acceptance and actua
 - `computer-science/gameplay-engineer`: controller ownership and selected-engine motion/effect integration.
 - `arts/art-director`, `arts/game-vfx-artist` and `computer-science/qa-engineer`: independent visual/effects/technical review and actual acceptance evidence.
 
-Use `build-model-animations` to coordinate these existing owners. No replacement role, hosted service or additional general particle engine is introduced.
+Use `build-model-animations` to coordinate these existing owners. No replacement role or hosted service is introduced. New THREEJS particle production uses its selected three.quarks owner; historical pinned sample adapters keep their original point implementation and require explicit reviewed integration.

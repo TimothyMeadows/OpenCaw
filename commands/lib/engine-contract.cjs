@@ -23,6 +23,18 @@ function packagingSelection(id) {
       : { profile: null, selectionSource: 'engine', platforms: [], nativeReadiness: 'not-applicable', reason: 'Use the selected engine native exporter.' }
   };
 }
+// Particle selection follows the effective engine. It advertises the supported
+// integration; host package locks, installed APIs and rendering remain separate.
+function particleSelection(id) {
+  const definition = registry().engines[id];
+  const expected = id === 'THREEJS' ? 'THREE_QUARKS' : null;
+  if (!definition || !Object.hasOwn(definition, 'particleBackend') || definition.particleBackend !== expected) fail(`Invalid particleBackend metadata for ${id}; THREEJS requires THREE_QUARKS and other engines retain their own backend.`);
+  return { particles: expected === null ? null : {
+    backend: 'THREE_QUARKS', package: 'three.quarks', skill: 'threejs-build-particles',
+    selectionSource: 'engine', renderer: 'WebGLRenderer', readiness: 'unverified',
+    testedVersion: '0.17.1', testedCoreVersion: '0.17.1', minimumThreeVersion: '0.182.0'
+  } };
+}
 function engineId(value) {
   const match = Object.entries(registry().engines).filter(([id, def]) => [id, ...def.aliases].some(a => normalized(a) === normalized(value)));
   if (match.length !== 1) fail(`Unknown or ambiguous engine '${value}'. Select THREEJS, BABYLONJS, PHASERJS, UNITY, UNREAL or GODOT with generate-engine.sh.`);
@@ -153,7 +165,7 @@ function resolve(root, options = {}) {
   const existing = productionEngines(root);
   if (existing.some(e => e !== selected.projectEngine)) fail(`Existing engine evidence (${existing.join(', ')}) conflicts with ${selected.projectEngine}. Migrate ENGINE.md and legacy architecture directives explicitly; no fallback or implicit installation was performed.`);
   const definition = path.join(BASE, '.engine', registry().engines[selected.projectEngine].definition);
-  const result = { schemaVersion: 1, ...selected, effectiveEngine: selected.projectEngine, ...packagingSelection(selected.projectEngine), definitionSha256: hash(definition), registrySha256: hash(path.join(BASE, '.engine/registry.json')), existingEngines: existing, outputScope: null, task: null };
+  const result = { schemaVersion: 1, ...selected, effectiveEngine: selected.projectEngine, ...packagingSelection(selected.projectEngine), ...particleSelection(selected.projectEngine), definitionSha256: hash(definition), registrySha256: hash(path.join(BASE, '.engine/registry.json')), existingEngines: existing, outputScope: null, task: null };
   if (options.override && !options.recordOverride && !options.evidence) fail('An override requires --record-override --task TASK --scope prototypes/NAME, or an existing --evidence receipt.');
   if (options.recordOverride) {
     if (!options.override || !/^[a-z0-9][a-z0-9-]*$/.test(options.task || '')) fail('Record an explicit --override ENGINE and safe --task TASK.');
@@ -163,7 +175,7 @@ function resolve(root, options = {}) {
     const taskFile = inside(root, `.opencaw/.cache/tasks/${options.task}/TASK.md`, 'Task contract');
     if (!fs.existsSync(taskFile.absolute)) fail('An existing task contract is required before recording an override.');
     if (fs.existsSync(scope.absolute) && (!fs.statSync(scope.absolute).isDirectory() || fs.readdirSync(scope.absolute).length)) fail('Record a new override before creating prototype output; the scope must be absent or empty.');
-    const receipt = { ...result, selectionSource: 'prompt', effectiveEngine: engineId(options.override), ...packagingSelection(engineId(options.override)), task: options.task, taskSha256: hash(taskFile.absolute), outputScope: scope.relative, effectiveDefinitionSha256: hash(path.join(BASE, '.engine', registry().engines[engineId(options.override)].definition)) };
+    const receipt = { ...result, selectionSource: 'prompt', effectiveEngine: engineId(options.override), ...packagingSelection(engineId(options.override)), ...particleSelection(engineId(options.override)), task: options.task, taskSha256: hash(taskFile.absolute), outputScope: scope.relative, effectiveDefinitionSha256: hash(path.join(BASE, '.engine', registry().engines[engineId(options.override)].definition)) };
     const file = inside(root, `.opencaw/.cache/tasks/${options.task}/engine-override.json`, 'Override evidence');
     const digest = inside(root, `${file.relative}.sha256`, 'Override digest');
     if (fs.existsSync(file.absolute)) fail('Override evidence already exists. Use a new task for a different selection; do not overwrite evidence.');
@@ -190,7 +202,7 @@ function resolve(root, options = {}) {
       const output = validateOutput(root, options.output, receipt, true);
       if (output.relative !== scope.relative && !output.relative.startsWith(scope.relative + '/')) fail('Output is outside the approved override scope.');
     }
-    return { ...receipt, ...packagingSelection(effective), existingEngines: existing, evidence: file.relative };
+    return { ...receipt, ...packagingSelection(effective), ...particleSelection(effective), existingEngines: existing, evidence: file.relative };
   }
   if (options.output) validateOutput(root, options.output, result, false);
   return result;
@@ -318,6 +330,7 @@ function generate(root, value, options = {}) {
   const id = value !== undefined ? engineId(value) : contract(root).projectEngine;
   const def = registry().engines[id];
   const packaging = packagingSelection(id); // Validate metadata before any contract write.
+  const particles = particleSelection(id);
   const relative = path.relative(root, BASE).split(path.sep).join('/');
   const directive = `Read \`${relative ? './' + relative + '/' : './'}.engine/${def.definition}\` instructions`;
   const body = ['<!-- opencaw-engine:start -->', '## Engine Selection', '', 'Selected OpenCaw engine:', `- ${id}`, '', options.inline ? `### Inline Engine Definition\n\n${read(path.join(BASE, '.engine', def.definition)).trim()}` : directive, '', '<!-- opencaw-engine:end -->'].join('\n');
@@ -332,7 +345,7 @@ function generate(root, value, options = {}) {
   const existing = productionEngines(root);
   if (existing.some(e => e !== id)) fail(`Requested ${id} conflicts with existing ${existing.join(', ')} evidence. Migrate the existing game and legacy directives before regeneration.`);
   fs.writeFileSync(file.absolute, content);
-  return { engine: id, ...packaging, contract: 'ENGINE.md', inline: !!options.inline, customContentPreserved: exists };
+  return { engine: id, ...packaging, ...particles, contract: 'ENGINE.md', inline: !!options.inline, customContentPreserved: exists };
 }
 function validateCatalog() {
   const data = registry();
@@ -342,6 +355,7 @@ function validateCatalog() {
   let count = 0;
   for (const [id, def] of Object.entries(data.engines)) {
     packagingSelection(id);
+    particleSelection(id);
     if (def.prefix !== `${id.toLowerCase()}-` || def.definition !== `${id}.md` || !def.languages.length) fail(`Invalid definition metadata for ${id}`);
     if (!fs.existsSync(path.join(BASE, '.engine', def.definition))) fail(`Missing definition ${id}`);
     for (const a of [id, ...def.aliases]) {
@@ -437,5 +451,5 @@ function main() {
   } else fail(`Unknown operation ${operation}`);
   console.log(JSON.stringify(result, null, 2));
 }
-module.exports = { engineId, packagingSelection, resolve, skill, classify, requireEngine, codeProduction, generate, validateCatalog, roleCapabilities, inside, BASE };
+module.exports = { engineId, packagingSelection, particleSelection, resolve, skill, classify, requireEngine, codeProduction, generate, validateCatalog, roleCapabilities, inside, BASE };
 if (require.main === module) { try { main(); } catch (error) { console.error(JSON.stringify({ error: error.message, compatible: false })); process.exitCode = 1; } }

@@ -25,9 +25,11 @@
         "threejs-build-ui",
         "threejs-build-code-models",
         "threejs-build-code-characters",
-        "threejs-review-code-characters"
+        "threejs-review-code-characters",
+        "threejs-build-particles"
       ],
-      "runtimeKind": "web"
+      "runtimeKind": "web",
+      "particleBackend": "THREE_QUARKS"
     },
     "BABYLONJS": {
       "definition": "BABYLONJS.md",
@@ -53,7 +55,8 @@
         "babylonjs-build-ui",
         "babylonjs-build-audio"
       ],
-      "runtimeKind": "web"
+      "runtimeKind": "web",
+      "particleBackend": null
     },
     "PHASERJS": {
       "definition": "PHASERJS.md",
@@ -77,7 +80,8 @@
         "phaserjs-build-ui",
         "phaserjs-build-audio"
       ],
-      "runtimeKind": "web"
+      "runtimeKind": "web",
+      "particleBackend": null
     },
     "UNITY": {
       "definition": "UNITY.md",
@@ -112,7 +116,8 @@
         "unity-integrate-purchases",
         "unity-integrate-ads"
       ],
-      "runtimeKind": "native"
+      "runtimeKind": "native",
+      "particleBackend": null
     },
     "UNREAL": {
       "definition": "UNREAL.md",
@@ -152,7 +157,8 @@
         "unreal-build-procedural-content",
         "unreal-build-save-systems"
       ],
-      "runtimeKind": "native"
+      "runtimeKind": "native",
+      "particleBackend": null
     },
     "GODOT": {
       "definition": "GODOT.md",
@@ -178,7 +184,8 @@
         "godot-build-multiplayer",
         "godot-run-tooling"
       ],
-      "runtimeKind": "native"
+      "runtimeKind": "native",
+      "particleBackend": null
     }
   },
   "skillAliases": {
@@ -193,6 +200,7 @@
     "commands/next-code-model-pass.sh": "THREEJS",
     "commands/record-code-character-calibration.sh": "THREEJS",
     "commands/record-code-character-gate.sh": "THREEJS",
-    "commands/measure-code-character-evidence.sh": "THREEJS"
+    "commands/measure-code-character-evidence.sh": "THREEJS",
+    "commands/threejs-particles.sh": "THREEJS"
   }
 }
