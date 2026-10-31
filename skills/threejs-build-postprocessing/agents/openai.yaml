@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Postprocessing"
+  short_description: "Build bounded Three.js screen effects for WebGL2 hosts"
+  default_prompt: "Use $threejs-build-postprocessing to integrate and verify pmndrs postprocessing in this Three.js project."

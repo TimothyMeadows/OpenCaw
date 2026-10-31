@@ -8,7 +8,8 @@
     "threejs-build-code-models",
     "threejs-build-code-characters",
     "threejs-review-code-characters",
-    "threejs-build-particles"
+    "threejs-build-particles",
+    "threejs-build-postprocessing"
   ],
   "BABYLONJS": [
     "babylonjs-build-scenes",

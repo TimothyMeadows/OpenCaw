@@ -18,3 +18,7 @@ Engine/API references are primary vendor documentation linked from definitions a
 ## Three.js particle integration
 
 The requested [three.quarks](https://github.com/Alchemist0823/three.quarks) particle/VFX library and `quarks.core` are MIT-licensed dependencies. Initial published acceptance uses version0.17.1 and the [upstream package manifest at its published source revision](https://github.com/Alchemist0823/three.quarks/blob/a432a153354ed568c5aa2c94777376c546b5425b/packages/three.quarks/package.json). The independent OpenCaw host helper uses their public APIs; no upstream editor/demo assets, hosted editor requirement, provider or copied implementation is added. Host dependency distributions must preserve applicable notices and lock exact resolved versions/integrities, including wildcard core transitive resolution. Source/CPU checks do not establish renderer/device quality or performance.
+
+## Three.js postprocessing integration
+
+[pmndrs postprocessing](https://github.com/pmndrs/postprocessing)6.39.5 is Zlib licensed. Exact fixture dependencies/integrities are locked in tests/fixtures/threejs-postprocessing. The independently authored bounded helper uses public composer/effect APIs with pinned ownership details documented in its README; no upstream demos/assets are vendored. Preserve dependency license notices in host distributions. The requested MIT-licensed three-gpu-pathtracer was researched and excluded from the screen-effects default; this introduces no tracing dependency. API/CPU evidence cannot establish MAUI/GPU/device performance.

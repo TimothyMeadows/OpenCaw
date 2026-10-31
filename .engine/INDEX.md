@@ -43,3 +43,7 @@ Use `commands/web-game-package.sh` and read `docs/WEB_GAME_PACKAGING.md` in this
 THREEJS declares `particleBackend: THREE_QUARKS` and automatically selects the `three.quarks` integration and `threejs-build-particles` skill. Every other engine declares a null Quarks backend and retains its own particle owner. Resolution emits the effective selection with unverified readiness, including default and valid isolated overrides; it loads or installs nothing. MAUI packaging remains independent.
 
 Use `docs/THREEJS_PARTICLES.md` and `commands/threejs-particles.sh` for host inspection and an explicit fresh helper scaffold. Initial real-package acceptance uses `three.quarks`/`quarks.core` 0.17.1 with Three.js 0.182.0; lockfiles and actual API/renderer checks govern host readiness. No automatic version upgrade, WebGPU experiment or primitive fallback is implied.
+
+## Default Three.js postprocessing
+
+THREEJS derives `postprocessingBackend: PMNDRS_POSTPROCESSING`; other engines require null. Use `threejs-build-postprocessing`, `commands/threejs-postprocessing.sh` and `docs/THREEJS_POSTPROCESSING.md`. Selection loads/installs nothing. Existing WebGLRenderer/Quarks share one host clock; guarded LDR/FXAA starter requires actual WebGL2. Path tracing is separate and excluded from this default. MAUI device rendering remains unverified until actual target checks.

@@ -1,0 +1,15 @@
+{
+  "name": "opencaw-threejs-postprocessing-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "three": "0.182.0",
+    "postprocessing": "6.39.5",
+    "three.quarks": "0.17.1",
+    "quarks.core": "0.17.1"
+  },
+  "overrides": {
+    "quarks.core": "0.17.1"
+  }
+}

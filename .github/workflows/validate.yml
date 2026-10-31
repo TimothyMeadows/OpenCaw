@@ -34,6 +34,9 @@ jobs:
       - name: Explicit pinned Quarks test dependencies (no package scripts)
         shell: bash
         run: npm ci --ignore-scripts --no-audit --no-fund --prefix tests/fixtures/threejs-quarks --cache .local/ci-npm-cache
+      - name: Explicit pinned postprocessing test dependencies (no package scripts)
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix tests/fixtures/threejs-postprocessing --cache .local/ci-npm-cache
       - name: Host policy, clone/submodule installations and admission
         shell: bash
         run: |
@@ -64,6 +67,9 @@ jobs:
           node tests/test-threejs-quarks-selection.cjs
           node tests/test-threejs-particles.cjs
           node tests/test-threejs-quarks-runtime.mjs
+          node tests/test-threejs-postprocessing-selection.cjs
+          node tests/test-threejs-postprocessing.cjs
+          node tests/test-threejs-postprocessing-runtime.mjs
           node tests/test-web-game-packaging.cjs
           node tests/test-web-game-package-transactions.cjs
       - name: Actual managed Linux cancellation and native group cleanup
