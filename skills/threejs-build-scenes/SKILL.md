@@ -28,3 +28,5 @@ Before edits or tool launches, run `resolve-engine.sh` and `resolve-skill.sh thr
 Deliver the lifecycle, asset ownership table, world adapter and budget evidence. Exercise failed loads, transition during loading, repeated enter/exit, resize, hidden-tab resume and context loss. Compare `renderer.info` and application resource counts across cycles; internal renderer caches need not reach zero. Unit fixtures cannot certify GPU behavior on target devices. Consult the [official disposal guidance](https://threejs.org/manual/pages/how-to-dispose-of-objects.html) for the selected revision.
 
 For particle/VFX work use the automatically selected `threejs-build-particles` Quarks owner. Keep one scene-owned batch renderer on this presentation clock and dispose its owned effects on scene teardown; selection does not install or upgrade host dependencies.
+
+For fullscreen effects use `threejs-build-postprocessing` and the automatically selected pmndrs `postprocessing` backend. Share the host WebGLRenderer/clock with Quarks; verify actual WebGL2 and MAUI target behavior, output color and owned composer cleanup. No implicit renderer change, package upgrade or path tracing.

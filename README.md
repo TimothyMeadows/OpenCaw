@@ -59,6 +59,7 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
   - [Game Engine Selection](#game-engine-selection)
   - [Native Web-Game Packaging](#native-web-game-packaging)
   - [Three.js Particles](#threejs-particles)
+  - [Three.js Postprocessing](#threejs-postprocessing)
   - [Roles](#roles)
   - [Role, Skill, and Command Bindings](#role-skill-and-command-bindings)
   - [Skills](#skills)
@@ -750,6 +751,18 @@ The workflow provides read-only npm dependency discovery and a reusable bounded 
 
 Use the [particle integration guide](docs/THREEJS_PARTICLES.md) for exact dependency, ownership, lifecycle, accessibility and target checks. Metadata is not executable readiness. Pinned legacy Bubo particle samples retain their original implementations; current capability selection does not silently migrate their resources or approvals.
 
+## Three.js Postprocessing
+
+**Three.js automatically selects pmndrs `postprocessing` for screen effects.** Use `threejs-build-postprocessing` and the [postprocessing guide](docs/THREEJS_POSTPROCESSING.md) for read-only dependency inspection, explicit source scaffolding and a bounded WebGL2 composer shared with the existing Quarks renderer/clock.
+
+```bash
+bash .opencaw/commands/threejs-postprocessing.sh inspect --renderer WebGLRenderer
+bash .opencaw/commands/threejs-postprocessing.sh scaffold --output src/engine/postprocessing --renderer WebGLRenderer
+```
+
+The tested stack uses Three0.182.0/postprocessing6.39.5. The starter uses LDR byte targets and FXAA with explicit size, lifecycle and resource ownership. Selection installs nothing. HDR/heavier effects require reviewed host integration and target checks. MAUI WebViews can support WebGL2, but actual packaged GPU/color/performance acceptance remains device-specific and unverified by source/CPU tests. Ray tracing and path tracing are deferred to prioritize device coverage.
+
+
 ## Roles
 
 Roles are optional named perspectives. Use one when you want a specific specialist lens, not because OpenCaw requires a role to work.
@@ -859,6 +872,7 @@ $design-game-systems
 | Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
 | Generative media | `plan-generative-media-pipeline`, `use-bubo-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
 | Three.js particles | `threejs-build-particles` | Integrate the default Quarks backend with bounded effects and lifecycle ownership |
+| Three.js postprocessing | `threejs-build-postprocessing` | Integrate bounded WebGL2 screen effects with target capability checks |
 | Native web-game packaging | `package-web-games` | Prepare four-platform MAUI packages and release evidence |
 | Sound effects and ambience | `build-audio-assets` | Run the independent AUDIO lifecycle, including complete listening and loop review |
 | Instrumental and songs | `build-music-assets` | Run MUSIC with exact supplied lyrics/rights and full-track review |
@@ -901,6 +915,7 @@ Or run the command directly:
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
 | Three.js particles | `threejs-particles.sh` |
+| Three.js postprocessing | `threejs-postprocessing.sh` |
 | Native web-game packaging | `web-game-package.sh` |
 | Engine selection and compatibility | `generate-engine.sh`, `validate-engine-contract.sh`, `resolve-engine.sh`, `resolve-skill.sh`, `resolve-role-capabilities.sh`, `validate-engines.sh` |
 | Gameplay design, UI, and feedback | `print-gameplay-system-brief.sh`, `validate-gameplay-review.sh` |

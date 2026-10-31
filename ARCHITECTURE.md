@@ -51,3 +51,7 @@ Project-local configuration and generated native source remain in the host repos
 ## Three.js particle ownership
 
 The effective THREEJS registry entry derives the three.quarks particle capability independently of MAUI or visual/media selection. Read-only commands/lib/threejs-particles.cjs inspects explicit host dependency metadata and scaffolds reviewed source only on request. .engine/threejs/particles supplies the bounded scene/clock/resource helper; host packages, renderer, simulation and target evidence remain host-owned. It imports no library during startup/discovery and changes no Bubo pin or historical adapter.
+
+## Three.js postprocessing ownership
+
+EffectiveTHREEJS selects pmndrs postprocessing independently of Quarks, MAUI and art/media routing. Metadata-only commands/lib/threejs-postprocessing.cjs inspects explicit host locks and scaffolds fresh reviewed source. .engine/threejs/postprocessing owns the bounded LDR/FXAA composer lifecycle on the caller presentation clock; host renderer/scene/Quarks/assets remain borrowed. Runtime WebGL2/framebuffer validation and device acceptance are separate from selection. Ray tracing and path tracing are deferred; this capability uses the existing raster renderer.

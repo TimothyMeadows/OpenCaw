@@ -1,6 +1,6 @@
 # Engine Contract Schema
 
-`registry.json` is canonical for six IDs, normalized aliases, prefixes, supported languages, `runtimeKind` (`web` or `native`), `particleBackend` (`THREE_QUARKS` for THREEJS, null otherwise), feature bindings, legacy skill aliases and engine-bound commands. `validate-engines.sh` checks all classifications, prefixes and bindings. Metadata arrays contain one canonical engine or AGNOSTIC.
+`registry.json` is canonical for six IDs, normalized aliases, prefixes, supported languages, `runtimeKind` (`web` or `native`), `particleBackend` (`THREE_QUARKS` for THREEJS, null otherwise), `postprocessingBackend` (`PMNDRS_POSTPROCESSING` for THREEJS, null otherwise), feature bindings, legacy skill aliases and engine-bound commands. `validate-engines.sh` checks all classifications, prefixes and bindings. Metadata arrays contain one canonical engine or AGNOSTIC.
 
 A generated ENGINE.md contains exactly one `Selected OpenCaw engine:` list with one canonical ID inside a unique managed block. It reads the matching .engine definition or embeds its complete current text. Regeneration replaces only that block. Unknown IDs, duplicates, conflicting read directives, stale/incomplete inline definitions and conflicting production evidence fail. Three browser architecture files remain compatibility redirects and do not create a second engine selector.
 
@@ -36,3 +36,7 @@ THREEJS requires registry `particleBackend: THREE_QUARKS`; the five other regist
 ```
 
 The version fields identify the initial tested API/dependency pair and upstream peer minimum, not a host installation or upgrade instruction. Capability metadata is recomputed from the effective engine on valid override recording and consumption; serialized `particles` fields cannot select another package/backend, claim readiness or bypass registry/task/definition freshness. MAUI packaging and engine selection remain unchanged. No resolution/generation probes node_modules, imports the library, creates helper source, installs dependencies or renders particles. Read-directive contracts acquire current guidance automatically; stale inline definitions retain their explicit regeneration requirement.
+
+## Three.js postprocessing capability
+
+Registry `postprocessingBackend` is `PMNDRS_POSTPROCESSING` only for THREEJS, null for other engines. Missing/conflicting metadata fails before contract writes. Resolve/generate/skill/role output exposes `postprocessing` null for others; effectiveTHREEJS emits backend/package/skill, selectionSource engine, renderer WebGLRenderer, context webgl2, testedVersion6.39.5, testedThreeVersion0.182.0, profile ldr and readiness unverified. Valid overrides recompute it; serialized capabilities cannot change backend or establish readiness. No inspection/import/install/renderer change occurs during selection. Inline contracts require regeneration after definition changes.

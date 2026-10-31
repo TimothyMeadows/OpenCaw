@@ -25,3 +25,5 @@ Before edits or tool launches, run `resolve-engine.sh` and `resolve-skill.sh thr
 ## Output and verification
 
 Deliver parameters, texture/channel conventions, shader or node sources and GPU evidence. Compare lit/unlit surfaces, grazing angles, alpha sorting, color references and device frame cost. Record compile failures and unsupported backends. Compilation does not prove visual agreement with the art contract. Refer to [renderer compatibility](https://threejs.org/manual/pages/webgpurenderer), [ShaderMaterial](https://threejs.org/docs/pages/ShaderMaterial.html), and [color management](https://threejs.org/manual/pages/color-management.html).
+
+For fullscreen effects use `threejs-build-postprocessing` and the automatically selected pmndrs `postprocessing` backend. Share the host WebGLRenderer/clock with Quarks; verify actual WebGL2 and MAUI target behavior, output color and owned composer cleanup. No implicit renderer change, package upgrade or path tracing.
