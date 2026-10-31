@@ -37,6 +37,9 @@ bash ./commands/test-bubo-runtime.sh media
 ./commands/validate-engines.sh
 ./tests/test-engine-selection.sh
 node ./tests/test-maui-engine-selection.cjs
+node ./tests/test-threejs-quarks-selection.cjs
+node ./tests/test-threejs-particles.cjs
+node ./tests/test-threejs-quarks-runtime.mjs
 node ./tests/test-web-game-packaging.cjs
 node ./tests/test-web-game-package-transactions.cjs
 ./tests/test-unreal-capabilities.sh

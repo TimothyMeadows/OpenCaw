@@ -4,7 +4,7 @@ Select one engine in repository-root ENGINE.md. Unconfigured repositories defaul
 
 | Identifier | Aliases | Engine-owned language | Prerequisites |
 | --- | --- | --- | --- |
-| THREEJS | three.js, three | TypeScript/JavaScript, shaders | Host package and browser tooling; physics/networking explicitly selected |
+| THREEJS | three.js, three | TypeScript/JavaScript, shaders | Host packages and browser tooling; automatic three.quarks particles; physics/networking explicitly selected |
 | BABYLONJS | babylon.js, babylon | TypeScript/JavaScript, shaders | Host packages, browser tooling, explicit physics plugin |
 | PHASERJS | phaser, phaser.js | TypeScript/JavaScript | Host-locked package major and browser tooling; Arcade or Matter |
 | UNITY | unity, unity3d | Editor-compatible C# | Matching licensed Editor and platform modules; packages explicit |
@@ -37,3 +37,9 @@ Move legacy browser-engine architecture selection into ENGINE.md and retain soft
 THREEJS, BABYLONJS and PHASERJS declare `runtimeKind: web` and automatically select .NET 10 MAUI HybridWebView packaging for Windows, macOS (Mac Catalyst), Android and iOS. Any future registered web engine uses that same metadata-derived capability. MAUI remains a packaging host, never another game engine or visual pipeline. Native engines retain their own exporters.
 
 Use `commands/web-game-package.sh` and read `docs/WEB_GAME_PACKAGING.md` in this installation. Resolution only declares the capability with unverified native readiness; explicit initialization, web-build sync, compatible SDK/workloads, signing and actual target QA precede release. Linux and TV are excluded. Linux users may independently try the Windows package with Wine or Proton, without a compatibility guarantee.
+
+## Default Three.js particles
+
+THREEJS declares `particleBackend: THREE_QUARKS` and automatically selects the `three.quarks` integration and `threejs-build-particles` skill. Every other engine declares a null Quarks backend and retains its own particle owner. Resolution emits the effective selection with unverified readiness, including default and valid isolated overrides; it loads or installs nothing. MAUI packaging remains independent.
+
+Use `docs/THREEJS_PARTICLES.md` and `commands/threejs-particles.sh` for host inspection and an explicit fresh helper scaffold. Initial real-package acceptance uses `three.quarks`/`quarks.core` 0.17.1 with Three.js 0.182.0; lockfiles and actual API/renderer checks govern host readiness. No automatic version upgrade, WebGPU experiment or primitive fallback is implied.

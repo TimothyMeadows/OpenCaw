@@ -98,6 +98,7 @@ Skills:
 - `unity-build-2d-content`
 - `unity-localize-content`
 - `unity-configure-rendering`
+- `threejs-build-particles`
 
 Commands:
 
@@ -122,6 +123,7 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 - `commands/proof-to-model.sh`
+- `commands/threejs-particles.sh`
 
 ### arts/blender-production-artist
 
@@ -292,6 +294,7 @@ Skills:
 - `unreal-build-cinematics`
 - `unity-build-2d-content`
 - `unity-configure-rendering`
+- `threejs-build-particles`
 
 Commands:
 
@@ -306,6 +309,7 @@ Commands:
 - `commands/print-game-art-handoff-template.sh`
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
+- `commands/threejs-particles.sh`
 
 ### arts/generative-art-designer
 
@@ -557,6 +561,7 @@ Skills:
 - `unity-configure-rendering`
 - `unity-build-editor-tools`
 - `unity-optimize-web`
+- `threejs-build-particles`
 
 Commands:
 
@@ -583,6 +588,7 @@ Commands:
 - `commands/art-sanity-checklist.sh`
 - `commands/validate-art-sanity-report.sh`
 - `commands/proof-to-model.sh`
+- `commands/threejs-particles.sh`
 
 ### arts/tile-set-artist
 
@@ -812,6 +818,7 @@ Skills:
 - `unity-localize-content`
 - `unity-build-editor-tools`
 - `unity-optimize-web`
+- `threejs-build-particles`
 
 Commands:
 
@@ -835,6 +842,7 @@ Commands:
 - `commands/web-performance-report.sh`
 - `commands/validate-style-contract.sh`
 - `commands/validate-svg-assets.sh`
+- `commands/threejs-particles.sh`
 
 ### computer-science/fullstack-engineer
 
@@ -967,6 +975,7 @@ Skills:
 - `unity-integrate-voice-chat`
 - `unity-integrate-purchases`
 - `unity-integrate-ads`
+- `threejs-build-particles`
 
 Commands:
 
@@ -986,6 +995,7 @@ Commands:
 - `commands/playwright-capture-page.sh`
 - `commands/render-browser-demo.sh`
 - `commands/web-performance-report.sh`
+- `commands/threejs-particles.sh`
 
 ### computer-science/generative-media-pipeline-engineer
 

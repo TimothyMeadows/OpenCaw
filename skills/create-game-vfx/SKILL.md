@@ -16,6 +16,8 @@ engines: [AGNOSTIC]
 
 For effects timed across a dance, combination or charge/cast sequence, coordinate with `build-model-actions`. Bind cues to real reviewed step/clip markers and anchors, capture fixed target points explicitly, and keep cancellation/resource cleanup separate from gameplay hit and projectile decisions.
 
+For THREEJS, particle production uses the engine-selected `threejs-build-particles` Quarks owner and host-locked compatible packages. Missing dependencies or an unsupported renderer require direction; do not silently substitute native point primitives or install another backend. Other engine owners remain unchanged.
+
 1. Define the gameplay event, audience, visibility distance, camera, duration, priority, and success signal.
 2. Break the effect into anticipation, activation, impact, sustain, and release as applicable.
 3. Assign shape, color, motion, scale, depth, audio, camera, and UI layers without duplicating feedback.

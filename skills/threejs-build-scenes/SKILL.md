@@ -26,3 +26,5 @@ Before edits or tool launches, run `resolve-engine.sh` and `resolve-skill.sh thr
 ## Output and verification
 
 Deliver the lifecycle, asset ownership table, world adapter and budget evidence. Exercise failed loads, transition during loading, repeated enter/exit, resize, hidden-tab resume and context loss. Compare `renderer.info` and application resource counts across cycles; internal renderer caches need not reach zero. Unit fixtures cannot certify GPU behavior on target devices. Consult the [official disposal guidance](https://threejs.org/manual/pages/how-to-dispose-of-objects.html) for the selected revision.
+
+For particle/VFX work use the automatically selected `threejs-build-particles` Quarks owner. Keep one scene-owned batch renderer on this presentation clock and dispose its owned effects on scene teardown; selection does not install or upgrade host dependencies.

@@ -58,6 +58,7 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
   - [Engine, Architecture, Style, and Media Contracts](#engine-architecture-style-and-media-contracts)
   - [Game Engine Selection](#game-engine-selection)
   - [Native Web-Game Packaging](#native-web-game-packaging)
+  - [Three.js Particles](#threejs-particles)
   - [Roles](#roles)
   - [Role, Skill, and Command Bindings](#role-skill-and-command-bindings)
   - [Skills](#skills)
@@ -733,6 +734,22 @@ Use `build` for compilation and `package` for distribution artifacts. Configure 
 
 Use `package-web-games` and the [complete packaging/release workflow](docs/WEB_GAME_PACKAGING.md) for other targets, signing and target QA. No command installs workloads or submits to stores. Signing credentials, store accounts, actual device tests and publication authorization remain separate. Native WebView support for WebGL/WebGPU, WASM, input and audio needs actual game testing. Linux and TVs are excluded; Wine/Proton compatibility with Windows output is unverified.
 
+
+## Three.js Particles
+
+**Three.js automatically selects `three.quarks` for particle and VFX work.** Its engine capability and `threejs-build-particles` skill route new effects through the same backend. Other engines retain their own particle systems, and MAUI packaging remains independent.
+
+From an installed host root:
+
+```bash
+bash .opencaw/commands/threejs-particles.sh inspect --renderer WebGLRenderer
+bash .opencaw/commands/threejs-particles.sh scaffold --output src/engine/particles --renderer WebGLRenderer
+```
+
+The workflow provides read-only npm dependency discovery and a reusable bounded scene/clock/resource owner with pause, reset, cancellation and disposal. The initial CPU-tested set is Three0.182.0 with `three.quarks`0.17.1 and `quarks.core`0.17.1. Selection never installs or upgrades packages; incompatible host locks and unsupported renderers require direction. Core WebGL integration does not imply WebGPU or actual MAUI/device rendering acceptance.
+
+Use the [particle integration guide](docs/THREEJS_PARTICLES.md) for exact dependency, ownership, lifecycle, accessibility and target checks. Metadata is not executable readiness. Pinned legacy Bubo particle samples retain their original implementations; current capability selection does not silently migrate their resources or approvals.
+
 ## Roles
 
 Roles are optional named perspectives. Use one when you want a specific specialist lens, not because OpenCaw requires a role to work.
@@ -841,6 +858,7 @@ $design-game-systems
 | Model motion and actions | `build-model-animations`, `build-model-actions` | Create reviewed clips and compound actions with selected-engine presentation and separate gameplay authority |
 | Three.js CODE characters | `threejs-build-code-characters`, `threejs-review-code-characters` | Author and independently review source-native Three.js actors |
 | Generative media | `plan-generative-media-pipeline`, `use-bubo-local-generation`, `produce-generative-audio`, `validate-generated-media` | Plan, generate, stage, review, and validate selected image/audio production |
+| Three.js particles | `threejs-build-particles` | Integrate the default Quarks backend with bounded effects and lifecycle ownership |
 | Native web-game packaging | `package-web-games` | Prepare four-platform MAUI packages and release evidence |
 | Sound effects and ambience | `build-audio-assets` | Run the independent AUDIO lifecycle, including complete listening and loop review |
 | Instrumental and songs | `build-music-assets` | Run MUSIC with exact supplied lyrics/rights and full-track review |
@@ -882,6 +900,7 @@ Or run the command directly:
 | Group | Commands |
 | --- | --- |
 | Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Three.js particles | `threejs-particles.sh` |
 | Native web-game packaging | `web-game-package.sh` |
 | Engine selection and compatibility | `generate-engine.sh`, `validate-engine-contract.sh`, `resolve-engine.sh`, `resolve-skill.sh`, `resolve-role-capabilities.sh`, `validate-engines.sh` |
 | Gameplay design, UI, and feedback | `print-gameplay-system-brief.sh`, `validate-gameplay-review.sh` |
@@ -1487,7 +1506,7 @@ The native .NET 10 workflow preserves the source and recipe, runs fixed hash-bou
 
 Humanoids can declare run, jump takeoff/air/landing, swimming and death motions. Cars use real wheel, steering and suspension parts. Ships can use rigid hulls, thruster anchors and cruise/boost/warp states. Continuous speed and acceleration drive presentation; warp has explicit enter/sustain/exit/cancel phases. The gameplay controller retains movement, collision and travel authority. Clips, particles and completion callbacks do not decide gameplay outcomes.
 
-Motion packages keep clips, hierarchy, parameters and effect anchors alongside selected-engine bindings. A GLB does not instantiate a portable particle system or state machine. Compatible animation/VFX/material/camera/audio owners implement bounded effects and cleanup in the selected engine. Three.js uses host-provided animation and point/mesh/material primitives without an implicit CDN or extra particle library. Other native engines require their actual import/tooling evidence; Phaser's 2D path needs an explicit sprite/pre-rendered handoff. CODE remains Three.js source authoring.
+Motion packages keep clips, hierarchy, parameters and effect anchors alongside selected-engine bindings. A GLB does not instantiate a portable particle system or state machine. Compatible animation/VFX/material/camera/audio owners implement bounded effects and cleanup in the selected engine. Three.js selects the host-locked three.quarks particle backend through `threejs-build-particles`; see the particle guide for explicit legacy sample integration and dependency checks. Other native engines require their actual import/tooling evidence; Phaser's 2D path needs an explicit sprite/pre-rendered handoff. CODE remains Three.js source authoring.
 
 No Adobe products, services or authoring integrations are supported by this workflow. Native authoring and reviewed non-Adobe clip imports are the baseline. Optional rig aids, AI models, hosted services and paid motion libraries remain separate dependency and rights decisions; ordinary production installs and downloads nothing. Source, rig, clip, mapping, recipe, tool or engine changes invalidate dependent evidence. State stays in `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs stay in `.art-staging/model-to-animation/`; explicit promotion targets reviewed runtime assets under `<project-root>/assets/models/`.
 

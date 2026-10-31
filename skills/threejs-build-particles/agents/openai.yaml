@@ -1,0 +1,4 @@
+interface:
+  display_name: "Three.js Build Particles"
+  short_description: "Build owned, bounded Three.js effects with Quarks"
+  default_prompt: "Use $threejs-build-particles to add and verify three.quarks particles in this Three.js project."

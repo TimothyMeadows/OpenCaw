@@ -31,6 +31,9 @@ jobs:
           printf '#!/usr/bin/env bash\nexec python -X utf8 "$@"\n' > .local/ci-bin/python3
           chmod +x .local/ci-bin/python3
           cygpath -w "$PWD/.local/ci-bin" >> "$GITHUB_PATH"
+      - name: Explicit pinned Quarks test dependencies (no package scripts)
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix tests/fixtures/threejs-quarks --cache .local/ci-npm-cache
       - name: Host policy, clone/submodule installations and admission
         shell: bash
         run: |
@@ -58,6 +61,9 @@ jobs:
           bash commands/validate-art-pipelines.sh
           node tests/test-engine-selection.cjs
           node tests/test-maui-engine-selection.cjs
+          node tests/test-threejs-quarks-selection.cjs
+          node tests/test-threejs-particles.cjs
+          node tests/test-threejs-quarks-runtime.mjs
           node tests/test-web-game-packaging.cjs
           node tests/test-web-game-package-transactions.cjs
       - name: Actual managed Linux cancellation and native group cleanup
