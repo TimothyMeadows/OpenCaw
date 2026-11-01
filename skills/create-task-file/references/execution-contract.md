@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Turn an ordinary request into a bounded, resumable task using the existing `.opencaw/.cache/tasks/<task>/` structure. This extends task execution, not the delivery-mode hierarchy. Populate the contract from the conversation; do not make users learn placeholder syntax or repeat decisions already established.
+Turn an ordinary request into a bounded, resumable task using the existing `.hephaera/.cache/tasks/<task>/` structure. This extends task execution, not the delivery-mode hierarchy. Populate the contract from the conversation; do not make users learn placeholder syntax or repeat decisions already established.
 
 Use [the task template](task-template.md) for substantial work. Existing task files are left untouched by scaffolding. When continuing legacy work, merge only missing sections after inspecting the current instructions and user edits. Small changes do not require an elaborate experiment ledger.
 
@@ -30,14 +30,14 @@ The host/orchestrator is responsible for hard wall-clock limits, cancellation, t
 
 ## Checkpoints and resumption
 
-These commands require existing Python 3.9+, Git, and the normal OpenCaw Bash runtime. Issue creation also requires authenticated `gh`. Nothing is installed automatically. Run commands from inside `.opencaw/`, or use `./.opencaw/commands/` from the project root. Task state is durable local data under `.opencaw/.cache/`, excluded from shared-baseline Git history.
+These commands require existing Python 3.9+, Git, and the normal Hephaera Bash runtime. Issue creation also requires authenticated `gh`. Nothing is installed automatically. Run commands from inside `.hephaera/`, or use `./.hephaera/commands/` from the project root. Task state is durable local data under `.hephaera/.cache/`, excluded from shared-baseline Git history.
 
 ```bash
 ./commands/record-task-checkpoint.sh checkout-fix \
   --artifact src/Checkout.cs \
   --artifact tests/CheckoutTests.cs \
   --artifact config/checkout.json \
-  --evidence .opencaw/.cache/tasks/checkout-fix/evidence/tests.txt \
+  --evidence .hephaera/.cache/tasks/checkout-fix/evidence/tests.txt \
   --status ready-for-review \
   --next-action "Review current evidence and prepare the human readiness summary."
 
@@ -92,4 +92,4 @@ The previous attempt and reason are retained. Do not remove the journal to force
 
 ## Verification
 
-Run the offline regression suite with `bash tests/test-task-execution.sh`. It uses real temporary Git repositories and filesystem writes inside the test checkout, with a fake GitHub API. It never posts real issues. The suite is also included in `commands/validate-opencaw.sh`; use focused validation for this feature instead of incidentally running unrelated Gauntlet regression work.
+Run the offline regression suite with `bash tests/test-task-execution.sh`. It uses real temporary Git repositories and filesystem writes inside the test checkout, with a fake GitHub API. It never posts real issues. The suite is also included in `commands/validate-hephaera.sh`; use focused validation for this feature instead of incidentally running unrelated Gauntlet regression work.

@@ -3,11 +3,11 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-OPENCAW_PROJECT_ROOT="${OPENCAW_HOST_ROOT:-${OPENCAW_PROJECT_ROOT:-}}"
-opencaw_resolve_paths
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+HEPHAERA_PROJECT_ROOT="${HEPHAERA_HOST_ROOT:-${HEPHAERA_PROJECT_ROOT:-}}"
+hephaera_resolve_paths
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 results_json="${1:-test-results/results.json}"
-output_dir="${2:-.opencaw/.cache/reports}"
+output_dir="${2:-.hephaera/.cache/reports}"
 
 cd "$host_root"
 mkdir -p "$output_dir"

@@ -12,7 +12,7 @@ Build or revise PCG graphs, procedural geometry and repeatable content-generatio
 
 ## Activation and inputs
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-procedural-content`; require effective `UNREAL` and `compatible: true` before edits or tools. Honor validated task overrides and output boundaries; record discovered context under `.opencaw/.cache` without replacing `ENGINE.md`.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-procedural-content`; require effective `UNREAL` and `compatible: true` before edits or tools. Honor validated task overrides and output boundaries; record discovered context under `.hephaera/.cache` without replacing `ENGINE.md`.
 
 Inspect actual engine/plugin versions and explicitly selected PCG, Geometry Script, Dynamic Mesh or other implementations. Their runtime/editor availability differs by release and target. Do not enable a plugin, install middleware or switch a CPU graph to GPU execution implicitly. Record generation domain, seed policy, source rights, recipe hash, output types, geometry/collision/texture budgets and authority.
 

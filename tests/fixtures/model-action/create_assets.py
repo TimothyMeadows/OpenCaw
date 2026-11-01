@@ -1,4 +1,4 @@
-"""Original action fixtures using OpenCaw's existing controlled humanoid rig.
+"""Original action fixtures using Hephaera's existing controlled humanoid rig.
 
 Run inside existing Blender4.5: --output REPOSITORY_LOCAL_DIRECTORY.
 No third-party artwork, clip vendor, model provider or runtime acceptance.
@@ -45,7 +45,7 @@ def compile_fixture(recipe,motion):
             result=copy.deepcopy(cue);result['start']=resolve(cue['start']);result['end']=resolve(cue['end']);cues.append(result)
         actions.append({'id':declared['id'],'role':declared['role'],'clip':declared['id'],'duration':duration,'steps':steps,'cues':cues,
                         'markers':sorted(markers,key=lambda value:(value['at'],value['id']))})
-    return {'schemaVersion':'opencaw-action-package/v1','asset':'sequence-fixture','version':'v1','profile':motion['profile'],'fps':recipe['fps'],
+    return {'schemaVersion':'hephaera-action-package/v1','asset':'sequence-fixture','version':'v1','profile':motion['profile'],'fps':recipe['fps'],
             'coordinateSystem':{'runtimeUp':'+Y','runtimeForward':'+Z'},'rig':motion['rig'],'anchors':motion['anchors'],'targets':recipe['targets'],
             'budgets':recipe['budgets'],'actions':actions,'sourceMotion':{'packageSha256':'0'*64,'modelSha256':motion['model']['sha256'],
                 'rigId':motion['rig']['id'],'clips':[{'id':clip['id'],'motionSha256':clip['motionSha256']} for clip in motion['clips']]},

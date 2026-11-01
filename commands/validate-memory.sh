@@ -4,13 +4,13 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 
-opencaw_resolve_paths
+hephaera_resolve_paths
 
 status=0
 
 validate_flat_system_file() {
   local line_number=0 line
-  [[ -f "$OPENCAW_SYSTEM_MEMORY_FILE" ]] || { echo "Missing system memory: $OPENCAW_SYSTEM_MEMORY_FILE" >&2; status=1; return; }
+  [[ -f "$HEPHAERA_SYSTEM_MEMORY_FILE" ]] || { echo "Missing system memory: $HEPHAERA_SYSTEM_MEMORY_FILE" >&2; status=1; return; }
 
   while IFS= read -r line || [[ -n "$line" ]]; do
     line_number=$((line_number + 1))
@@ -22,19 +22,19 @@ validate_flat_system_file() {
       status=1
       continue
     fi
-    if ! opencaw_validate_single_line "${line#- }" 'System memory entry' \
-      || ! opencaw_reject_sensitive_text "${line#- }" system; then
+    if ! hephaera_validate_single_line "${line#- }" 'System memory entry' \
+      || ! hephaera_reject_sensitive_text "${line#- }" system; then
       echo "Invalid system-memory line $line_number." >&2
       status=1
     fi
-  done < "$OPENCAW_SYSTEM_MEMORY_FILE"
+  done < "$HEPHAERA_SYSTEM_MEMORY_FILE"
 
   while IFS= read -r line; do
-    if ! awk -v expected="$line" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$OPENCAW_SYSTEM_MEMORY_FILE"; then
+    if ! awk -v expected="$line" '{ sub(/\r$/, ""); if ($0 == expected) found=1 } END { exit !found }' "$HEPHAERA_SYSTEM_MEMORY_FILE"; then
       echo "Missing protected system-memory entry: $line" >&2
       status=1
     fi
-  done < <(opencaw_system_defaults)
+  done < <(hephaera_system_defaults)
 }
 
 validate_tagged_file() {
@@ -47,7 +47,7 @@ validate_tagged_file() {
     line_number=$((line_number + 1))
     line="${line%$'\r'}"
     [[ -z "$line" || "$line" == '# '* || "$line" == '<!-- '* ]] && continue
-    if ! opencaw_validate_tagged_line "$line"; then
+    if ! hephaera_validate_tagged_line "$line"; then
       echo "Invalid $label line $line_number." >&2
       status=1
     fi
@@ -69,10 +69,10 @@ validate_tagged_file() {
 }
 
 validate_flat_system_file
-validate_tagged_file "$OPENCAW_PROJECT_MEMORY_FILE" 'project memory'
-validate_tagged_file "$OPENCAW_REPO_MAP_FILE" 'repository map'
+validate_tagged_file "$HEPHAERA_PROJECT_MEMORY_FILE" 'project memory'
+validate_tagged_file "$HEPHAERA_REPO_MAP_FILE" 'repository map'
 
-if ! awk '{ sub(/\r$/, ""); if ($0 ~ /^<!-- OPENCAW_REPO_MAP_FINGERPRINT: (pending|[a-f0-9]{64}) -->$/) found=1 } END { exit !found }' "$OPENCAW_REPO_MAP_FILE"; then
+if ! awk '{ sub(/\r$/, ""); if ($0 ~ /^<!-- HEPHAERA_REPO_MAP_FINGERPRINT: (pending|[a-f0-9]{64}) -->$/) found=1 } END { exit !found }' "$HEPHAERA_REPO_MAP_FILE"; then
   echo 'Repository map is missing a valid fingerprint marker.' >&2
   status=1
 fi

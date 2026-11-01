@@ -8,7 +8,7 @@ Usage: ./commands/create-code-model-manifest.sh MODEL_ID --brief TEXT [options]
 Options:
   --style STYLE.md                 Style contract (default: resolved project STYLE.md)
   --prompt-override               Select CODE for this task when STYLE.md uses another primary
-  --output FILE                   Manifest below .opencaw/.cache/tasks (default: .opencaw/.cache/tasks/MODEL_ID/code-model.json)
+  --output FILE                   Manifest below .hephaera/.cache/tasks (default: .hephaera/.cache/tasks/MODEL_ID/code-model.json)
   --source FILE                   Host source target (default: src/models/MODEL_ID.ts)
   --title TEXT                    Human-readable title
   --intended-use TEXT             Runtime use
@@ -39,8 +39,8 @@ case "${1:-}" in -h|--help) usage; exit 0 ;; esac
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+hephaera_resolve_paths
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 style_file="$host_root/STYLE.md"
 prompt_override=0
 engine_evidence=''

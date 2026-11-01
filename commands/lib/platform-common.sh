@@ -2,7 +2,7 @@
 
 # Shared host-platform helpers. Commands sourcing this file must enable strict mode.
 
-opencaw_is_windows_host() {
+hephaera_is_windows_host() {
   local kernel="${1:-}"
   local version_text="${2:-}"
 

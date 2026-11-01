@@ -11,10 +11,10 @@ cleanup() {
 }
 trap cleanup EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }
-project_command() { OPENCAW_PROJECT_ROOT="$project" "$@"; }
+project_command() { HEPHAERA_PROJECT_ROOT="$project" "$@"; }
 
 echo '[1/4] checking architecture and style catalog consistency'
-grep -Fq 'bash ./tests/test-game-template-catalog.sh' commands/validate-opencaw.sh || fail 'integrated validation omits game template tests'
+grep -Fq 'bash ./tests/test-game-template-catalog.sh' commands/validate-hephaera.sh || fail 'integrated validation omits game template tests'
 for catalog in .architecture .styles; do
   while IFS= read -r name; do
     [[ -f "$catalog/$name.md" ]] || fail "$catalog advertises missing template $name"

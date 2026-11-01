@@ -29,11 +29,11 @@ done
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/art-pipeline-common.sh"
-opencaw_resolve_paths
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-mount_dir_name="$(basename "$opencaw_root")"
-if [[ "$opencaw_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
+hephaera_resolve_paths
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+mount_dir_name="$(basename "$hephaera_root")"
+if [[ "$hephaera_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
 target="${output:-$host_root/MEDIA.md}"
 
 backend_template_relative_path() {
@@ -49,7 +49,7 @@ for raw in "${backends[@]}"; do
   name="$(art_pipeline_normalize "$raw")" || { echo "Unknown media pipeline: $raw" >&2; exit 1; }
   case "$name" in CLOUD|LOCAL) ;; *) echo "MEDIA.md supports only CLOUD and LOCAL: $raw" >&2; exit 1 ;; esac
   template_relative_path="$(backend_template_relative_path "$name")"
-  [[ -f "$opencaw_root/$template_relative_path" ]] || { echo "Missing media template: $name ($template_relative_path)" >&2; exit 1; }
+  [[ -f "$hephaera_root/$template_relative_path" ]] || { echo "Missing media template: $name ($template_relative_path)" >&2; exit 1; }
   for existing in "${selected[@]:-}"; do [[ "$existing" != "$name" ]] || { echo "Duplicate media pipeline: $name" >&2; exit 1; }; done
   selected+=("$name")
 done
@@ -66,7 +66,7 @@ mkdir -p "$(dirname "$target")"
   echo
   echo "This file is the canonical generative media contract for this repository. STYLE.md remains the visual authority."
   echo
-  echo "Generated from OpenCaw media pipeline templates:"
+  echo "Generated from Hephaera media pipeline templates:"
   for name in "${selected[@]}"; do echo "- $name"; done
   echo
   echo "---"
@@ -128,7 +128,7 @@ mkdir -p "$(dirname "$target")"
       template_relative_path="$(backend_template_relative_path "$name")"
       echo "<!-- BEGIN MEDIA PIPELINE: $name -->"
       echo
-      cat "$opencaw_root/$template_relative_path"
+      cat "$hephaera_root/$template_relative_path"
       echo
       echo "<!-- END MEDIA PIPELINE: $name -->"
       echo

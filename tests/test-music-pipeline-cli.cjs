@@ -7,9 +7,9 @@ const assert=require('assert/strict'),fs=require('fs'),path=require('path'),cp=r
 const runtime=require('../commands/lib/bubo-runtime.cjs'),contracts=require('../commands/lib/media-pipeline-contract.cjs');
 const lifecycle=require('../commands/lib/media-pipeline-state.cjs'),engines=require('../commands/lib/engine-contract.cjs');
 const coordinator=require('../commands/lib/media-pipeline-command.cjs'),spec=require('../commands/lib/music-pipeline.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-music-pipeline/evidence/cli-fixtures');fs.mkdirSync(evidence,{recursive:true});
-const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-music-cli',workspace='.opencaw/.cache/owned-media',mediaState='.opencaw/.cache/shared-media-allowance';
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-music-pipeline/evidence/cli-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-music-cli',workspace='.hephaera/.cache/owned-media',mediaState='.hephaera/.cache/shared-media-allowance';
 const observations=[],unavailable={unavailable:true,reason:'Owned synthetic fixture; not a real provider/model/acoustic observation.'};
 const copy=value=>JSON.parse(JSON.stringify(value));
 function check(value,message){assert(value,message);observations.push(message);}
@@ -23,19 +23,19 @@ function cli(operation,args=[],expected=0){
 }
 function reject(operation,args,pattern){const message=cli(operation,args,1);check(pattern.test(message),'Rejected '+operation+' for the stated boundary: '+message);}
 function snapshot(folder=root){const rows=[];function visit(dir){for(const name of fs.readdirSync(dir).sort()){const full=path.join(dir,name),stat=fs.lstatSync(full);rows.push([path.relative(folder,full),stat.isDirectory()?'dir':stat.isSymbolicLink()?'link':runtime.hash(full)]);if(stat.isDirectory()&&!stat.isSymbolicLink())visit(full);}}visit(folder);return JSON.stringify(rows);}
-const media='# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')+'Image, music, sound-effect SFX and voice are independent. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
-write('MEDIA.md',media);write(`.opencaw/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task\n');contracts.generate({root,domain:'MUSIC',inline:true});
+const media='# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')+'Image, music, sound-effect SFX and voice are independent. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
+write('MEDIA.md',media);write(`.hephaera/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task\n');contracts.generate({root,domain:'MUSIC',inline:true});
 write('inputs/rights.json',{schemaVersion:'bubo-media-rights/v1',task,owner:'Owned synthetic assertion only',promptRightsConfirmed:true,generationAllowed:true});
 write('inputs/license-source.json',{fixture:'Not an actual license acceptance'});
 write('inputs/license.json',{schemaVersion:'bubo-media-license-evidence/v1',accepted:true,backends:['ace-step-turbo'],licenseIds:['owned-fixture-only'],sourceEvidence:ref('inputs/license-source.json')});
 write('inputs/installation.json',{schemaVersion:'bubo-media-installation/v1',backend:'ace-step-turbo',licenses:[ref('inputs/license.json')]});
-const brief={schemaVersion:'opencaw-music-brief/v1',kind:'supplied-lyrics',purpose:'Owned test fixture, no real media requested',provider:'LOCAL',spatialization:'2d',loopIntent:false,
+const brief={schemaVersion:'hephaera-music-brief/v1',kind:'supplied-lyrics',purpose:'Owned test fixture, no real media requested',provider:'LOCAL',spatialization:'2d',loopIntent:false,
   request:{rights:ref('inputs/rights.json'),installation:ref('inputs/installation.json'),settings:{device:'cuda:0',precision:'bfloat16',offload:'none'},
     budget:{maximumOutputs:1,maximumBytesPerOutput:33554432,maximumTotalBytes:33554432,maximumPixels:4096,maximumAudioSeconds:20},
     items:[{id:'owned',prompt:'Owned harmless metadata fixture',negativePrompt:'',seed:17,steps:8,guidance:1,seconds:20,loopCandidate:false,music:{mode:'supplied-lyrics',lyrics:'[Verse]\nWe carry our own light.\nCaf\u00e9 skies rise.\n',vocalLanguage:'en',bpm:100,keyScale:'C major',timeSignature:'4',shift:3}}]},
   technical:{maxPeak:1,maxClippedFraction:0,maxSilentFraction:1}};
 const lyricSource=ref(write('inputs/lyrics-source.json',{fixture:'Owned synthetic lyric permission only, not actual consent'}));
-const lyricRights=write('inputs/lyrics-rights.json',{schemaVersion:'opencaw-music-lyrics-rights/v1',task,purpose:brief.purpose,lyrics:brief.request.items.map(item=>({itemId:item.id,lyricsSha256:crypto.createHash('sha256').update(item.music.lyrics,'utf8').digest('hex')})),rightsConfirmed:true,generationAllowed:true,sourceEvidence:lyricSource});
+const lyricRights=write('inputs/lyrics-rights.json',{schemaVersion:'hephaera-music-lyrics-rights/v1',task,purpose:brief.purpose,lyrics:brief.request.items.map(item=>({itemId:item.id,lyricsSha256:crypto.createHash('sha256').update(item.music.lyrics,'utf8').digest('hex')})),rightsConfirmed:true,generationAllowed:true,sourceEvidence:lyricSource});
 brief.lyricsRights=ref(lyricRights);
 write('inputs/brief.json',brief);
 function nativeSettings(item){
@@ -61,7 +61,7 @@ function provenance(stateFile,selected=brief,prefix='inputs'){
   const native={schemaVersion:'bubo-media-manifest/v1',status:'generated-staged',backend:'ace-step-turbo',promotion:false,humanReview:'pending',
     outputs:[measured],hostContextSha256:ref(host).sha256,mediaPolicySha256:ref('MEDIA.md').sha256,runtimeBuild:build,requestPath:source,requestSha256:ref(source).sha256,
     requestedSettings:selected.request.settings,actualSettings:selected.request.settings,resourceCatalogSha256:build.resourceCatalogSha256,catalogSha256:modelCatalog.sha256,workerSourceSha256,unloaded:true,modelLoads:1,cleanup:{mechanism:'torch._C._cuda_clearCublasWorkspaces',allocatedBeforeWorkspaceClearBytes:1024,reservedBeforeWorkspaceClearBytes:2048,endingAllocatedBytes:0,endingReservedBytes:512}};
-  const nativeFile=write(prefix+'/native-manifest.json',native),result=write(prefix+'/native-result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:1,status:'succeeded',workflow:'media',operation:'generate',hostContextSha256:ref(host).sha256,runtime:build,data:native});
+  const nativeFile=write(prefix+'/native-manifest.json',native),result=write(prefix+'/native-result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:2,status:'succeeded',workflow:'media',operation:'generate',hostContextSha256:ref(host).sha256,runtime:build,data:native});
   const manifest={schemaVersion:1,runId:sourceRequest.requestId+'-0',createdAt:new Date().toISOString(),backend:{kind:'local',provider:'Owned fixture',capability:'ace-step-turbo',toolVersion:sourceRevision},
     modality:'music',model:{name:'ace-step-turbo',revision:'owned-fixture-snapshot',digest:modelDigest,license:'OWNED synthetic license only'},workflow:{name:'Owned synthetic fixture',revision:sourceRevision,digest:workerSourceSha256},
     generation:{prompt:selected.request.items[0].prompt,negativePrompt:unavailable,seed:17,parameters:{nativeManifest:ref(nativeFile),nativeResult:ref(result),hostContext:ref(host),sourceRequest:ref(source),modelCatalog,runtime:{build,revision:sourceRevision,resourceCatalogSha256:build.resourceCatalogSha256,sourceRevisionEvidence},requested:measured.requested,actual:measured.actual,execution:selected.request.settings}},
@@ -72,7 +72,7 @@ function provenance(stateFile,selected=brief,prefix='inputs'){
 async function main(){
   const help=cp.spawnSync(process.execPath,[path.join(runtime.BASE,'commands/lib/media-pipeline-command.cjs'),'MUSIC','--help'],{cwd:root,encoding:'utf8'});
   check(help.status===0&&/setup-plan/.test(help.stdout)&&/recover/.test(help.stdout),'Actual help works without initializing or resolving a host');
-  const shell=process.env.OPENCAW_BASH||(process.platform==='win32'?'C:/Program Files/Git/bin/bash.exe':'bash');
+  const shell=process.env.HEPHAERA_BASH||(process.platform==='win32'?'C:/Program Files/Git/bin/bash.exe':'bash');
   const wrapper=cp.spawnSync(shell,[path.join(runtime.BASE,'commands/music-pipeline.sh').replace(/\\/g,'/'),'--help'],{cwd:root,encoding:'utf8'});
   check(wrapper.status===0&&/music-pipeline/.test(wrapper.stdout),'Real Bash MUSIC wrapper help works outside initialized host');
   const schema=JSON.parse(fs.readFileSync(path.join(runtime.BASE,'.media/pipelines/music/brief.schema.json'),'utf8'));
@@ -82,7 +82,7 @@ async function main(){
   for(const filename of ['brief.local.json','brief.song.local.json','brief.cloud.json']){
     const example=JSON.parse(fs.readFileSync(path.join(runtime.BASE,'.media/pipelines/music/examples',filename),'utf8'));
     example.request.rights=brief.request.rights;if(example.provider==='LOCAL')example.request.installation=brief.request.installation;
-    if(example.kind==='supplied-lyrics')example.lyricsRights=ref(write('inputs/example-'+filename+'.lyrics.json',{schemaVersion:'opencaw-music-lyrics-rights/v1',task,purpose:example.purpose,lyrics:example.request.items.map(item=>({itemId:item.id,lyricsSha256:crypto.createHash('sha256').update(item.music.lyrics,'utf8').digest('hex')})),rightsConfirmed:true,generationAllowed:false,sourceEvidence:lyricSource}));
+    if(example.kind==='supplied-lyrics')example.lyricsRights=ref(write('inputs/example-'+filename+'.lyrics.json',{schemaVersion:'hephaera-music-lyrics-rights/v1',task,purpose:example.purpose,lyrics:example.request.items.map(item=>({itemId:item.id,lyricsSha256:crypto.createHash('sha256').update(item.music.lyrics,'utf8').digest('hex')})),rightsConfirmed:true,generationAllowed:false,sourceEvidence:lyricSource}));
     write('inputs/example-'+filename,example);check(cli('brief',['--brief','inputs/example-'+filename]).valid,'Published '+filename+' validates after supplying only current owned evidence references');
   }
   const beforeBrief=snapshot();check(cli('brief',['--brief','inputs/brief.json']).valid===true,'Supported explicit native brief validates without execution');
@@ -119,7 +119,7 @@ async function main(){
   check(technicalReport.measurements[0].music.lyricsSha256===crypto.createHash('sha256').update(brief.request.items[0].music.lyrics,'utf8').digest('hex')&&!technicalReport.measurements[0].music.planningLmLoaded&&technicalReport.executions[0].cleanup.endingReservedBytes===512,'Actual CLI retains exact lyric identity, disabled planning and honest measured cleanup counters');
   reject('handoff',['--state',stateFile],/content/);
   const fingerprint=current(stateFile).assetSha256,reviewSource=ref(write('inputs/human-source.json',{fixture:'Synthetic review source; no human listened'}));
-  const content={schemaVersion:'opencaw-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'content',verdict:'accepted',reviewer:'Owned synthetic fixture only',reason:'Test explicit evidence binding, not acoustic quality',sourceEvidence:reviewSource,
+  const content={schemaVersion:'hephaera-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'content',verdict:'accepted',reviewer:'Owned synthetic fixture only',reason:'Test explicit evidence binding, not acoustic quality',sourceEvidence:reviewSource,
     criteria:{listenedEntireOutput:true,matchesBrief:true,intendedVocalContentReviewed:true,everySuppliedLineReviewed:true,artifactsAcceptable:true,headTailAccepted:true}};
   const missing=write('inputs/incomplete-review.json',{...content,criteria:{}});reject('review',['--state',stateFile,'--review',missing],/criteria/);
   const missingLine=copy(content);delete missingLine.criteria.everySuppliedLineReviewed;
@@ -134,9 +134,9 @@ async function main(){
   engines.generate(root,'THREEJS',{inline:true});const engine=lifecycle.engineIdentity(root);
   const target={directory:'assets/music/owned-fixture',codecs:['wav'],sampleRates:[48000],channels:[2],maxOutputBytes:33554432,maxAudioSeconds:20,spatialization:'2d',loopIntent:false};
   const distributionSource=ref(write('inputs/distribution-source.json',{fixture:'Synthetic distribution assertion, no real rights granted'}));
-  const distribution=ref(write('inputs/distribution.json',{schemaVersion:'opencaw-music-distribution/v1',task,purpose:brief.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
-  const targetEvidence=ref(write('inputs/target-evidence.json',{schemaVersion:'opencaw-music-runtime-evidence/v1',task,engine,outputs:source.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:reviewSource}));
-  const runtimeReview={schemaVersion:'opencaw-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'runtime',verdict:'accepted',reviewer:content.reviewer,reason:content.reason,sourceEvidence:reviewSource,
+  const distribution=ref(write('inputs/distribution.json',{schemaVersion:'hephaera-music-distribution/v1',task,purpose:brief.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
+  const targetEvidence=ref(write('inputs/target-evidence.json',{schemaVersion:'hephaera-music-runtime-evidence/v1',task,engine,outputs:source.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:reviewSource}));
+  const runtimeReview={schemaVersion:'hephaera-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'runtime',verdict:'accepted',reviewer:content.reviewer,reason:content.reason,sourceEvidence:reviewSource,
     criteria:{targetPlaybackReviewed:true,loadDisposeReviewed:true,spatializationReviewed:true},engine,target,rightsEvidence:distribution,targetEvidence};
   const missingDistribution=copy(runtimeReview);delete missingDistribution.rightsEvidence;
   reject('review',['--state',stateFile,'--review',write('inputs/missing-distribution.json',missingDistribution)],/identity|rights|path/i);
@@ -166,7 +166,7 @@ async function main(){
   }
   cli('review',['--state',stateFile,'--review','inputs/runtime-review.json']);
   const handoff=cli('handoff',['--state',stateFile]);check(handoff.promotion===false&&!fs.existsSync(path.join(root,target.directory)),'Actual handoff does not copy files');
-  const authorization=write('inputs/promotion.json',{schemaVersion:'opencaw-media-promotion/v1',authorized:true,assetSha256:fingerprint,target,outputs:source.outputs,authorizedBy:'Owned synthetic fixture; not a real permission',reason:'Exercise copying of harmless bytes inside owned fixture',sourceEvidence:ref(write('inputs/promotion-source.json',{fixture:'No real asset promotion authorization'}))});
+  const authorization=write('inputs/promotion.json',{schemaVersion:'hephaera-media-promotion/v1',authorized:true,assetSha256:fingerprint,target,outputs:source.outputs,authorizedBy:'Owned synthetic fixture; not a real permission',reason:'Exercise copying of harmless bytes inside owned fixture',sourceEvidence:ref(write('inputs/promotion-source.json',{fixture:'No real asset promotion authorization'}))});
   const invalidAuthorization=JSON.parse(fs.readFileSync(path.join(root,authorization),'utf8'));invalidAuthorization.outputs=[];
   reject('promote',['--state',stateFile,'--authorization',write('inputs/wrong-authorization.json',invalidAuthorization)],/different staged outputs/);
   for(const name of ['inputs/lyrics-source.json','inputs/distribution-source.json']){
@@ -238,7 +238,7 @@ async function main(){
     const failed=lifecycle.load({root,stateFile:failure.stateFile});
     check(failed.events.map(event=>event.kind).join(',')==='dispatch-started,dispatch-failed'&&current(failure.stateFile).stage==='dispatch-recorded','Failed attempt retains immutable start/failure and original request identity');
     await assert.rejects(coordinator.run(spec,args),/already exists or started/);observations.push('A failed started MUSIC version cannot retry or reset a candidate allowance');
-    const changedLedger=[...args];changedLedger[changedLedger.indexOf('--media-state')+1]='.opencaw/.cache/another-shared-state';
+    const changedLedger=[...args];changedLedger[changedLedger.indexOf('--media-state')+1]='.hephaera/.cache/another-shared-state';
     await assert.rejects(coordinator.run(spec,changedLedger),/already exists or started/);observations.push('Changing a workspace ledger does not replenish a started attempt');
     check(failedCalls===1&&lifecycle.load({root,stateFile:failure.stateFile}).events.length===2,'Blocked retries never enter native boundary or rewrite failure history');
   }finally{adapter.invoke=oldInvoke;}

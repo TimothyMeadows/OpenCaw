@@ -1,6 +1,6 @@
 ---
 name: adapt-external-agent-skills
-description: Redesign an external agent capability as a concise OpenCaw-native role, skill, command, or rejection decision. Use after a security review when useful behavior must be integrated without copying source text, code, assets, identities, vendor assumptions, or unsafe side effects.
+description: Redesign an external agent capability as a concise Hephaera-native role, skill, command, or rejection decision. Use after a security review when useful behavior must be integrated without copying source text, code, assets, identities, vendor assumptions, or unsafe side effects.
 engines: [AGNOSTIC]
 ---
 
@@ -8,7 +8,7 @@ engines: [AGNOSTIC]
 
 ## When to use
 
-- Turning an audited capability into OpenCaw behavior.
+- Turning an audited capability into Hephaera behavior.
 - Consolidating overlapping public skills into a smaller native workflow.
 - Deciding whether to enhance an existing role or skill instead of adding one.
 
@@ -23,7 +23,7 @@ engines: [AGNOSTIC]
 
 ## Output
 
-- A disposition with rationale and affected OpenCaw surfaces.
+- A disposition with rationale and affected Hephaera surfaces.
 - A decision-complete native specification.
 - Validation evidence showing no placeholders, broken mappings, or unsafe behavior.
 

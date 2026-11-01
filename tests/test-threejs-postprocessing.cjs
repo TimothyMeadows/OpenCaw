@@ -9,7 +9,7 @@ const crypto = require('node:crypto');
 const engine = require('../commands/lib/engine-contract.cjs');
 const postprocessing = require('../commands/lib/threejs-postprocessing.cjs');
 const ROOT = path.resolve(__dirname, '..');
-const parent = path.join(ROOT, '.opencaw/.cache/tasks/opencaw-threejs-postprocessing');
+const parent = path.join(ROOT, '.hephaera/.cache/tasks/hephaera-threejs-postprocessing');
 fs.mkdirSync(parent, { recursive: true });
 const fixtures = fs.mkdtempSync(path.join(parent, 'cli-fixtures-'));
 const cliFile = path.join(ROOT, 'commands/lib/threejs-postprocessing.cjs');
@@ -68,7 +68,7 @@ try {
   const absent = inspect(missing);
   equal(absent.backend, 'PMNDRS_POSTPROCESSING'); equal(absent.metadataReadyForIntegration, false);
   equal(absent.installedContent, 'unverified'); equal(absent.executionReadiness, 'unverified');
-  equal(snapshot(missing), before); equal(fs.existsSync(path.join(missing, '.opencaw')), false);
+  equal(snapshot(missing), before); equal(fs.existsSync(path.join(missing, '.hephaera')), false);
 
   const root = ready('metadata'); const baseline = snapshot(root); const result = inspect(root);
   equal(result.testedPair, true); equal(result.metadataReadyForIntegration, true);
@@ -83,7 +83,7 @@ try {
   rejects(() => inspect(root, { renderer: 'UnknownRenderer' }), /renderer/i);
 
   const native = host('native', 'UNITY'); rejects(() => inspect(native), /THREEJS/);
-  equal(fs.existsSync(path.join(native, '.opencaw')), false);
+  equal(fs.existsSync(path.join(native, '.hephaera')), false);
   const stale = ready('stale-manifest'); const manifest = json(path.join(stale, 'package.json'));
   manifest.dependencies['postprocessing'] = '6.38.0'; write(stale, 'package.json', manifest);
   equal(inspect(stale).metadataReadyForIntegration, false);
@@ -110,14 +110,14 @@ try {
 
   const gpu = ready('gpu'); const gpuBefore = snapshot(gpu); rejects(() => postprocessing.scaffold(gpu, { renderer: 'WebGPURenderer' }), /WebGPU|WebGL/i); equal(snapshot(gpu), gpuBefore);
   const unsafe = ready('unsafe-output');
-  for (const output of ['../outside', '/outside', 'src/../outside', 'src\\fx', '.opencaw/fx', '.git/fx', 'node_modules/fx', 'commands/fx', 'runtime/fx', 'src/fx:stream', 'src/fx.', 'src/NUL']) rejects(() => postprocessing.scaffold(unsafe, { output }), /path|Output|traversal|scope|root/i);
+  for (const output of ['../outside', '/outside', 'src/../outside', 'src\\fx', '.hephaera/fx', '.git/fx', 'node_modules/fx', 'commands/fx', 'runtime/fx', 'src/fx:stream', 'src/fx.', 'src/NUL']) rejects(() => postprocessing.scaffold(unsafe, { output }), /path|Output|traversal|scope|root/i);
   write(unsafe, 'occupied/sentinel.txt', 'foreign'); rejects(() => postprocessing.scaffold(unsafe, { output: 'occupied' }), /exists/i); equal(fs.readFileSync(path.join(unsafe, 'occupied/sentinel.txt'), 'utf8'), 'foreign');
   write(unsafe, 'bad-parent', 'file'); rejects(() => postprocessing.scaffold(unsafe, { output: 'bad-parent/postprocessing' }), /directory|ENOTDIR/i);
 
   ok(fs.existsSync(path.join(template, 'postprocessing-runtime.mjs')));
   const fresh = ready('scaffold'); const filesBefore = snapshot(fresh); const created = postprocessing.scaffold(fresh, { renderer: 'WebGLRenderer' });
   equal(created.backend, 'PMNDRS_POSTPROCESSING'); equal(created.installationPerformed, false); equal(created.executionReadiness, 'unverified');
-  const output = path.join(fresh, created.output), receipt = json(path.join(output, 'opencaw-postprocessing.json'));
+  const output = path.join(fresh, created.output), receipt = json(path.join(output, 'hephaera-postprocessing.json'));
   for (const source of receipt.source) equal(hash(path.join(output, source.name)), hash(path.join(template, source.name)));
   equal(receipt.dependencies.metadataReadyForIntegration, true); equal(receipt.runtimeAcceptance, 'unverified');
   for (const [name, sha] of filesBefore.filter(([, value]) => value !== 'directory')) equal(hash(path.join(fresh, name)), sha);
@@ -125,14 +125,14 @@ try {
   rejects(() => postprocessing.scaffold(fresh, { output: `${created.output}/nested` }), /nest|owned/i);
   const symlinkOutput = ready('linked-output'); const outside = host('outside');
   if (link(outside, path.join(symlinkOutput, 'src'))) rejects(() => postprocessing.scaffold(symlinkOutput), /link|symbolic/i);
-  const locked = ready('locked'); fs.mkdirSync(path.join(locked, '.opencaw/.cache/threejs-postprocessing/scaffolds/operation.lock'), { recursive: true }); rejects(() => postprocessing.scaffold(locked), /lock/i); ok(fs.existsSync(path.join(locked, '.opencaw/.cache/threejs-postprocessing/scaffolds/operation.lock')));
+  const locked = ready('locked'); fs.mkdirSync(path.join(locked, '.hephaera/.cache/threejs-postprocessing/scaffolds/operation.lock'), { recursive: true }); rejects(() => postprocessing.scaffold(locked), /lock/i); ok(fs.existsSync(path.join(locked, '.hephaera/.cache/threejs-postprocessing/scaffolds/operation.lock')));
 
-  const override = host('override', 'UNITY'); write(override, '.opencaw/.cache/tasks/postfx/TASK.md', '# isolated postprocessing test\n');
+  const override = host('override', 'UNITY'); write(override, '.hephaera/.cache/tasks/postfx/TASK.md', '# isolated postprocessing test\n');
   const selected = engine.resolve(override, { override: 'THREEJS', task: 'postfx', scope: 'prototypes/postfx', recordOverride: true });
   rejects(() => postprocessing.scaffold(override, { engineEvidence: selected.evidence }), /scope|outside|prototype/i);
   const isolated = postprocessing.scaffold(override, { engineEvidence: selected.evidence, output: 'prototypes/postfx/postprocessing' }); equal(isolated.output, 'prototypes/postfx/postprocessing'); equal(isolated.dependencies.executionReadiness, 'unverified');
 
-  const installed = host('installed'); const baselineDir = path.join(installed, '.opencaw');
+  const installed = host('installed'); const baselineDir = path.join(installed, '.hephaera');
   for (const file of ['commands/lib/engine-contract.cjs', 'commands/lib/threejs-postprocessing.cjs', '.engine/registry.json', ...Object.keys(JSON.parse(fs.readFileSync(path.join(ROOT, '.engine/registry.json'))).engines).map(id => `.engine/${id}.md`)]) { const target = path.join(baselineDir, file); fs.mkdirSync(path.dirname(target), { recursive: true }); fs.copyFileSync(path.join(ROOT, file), target); }
   fs.cpSync(template, path.join(baselineDir, '.engine/threejs/postprocessing'), { recursive: true });
   require(path.join(baselineDir, 'commands/lib/engine-contract.cjs')).generate(installed, 'THREEJS'); dependencies(installed);

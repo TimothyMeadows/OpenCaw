@@ -17,7 +17,7 @@ function manifest() {
   const value = JSON.parse(fs.readFileSync(path.join(DIRECTORY, 'fixture.json'), 'utf8'));
   if (value.schemaVersion !== 1 || value.engine !== 'UNITY' || !Array.isArray(value.cases) || value.cases.length !== 16 || new Set(value.cases.map(test => test.id)).size !== 16) fail('Invalid Unity feature inventory');
   for (const test of value.cases) {
-    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(test.id) || !/^OpenCawUnity(?:Content|Presentation|Tooling)Cases\.[A-Za-z][A-Za-z0-9]*$/.test(test.method) || test.method.split('.').at(-1) !== test.id || !Number.isInteger(test.minimumChecks) || test.minimumChecks < 1 || !test.limit) fail('Invalid Unity feature case contract');
+    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(test.id) || !/^HephaeraUnity(?:Content|Presentation|Tooling)Cases\.[A-Za-z][A-Za-z0-9]*$/.test(test.method) || test.method.split('.').at(-1) !== test.id || !Number.isInteger(test.minimumChecks) || test.minimumChecks < 1 || !test.limit) fail('Invalid Unity feature case contract');
   }
   if (value.manual.length !== 10 || new Set(value.manual.map(test => test.id)).size !== 10) fail('Incomplete Unity supplemental procedures');
   return value;
@@ -106,7 +106,7 @@ function inspectReport(file, test, runId, inputSha256, startedAt, expectedVersio
   const stat = fs.statSync(file);
   if (stat.mtimeMs < startedAt - 2000 || stat.mtimeMs > Date.now() + 2000) fail('Stale native Unity report timestamp');
   const report = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
-  if (report.schemaVersion !== 1 || report.fixture !== 'opencaw-unity-feature' || report.caseName !== test.id || report.runId !== runId || report.inputSha256 !== inputSha256 || report.engineVersion !== expectedVersion) fail('Wrong or stale native Unity report identity');
+  if (report.schemaVersion !== 1 || report.fixture !== 'hephaera-unity-feature' || report.caseName !== test.id || report.runId !== runId || report.inputSha256 !== inputSha256 || report.engineVersion !== expectedVersion) fail('Wrong or stale native Unity report identity');
   if (!['pass', 'blocked', 'fail'].includes(report.status) || typeof report.reason !== 'string' || !report.reason || !Array.isArray(report.observations) || !Number.isInteger(report.checks) || report.checks < 0) fail('Incomplete native Unity report');
   const start = Date.parse(report.startedUtc);
   if (!Number.isFinite(start) || start < startedAt - 2000 || start > Date.now() + 2000) fail('Stale native Unity invocation time');
@@ -145,16 +145,16 @@ async function run(context, api) {
   const verdict = (test, status, reason, details = {}) => ({ engine: 'UNITY', phase: test.execution === 'manual' ? 'manual-native' : 'native-feature', test: test.id, status, reason, ...details });
   const manual = meta.manual.map(test => ({ engine: 'UNITY', phase: 'manual-native', test: test.id, status: test.kind === 'online' ? 'blocked' : 'not-run', reason: test.reason }));
   const all = (status, reason) => [...meta.cases.map(test => verdict(test, status, reason)), ...manual];
-  const selected = process.env.OPENCAW_UNITY_FEATURE_CONFIG;
-  if (!selected) return all('blocked', 'Select a prepared repository-local OPENCAW_UNITY_FEATURE_CONFIG; no native tooling or service is installed');
+  const selected = process.env.HEPHAERA_UNITY_FEATURE_CONFIG;
+  if (!selected) return all('blocked', 'Select a prepared repository-local HEPHAERA_UNITY_FEATURE_CONFIG; no native tooling or service is installed');
   const configFile = api.safeLocalFile(selected);
   const relative = path.relative(ROOT, configFile).replaceAll(path.sep, '/');
-  if (!(relative.startsWith('tests/fixtures/engines/unity/features/') || /^\.opencaw\/\.cache\/tasks\/[a-z0-9-]+\//.test(relative)) || path.extname(configFile) !== '.json') fail('Unity fixture configuration must be task-local or inside its fixture directory');
+  if (!(relative.startsWith('tests/fixtures/engines/unity/features/') || /^\.hephaera\/\.cache\/tasks\/[a-z0-9-]+\//.test(relative)) || path.extname(configFile) !== '.json') fail('Unity fixture configuration must be task-local or inside its fixture directory');
   const config = configuration(configFile);
-  const editor = api.executable(process.env.OPENCAW_UNITY_EDITOR, ['Unity', 'Unity.exe']);
+  const editor = api.executable(process.env.HEPHAERA_UNITY_EDITOR, ['Unity', 'Unity.exe']);
   if (!editor) return all('blocked', 'Matching Unity Editor is unavailable');
-  const version = process.env.OPENCAW_UNITY_VERSION;
-  if (!versionPattern.test(version || '')) return all('blocked', 'Set exact OPENCAW_UNITY_VERSION for the matching installed Editor');
+  const version = process.env.HEPHAERA_UNITY_VERSION;
+  if (!versionPattern.test(version || '')) return all('blocked', 'Set exact HEPHAERA_UNITY_VERSION for the matching installed Editor');
   const inventory = packageInventory(DIRECTORY, api.safeLocalFile);
   const prepared = meta.cases.map(test => prerequisites(test, config, inventory, DIRECTORY, api.safeLocalFile));
   const results = [];
@@ -177,11 +177,11 @@ async function run(context, api) {
     const inputSha256 = crypto.createHash('sha256').update(JSON.stringify(inputs)).digest('hex');
     fs.writeFileSync(path.join(output, 'inputs.json'), JSON.stringify(inputs, null, 2) + '\n', { flag: 'wx' });
     const log = path.join(directory, 'editor.log');
-    const args = ['-batchmode', '-noUpm', '-projectPath', directory, '-executeMethod', 'OpenCawUnityFeatureDriver.Run', '-logFile', log];
+    const args = ['-batchmode', '-noUpm', '-projectPath', directory, '-executeMethod', 'HephaeraUnityFeatureDriver.Run', '-logFile', log];
     if (!test.graphics) args.push('-nographics');
     if (test.buildTarget) args.push('-buildTarget', test.buildTarget);
-    const env = { OPENCAW_UNITY_FEATURE_CASE: test.id, OPENCAW_UNITY_FEATURE_METHOD: test.method, OPENCAW_UNITY_FEATURE_RUN: runId, OPENCAW_UNITY_FEATURE_REPORT: report, OPENCAW_UNITY_FEATURE_OUTPUT: output, OPENCAW_UNITY_FEATURE_INPUT_SHA256: inputSha256, OPENCAW_UNITY_FEATURE_TIMEOUT_MS: String(context.timeoutMs || 180000), OPENCAW_UNITY_FEATURE_PLAYMODE: test.playMode ? '1' : '0' };
-    for (const key of Object.keys(test.settings)) env['OPENCAW_UNITY_FIXTURE_' + key] = config.settings[key];
+    const env = { HEPHAERA_UNITY_FEATURE_CASE: test.id, HEPHAERA_UNITY_FEATURE_METHOD: test.method, HEPHAERA_UNITY_FEATURE_RUN: runId, HEPHAERA_UNITY_FEATURE_REPORT: report, HEPHAERA_UNITY_FEATURE_OUTPUT: output, HEPHAERA_UNITY_FEATURE_INPUT_SHA256: inputSha256, HEPHAERA_UNITY_FEATURE_TIMEOUT_MS: String(context.timeoutMs || 180000), HEPHAERA_UNITY_FEATURE_PLAYMODE: test.playMode ? '1' : '0' };
+    for (const key of Object.keys(test.settings)) env['HEPHAERA_UNITY_FIXTURE_' + key] = config.settings[key];
     const startedAt = Date.now();
     const executed = await context.run(editor, args, { cwd: directory, log: path.join(directory, 'process.log'), env });
     const failure = api.nativeFailure(executed);

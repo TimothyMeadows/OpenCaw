@@ -236,7 +236,7 @@ function validatePathHash(root, record, label, usedPaths = null) {
 function validateCalibrationReport(root, profile, linked, gate, record, decision, label, usedPaths = null) {
   const located = validatePathHash(root, record, label, usedPaths);
   const report = readJson(located.absolute, label);
-  if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) {
+  if (report.schemaVersion !== 'hephaera-code-character-evidence/v1' || report.characterId !== profile.characterId) {
     fail(`${label} has the wrong schema or character identity.`);
   }
   if (report.captureMode !== 'fixture' || report.trustedMachineEvidence !== false) fail(`${label} must be an untrusted deterministic fixture report.`);
@@ -262,7 +262,7 @@ function validateCalibrationReport(root, profile, linked, gate, record, decision
 function validateMachineResultReport(root, profile, linked, gate, evidence) {
   const located = relativeArtifact(root, evidence.path, `${gate.id} machine report`);
   const report = readJson(located.absolute, `${gate.id} machine report`);
-  if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) fail(`${gate.id} machine report has the wrong schema or character identity.`);
+  if (report.schemaVersion !== 'hephaera-code-character-evidence/v1' || report.characterId !== profile.characterId) fail(`${gate.id} machine report has the wrong schema or character identity.`);
   if (report.captureMode !== 'browser' || report.trustedMachineEvidence !== true) fail(`${gate.id} pass requires trusted sandboxed browser evidence.`);
   const result = report.gateResults?.find((candidate) => candidate?.id === gate.id);
   if (!result || result.decision !== 'pass') fail(`${gate.id} machine report does not pass the target gate.`);
@@ -334,7 +334,7 @@ function validateProfile(root, profileValue, mode = 'base', profilePath = null) 
     ? profileValue
     : readJson(located.absolute, 'Character profile');
   onlyKeys(profile, ['schemaVersion', 'characterId', 'title', 'codeModel', 'intent', 'silhouette', 'structure', 'motion', 'budgets', 'reviewPolicy', 'gates'], 'profile');
-  if (profile.schemaVersion !== 'opencaw-code-character/v1') fail('schemaVersion must be opencaw-code-character/v1.');
+  if (profile.schemaVersion !== 'hephaera-code-character/v1') fail('schemaVersion must be hephaera-code-character/v1.');
   requireId(profile.characterId, 'characterId');
   requireString(profile.title, 'title');
 
@@ -629,8 +629,8 @@ function create(root, values) {
   requireString(options['intended-use'], '--intended-use');
   const linked = relativeArtifact(root, options.manifest, 'Linked code-model manifest');
   const linkedValidation = validateManifest(root, linked.absolute, 'base');
-  const output = relativeInside(root, options.output ?? `.opencaw/.cache/tasks/${characterId}/code-character.json`, 'Character profile output');
-  if (!output.relative.startsWith('.opencaw/.cache/tasks/')) fail('Character profile output must be below .opencaw/.cache/tasks/.');
+  const output = relativeInside(root, options.output ?? `.hephaera/.cache/tasks/${characterId}/code-character.json`, 'Character profile output');
+  if (!output.relative.startsWith('.hephaera/.cache/tasks/')) fail('Character profile output must be below .hephaera/.cache/tasks/.');
   if (fs.existsSync(output.absolute)) fail(`Character profile already exists: ${output.relative}`);
   fs.mkdirSync(path.dirname(output.absolute), { recursive: true });
   const modelParts = linkedValidation.manifest.runtime.parts;
@@ -648,7 +648,7 @@ function create(root, values) {
   const skeletonId = motionMode === 'skinned' ? requireId(options['skeleton-id'] ?? `${characterId}-skeleton`, '--skeleton-id') : null;
   const parts = modelParts.map((id, index) => ({ id, parent: index === 0 ? null : modelParts[0], role: index === 0 ? 'primary' : index === 1 ? 'secondary' : 'detail', required: true }));
   const profile = {
-    schemaVersion: 'opencaw-code-character/v1',
+    schemaVersion: 'hephaera-code-character/v1',
     characterId,
     title: options.title ?? characterId.split('-').map((word) => word[0].toUpperCase() + word.slice(1)).join(' '),
     codeModel: { manifest: linked.relative, modelId: linkedValidation.manifest.modelId },
@@ -752,7 +752,7 @@ function calibrationEvidence(root, profile, linked, gate, entries, decision, use
     if (usedPaths.has(located.relative)) fail(`Calibration report path is reused: ${located.relative}`);
     usedPaths.add(located.relative);
     const report = readJson(located.absolute, `${gate.id} ${decision} calibration report ${index + 1}`);
-    if (report.schemaVersion !== 'opencaw-code-character-evidence/v1' || report.characterId !== profile.characterId) {
+    if (report.schemaVersion !== 'hephaera-code-character-evidence/v1' || report.characterId !== profile.characterId) {
       fail(`${gate.id} ${decision} calibration report has the wrong schema or character identity.`);
     }
     if (report.captureMode !== 'fixture' || report.trustedMachineEvidence !== false) {

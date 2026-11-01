@@ -21,7 +21,7 @@ engines: [AGNOSTIC]
 4. Define semantic clip roles, looping, root motion, contact events, and skeleton compatibility.
 5. Define navigation, hurt, attack, and targeting colliders independently from the render mesh.
 6. Measure geometry, skeleton, material, texture, and package budgets on a representative target.
-7. Record provenance and verification in an `opencaw-rigged-actor/v1` manifest.
+7. Record provenance and verification in an `hephaera-rigged-actor/v1` manifest.
 8. Run `./commands/validate-rigged-actor-manifest.sh <manifest> --root <repo>`; add `--require-verified` before claiming production readiness.
 
 When the authored source is Blender, use `rig-and-animate-blender-actors` for armature, weighting, action, NLA, root-motion, and exportable-deform-bone preparation before this runtime contract begins.

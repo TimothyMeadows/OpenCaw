@@ -12,7 +12,7 @@ Implement per-player/world mutable state, checkpointing, save migration and rest
 
 ## Activation and inputs
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-save-systems`; require effective `UNREAL` and `compatible: true` before edits or launches. Respect validated task-only output scope. Keep observed project context under `.opencaw/.cache`; game saves use the project's supported platform storage, not OpenCaw task storage.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-save-systems`; require effective `UNREAL` and `compatible: true` before edits or launches. Respect validated task-only output scope. Keep observed project context under `.hephaera/.cache`; game saves use the project's supported platform storage, not Hephaera task storage.
 
 Inspect Unreal version, platform/user identity, slot/storage policy, authority, data sizes, supported older versions, migration rules and privacy requirements. Select local/platform/cloud storage explicitly; no account setup, third-party service or implicit license acceptance is part of this skill.
 

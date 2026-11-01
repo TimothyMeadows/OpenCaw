@@ -1,11 +1,12 @@
 'use strict';
 
-// OpenCaw owns policy and caller scope. Bubo owns every execution algorithm.
+// Hephaera owns policy and caller scope. Bubo owns every execution algorithm.
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
 const crypto = require('crypto');
 const runtime = require('./bubo-runtime.cjs');
+const transition = require('./state-transition.cjs');
 const engines = require('./engine-contract.cjs');
 const styles = require('./style-contract.cjs');
 const fail = message => { throw new Error(message); };
@@ -20,14 +21,14 @@ function parse(values) {
     const key = name.slice(2);
     const value = key === 'execute' && (index + 1 === values.length || values[index + 1].startsWith('--')) ? 'true'
       : index + 1 < values.length && !values[index + 1].startsWith('--') ? values[++index] : fail('Missing value for ' + name);
-    if (['host-context', 'api-version', 'baseline-root', 'state-root', 'staging-root', 'runtime-build-sha256'].includes(key)) fail('OpenCaw supplies protected execution option --' + key + '.');
+    if (['host-context', 'api-version', 'baseline-root', 'state-root', 'staging-root', 'runtime-build-sha256'].includes(key)) fail('Hephaera supplies protected execution option --' + key + '.');
     if (key === 'execute' && value !== 'true') fail('--execute accepts only true; omit it for dry-run setup.');
     options.set(key, value);
   }
   return options;
 }
 function bash() {
-  if (process.env.OPENCAW_BASH) { runtime.components(process.env.OPENCAW_BASH); return process.env.OPENCAW_BASH; }
+  if (process.env.HEPHAERA_BASH) { runtime.components(process.env.HEPHAERA_BASH); return process.env.HEPHAERA_BASH; }
   if (process.platform === 'win32') {
     for (const folder of [process.env.ProgramFiles, process.env['ProgramFiles(x86)']].filter(Boolean)) {
       const candidate = path.join(folder, 'Git/bin/bash.exe');
@@ -36,12 +37,12 @@ function bash() {
   }
   const result = process.platform === 'win32' ? cp.spawnSync('where.exe', ['bash'], { encoding: 'utf8', windowsHide: true }) : cp.spawnSync('which', ['bash'], { encoding: 'utf8' });
   const found = result.status === 0 ? result.stdout.trim().split(/\r?\n/)[0] : null;
-  if (!found) fail('An existing Bash runtime is required by OpenCaw policy resolvers; nothing was installed.');
+  if (!found) fail('An existing Bash runtime is required by Hephaera policy resolvers; nothing was installed.');
   return found;
 }
 function policyCommand(command, args, root, asJson = true) {
   const shellPath = value => process.platform === 'win32' ? value.replace(/\\/g, '/') : value;
-  const value = runtime.run(bash(), [shellPath(path.join(runtime.BASE, 'commands', command)), ...args.map(shellPath)], { env: { ...process.env, OPENCAW_PROJECT_ROOT: shellPath(root) } });
+  const value = runtime.run(bash(), [shellPath(path.join(runtime.BASE, 'commands', command)), ...args.map(shellPath)], { env: { ...process.env, HEPHAERA_PROJECT_ROOT: shellPath(root) } });
   return asJson ? JSON.parse(value) : value;
 }
 function executable(value, root, required = false) {
@@ -60,7 +61,7 @@ function executable(value, root, required = false) {
 }
 function contextFor(workflow, operation, options, info) {
   const rootArg = options.get('root');
-  if (!rootArg) fail('Explicit resolved --root is required; OpenCaw never infers a workspace parent.');
+  if (!rootArg) fail('Explicit resolved --root is required; Hephaera never infers a workspace parent.');
   const root = path.resolve(runtime.native(rootArg)); runtime.components(root);
   runtime.syntax(root);
   if (!fs.statSync(root).isDirectory()) fail('Project root must be a real directory.');
@@ -72,7 +73,7 @@ function contextFor(workflow, operation, options, info) {
   if (options.has('task') && state && state.task !== task) fail('Manifest/task ownership mismatch.');
   if (operation !== 'init' && (!state || !manifest)) fail('A current --manifest is required.');
   if (state && (!state.hostPolicySha256 || !state.runtimeBuildSha256)) fail('Historical pre-extraction state is preserved. Initialize a new asset version with retained ancestry and fresh affected verification; do not rewrite old approvals.');
-  const stateRoot = '.opencaw/.cache/tasks/' + task;
+  const stateRoot = '.hephaera/.cache/tasks/' + task;
   if (manifest && !relative(manifest).startsWith(stateRoot + '/')) fail('Manifest must stay in the active canonical task cache.');
   const references = new Map(); const tools = new Map(); const visitedJson = new Set();
   function reference(value, kind = 'input') {
@@ -191,11 +192,13 @@ async function invoke(workflow, operation, options) {
   return execute(workflow, operation, options, prepared, info);
 }
 async function execute(workflow, operation, options, prepared, info, emit = true) {
+  const readOnlyInspection=workflow==='blender-inspection'&&operation==='inspect'&&prepared.context?.policy?.purpose==='read-only-blender-inspection';
+  if(!readOnlyInspection)transition.assertProductionAllowed(prepared.root,workflow+' '+operation);
   const folder = runtime.projectPath(prepared.root, prepared.stateRoot + '/bubo-host/' + crypto.randomUUID());
   fs.mkdirSync(folder, { recursive: true }); runtime.components(folder);
   const contextFile = path.join(folder, 'host-context.json');
   fs.writeFileSync(contextFile, JSON.stringify(prepared.context, null, 2) + '\n', { flag: 'wx' });
-  const args = [workflow, operation, '--api-version', '1', '--host-context', contextFile];
+  const args = [workflow, operation, '--api-version', '2', '--host-context', contextFile];
   for (const [name, value] of options) args.push('--' + name, value);
   const executionStarted = performance.now();
   const child = cp.spawn(info.executable, args, { cwd: prepared.root, windowsHide: true, stdio: ['ignore', 'pipe', 'inherit'] });
@@ -217,7 +220,7 @@ async function execute(workflow, operation, options, prepared, info, emit = true
     modelLoadingMilliseconds: null, inferenceMilliseconds: null,
     limits: 'Runtime process includes CLI startup and workflow/native work. Host does not infer model-loading or inference phases from elapsed time.' }, null, 2) + '\n', { flag: 'wx' });
   if (status !== 0 || result.status !== 'succeeded') fail(result.error || 'Bubo execution failed; inspect retained task-local evidence.');
-  if (result.schemaVersion !== 'bubo-execution-result/v1' || result.apiVersion !== 1 || result.hostContextSha256 !== runtime.hash(contextFile)) fail('Bubo result/context identity mismatch.');
+  if (result.schemaVersion !== 'bubo-execution-result/v1' || result.apiVersion !== 2 || result.hostContextSha256 !== runtime.hash(contextFile)) fail('Bubo result/context identity mismatch.');
   if (emit && result.data && typeof result.data === 'object') console.log(JSON.stringify(result.data));
   else if (emit && result.data !== null && result.data !== undefined) console.log(String(result.data));
   return result;

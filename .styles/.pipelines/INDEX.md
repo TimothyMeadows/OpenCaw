@@ -1,6 +1,6 @@
 # Art Pipelines
 
-OpenCaw separates visual language from the method used to produce it. Every generated `STYLE.md` selects one or more art style templates and exactly one primary art pipeline.
+Hephaera separates visual language from the method used to produce it. Every generated `STYLE.md` selects one or more art style templates and exactly one primary art pipeline.
 
 Primary art pipelines selectable in `STYLE.md`:
 

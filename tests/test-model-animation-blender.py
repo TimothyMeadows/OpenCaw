@@ -31,7 +31,7 @@ class MotionProduction(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if not Path(BLENDER).is_file():raise unittest.SkipTest('BLOCKED: Blender4.5 unavailable; no installation attempted')
-        evidence=ROOT/'.opencaw/.cache/tasks/model-to-animation-design/evidence';evidence.mkdir(parents=True,exist_ok=True)
+        evidence=ROOT/'.hephaera/.cache/tasks/model-to-animation-design/evidence';evidence.mkdir(parents=True,exist_ok=True)
         cls.work=Path(tempfile.mkdtemp(prefix='blender-motion-tests-',dir=evidence));cls.project=cls.work/'project';cls.project.mkdir()
         cls.calls=[]
         cls.run_blender(ROOT/'tests/fixtures/model-animation/create_assets.py',['--output',str(cls.project/'inputs')],'create-fixtures')
@@ -70,7 +70,7 @@ class MotionProduction(unittest.TestCase):
         if not success:
             if result.exists():raise AssertionError('Failed stage emitted a passing-looking result')
             return process
-        value=json.loads(result.read_text());assert value['operation']==operation and value['schemaVersion']=='opencaw-motion-stage/v1'
+        value=json.loads(result.read_text());assert value['operation']==operation and value['schemaVersion']=='hephaera-motion-stage/v1'
         for artifact in value['artifacts'].values():assert (cls.project/artifact).is_file(),artifact
         return value
 

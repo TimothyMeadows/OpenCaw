@@ -1,6 +1,6 @@
 ---
 name: goal-flow
-description: Manage explicitly requested OpenCaw goals as automated multi-task delivery flows with automatic per-task PR creation and required post-PR QA.
+description: Manage explicitly requested Hephaera goals as automated multi-task delivery flows with automatic per-task PR creation and required post-PR QA.
 engines: [AGNOSTIC]
 ---
 
@@ -12,7 +12,7 @@ Do not activate goal flow from the generic `## Goal` section in a normal `TASK.m
 Do not activate or create goal flow while repository-root `BRAINSTORM.md` is active. Brainstorm must be explicitly closed and converted into a plan first.
 
 ## Output
-- goal file path under `../.opencaw/.cache/goals/<goal_name>/GOAL.md`
+- goal file path under `../.hephaera/.cache/goals/<goal_name>/GOAL.md`
 - ordered goal task list
 - task flow mode marked as `goal`
 - per-task PR readiness report generated with goal automation enabled

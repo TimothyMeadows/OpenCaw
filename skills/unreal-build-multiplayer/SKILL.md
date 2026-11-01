@@ -12,7 +12,7 @@ Build Unreal replication and multiplayer lifecycles with explicit server authori
 
 ## Activation and prerequisites
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-multiplayer` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-multiplayer` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
 
 Read Unreal version, replication system selection, listen/dedicated topology, player counts, target transports/platforms, session identity and network budgets. Iris, Replication Graph and online service plugins are explicit decisions.
 

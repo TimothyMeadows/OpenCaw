@@ -142,7 +142,7 @@ async function run(spec,values) {
     const task=prior?.asset.task || options.task, asset=prior?.asset.asset || options.asset;
     const brief=spec.validateBrief(read(root,options.brief),{root,task});
     if(!spec.modalities.includes(brief.kind))fail('Brief kind is unsupported by this domain.');
-    const workspace=options.workspace || '.opencaw/.cache/bubo-media';
+    const workspace=options.workspace || '.hephaera/.cache/bubo-media';
     const stagingRoot=options['staging-root'] || (options.workspace?workspace+'/staging/'+spec.domain.toLowerCase():prior?.asset.stagingRoot)
       || (brief.provider==='LOCAL'?workspace+'/staging/'+spec.domain.toLowerCase():'.art-staging/media/'+spec.domain.toLowerCase());
     const result=lifecycle.init({root,task,asset,version:options.version,domain:spec.domain,modality:brief.kind,brief:options.brief,stagingRoot,

@@ -6,15 +6,15 @@ const fs=require('fs'),path=require('path'),cp=require('child_process'),assert=r
 const runtime=require('../commands/lib/bubo-runtime.cjs'),contracts=require('../commands/lib/media-pipeline-contract.cjs');
 const state=require('../commands/lib/media-pipeline-state.cjs'),promotion=require('../commands/lib/media-pipeline-promotion.cjs');
 const engines=require('../commands/lib/engine-contract.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-audio-pipeline/evidence/promotion-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-audio-pipeline/evidence/promotion-fixtures');fs.mkdirSync(evidence,{recursive:true});
 const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-promotion',observations=[];
 function write(name,value){const file=path.join(root,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');return name;}
 const ref=name=>state.identity(root,name),check=(value,message)=>{assert(value,message);observations.push(message);};
 const rejects=(action,pattern,message)=>{assert.throws(action,pattern,message);observations.push(message);};
 const unavailable={unavailable:true,reason:'Owned synthetic metadata only'};
-write(`.opencaw/.cache/tasks/${task}/TASK.md`,'# Owned test task\n');
-write('MEDIA.md','# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n'));
+write(`.hephaera/.cache/tasks/${task}/TASK.md`,'# Owned test task\n');
+write('MEDIA.md','# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n'));
 contracts.generate({root,domain:'AUDIO',inline:true});engines.generate(root,'THREEJS',{inline:true});
 function make(name,{count=1,destination='assets/audio/'+name}={}){
   const brief=write('inputs/'+name+'.brief.json',{fixture:'No media requested; metadata test only'});
@@ -30,7 +30,7 @@ function make(name,{count=1,destination='assets/audio/'+name}={}){
     runtime:{destination:unavailable,budgets:{bytes:4096}},review:{status:'pending',reviewer:unavailable,reviewedAt:unavailable,notes:'No actual listening'}});
   state.recordCandidate({...opts,manifest,provider:'CLOUD'});
   const assetSha256=state.status(opts).assetSha256;
-  const technical=write('inputs/'+name+'.technical.json',{schemaVersion:'opencaw-media-technical/v1',assetSha256,outputs,status:'passed',
+  const technical=write('inputs/'+name+'.technical.json',{schemaVersion:'hephaera-media-technical/v1',assetSha256,outputs,status:'passed',
     checks:[{id:'synthetic',status:'passed',reason:'Metadata plumbing only; no actual waveform analysis'}],
     measurements:outputs.map(output=>({...output,bytes:fs.statSync(path.join(root,output.path)).size,durationSeconds:1,sampleRate:44100,channels:2}))});
   state.recordTechnical({...opts,report:technical});
@@ -39,13 +39,13 @@ function make(name,{count=1,destination='assets/audio/'+name}={}){
   const rights=ref(write('inputs/'+name+'.distribution.json',{sourceEvidence:leaf,fixture:true}));
   const target={directory:destination,codecs:['wav'],sampleRates:[44100],channels:[2],maxOutputBytes:4096,maxAudioSeconds:4};
   for(const kind of ['content','runtime']){
-    const review=write('inputs/'+name+'.'+kind+'.json',{schemaVersion:'opencaw-media-review/v1',assetSha256,outputs,kind,
+    const review=write('inputs/'+name+'.'+kind+'.json',{schemaVersion:'hephaera-media-review/v1',assetSha256,outputs,kind,
       verdict:'accepted',reviewer:'Synthetic test only',reason:'Exercise ownership and copying, no actual acceptance',sourceEvidence:human,
       ...(kind==='runtime'?{engine:state.engineIdentity(root),target,rightsEvidence:rights}:{})});
     state.recordReview({...opts,review});
   }
   const sourceEvidence=ref(write('inputs/'+name+'.promotion-source.json',{fixture:'Synthetic copy authorization only'}));
-  const authorization=write('inputs/'+name+'.authorization.json',{schemaVersion:'opencaw-media-promotion/v1',authorized:true,
+  const authorization=write('inputs/'+name+'.authorization.json',{schemaVersion:'hephaera-media-promotion/v1',authorized:true,
     assetSha256,outputs,target,authorizedBy:'Owned fixture',reason:'Copy only test-owned harmless bytes',sourceEvidence});
   const validate=()=>{state.identity(root,leaf);};
   return {...opts,authorization,validate,target,outputs,asset,leaf,sourceEvidence};
@@ -183,11 +183,11 @@ async function main(){
     write('inputs/alias-runtime.json',payload);state.recordReview({...aliased,review:'inputs/alias-runtime.json'});
     rejects(()=>promotion.promote(args(aliased)),/symbolic|junction/,'Promotion rejects a linked target ancestor before copying');
   }catch(error){if(error.code!=='EPERM')throw error;observations.push('SKIP: link fixture unavailable on this host');}
-  const corrupt=make('corrupt-claim-guard'),badClaim='.opencaw/.cache/media-promotions/claims/'+('f'.repeat(64))+'.json';
+  const corrupt=make('corrupt-claim-guard'),badClaim='.hephaera/.cache/media-promotions/claims/'+('f'.repeat(64))+'.json';
   write(badClaim,{schemaVersion:'unrecognized'});
   rejects(()=>promotion.promote(args(corrupt)),/Malformed promotion ownership claim/,'Malformed persisted ownership fails closed before runtime writes');
-  const validClaim=JSON.parse(fs.readFileSync(path.join(root,'.opencaw/.cache/media-promotions/claims',crypto.createHash('sha256').update(orphan.target.directory).digest('hex')+'.json'),'utf8'));
-  validClaim.state.path='.opencaw/.cache/tasks/missing-owner/media/audio/missing/v1/asset.json';write(badClaim,validClaim);
+  const validClaim=JSON.parse(fs.readFileSync(path.join(root,'.hephaera/.cache/media-promotions/claims',crypto.createHash('sha256').update(orphan.target.directory).digest('hex')+'.json'),'utf8'));
+  validClaim.state.path='.hephaera/.cache/tasks/missing-owner/media/audio/missing/v1/asset.json';write(badClaim,validClaim);
   rejects(()=>promotion.promote(args(corrupt)),/ENOENT|regular file/,'An unresolvable ownership source cannot be silently discarded');
   check(!fs.existsSync(path.join(root,corrupt.target.directory)),'Invalid ownership registry creates no runtime output');
   const report={assertions:observations.length,observations,root,limits:['Owned fixture byte copying and metadata only','Synthetic review/assertion fixtures are not actual acoustic/rights/user acceptance','No models, generation, external installs or real runtime asset promotion']};

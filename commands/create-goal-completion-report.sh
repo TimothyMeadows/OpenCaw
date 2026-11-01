@@ -43,9 +43,9 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/workflow-path-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
-goal_file="$(opencaw_workflow_file "$goal_ref" goals GOAL.md)"
+goal_file="$(hephaera_workflow_file "$goal_ref" goals GOAL.md)"
 goal_dir="$(cd "$(dirname "$goal_file")" && pwd)"
 goal_name="$(basename "$goal_dir")"
 report_file="$goal_dir/GOAL_REPORT.md"

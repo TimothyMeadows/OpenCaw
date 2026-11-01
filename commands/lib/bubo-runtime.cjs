@@ -60,12 +60,12 @@ const git = (root, args) => run('git', ['-C', root, ...args]).trim();
 function lock() {
   const value = json(path.join(BASE, 'runtime/bubo.lock.json'));
   if (value.schemaVersion !== 1 || value.path !== 'runtime/bubo' || value.repository !== 'https://github.com/TimothyMeadows/Bubo.git'
-      || !/^[a-f0-9]{40}$/.test(value.revision) || value.apiVersion !== 1 || !/^[a-f0-9]{64}$/.test(value.resourceCatalogSha256)
+      || !/^[a-f0-9]{40}$/.test(value.revision) || value.apiVersion !== 2 || !/^[a-f0-9]{64}$/.test(value.resourceCatalogSha256)
       || value.buildReceipt !== 'artifacts/bubo/build-info.json') fail('Invalid Bubo dependency lock.');
   return value;
 }
 function missing() {
-  return 'Bubo is not initialized. Run git -C "<project-root>/.opencaw" submodule update --init --recursive --checkout runtime/bubo, then run ./.opencaw/commands/build-bubo-runtime.sh. No sibling or source fallback was used.';
+  return 'Bubo is not initialized. Run git -C "<project-root>/.hephaera" submodule update --init --recursive --checkout runtime/bubo, then run ./.hephaera/commands/build-bubo-runtime.sh. No sibling or source fallback was used.';
 }
 function dependency() {
   const pinned = lock(), root = projectPath(BASE, pinned.path);
@@ -89,7 +89,7 @@ function resource(relative) {
 function verified() {
   const info = dependency(), folder = projectPath(info.root, 'artifacts/bubo');
   const receiptFile = projectPath(info.root, info.pinned.buildReceipt);
-  if (!fs.existsSync(receiptFile)) fail('Bubo CLI is not built. Run ./.opencaw/commands/build-bubo-runtime.sh explicitly; production never runs dotnet run or installs software.');
+  if (!fs.existsSync(receiptFile)) fail('Bubo CLI is not built. Run ./.hephaera/commands/build-bubo-runtime.sh explicitly; production never runs dotnet run or installs software.');
   const receipt = json(receiptFile), capability = receipt.capabilities, build = capability?.build;
   if (receipt.schemaVersion !== 'bubo-build/v1' || receipt.sourceRevision !== info.pinned.revision || receipt.sourceDirty !== false)
     fail('Bubo build receipt is stale/dirty or does not identify the pinned revision. Rebuild explicitly.');
@@ -109,13 +109,13 @@ function verified() {
   const executable = projectPath(folder, process.platform === 'win32' ? 'bubo.exe' : 'bubo');
   if (!fs.existsSync(executable)) fail('Bubo prebuilt apphost is missing; rebuild explicitly.');
   const live = JSON.parse(run(executable, ['capabilities', '--api-version', String(info.pinned.apiVersion)]));
-  if (live.schemaVersion !== 'bubo-capabilities/v1' || !live.apiVersions?.includes(1)
+  if (live.schemaVersion !== 'bubo-capabilities/v1' || !live.apiVersions?.includes(2)
       || JSON.stringify(canonical(live.build)) !== JSON.stringify(canonical(build))) fail('Bubo live capability/build identity differs from its receipt.');
   return { ...info, folder, executable, receipt, capability: live };
 }
 function main(args) {
   if (args.length === 1 && args[0] === 'verify') {
-    const info = verified(); console.log(JSON.stringify({ revision: info.pinned.revision, apiVersion: 1, build: info.capability.build }, null, 2)); return;
+    const info = verified(); console.log(JSON.stringify({ revision: info.pinned.revision, apiVersion: 2, build: info.capability.build }, null, 2)); return;
   }
   if (args.length === 2 && args[0] === 'resource') { console.log(resource(args[1])); return; }
   fail('Use bubo-runtime.cjs verify | resource RESOURCE_RELATIVE_PATH.');

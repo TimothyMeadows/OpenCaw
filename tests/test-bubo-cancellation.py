@@ -10,8 +10,8 @@ def main():
     if sys.platform!='linux':
         print('NOT RUN: managed Linux signal/group test requires Linux; Windows owned jobs have separate runtime coverage.')
         return 77
-    cache=ROOT/'.cache' if ROOT.name=='.opencaw' else ROOT/'.opencaw/.cache'
-    evidence=cache/'tasks/opencaw-integrate-bubo-runtime/evidence/cancellation'; evidence.mkdir(parents=True,exist_ok=True)
+    cache=ROOT/'.cache' if ROOT.name=='.hephaera' else ROOT/'.hephaera/.cache'
+    evidence=cache/'tasks/hephaera-integrate-bubo-runtime/evidence/cancellation'; evidence.mkdir(parents=True,exist_ok=True)
     project=Path(tempfile.mkdtemp(prefix='p-',dir=evidence))
     scene=project/'owned.blend'; scene.write_bytes(b'OWNED EMPTY ENGINEERING SCENE; native tool is a process fixture')
     tool=project/'sleep-fixture.sh'
@@ -33,7 +33,7 @@ def main():
             until=time.monotonic()+5
             while alive(pid) and time.monotonic()<until:time.sleep(.05)
             assert exitcode!=0 and not alive(pid),'Adapter cancellation must fail execution and retire its actual native descendant.'
-            requests=list((project/'.opencaw/.cache/tasks/blender-inspection/bubo-executions').glob('*/failure.json'))
+            requests=list((project/'.hephaera/.cache/tasks/blender-inspection/bubo-executions').glob('*/failure.json'))
             assert requests,'Bubo must retain managed failure evidence rather than terminate before cleanup.'
             result={'status':'pass','actualAdapter':True,'actualCli':True,'actualNativeProcessGroup':True,'nativeTool':'owned-sleeping-fixture-not-Blender','descendantRetired':True,'managedFailureReceipt':str(requests[0]),'seconds':time.monotonic()-started,'productionGeneration':False}
             (evidence/'latest.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')

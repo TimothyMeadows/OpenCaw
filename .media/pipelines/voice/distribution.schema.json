@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/voice-distribution-v1.json",
+  "$id": "https://hephaera.dev/schemas/voice-distribution-v1.json",
   "title": "Separate VOICE runtime distribution/public-disclosure grant",
   "description": "Source-backed assertion only. Runtime rehashes all nested sources and exact task/purpose/item/output bindings; a schema match is not actual human permission.",
   "type": "object",
@@ -15,7 +15,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "opencaw-voice-distribution/v1"
+      "const": "hephaera-voice-distribution/v1"
     },
     "task": {
       "type": "string",

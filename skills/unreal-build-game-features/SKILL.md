@@ -14,7 +14,7 @@ Implement modular feature activation, actor extension and teardown through Unrea
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-game-features` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate task override and output scope. A skill never selects its engine.
 
-Read host version, selected GameFeatures/ModularGameplay plugins, project policy, feature dependencies and applicable worlds. Sample-specific interfaces are not universal APIs. Record evidence only in resolved `.opencaw/.cache/tasks/<task>/`; preserve `ENGINE.md`.
+Read host version, selected GameFeatures/ModularGameplay plugins, project policy, feature dependencies and applicable worlds. Sample-specific interfaces are not universal APIs. Record evidence only in resolved `.hephaera/.cache/tasks/<task>/`; preserve `ENGINE.md`.
 
 ## Workflow
 

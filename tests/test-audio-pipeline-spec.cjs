@@ -4,8 +4,8 @@
 // establish no real installation, inference, acoustic measurement or listening.
 const assert=require('assert/strict'),fs=require('fs'),path=require('path'),crypto=require('crypto');
 const runtime=require('../commands/lib/bubo-runtime.cjs'),spec=require('../commands/lib/audio-pipeline.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-audio-pipeline/evidence/spec-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-audio-pipeline/evidence/spec-fixtures');fs.mkdirSync(evidence,{recursive:true});
 const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-audio';let sequence=0;const observations=[];
 const check=(value,message)=>{assert(value,message);observations.push(message);};
 const rejects=(action,pattern,message)=>{assert.throws(action,pattern,message);observations.push(message);};
@@ -20,7 +20,7 @@ write('MEDIA.md','Owned synthetic native-policy source; not a configured provide
 const base=JSON.parse(fs.readFileSync(path.join(runtime.BASE,'.media/pipelines/audio/examples/brief.local.json'),'utf8'));
 base.purpose='Owned test purpose';base.request.rights=rights;base.request.installation=installation;base.request.items[0]={id:'owned',prompt:'Synthetic fixture only',negativePrompt:'',seed:9,steps:10,guidance:7,seconds:1,loopCandidate:false};
 base.request.budget.maximumAudioSeconds=2;
-function fixture(brief=base,{mutateSource=()=>{},mutateNative=()=>{},mutateNeutral=()=>{}}={}){
+function fixture(brief=base,{mutateSource=()=>{},mutateNative=()=>{},mutateNeutral=()=>{},mutateResult=()=>{}}={}){
   const name='run-'+(++sequence),prefix='staging/'+name,sourceRevision='1'.repeat(40),build={cliSha256:'6'.repeat(64),resourceCatalogSha256:'2'.repeat(64),assemblies:{},launch:{}};
   const request={...spec.request(brief,{root,asset:{task}}),requestId:name,outputDirectory:'staging'};mutateSource(request);
   const sourceRequest=identity(write(prefix+'/source-request.json',request));
@@ -41,7 +41,8 @@ function fixture(brief=base,{mutateSource=()=>{},mutateNative=()=>{},mutateNeutr
     resourceCatalogSha256:build.resourceCatalogSha256,catalogSha256:modelCatalog.sha256,workerSourceSha256:'4'.repeat(64),completedAt:'2026-10-30T01:00:00Z'};
   const sourceRevisionEvidence=identity(write(prefix+'/build-info.json',{schemaVersion:'bubo-build/v1',sourceRevision,sourceDirty:false,capabilities:{build}}));
   mutateNative(native);const nativeManifest=identity(write(prefix+'/native-manifest.json',native));
-  const result={schemaVersion:'bubo-execution-result/v1',apiVersion:1,workflow:'media',operation:'generate',status:'succeeded',runtime:build,data:native,hostContextSha256:hostContext.sha256};
+  const result={schemaVersion:'bubo-execution-result/v1',apiVersion:2,workflow:'media',operation:'generate',status:'succeeded',runtime:build,data:native,hostContextSha256:hostContext.sha256};
+  mutateResult(result);
   const nativeResult=identity(write(prefix+'/result.json',result)),manifests=[];
   for(const output of native.outputs){
     const unavailable={unavailable:true,reason:'Owned metadata fixture; no provider operation occurred'};
@@ -148,6 +149,7 @@ try{
   const cloudContext={root,state:{asset:{task}},brief:cloud,candidate:{provider:'CLOUD',outputs:context.candidate.outputs},status:context.status};
   check(spec.technical(cloudContext).checks[0].status==='unavailable','Missing CLOUD analysis stays unavailable rather than borrowing requested metrics');
   rejects(()=>spec.request(cloud,{root,asset:{task}}),/session capability/,'CLOUD generation cannot silently fall back to LOCAL');
+  rejects(()=>spec.technical(fixture(base,{mutateResult:r=>r.apiVersion=1})),/ancestry differs/,'API1 evidence cannot masquerade as a current API2 dispatch');
   const history=historicalFixture(),historyReport=spec.technical(history);
   check(historyReport.status==='passed'&&historyReport.generationIdentities[0].sourceRevision==='1'.repeat(40),'Original-root import retains actual original commit and typed raw source evidence without rewriting it');
   check(historyReport.generationIdentities[0].sourceRunId==='old-native','Retained original run ID is not relabeled as a current dispatch');
@@ -161,7 +163,7 @@ try{
   check(spec.technical(unanchored).generationIdentities[0].sourceRevision.unavailable,'Truly undisclosed source revision remains explicit unavailable rather than a current PIN guess');
   rejects(()=>spec.technical(fixture(base,{mutateNeutral:n=>n.workflow.digest={unavailable:true,reason:'hide known digest'}})),/contradicts/,'A disclosed native worker digest cannot be hidden behind unavailable');
   const humanSource=identity(write('inputs/listening-source.json',{fixture:'Synthetic human-source assertion only, not an actual listening verdict'}));
-  const content={schemaVersion:'opencaw-media-review/v1',assetSha256:context.status.assetSha256,outputs:context.candidate.outputs,kind:'content',verdict:'accepted',reviewer:'Owned fixture',reason:'Exercise validation plumbing only',sourceEvidence:humanSource,
+  const content={schemaVersion:'hephaera-media-review/v1',assetSha256:context.status.assetSha256,outputs:context.candidate.outputs,kind:'content',verdict:'accepted',reviewer:'Owned fixture',reason:'Exercise validation plumbing only',sourceEvidence:humanSource,
     criteria:{listenedEntireOutput:true,matchesBrief:true,unwantedSpeechMusicAbsent:true,artifactsAcceptable:true,headTailAccepted:true}};
   check(spec.validateReview(content,context)===content,'Explicit complete AUDIO review criteria validate synthetic source plumbing');
   const missed=copy(content);missed.criteria.headTailAccepted=false;rejects(()=>spec.validateReview(missed,context),/complete-listening/,'Incomplete full-output content criteria reject acceptance');
@@ -169,9 +171,9 @@ try{
   const loopReview=copy(content);loopReview.criteria.loopSeamReviewed=true;check(spec.validateReview(loopReview,loopContext)===loopReview,'Explicit seam criterion completes only the requested loop review gate');
   const rejected={...content,verdict:'rejected',criteria:{matchesBrief:false}};check(spec.validateReview(rejected,context).verdict==='rejected','Explicit rejection remains recordable without fabricating positive criteria');
   const engine={engine:'THREEJS',sha256:'3'.repeat(64)},distributionSource=identity(write('inputs/distribution-source.json',{fixture:'Not real distribution authorization'}));
-  const rightsEvidence=identity(write('inputs/distribution.json',{schemaVersion:'opencaw-audio-distribution/v1',task,purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
+  const rightsEvidence=identity(write('inputs/distribution.json',{schemaVersion:'hephaera-audio-distribution/v1',task,purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
   const playbackSource=identity(write('inputs/playback-source.json',{fixture:'Not real target playback'}));
-  const targetEvidence=identity(write('inputs/target.json',{schemaVersion:'opencaw-audio-runtime-evidence/v1',task,engine,outputs:context.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
+  const targetEvidence=identity(write('inputs/target.json',{schemaVersion:'hephaera-audio-runtime-evidence/v1',task,engine,outputs:context.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
   const runtimeReview={...content,kind:'runtime',criteria:{targetPlaybackReviewed:true,loadDisposeReviewed:true,spatializationReviewed:true},engine,target:{spatialization:'2d',loopIntent:false},rightsEvidence,targetEvidence};
   check(spec.validateRuntimeReview(runtimeReview,context)===runtimeReview,'Runtime review binds separate rights and selected-engine source evidence');
   const noRights=copy(runtimeReview);delete noRights.rightsEvidence;rejects(()=>spec.validateRuntimeReview(noRights,context),/identity|object/,'Generation rights cannot replace separate runtime distribution evidence');

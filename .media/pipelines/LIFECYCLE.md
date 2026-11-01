@@ -14,7 +14,7 @@ Generation also retains immutable asset/brief/selected-contract references and d
 
 ## Ownership
 
-OpenCaw owns domain routing, host policy, task state, input rights and consent, staged-asset ancestry, review and runtime promotion. LOCAL execution stays behind the verified [Bubo media adapter](../../commands/bubo-media.sh). The pinned Bubo dependency owns model and tool identities, installation verification, synthesis, native process limits, cancellation, GPU ownership and atomic generation-attempt accounting. This layer creates no separate inference implementation or attempt allocator.
+Hephaera owns domain routing, host policy, task state, input rights and consent, staged-asset ancestry, review and runtime promotion. LOCAL execution stays behind the verified [Bubo media adapter](../../commands/bubo-media.sh). The pinned Bubo dependency owns model and tool identities, installation verification, synthesis, native process limits, cancellation, GPU ownership and atomic generation-attempt accounting. This layer creates no separate inference implementation or attempt allocator.
 
 Loading visual, AUDIO, MUSIC and VOICE contexts together does not permit simultaneous GPU inference. Proof reconstruction and LOCAL media use shared native GPU exclusion. The six-case LOCAL-media acceptance ledger covers image, SFX, instrumental, supplied-lyric, preset-speech and cloning cases under their original media approval; proof/model workflows keep their own existing approval/attempt records. A domain-local state directory must never become a separate media approval ledger. Keep the same physical shared media-state root for a media approval identity across tasks, domains, revisions, restarts and workspace changes.
 
@@ -23,7 +23,7 @@ Loading visual, AUDIO, MUSIC and VOICE contexts together does not permit simulta
 Each asset version binds the task, domain, original asset name, version, modality and brief to its policy and input identities. Each dispatched run additionally retains the actual provider, native request, runtime/build/settings and staged output identities. Keep host state below:
 
 ```text
-.opencaw/.cache/tasks/<task>/media/<audio|music|voice>/
+.hephaera/.cache/tasks/<task>/media/<audio|music|voice>/
 ```
 
 Keep generated media in the workflow's versioned non-runtime staging location. Domain state and native execution state remain separate. Native request IDs and resulting native output paths must include a collision-safe identity for domain, asset and version; a plain human name such as `candidate` is insufficient. Current native IDs are limited to 80 characters matching `[A-Za-z0-9][A-Za-z0-9._-]*`. Preserve the original human names separately and allocate a fresh version/request identity for a revision.
@@ -68,10 +68,10 @@ Domain validators remain responsible for applicable rights/consent, supported se
 | `nativeRequest` | Takes the state plus a native request object, explicit `provider: 'LOCAL'`, cache-local `workspace` and physically shared `mediaState`; returns the owned native request and final state/output paths without dispatching. Shared MEDIA policy must exist. |
 | `dispatch` | Uses the same inputs plus optional whitelisted `controls`, requires `executionAvailable`, saves the native request/start event and invokes the existing Bubo adapter. Retained starts prevent a fresh rerun of the same version even after failure. |
 | `recordCandidate` | Takes a provider-neutral manifest path and explicit `LOCAL` or `CLOUD` provider. Reuses the existing manifest validator, binds every exact staged output and records pending review. Replacing that candidate requires a new version. |
-| `recordTechnical` | Imports an `opencaw-media-technical/v1` report with the current asset fingerprint, exact ordered output identities, explicit check verdicts/reasons and any measured output properties. Unavailable or failed checks cannot produce a passed report. |
-| `recordReview` | Imports an `opencaw-media-review/v1` content or runtime review with the current fingerprint/output set, accepted/rejected verdict, reviewer, reason and a distinct source-evidence file identity. Runtime review also binds the current engine identity. |
+| `recordTechnical` | Imports an `hephaera-media-technical/v1` report with the current asset fingerprint, exact ordered output identities, explicit check verdicts/reasons and any measured output properties. Unavailable or failed checks cannot produce a passed report. |
+| `recordReview` | Imports an `hephaera-media-review/v1` content or runtime review with the current fingerprint/output set, accepted/rejected verdict, reviewer, reason and a distinct source-evidence file identity. Runtime review also binds the current engine identity. |
 | `admitHandoff` | Requires current passed technical, accepted content and accepted runtime evidence. Validates target format/rate/channel/duration/byte budgets, measured outputs and a fresh scoped assets destination, then returns a plan with `promotion: false`. |
-| `admitPromotion` | Requires handoff admission plus an `opencaw-media-promotion/v1` authorization binding the current fingerprint, exact outputs and target, authorizer, reason and source evidence. Returns an admitted plan; it performs no runtime copy. |
+| `admitPromotion` | Requires handoff admission plus an `hephaera-media-promotion/v1` authorization binding the current fingerprint, exact outputs and target, authorizer, reason and source evidence. Returns an admitted plan; it performs no runtime copy. |
 
 Use `status.assetSha256` for a technical report, review or promotion authorization's `assetSha256`: this is the current composite asset/policy/candidate fingerprint, not the hash of `asset.json` or an audio file. Evidence must bind all current outputs in the recorded order. A revision's parent must identify the same task, domain and asset with a different version.
 

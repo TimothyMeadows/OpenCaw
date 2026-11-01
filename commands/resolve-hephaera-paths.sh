@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/lib/memory-common.sh"
+
+hephaera_resolve_paths
+
+echo "HEPHAERA_PROJECT_ROOT=$HEPHAERA_PROJECT_ROOT_RESOLVED"
+echo "HEPHAERA_INSTALL_DIR=$HEPHAERA_INSTALL_DIR"
+echo "HEPHAERA_PROJECT_CACHE_DIR=$HEPHAERA_PROJECT_CACHE_DIR"
+echo "SYSTEM_MEMORY_FILE=$HEPHAERA_SYSTEM_MEMORY_FILE"
+echo "PROJECT_MEMORY_FILE=$HEPHAERA_PROJECT_MEMORY_FILE"
+echo "REPO_MAP_FILE=$HEPHAERA_REPO_MAP_FILE"

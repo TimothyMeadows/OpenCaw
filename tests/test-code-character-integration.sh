@@ -58,10 +58,10 @@ if sed -n '/| CA-036 |/,/| CA-040 |/p' skills/EXTERNAL_SOURCES.md | grep -Eqi 'h
 fi
 
 echo '[4/4] checking integrated validators and generated surfaces'
-require_text commands/validate-opencaw.sh './tests/test-code-character-contract.sh'
-require_text commands/validate-opencaw.sh './tests/test-code-character-skills.sh'
-require_text commands/validate-opencaw.sh './tests/test-code-character-evidence.sh'
-require_text commands/validate-opencaw.sh './tests/test-code-character-integration.sh'
+require_text commands/validate-hephaera.sh './tests/test-code-character-contract.sh'
+require_text commands/validate-hephaera.sh './tests/test-code-character-skills.sh'
+require_text commands/validate-hephaera.sh './tests/test-code-character-evidence.sh'
+require_text commands/validate-hephaera.sh './tests/test-code-character-integration.sh'
 bash commands/validate-readme.sh >/dev/null
 bash commands/validate-art-pipelines.sh >/dev/null
 bash commands/validate-role-skill-map.sh >/dev/null

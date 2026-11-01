@@ -143,10 +143,10 @@ def native_case(output, scripts, action_scripts):
                         obj=bpy.data.objects[('Geo.' if profile=='skinned' else '')+part]
                         identity=geometry_ids.get(part)
                         candidates=[obj] if obj.type=='MESH' else [child for child in bpy.context.scene.objects if child.type=='MESH' and identity is not None and
-                          (child.get('opencaw_action_mesh')==identity or child.data.get('opencaw_action_mesh')==identity)]
+                          (child.get('hephaera_action_mesh')==identity or child.data.get('hephaera_action_mesh')==identity)]
                         assert len(candidates)==1, 'Semantic mesh owner must have exactly one real geometry child'
                         obj=candidates[0]
-                        if obj.get('opencaw_action_mesh'):geometry_ids[part]=obj['opencaw_action_mesh']
+                        if obj.get('hephaera_action_mesh'):geometry_ids[part]=obj['hephaera_action_mesh']
                         evaluated=obj.evaluated_get(deps);mesh=evaluated.to_mesh()
                         try:actual=[evaluated.matrix_world@vertex.co for vertex in mesh.vertices]
                         finally:evaluated.to_mesh_clear()
@@ -198,7 +198,7 @@ def main():
         return
     blender=Path(os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe')
     if not blender.is_file():raise SystemExit('BLOCKED: existing Blender4.5 required; no installation attempted')
-    parent=args.output or ROOT/'.opencaw/.cache/tasks/model-to-animation-design/evidence'
+    parent=args.output or ROOT/'.hephaera/.cache/tasks/model-to-animation-design/evidence'
     parent=parent.resolve();parent.relative_to(ROOT);parent.mkdir(parents=True,exist_ok=True)
     output=Path(tempfile.mkdtemp(prefix='q-',dir=parent))
     temp=output/'temp';temp.mkdir()

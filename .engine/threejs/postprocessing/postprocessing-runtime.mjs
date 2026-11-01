@@ -98,7 +98,7 @@ export function createPostprocessingRuntime({THREE, Postprocessing, scene, camer
     verifyTargets();
     listen(renderer.domElement, 'webglcontextlost', event => { event.preventDefault(); markLost(); });
     listen(renderer.domElement, 'webglcontextrestored', () => { lost = false; needsRevalidation = true; restorationRequired = true; });
-    listen(lifecycleTarget, 'opencaw:lifecycle', event => {
+    listen(lifecycleTarget, 'hephaera:lifecycle', event => {
       if (event.detail?.state === 'suspend') suspended = true;
       else if (event.detail?.state === 'resume') suspended = false;
     });

@@ -1,0 +1,7 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "",
+  "Category": "Hephaera native verification",
+  "Description": "Source-only isolated lifecycle and state fixture",
+  "Modules": [{"Name": "HephaeraNativeFixture", "Type": "Runtime", "LoadingPhase": "Default"}]
+}

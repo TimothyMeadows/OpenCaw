@@ -45,7 +45,7 @@ cp -R tests/fixtures/unsafe-agent-source "$audit_fixture"
 chmod +x "$audit_fixture/payload.sh"
 printf 'outside\n' > "$temp_root/outside.txt"
 ln -s "$temp_root/outside.txt" "$audit_fixture/escape-link"
-export OPENCAW_TEST_MARKER="$temp_root/executed-marker"
+export HEPHAERA_TEST_MARKER="$temp_root/executed-marker"
 export REMOTE_SCRIPT="inert"
 export UNSAFE_TARGET="inert"
 audit_report="$temp_root/audit.json"
@@ -54,7 +54,7 @@ for code in executable-content symbolic-link embedded-private-key credential-lik
   if [[ "$code" == "embedded-private-key" ]]; then continue; fi
   grep -q "\"code\": \"$code\"" "$audit_report" || fail "audit did not report $code"
 done
-[[ ! -e "$OPENCAW_TEST_MARKER" ]] || fail "audit executed the inert payload"
+[[ ! -e "$HEPHAERA_TEST_MARKER" ]] || fail "audit executed the inert payload"
 ! grep -q 'ghp_AAAAAAAAAA' "$audit_report" || fail "audit report exposed a credential-shaped value"
 set +e
 bash commands/audit-agent-source.sh "$audit_fixture" --fail-on high >/dev/null
@@ -188,7 +188,7 @@ if [[ -n "$ffmpeg_bin" && -n "$ffprobe_bin" ]]; then
   expect_failure "$temp_root/demo-invalid.log" bash commands/render-browser-demo.sh --manifest "$runtime_dir/invalid.json" --output "$runtime_dir/invalid.gif"
   printf '%s\n' '{"width":160,"height":90,"fps":12,"frames":[{"path":"../outside.ppm","duration":1}]}' > "$runtime_dir/escaping.json"
   expect_failure "$temp_root/demo-escaping.log" bash commands/render-browser-demo.sh --manifest "$runtime_dir/escaping.json" --output "$runtime_dir/escaping.gif"
-  expect_failure "$temp_root/demo-boundary.log" bash commands/render-browser-demo.sh --manifest tests/fixtures/browser-demo/manifest.json --output "$repo_root/../opencaw-demo-escape-${RANDOM}.gif"
+  expect_failure "$temp_root/demo-boundary.log" bash commands/render-browser-demo.sh --manifest tests/fixtures/browser-demo/manifest.json --output "$repo_root/../hephaera-demo-escape-${RANDOM}.gif"
 else
   echo "System media dependencies are absent; dependency failure behavior was verified."
 fi
@@ -197,10 +197,10 @@ echo "[8/9] capturing local browser evidence"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || fail "Node.js is required by the test harness"
 expect_failure "$temp_root/capture-viewport.log" bash commands/playwright-capture-page.sh --url http://127.0.0.1:9 --output "$runtime_dir/invalid.png" --viewport bad
-expect_failure "$temp_root/capture-boundary.log" bash commands/playwright-capture-page.sh --url http://127.0.0.1:9 --output "$repo_root/../opencaw-escape-${RANDOM}.png"
+expect_failure "$temp_root/capture-boundary.log" bash commands/playwright-capture-page.sh --url http://127.0.0.1:9 --output "$repo_root/../hephaera-escape-${RANDOM}.png"
 grep -q 'inside repository root' "$temp_root/capture-boundary.log" || fail "capture output confinement was not enforced"
 
-if [[ -n "${OPENCAW_PLAYWRIGHT_ROOT:-}" ]]; then
+if [[ -n "${HEPHAERA_PLAYWRIGHT_ROOT:-}" ]]; then
   port=$((43100 + RANDOM % 1000))
   fixture_root="$repo_root/tests/fixtures/web-capture"
   if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then fixture_root="$(wslpath -w "$fixture_root")"; fi
@@ -222,12 +222,12 @@ if [[ -n "${OPENCAW_PLAYWRIGHT_ROOT:-}" ]]; then
   expect_failure "$temp_root/capture-navigation.log" bash commands/playwright-capture-page.sh --url "http://127.0.0.1:$port/missing" --output "$runtime_dir/missing.png"
   grep -q 'HTTP 404' "$temp_root/capture-navigation.log" || fail "failed navigation did not report status"
 else
-  OPENCAW_PLAYWRIGHT_ROOT="$temp_root/missing-playwright" expect_failure "$temp_root/capture-dependency.log" bash commands/playwright-capture-page.sh --url http://127.0.0.1:9 --output "$runtime_dir/missing.png"
+  HEPHAERA_PLAYWRIGHT_ROOT="$temp_root/missing-playwright" expect_failure "$temp_root/capture-dependency.log" bash commands/playwright-capture-page.sh --url http://127.0.0.1:9 --output "$runtime_dir/missing.png"
   grep -q 'Playwright is not installed' "$temp_root/capture-dependency.log" || fail "missing Playwright dependency was not explained"
 fi
 
-echo "[9/9] validating integrated OpenCaw structure"
-bash commands/validate-opencaw.sh "${validation_args[@]}"
+echo "[9/9] validating integrated Hephaera structure"
+bash commands/validate-hephaera.sh "${validation_args[@]}"
 git_check_bin="$(command -v git.exe 2>/dev/null || command -v git)"
 "$git_check_bin" diff --check
 echo "Capability expansion tests passed."

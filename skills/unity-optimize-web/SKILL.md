@@ -12,7 +12,7 @@ Improve a selected Unity project's web-player startup, delivery size, memory or 
 
 ## Activation and inputs
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unity-optimize-web`; require effective `UNITY` compatibility before edits, builds or browser launches. Honor permitted output scope. Inspect actual Editor version, web build module, selected packages, build configuration, hosting control and supported browser/device matrix. Keep observations and reports in the resolved `.opencaw/.cache/`.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unity-optimize-web`; require effective `UNITY` compatibility before edits, builds or browser launches. Honor permitted output scope. Inspect actual Editor version, web build module, selected packages, build configuration, hosting control and supported browser/device matrix. Keep observations and reports in the resolved `.hephaera/.cache/`.
 
 ## Workflow
 

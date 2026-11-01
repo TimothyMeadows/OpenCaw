@@ -3,9 +3,9 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
-temp_root="$(mktemp -d "${TMPDIR:-/tmp}/opencaw-gameplay.XXXXXX")"
+temp_root="$(mktemp -d "${TMPDIR:-/tmp}/hephaera-gameplay.XXXXXX")"
 cleanup() {
-  case "$temp_root" in "${TMPDIR:-/tmp}"/opencaw-gameplay.*) rm -rf -- "$temp_root" ;; esac
+  case "$temp_root" in "${TMPDIR:-/tmp}"/hephaera-gameplay.*) rm -rf -- "$temp_root" ;; esac
 }
 trap cleanup EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }

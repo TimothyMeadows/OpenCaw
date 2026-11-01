@@ -11,7 +11,7 @@ using UnityEngine;
 
 // Native Editor fixture. Online SDK acceptance is deliberately a separate,
 // authorized procedure; the offline protocol simulations never run here.
-public static class OpenCawUnityToolingCases
+public static class HephaeraUnityToolingCases
 {
     private static string HashFile(string file)
     {
@@ -19,7 +19,7 @@ public static class OpenCawUnityToolingCases
             return BitConverter.ToString(hash.ComputeHash(File.ReadAllBytes(file)));
     }
 
-    public static IEnumerator PackageInventory(OpenCawUnityFeatureContext context)
+    public static IEnumerator PackageInventory(HephaeraUnityFeatureContext context)
     {
         if (Environment.GetCommandLineArgs().Any(argument => String.Equals(argument, "-noUpm", StringComparison.OrdinalIgnoreCase)))
             context.Blocked("UPM is disabled for this invocation; use an explicitly prepared Editor for offline request acceptance");

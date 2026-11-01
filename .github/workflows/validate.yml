@@ -56,7 +56,9 @@ jobs:
           bash tests/test-generative-media.sh
           node tests/test-bubo-installation.cjs
           node tests/test-bubo-installation.cjs --real-runtime
-          bash tests/test-opencaw-layout.sh
+          bash tests/test-hephaera-layout.sh
+          bash tests/test-state-transition.sh
+          node tests/test-state-transition.cjs
           bash tests/test-art-pipelines.sh
           bash tests/test-external-asset-library.sh
           bash tests/test-task-execution.sh

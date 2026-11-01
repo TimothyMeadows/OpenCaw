@@ -31,7 +31,7 @@ Test rapid view replacement, old-claim cancellation, target destruction, respawn
 
 ## Output
 
-Native camera code/assets, ownership and restoration map, selected plugin/version evidence, declared blend/clock/effect limits, lifecycle tests and representative native captures. Record environment, scope, expected/observed behavior and blocked/not-run checks under the active `.opencaw/.cache/tasks/` task.
+Native camera code/assets, ownership and restoration map, selected plugin/version evidence, declared blend/clock/effect limits, lifecycle tests and representative native captures. Record environment, scope, expected/observed behavior and blocked/not-run checks under the active `.hephaera/.cache/tasks/` task.
 
 ## Boundaries
 

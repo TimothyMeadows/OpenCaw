@@ -31,7 +31,7 @@ Test overlapping events, pool reacquisition, stale completion, actor removal, tr
 
 ## Output
 
-Native effect assets, typed parameter and event contracts, pool/reset/cancel rules, target budgets, lifecycle tests and native visual/performance findings. Record environment, expected/observed results and blocked/not-run checks under the active `.opencaw/.cache/tasks/` task.
+Native effect assets, typed parameter and event contracts, pool/reset/cancel rules, target budgets, lifecycle tests and native visual/performance findings. Record environment, expected/observed results and blocked/not-run checks under the active `.hephaera/.cache/tasks/` task.
 
 ## Boundaries
 

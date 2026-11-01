@@ -12,4 +12,4 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
     var root := get_tree().root
-    root.set_meta("opencaw_fixture_exits", int(root.get_meta("opencaw_fixture_exits", 0)) + 1)
+    root.set_meta("hephaera_fixture_exits", int(root.get_meta("hephaera_fixture_exits", 0)) + 1)

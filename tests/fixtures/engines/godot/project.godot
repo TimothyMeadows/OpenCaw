@@ -1,7 +1,7 @@
 config_version=5
 
 [application]
-config/name="OpenCaw Native Fixture"
+config/name="Hephaera Native Fixture"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
 

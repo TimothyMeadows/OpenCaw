@@ -1,6 +1,6 @@
 # Style Templates
 
-Available OpenCaw art style templates:
+Available Hephaera art style templates:
 
 - ABYSSAL_MONSTER_GROTESQUE
 - ARCANE_ARENA_CLARITY

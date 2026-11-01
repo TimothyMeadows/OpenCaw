@@ -14,7 +14,7 @@ Implement data-oriented composition, entity processing or Mass spawn/despawn. De
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-mass-entities` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate task override and output scope. A skill never selects its engine.
 
-Read release, selected Mass modules/plugins, simulation phase, actor bridge, spawn policy and CPU/memory budgets. Core storage does not imply optional MassGameplay features. Record context/evidence in resolved `.opencaw/.cache/tasks/<task>/`; preserve `ENGINE.md`.
+Read release, selected Mass modules/plugins, simulation phase, actor bridge, spawn policy and CPU/memory budgets. Core storage does not imply optional MassGameplay features. Record context/evidence in resolved `.hephaera/.cache/tasks/<task>/`; preserve `ENGINE.md`.
 
 ## Workflow
 

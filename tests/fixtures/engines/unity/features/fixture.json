@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "engine": "UNITY",
   "files": [
-    "Assets/Editor/OpenCawUnityFeatureDriver.cs",
-    "Assets/OpenCawUnityPresentationProbe.cs",
+    "Assets/Editor/HephaeraUnityFeatureDriver.cs",
+    "Assets/HephaeraUnityPresentationProbe.cs",
     "Assets/Editor/ContentFeatureCases.cs",
     "Assets/Editor/PresentationFeatureCases.cs",
     "Assets/Editor/ToolingServiceFeatureCases.cs",
@@ -16,14 +16,14 @@
   "cases": [
     {
       "id": "SpriteIdentity",
-      "method": "OpenCawUnityContentCases.SpriteIdentity",
+      "method": "HephaeraUnityContentCases.SpriteIdentity",
       "packages": [
         [
           "com.unity.2d.sprite"
         ]
       ],
       "symbols": [
-        "OPENCAW_UNITY_SPRITE"
+        "HEPHAERA_UNITY_SPRITE"
       ],
       "settings": {},
       "graphics": false,
@@ -33,7 +33,7 @@
     },
     {
       "id": "RuleTileTopology",
-      "method": "OpenCawUnityContentCases.RuleTileTopology",
+      "method": "HephaeraUnityContentCases.RuleTileTopology",
       "packages": [
         [
           "com.unity.2d.tilemap"
@@ -43,7 +43,7 @@
         ]
       ],
       "symbols": [
-        "OPENCAW_UNITY_TILEMAP"
+        "HEPHAERA_UNITY_TILEMAP"
       ],
       "settings": {
         "ContentRuleTile": "asset",
@@ -57,7 +57,7 @@
     },
     {
       "id": "AtlasLifecycle",
-      "method": "OpenCawUnityContentCases.AtlasLifecycle",
+      "method": "HephaeraUnityContentCases.AtlasLifecycle",
       "packages": [],
       "symbols": [],
       "settings": {
@@ -73,7 +73,7 @@
     },
     {
       "id": "Physics3D",
-      "method": "OpenCawUnityContentCases.Physics3D",
+      "method": "HephaeraUnityContentCases.Physics3D",
       "packages": [],
       "symbols": [],
       "settings": {},
@@ -84,7 +84,7 @@
     },
     {
       "id": "Physics2D",
-      "method": "OpenCawUnityContentCases.Physics2D",
+      "method": "HephaeraUnityContentCases.Physics2D",
       "packages": [],
       "symbols": [],
       "settings": {},
@@ -95,7 +95,7 @@
     },
     {
       "id": "NavigationCancellation",
-      "method": "OpenCawUnityContentCases.NavigationCancellation",
+      "method": "HephaeraUnityContentCases.NavigationCancellation",
       "packages": [],
       "symbols": [],
       "settings": {},
@@ -106,7 +106,7 @@
     },
     {
       "id": "ShaderCompilation",
-      "method": "OpenCawUnityContentCases.ShaderCompilation",
+      "method": "HephaeraUnityContentCases.ShaderCompilation",
       "packages": [],
       "symbols": [],
       "settings": {
@@ -119,7 +119,7 @@
     },
     {
       "id": "RenderingConfiguration",
-      "method": "OpenCawUnityContentCases.RenderingConfiguration",
+      "method": "HephaeraUnityContentCases.RenderingConfiguration",
       "packages": [],
       "symbols": [],
       "settings": {
@@ -132,7 +132,7 @@
     },
     {
       "id": "UIFocus",
-      "method": "OpenCawUnityPresentationCases.UIFocus",
+      "method": "HephaeraUnityPresentationCases.UIFocus",
       "packages": [],
       "symbols": [],
       "settings": {},
@@ -143,14 +143,14 @@
     },
     {
       "id": "UGUIFocus",
-      "method": "OpenCawUnityPresentationCases.UGUIFocus",
+      "method": "HephaeraUnityPresentationCases.UGUIFocus",
       "packages": [
         [
           "com.unity.ugui"
         ]
       ],
       "symbols": [
-        "OPENCAW_UNITY_UGUI"
+        "HEPHAERA_UNITY_UGUI"
       ],
       "settings": {},
       "graphics": false,
@@ -160,7 +160,7 @@
     },
     {
       "id": "UIFontCoverage",
-      "method": "OpenCawUnityPresentationCases.UIFontCoverage",
+      "method": "HephaeraUnityPresentationCases.UIFontCoverage",
       "packages": [
         [
           "com.unity.textmeshpro",
@@ -168,7 +168,7 @@
         ]
       ],
       "symbols": [
-        "OPENCAW_UNITY_TMP"
+        "HEPHAERA_UNITY_TMP"
       ],
       "settings": {
         "tmpFontAsset": "asset",
@@ -181,14 +181,14 @@
     },
     {
       "id": "LocalizationLifecycle",
-      "method": "OpenCawUnityPresentationCases.LocalizationLifecycle",
+      "method": "HephaeraUnityPresentationCases.LocalizationLifecycle",
       "packages": [
         [
           "com.unity.localization"
         ]
       ],
       "symbols": [
-        "OPENCAW_UNITY_LOCALIZATION"
+        "HEPHAERA_UNITY_LOCALIZATION"
       ],
       "settings": {
         "localizationLocaleA": "text",
@@ -205,7 +205,7 @@
     },
     {
       "id": "AudioLifecycle",
-      "method": "OpenCawUnityPresentationCases.AudioLifecycle",
+      "method": "HephaeraUnityPresentationCases.AudioLifecycle",
       "packages": [],
       "symbols": [],
       "settings": {
@@ -219,7 +219,7 @@
     },
     {
       "id": "EditorTransactions",
-      "method": "OpenCawUnityPresentationCases.EditorTransactions",
+      "method": "HephaeraUnityPresentationCases.EditorTransactions",
       "packages": [],
       "symbols": [],
       "settings": {},
@@ -230,7 +230,7 @@
     },
     {
       "id": "WebBuild",
-      "method": "OpenCawUnityPresentationCases.WebBuild",
+      "method": "HephaeraUnityPresentationCases.WebBuild",
       "packages": [],
       "symbols": [],
       "settings": {
@@ -244,7 +244,7 @@
     },
     {
       "id": "PackageInventory",
-      "method": "OpenCawUnityToolingCases.PackageInventory",
+      "method": "HephaeraUnityToolingCases.PackageInventory",
       "packages": [],
       "symbols": [],
       "settings": {

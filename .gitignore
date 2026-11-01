@@ -1,9 +1,16 @@
-# Project-local durable OpenCaw state; never ship it in the shared baseline.
-# .cache/ applies when this repository is installed at <project>/.opencaw.
+# Project-local durable Hephaera state; never ship it in the shared baseline.
+# .cache/ applies when this repository is installed at <project>/.hephaera.
 /.cache/
 # A standalone maintainer checkout stores its own context at this canonical path.
-/.opencaw/.cache/
+/.hephaera/.cache/
 
 # Project-local native toolchains and versioned asset working directories
 .local/
 .art-staging/
+
+# Generated Python bytecode is not source.
+__pycache__/
+*.py[cod]
+
+# Historical hidden-install caches stay private during name transitions.
+/.*/.cache/

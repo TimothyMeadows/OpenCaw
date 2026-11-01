@@ -28,9 +28,9 @@ done
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/external-asset-library-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 external_asset_library_validate_id "$library_id"
-style_file="${style_file:-$OPENCAW_PROJECT_ROOT_RESOLVED/STYLE.md}"
+style_file="${style_file:-$HEPHAERA_PROJECT_ROOT_RESOLVED/STYLE.md}"
 [[ -f "$style_file" ]] || { echo "Missing STYLE.md: $style_file" >&2; exit 1; }
 bash "$script_dir/validate-style-contract.sh" "$style_file" >/dev/null
 library_path="$(external_asset_library_get_path "$style_file" "$library_id")"

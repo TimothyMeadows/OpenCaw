@@ -39,7 +39,7 @@ node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || tr
 [[ -n "$node_bin" ]] || { echo "Node.js is required for page capture." >&2; exit 1; }
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-playwright_root="${OPENCAW_PLAYWRIGHT_ROOT:-$repo_root}"
+playwright_root="${HEPHAERA_PLAYWRIGHT_ROOT:-$repo_root}"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
   repo_root="$(wslpath -w "$repo_root")"
   output="$(wslpath -w "$output")"
@@ -88,7 +88,7 @@ if (parentRelative.startsWith('..') || path.isAbsolute(parentRelative)) {
 let playwright;
 try {
   const dependencyRoot = fs.realpathSync(playwrightRootArg);
-  const requireFromRepo = createRequire(path.join(dependencyRoot, '__opencaw_loader__.js'));
+  const requireFromRepo = createRequire(path.join(dependencyRoot, '__hephaera_loader__.js'));
   playwright = requireFromRepo('playwright');
 } catch {
   console.error('Playwright is not installed for this repository. Install it through the host architecture before capture.');

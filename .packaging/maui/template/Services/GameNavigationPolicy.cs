@@ -1,4 +1,4 @@
-namespace OpenCaw.GameHost.Services;
+namespace Hephaera.GameHost.Services;
 
 public static class GameNavigationPolicy
 {

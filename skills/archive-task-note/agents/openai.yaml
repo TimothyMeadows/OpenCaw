@@ -1,4 +1,4 @@
 interface:
   display_name: "Archive Task Note"
   short_description: "Help with Archive Task Note tasks"
-  default_prompt: "Use $archive-task-note to complete this OpenCaw workflow with explicit evidence and safety checks."
+  default_prompt: "Use $archive-task-note to complete this Hephaera workflow with explicit evidence and safety checks."

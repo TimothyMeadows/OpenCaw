@@ -26,4 +26,4 @@ Read [sessions and networking](references/session-lifecycle.md) for service boun
 
 ## Verification and output
 
-Deliver a versioned session/transport/replication map, operation-state ownership and sanitized multi-client evidence. Exercise simultaneous joins, cancellation races, host loss, reconnect expiry, rejected authentication and scene changes during connect. Clearly separate local simulations, real SDK calls and deployed multiplayer results. Service environments, relay traffic and hosting spend need explicit authorization; missing prerequisites remain blocked/not-run. Keep observations under resolved `.opencaw/.cache`.
+Deliver a versioned session/transport/replication map, operation-state ownership and sanitized multi-client evidence. Exercise simultaneous joins, cancellation races, host loss, reconnect expiry, rejected authentication and scene changes during connect. Clearly separate local simulations, real SDK calls and deployed multiplayer results. Service environments, relay traffic and hosting spend need explicit authorization; missing prerequisites remain blocked/not-run. Keep observations under resolved `.hephaera/.cache`.

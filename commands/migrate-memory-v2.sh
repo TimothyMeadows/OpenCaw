@@ -48,11 +48,11 @@ done
 
 [[ -n "$mode" ]] || { usage >&2; exit 1; }
 
-opencaw_resolve_paths
-opencaw_ensure_system_memory
-opencaw_ensure_project_files
+hephaera_resolve_paths
+hephaera_ensure_system_memory
+hephaera_ensure_project_files
 
-migrations_dir="$OPENCAW_PROJECT_CACHE_DIR/migrations"
+migrations_dir="$HEPHAERA_PROJECT_CACHE_DIR/migrations"
 mkdir -p "$migrations_dir"
 if [[ -z "$manifest_file" ]]; then
   manifest_file="$migrations_dir/memory-v2-candidates.tsv"
@@ -63,15 +63,15 @@ prepare_manifest() {
   local -a sources=()
 
   timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-  archive_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/$timestamp"
+  archive_dir="$HEPHAERA_PROJECT_CACHE_DIR/archive/memory-v1/$timestamp"
   mkdir -p "$archive_dir" "$(dirname "$manifest_file")"
 
-  sources+=("$OPENCAW_PROJECT_MEMORY_FILE")
-  if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/FRAGMENTS" ]]; then
-    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_CACHE_DIR/FRAGMENTS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
+  sources+=("$HEPHAERA_PROJECT_MEMORY_FILE")
+  if [[ -d "$HEPHAERA_PROJECT_CACHE_DIR/FRAGMENTS" ]]; then
+    while IFS= read -r source; do sources+=("$source"); done < <(find "$HEPHAERA_PROJECT_CACHE_DIR/FRAGMENTS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
   fi
-  if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/LEARNINGS" ]]; then
-    while IFS= read -r source; do sources+=("$source"); done < <(find "$OPENCAW_PROJECT_CACHE_DIR/LEARNINGS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
+  if [[ -d "$HEPHAERA_PROJECT_CACHE_DIR/LEARNINGS" ]]; then
+    while IFS= read -r source; do sources+=("$source"); done < <(find "$HEPHAERA_PROJECT_CACHE_DIR/LEARNINGS" -maxdepth 1 -type f -name '*.md' | LC_ALL=C sort)
   fi
 
   printf '# id\tsource\tentry\n' > "$manifest_file"
@@ -79,19 +79,19 @@ prepare_manifest() {
 
   for source in "${sources[@]}"; do
     [[ -f "$source" ]] || continue
-    source_label="${source#"$OPENCAW_PROJECT_CACHE_DIR"/}"
+    source_label="${source#"$HEPHAERA_PROJECT_CACHE_DIR"/}"
     mkdir -p "$archive_dir/$(dirname "$source_label")"
     cp "$source" "$archive_dir/$source_label"
 
     while IFS= read -r line || [[ -n "$line" ]]; do
       [[ "$line" == '- '* ]] || continue
-      if [[ "$source" == "$OPENCAW_PROJECT_MEMORY_FILE" && "$line" == '- ['* ]]; then
+      if [[ "$source" == "$HEPHAERA_PROJECT_MEMORY_FILE" && "$line" == '- ['* ]]; then
         continue
       fi
       id=$((id + 1))
       line="${line#- }"
       line="${line//$'\t'/ }"
-      if ! opencaw_reject_sensitive_text "$line" project >/dev/null 2>&1; then
+      if ! hephaera_reject_sensitive_text "$line" project >/dev/null 2>&1; then
         line="[REDACTED sensitive legacy entry; archive source: $source_label]"
       fi
       printf '%04d\t%s\t%s\n' "$id" "$source_label" "$line" >> "$manifest_file"
@@ -136,13 +136,13 @@ apply_classification() {
     case "$destination" in
       system)
         [[ "$metadata" == '-' ]] || { echo "System classification $id must use '-' metadata." >&2; exit 1; }
-        opencaw_validate_single_line "$entry" 'System migration entry'
-        opencaw_reject_sensitive_text "$entry" system
+        hephaera_validate_single_line "$entry" 'System migration entry'
+        hephaera_reject_sensitive_text "$entry" system
         ;;
       memory|repo-map)
-        opencaw_validate_single_line "$entry" 'Project migration entry'
-        opencaw_reject_sensitive_text "$entry" project
-        opencaw_normalize_tags "$metadata"
+        hephaera_validate_single_line "$entry" 'Project migration entry'
+        hephaera_reject_sensitive_text "$entry" project
+        hephaera_normalize_tags "$metadata"
         ;;
       archive)
         [[ "$metadata" != '-' ]] || { echo "Archived classification $id requires a rejection reason." >&2; exit 1; }
@@ -162,20 +162,20 @@ apply_classification() {
 
   awk '
     /^-[[:space:]]+\[/ || $0 !~ /^-[[:space:]]+/ { print }
-  ' "$OPENCAW_PROJECT_MEMORY_FILE" > "$OPENCAW_PROJECT_MEMORY_FILE.tmp"
-  mv "$OPENCAW_PROJECT_MEMORY_FILE.tmp" "$OPENCAW_PROJECT_MEMORY_FILE"
+  ' "$HEPHAERA_PROJECT_MEMORY_FILE" > "$HEPHAERA_PROJECT_MEMORY_FILE.tmp"
+  mv "$HEPHAERA_PROJECT_MEMORY_FILE.tmp" "$HEPHAERA_PROJECT_MEMORY_FILE"
 
   while IFS=$'\t' read -r id destination metadata; do
     entry="$(awk -F '\t' -v wanted="$id" '$1 == wanted { print $3; exit }' "$manifest_file")"
     case "$destination" in
       system)
-        if ! grep -Fxiq -- "- $entry" "$OPENCAW_SYSTEM_MEMORY_FILE"; then printf '%s\n' "- $entry" >> "$OPENCAW_SYSTEM_MEMORY_FILE"; fi
+        if ! grep -Fxiq -- "- $entry" "$HEPHAERA_SYSTEM_MEMORY_FILE"; then printf '%s\n' "- $entry" >> "$HEPHAERA_SYSTEM_MEMORY_FILE"; fi
         ;;
       memory)
-        opencaw_append_tagged_entry "$OPENCAW_PROJECT_MEMORY_FILE" "$metadata" "$entry" >/dev/null
+        hephaera_append_tagged_entry "$HEPHAERA_PROJECT_MEMORY_FILE" "$metadata" "$entry" >/dev/null
         ;;
       repo-map)
-        opencaw_append_tagged_entry "$OPENCAW_REPO_MAP_FILE" "$metadata" "$entry" >/dev/null
+        hephaera_append_tagged_entry "$HEPHAERA_REPO_MAP_FILE" "$metadata" "$entry" >/dev/null
         ;;
       archive)
         ;;
@@ -183,19 +183,19 @@ apply_classification() {
   done < "$normalized_file"
 
   timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-  retired_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/retired-$timestamp"
+  retired_dir="$HEPHAERA_PROJECT_CACHE_DIR/archive/memory-v1/retired-$timestamp"
   mkdir -p "$retired_dir"
   for source in FRAGMENTS LEARNINGS; do
-    if [[ -d "$OPENCAW_PROJECT_CACHE_DIR/$source" ]]; then
-      mv "$OPENCAW_PROJECT_CACHE_DIR/$source" "$retired_dir/$source"
+    if [[ -d "$HEPHAERA_PROJECT_CACHE_DIR/$source" ]]; then
+      mv "$HEPHAERA_PROJECT_CACHE_DIR/$source" "$retired_dir/$source"
     fi
   done
 
-  classification_archive="$OPENCAW_PROJECT_CACHE_DIR/archive/memory-v1/classification-$timestamp.tsv"
+  classification_archive="$HEPHAERA_PROJECT_CACHE_DIR/archive/memory-v1/classification-$timestamp.tsv"
   cp "$normalized_file" "$classification_archive"
 
-  mkdir -p "$OPENCAW_PROJECT_CACHE_DIR/reports"
-  report_file="$OPENCAW_PROJECT_CACHE_DIR/reports/memory-v2-migration-$timestamp.md"
+  mkdir -p "$HEPHAERA_PROJECT_CACHE_DIR/reports"
+  report_file="$HEPHAERA_PROJECT_CACHE_DIR/reports/memory-v2-migration-$timestamp.md"
   {
     echo '# Memory v2 Migration Report'
     echo

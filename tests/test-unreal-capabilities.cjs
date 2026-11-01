@@ -67,20 +67,20 @@ try {
   }
   equal(new Set(topics.filter(t => t.owner !== '.engine/UNREAL.md').map(t => t.owner)).size, 22);
   const meta = features.manifest();
-  equal(features.unavailableBuild("Unable to find plugin 'PCG' (referenced via OpenCawFeatureFixture.uproject)"), 'An explicitly selected native fixture plugin/module is unavailable');
+  equal(features.unavailableBuild("Unable to find plugin 'PCG' (referenced via HephaeraFeatureFixture.uproject)"), 'An explicitly selected native fixture plugin/module is unavailable');
   equal(features.unavailableBuild('Visual Studio compiler not found'), 'Native compiler/platform SDK unavailable');
   equal(features.unavailableBuild('PCG error C2039: invalid member in fixture.cpp'), null);
-  const source = ['Gameplay', 'Presentation', 'World'].map(name => fs.readFileSync(path.join(features.DIRECTORY, 'Source/OpenCawFeatureFixture/Private', name + 'FeatureTests.cpp'), 'utf8')).join('\n');
+  const source = ['Gameplay', 'Presentation', 'World'].map(name => fs.readFileSync(path.join(features.DIRECTORY, 'Source/HephaeraFeatureFixture/Private', name + 'FeatureTests.cpp'), 'utf8')).join('\n');
   for (const test of meta.cases) {
     equal(source.includes('"' + test.name + '"'), true);
-    equal(source.includes('OpenCawFeatureEvidence(*this, TEXT("' + test.name + '"))'), true);
+    equal(source.includes('HephaeraFeatureEvidence(*this, TEXT("' + test.name + '"))'), true);
     equal(typeof test.limit, 'string');
   }
   const featureProject = JSON.parse(fs.readFileSync(path.join(features.DIRECTORY, meta.project), 'utf8'));
   equal(featureProject.Modules[0].Type, 'Editor');
   equal(featureProject.EngineAssociation, meta.engineMinor);
   const configFile = path.join(temporary, 'settings.ini');
-  fs.writeFileSync(configFile, '[Other]\r\nIgnored=1\r\n[OpenCaw.UnrealFeatures]\r\nStreamingLevel=/Game/Fixture/Stream\r\nStreamingMarkerTag=Marker\r\n');
+  fs.writeFileSync(configFile, '[Other]\r\nIgnored=1\r\n[Hephaera.UnrealFeatures]\r\nStreamingLevel=/Game/Fixture/Stream\r\nStreamingMarkerTag=Marker\r\n');
   const config = features.configuration(configFile);
   equal(config, { StreamingLevel: '/Game/Fixture/Stream', StreamingMarkerTag: 'Marker' });
   fs.appendFileSync(configFile, 'StreamingLevel=second\n');
@@ -100,7 +100,7 @@ try {
   const file = path.join(temporary, 'automation.json');
   const nonce = crypto.randomUUID();
   const name = meta.cases[0].name;
-  const good = { failed: 0, notRun: 0, tests: [{ fullTestPath: name, state: 'Success', entries: [{ event: { type: 'Info', message: `OpenCawFeatureEvidence run=${nonce} case=${name}` } }] }] };
+  const good = { failed: 0, notRun: 0, tests: [{ fullTestPath: name, state: 'Success', entries: [{ event: { type: 'Info', message: `HephaeraFeatureEvidence run=${nonce} case=${name}` } }] }] };
   const inspect = () => features.inspectEvidence(file, name, nonce, Date.now(), native.inspectUnrealReport);
   fs.writeFileSync(file, JSON.stringify(good)); equal(inspect().runId, nonce);
   for (const change of [

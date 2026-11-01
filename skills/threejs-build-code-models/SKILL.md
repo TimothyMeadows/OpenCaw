@@ -22,7 +22,7 @@ Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh threejs-build-co
 1. Read `STYLE.md`, resolve `CODE` with `select-art-pipeline`, and read `.styles/.pipelines/code/PIPELINE.md`.
 2. If `STYLE.md` configures external asset libraries, inspect them first with `use-external-asset-library`. Copy any authorized template into the repository, but keep it as reference evidence rather than a primary runtime mesh.
 3. Inspect the host's existing Three.js version and documented model interface. Do not add or install Three.js. Use the interface recorded by the code-model manifest when the host has no interface.
-4. Scaffold a manifest below `.opencaw/.cache/tasks/` with the text brief, semantic parts, pivots or anchors, deterministic seed, explicit budgets, cleanup ownership, and any authorized reference-image hashes.
+4. Scaffold a manifest below `.hephaera/.cache/tasks/` with the text brief, semantic parts, pivots or anchors, deterministic seed, explicit budgets, cleanup ownership, and any authorized reference-image hashes.
 5. Validate the manifest before authoring. Treat references as review inputs only.
 6. Work in order: `blockout`, `structure`, `form`, `materials`, `interaction`, then `optimization`. Query the next unlocked pass before each change.
 7. For each pass, author source, build or typecheck with the host toolchain, and capture deterministic browser evidence. Non-planar models require front, orbit-left, and orbit-right views.
@@ -39,7 +39,7 @@ Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh threejs-build-co
 ## Guardrails
 
 - Do not download, generate, or load a mesh/model-library asset as the primary implementation.
-- Do not add Three.js to OpenCaw or silently install it in a host repository.
+- Do not add Three.js to Hephaera or silently install it in a host repository.
 - Do not use a reference image without a recorded rights basis and applicable consent.
 - Do not skip or reorder passes, exceed correction limits, or fabricate evidence.
 - Do not silently switch from `CODE` when implementation fails.

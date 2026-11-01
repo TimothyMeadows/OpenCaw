@@ -15,7 +15,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Test-OpenCawWindows {
+function Test-HephaeraWindows {
     if ($env:OS -eq 'Windows_NT') {
         return $true
     }
@@ -157,20 +157,20 @@ function Resolve-ProjectRoot {
         (Resolve-Path -LiteralPath $RequestedRoot).Path
     } else { $null }
 
-    if ($baselineName -ceq '.opencaw') {
+    if ($baselineName -ceq '.hephaera') {
         if ($requested -and -not $requested.Equals($baselineParent, [System.StringComparison]::OrdinalIgnoreCase)) {
-            throw 'ProjectRoot must match the direct parent of the .opencaw installation.'
+            throw 'ProjectRoot must match the direct parent of the .hephaera installation.'
         }
         $resolved = $baselineParent
     } else {
-        # Source checkouts support maintainer verification; hosts install only .opencaw.
+        # Source checkouts support maintainer verification; hosts install only .hephaera.
         if ($baselineName.StartsWith('.') -or -not (Test-Path -LiteralPath (Join-Path $baselineRoot '.git'))) {
-            throw 'Fresh host installations must be located directly at <project-root>/.opencaw.'
+            throw 'Fresh host installations must be located directly at <project-root>/.hephaera.'
         }
         $ancestor = $baselineParent
         while ($ancestor) {
             if (Test-Path -LiteralPath (Join-Path $ancestor '.git')) {
-                throw 'Nested OpenCaw installations must use <project-root>/.opencaw.'
+                throw 'Nested Hephaera installations must use <project-root>/.hephaera.'
             }
             $nextAncestor = Split-Path -Parent $ancestor
             if ($nextAncestor -eq $ancestor) { break }
@@ -178,16 +178,16 @@ function Resolve-ProjectRoot {
         }
         $resolved = if ($requested) { $requested } else { $baselineRoot }
     }
-    foreach ($component in @((Join-Path $resolved '.opencaw'), (Join-Path $resolved '.opencaw/.cache'))) {
+    foreach ($component in @((Join-Path $resolved '.hephaera'), (Join-Path $resolved '.hephaera/.cache'))) {
         $item = Get-Item -LiteralPath $component -Force -ErrorAction SilentlyContinue
         if ($item -and ((($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) -or -not $item.PSIsContainer)) {
-            throw 'The fixed .opencaw/.cache path requires real directories without links or file collisions.'
+            throw 'The fixed .hephaera/.cache path requires real directories without links or file collisions.'
         }
     }
     return $resolved
 }
 
-function Invoke-OpenCawScaffold {
+function Invoke-HephaeraScaffold {
     param(
         [pscustomobject]$SelectedProvider,
         [string]$ResolvedProjectRoot
@@ -195,7 +195,7 @@ function Invoke-OpenCawScaffold {
 
     $scaffoldScript = Join-Path $PSScriptRoot 'create-host-ai-scaffold.sh'
     if (-not (Test-Path -LiteralPath $scaffoldScript -PathType Leaf)) {
-        throw "OpenCaw scaffold command not found: $scaffoldScript"
+        throw "Hephaera scaffold command not found: $scaffoldScript"
     }
 
     $scaffoldTarget = if ($ResolvedProjectRoot) { $ResolvedProjectRoot } else { 'auto-resolved project' }
@@ -204,26 +204,26 @@ function Invoke-OpenCawScaffold {
     }
 
     if ($SelectedProvider.Name -eq 'GitBash') {
-        $previousProjectRoot = $env:OPENCAW_PROJECT_ROOT
+        $previousProjectRoot = $env:HEPHAERA_PROJECT_ROOT
         try {
             if ($ResolvedProjectRoot) {
-                $env:OPENCAW_PROJECT_ROOT = $ResolvedProjectRoot
+                $env:HEPHAERA_PROJECT_ROOT = $ResolvedProjectRoot
             }
             & $SelectedProvider.Command $scaffoldScript
             if ($LASTEXITCODE -ne 0) {
-                throw "OpenCaw scaffold failed under Git Bash (exit $LASTEXITCODE)."
+                throw "Hephaera scaffold failed under Git Bash (exit $LASTEXITCODE)."
             }
         }
         finally {
-            $env:OPENCAW_PROJECT_ROOT = $previousProjectRoot
+            $env:HEPHAERA_PROJECT_ROOT = $previousProjectRoot
         }
         return
     }
 
-    $openCawRoot = Split-Path -Parent $PSScriptRoot
+    $hephaeraRoot = Split-Path -Parent $PSScriptRoot
     $arguments = [System.Collections.Generic.List[string]]::new()
     $arguments.Add('--cd')
-    $arguments.Add($openCawRoot)
+    $arguments.Add($hephaeraRoot)
     if ($ResolvedProjectRoot) {
         $wslProjectOutput = @(& $SelectedProvider.Command --cd $ResolvedProjectRoot pwd)
         $wslProjectRoot = ($wslProjectOutput -join "`n").Trim()
@@ -231,18 +231,18 @@ function Invoke-OpenCawScaffold {
             throw 'Unable to resolve the project-root path through WSL.'
         }
         $arguments.Add('env')
-        $arguments.Add("OPENCAW_PROJECT_ROOT=$wslProjectRoot")
+        $arguments.Add("HEPHAERA_PROJECT_ROOT=$wslProjectRoot")
     }
     $arguments.Add('bash')
     $arguments.Add('./commands/create-host-ai-scaffold.sh')
 
     & $SelectedProvider.Command @arguments
     if ($LASTEXITCODE -ne 0) {
-        throw "OpenCaw scaffold failed under WSL (exit $LASTEXITCODE)."
+        throw "Hephaera scaffold failed under WSL (exit $LASTEXITCODE)."
     }
 }
 
-if (-not (Test-OpenCawWindows)) {
+if (-not (Test-HephaeraWindows)) {
     Write-Output 'WINDOWS_BASH_STATUS=NOT_REQUIRED'
     Write-Output 'WINDOWS_BASH_REASON=Linux and macOS use their existing Bash runtime.'
     exit 0
@@ -284,14 +284,14 @@ Write-Output "WINDOWS_BASH_COMMAND=$($selected.Command)"
 Write-Output 'WINDOWS_BASH_INSTALL_REQUIRED=false'
 
 if ($RunScaffold) {
-    Invoke-OpenCawScaffold -SelectedProvider $selected -ResolvedProjectRoot $resolvedRoot
+    Invoke-HephaeraScaffold -SelectedProvider $selected -ResolvedProjectRoot $resolvedRoot
     if ($WhatIfPreference) {
-        Write-Output 'OPENCAW_SCAFFOLD_RUN=planned'
+        Write-Output 'HEPHAERA_SCAFFOLD_RUN=planned'
     }
     else {
-        Write-Output 'OPENCAW_SCAFFOLD_RUN=true'
+        Write-Output 'HEPHAERA_SCAFFOLD_RUN=true'
     }
 }
 else {
-    Write-Output 'OPENCAW_SCAFFOLD_RUN=false'
+    Write-Output 'HEPHAERA_SCAFFOLD_RUN=false'
 }

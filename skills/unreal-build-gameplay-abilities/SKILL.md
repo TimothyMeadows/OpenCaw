@@ -14,7 +14,7 @@ Implement or repair GAS abilities, attributes, effects, cues, costs and predicte
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-gameplay-abilities` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate task overrides and permitted output scope. Skill selection never selects the engine.
 
-Read host version, explicit GameplayAbilities selection, ASC placement, owner/avatar lifetime, replication policy and input routing. Record context/evidence under resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains authoritative.
+Read host version, explicit GameplayAbilities selection, ASC placement, owner/avatar lifetime, replication policy and input routing. Record context/evidence under resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains authoritative.
 
 ## Workflow
 

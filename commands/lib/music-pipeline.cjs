@@ -23,7 +23,7 @@ function lyricsRights(brief,{root,task,requireGeneration=false}={}){
   if(!root)return;
   const rights=read(root,brief.lyricsRights).value;
   fields(rights,['schemaVersion','task','purpose','lyrics','rightsConfirmed','generationAllowed','sourceEvidence'],['schemaVersion','task','purpose','lyrics','rightsConfirmed','generationAllowed','sourceEvidence'],'lyrics rights');
-  if(rights.schemaVersion!=='opencaw-music-lyrics-rights/v1'||!ID.test(rights.task||'')||rights.purpose!==brief.purpose||rights.rightsConfirmed!==true||typeof rights.generationAllowed!=='boolean'
+  if(rights.schemaVersion!=='hephaera-music-lyrics-rights/v1'||!ID.test(rights.task||'')||rights.purpose!==brief.purpose||rights.rightsConfirmed!==true||typeof rights.generationAllowed!=='boolean'
       ||(requireGeneration&&(rights.generationAllowed!==true||rights.task!==task)))fail('Exact supplied-lyrics rights and applicable current task generation authority are required.');
   if(!Array.isArray(rights.lyrics)||rights.lyrics.length!==brief.request.items.length)fail('Lyrics rights must cover the complete ordered item set.');
   for(let i=0;i<rights.lyrics.length;i++){
@@ -43,7 +43,7 @@ function musicOptions(music,kind){
 }
 function validateBrief(brief,context={}){
   fields(brief,['schemaVersion','kind','purpose','provider','spatialization','loopIntent','request','technical','historicalRoot','lyricsRights'],['schemaVersion','kind','purpose','provider','spatialization','loopIntent','request','technical'],'MUSIC brief');
-  if(brief.schemaVersion!=='opencaw-music-brief/v1'||!modalities.includes(brief.kind)||!['LOCAL','CLOUD'].includes(brief.provider)||!['2d','3d'].includes(brief.spatialization)||typeof brief.loopIntent!=='boolean')fail('Explicit supported MUSIC kind, provider, spatialization and loop intent are required.');
+  if(brief.schemaVersion!=='hephaera-music-brief/v1'||!modalities.includes(brief.kind)||!['LOCAL','CLOUD'].includes(brief.provider)||!['2d','3d'].includes(brief.spatialization)||typeof brief.loopIntent!=='boolean')fail('Explicit supported MUSIC kind, provider, spatialization and loop intent are required.');
   text(brief.purpose,'MUSIC purpose',1024);
   if(brief.historicalRoot!==undefined){
     if(brief.provider!=='LOCAL')fail('Historical native root mapping applies only to explicit LOCAL import.');
@@ -126,7 +126,7 @@ const technical=context=>evidence.technical(evidenceSpec,context);
 function validateTechnicalReport(report,context){const expected=technical(context);same(report,expected,'Current MUSIC technical report');if(expected.status!=='passed')fail('Current authoritative MUSIC technical acceptance is unavailable or failed.');return report;}
 function reviewBase(review,context,kind){
   object(review,'MUSIC review');const record=context.state?.asset||context.state;validateBrief(context.brief,{root:context.root,task:record?.task});
-  if(review.schemaVersion!=='opencaw-media-review/v1')fail('Unsupported MUSIC review schema.');
+  if(review.schemaVersion!=='hephaera-media-review/v1')fail('Unsupported MUSIC review schema.');
   if(context.status?.assetSha256&&review.assetSha256!==context.status.assetSha256)fail('MUSIC review names another current asset fingerprint.');
   if(context.candidate)same(review.outputs,candidateData(context.candidate).outputs,'MUSIC reviewed output set');
   if(review.kind!==kind||!['accepted','rejected'].includes(review.verdict))fail('Explicit matching MUSIC review kind/verdict required.');
@@ -150,11 +150,11 @@ function validateRuntimeReview(review,context){
   if(review.target?.spatialization!==context.brief.spatialization||review.target?.loopIntent!==context.brief.loopIntent)fail('Runtime target must retain explicit MUSIC spatialization/loop intent.');
   const permission=read(root,review.rightsEvidence).value;
   fields(permission,['schemaVersion','task','purpose','rightsConfirmed','sourceEvidence'],['schemaVersion','task','purpose','rightsConfirmed','sourceEvidence'],'runtime distribution rights');
-  if(permission.schemaVersion!=='opencaw-music-distribution/v1'||permission.task!==record.task||permission.purpose!==context.brief.purpose||permission.rightsConfirmed!==true)fail('Separate current MUSIC distribution rights for this task/purpose are required.');
+  if(permission.schemaVersion!=='hephaera-music-distribution/v1'||permission.task!==record.task||permission.purpose!==context.brief.purpose||permission.rightsConfirmed!==true)fail('Separate current MUSIC distribution rights for this task/purpose are required.');
   readIdentity(root,permission.sourceEvidence);nested(root,permission);
   const target=read(root,review.targetEvidence).value;
   fields(target,['schemaVersion','task','engine','outputs','spatialization','loopIntent','playbackReviewed','loadDisposeReviewed','loopSeamReviewed','sourceEvidence'],['schemaVersion','task','engine','outputs','spatialization','loopIntent','playbackReviewed','loadDisposeReviewed','loopSeamReviewed','sourceEvidence'],'runtime playback evidence');
-  if(target.schemaVersion!=='opencaw-music-runtime-evidence/v1'||target.task!==record.task||target.spatialization!==context.brief.spatialization||target.loopIntent!==context.brief.loopIntent||target.playbackReviewed!==true||target.loadDisposeReviewed!==true||(target.loopIntent&&target.loopSeamReviewed!==true))fail('Actual current selected-engine playback/load/dispose evidence is required.');
+  if(target.schemaVersion!=='hephaera-music-runtime-evidence/v1'||target.task!==record.task||target.spatialization!==context.brief.spatialization||target.loopIntent!==context.brief.loopIntent||target.playbackReviewed!==true||target.loadDisposeReviewed!==true||(target.loopIntent&&target.loopSeamReviewed!==true))fail('Actual current selected-engine playback/load/dispose evidence is required.');
   same(target.engine,review.engine,'Runtime target engine');same(target.outputs,review.outputs,'Runtime target output set');readIdentity(root,target.sourceEvidence);nested(root,target);return review;
 }
 function generationReferences(brief,context){

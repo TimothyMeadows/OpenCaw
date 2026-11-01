@@ -3,13 +3,13 @@ set -euo pipefail
 
 # Bounded storage regression: no GitHub publication or Gauntlet lifecycle replay.
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-temp_root="$(mktemp -d "${TMPDIR:-/tmp}/opencaw-cache-workflows.XXXXXX")"
+temp_root="$(mktemp -d "${TMPDIR:-/tmp}/hephaera-cache-workflows.XXXXXX")"
 cleanup() {
-  case "$temp_root" in "${TMPDIR:-/tmp}"/opencaw-cache-workflows.*) rm -rf -- "$temp_root" ;; esac
+  case "$temp_root" in "${TMPDIR:-/tmp}"/hephaera-cache-workflows.*) rm -rf -- "$temp_root" ;; esac
 }
 trap cleanup EXIT
 project="$temp_root/project"
-cache="$project/.opencaw/.cache"
+cache="$project/.hephaera/.cache"
 mkdir -p "$cache/tasks/demo" "$project/.ai/tasks/legacy" "$project/.ai/goals/legacy"
 fail() { echo "FAIL: $*" >&2; exit 1; }
 expect_failure() {
@@ -18,7 +18,7 @@ expect_failure() {
 run_command() {
   local command="$1"
   shift
-  OPENCAW_PROJECT_ROOT="$project" bash "$repo_root/commands/$command" "$@"
+  HEPHAERA_PROJECT_ROOT="$project" bash "$repo_root/commands/$command" "$@"
 }
 cat >"$cache/tasks/demo/TASK.md" <<'EOF'
 # Cache workflow fixture
@@ -45,7 +45,7 @@ expect_failure run_command validate-subagent-plan.sh "$project/.ai/tasks/legacy/
 
 echo '[2/6] Goal references resolve only from canonical cache storage'
 run_command create-goal-file.sh demo 'Storage fixture' >/dev/null
-run_command create-goal-completion-report.sh .opencaw/.cache/goals/demo/GOAL.md >/dev/null
+run_command create-goal-completion-report.sh .hephaera/.cache/goals/demo/GOAL.md >/dev/null
 [[ -f "$cache/goals/demo/GOAL_REPORT.md" ]] || fail 'Goal report escaped the cache'
 expect_failure run_command create-goal-completion-report.sh "$project/.ai/goals/legacy/GOAL.md"
 [[ ! -e "$project/.ai/goals/legacy/GOAL_REPORT.md" ]] || fail 'legacy Goal storage was reused'
@@ -54,21 +54,21 @@ echo '[3/6] Gauntlet storage and task evidence use canonical project-relative pa
 run_command create-gauntlet-file.sh demo 'Storage fixture' --task demo >/dev/null
 gauntlet_file="$cache/gauntlets/demo/GAUNTLET.md"
 [[ -f "$gauntlet_file" ]] || fail 'Gauntlet escaped the cache'
-grep -Fq '.opencaw/.cache/tasks/demo/TASK.md' "$gauntlet_file" || fail 'Gauntlet task reference uses the wrong storage root'
+grep -Fq '.hephaera/.cache/tasks/demo/TASK.md' "$gauntlet_file" || fail 'Gauntlet task reference uses the wrong storage root'
 (
-  export OPENCAW_PROJECT_ROOT="$project"
+  export HEPHAERA_PROJECT_ROOT="$project"
   source "$repo_root/commands/lib/gauntlet-common.sh"
   [[ "$(gauntlet_resolve_file demo)" == "$gauntlet_file" ]] || fail 'Gauntlet name did not resolve in the cache'
   expect_failure gauntlet_resolve_file "$project/.ai/gauntlets/demo/GAUNTLET.md"
 )
 
 echo '[4/6] archival accepts canonical relative references and rejects legacy/outside paths'
-run_command archive-task-context.sh .opencaw/.cache/tasks/demo/TASK.md >/dev/null
+run_command archive-task-context.sh .hephaera/.cache/tasks/demo/TASK.md >/dev/null
 grep -q '^Archived on ' "$cache/tasks/demo/TASK.md" || fail 'canonical task reference was not archived'
 [[ -n "$(find "$cache/archive/tasks" -name 'demo-*.md' -print -quit)" ]] || fail 'task evidence was not retained in the cache archive'
 expect_failure run_command archive-task-context.sh "$project/.ai/tasks/legacy/TASK.md"
 [[ "$(sha256sum "$project/.ai/tasks/legacy/TASK.md")" == "$old_hash" ]] || fail 'legacy task was modified'
-outside_task="$temp_root/other-project/.opencaw/.cache/tasks/demo/TASK.md"
+outside_task="$temp_root/other-project/.hephaera/.cache/tasks/demo/TASK.md"
 mkdir -p "$(dirname "$outside_task")"
 printf '%s\n' 'Another project owns this task.' >"$outside_task"
 expect_failure run_command archive-task-context.sh "$outside_task"
@@ -80,12 +80,12 @@ mkdir -p "$project/test-results" "$project/.playwright-cli"
 printf '%s\n' '{"suites":[]}' >"$project/test-results/results.json"
 printf '%s\n' 'Page URL: https://example.test/game' >"$project/.playwright-cli/page.yaml"
 (
-  cd "$project/.opencaw"
+  cd "$project/.hephaera"
   run_command playwright-evidence-report.sh >"$temp_root/reports.log"
 )
 [[ -n "$(find "$cache/reports" -name 'playwright-test-run-*.md' -print -quit)" ]] || fail 'Playwright summary did not use the host cache'
 [[ -n "$(find "$cache/reports" -name 'playwright-discovery-*.md' -print -quit)" ]] || fail 'Playwright discovery did not use the host cache'
-[[ ! -e "$project/.opencaw/.opencaw" ]] || fail 'report invocation nested an install/cache under the mount'
+[[ ! -e "$project/.hephaera/.hephaera" ]] || fail 'report invocation nested an install/cache under the mount'
 
 echo '[6/6] workflow child symlinks cannot redirect durable state'
 mkdir -p "$temp_root/outside"

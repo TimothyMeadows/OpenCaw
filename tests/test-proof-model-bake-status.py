@@ -214,8 +214,8 @@ class BlenderBakeStatusProcess(unittest.TestCase):
         blender = os.environ.get("BLENDER_EXE") or shutil.which("blender") or r"C:/Program Files/Blender Foundation/Blender 4.5/blender.exe"
         if not Path(blender).is_file():
             self.skipTest("Blender 4.5 unavailable; set BLENDER_EXE")
-        configured = os.environ.get("OPENCAW_PROOF_BAKE_STATUS_EVIDENCE_ROOT")
-        evidence = Path(configured) if configured else ROOT / ".opencaw/.cache/tasks/proof-multiview-classification/bake-status"
+        configured = os.environ.get("HEPHAERA_PROOF_BAKE_STATUS_EVIDENCE_ROOT")
+        evidence = Path(configured) if configured else ROOT / ".hephaera/.cache/tasks/proof-multiview-classification/bake-status"
         if not evidence.is_absolute():
             evidence = ROOT / evidence
         self.assertNotIn("..", evidence.parts)

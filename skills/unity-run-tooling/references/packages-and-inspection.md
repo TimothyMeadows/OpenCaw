@@ -2,7 +2,7 @@
 
 ## Establish the project identity
 
-Inspect `ProjectSettings/ProjectVersion.txt`, package manifest/lock, assembly definitions and target build settings as data before launching tools. Record the installed Editor path/version, target modules and project-owned build/test entry points. Template-based project creation requires an absent approved destination and explicit template/version; it does not authorize replacing an existing project or installing a missing Editor. Keep generated evidence under resolved `.opencaw/.cache` and build outputs in an approved non-source location.
+Inspect `ProjectSettings/ProjectVersion.txt`, package manifest/lock, assembly definitions and target build settings as data before launching tools. Record the installed Editor path/version, target modules and project-owned build/test entry points. Template-based project creation requires an absent approved destination and explicit template/version; it does not authorize replacing an existing project or installing a missing Editor. Keep generated evidence under resolved `.hephaera/.cache` and build outputs in an approved non-source location.
 
 ## UPM requests
 

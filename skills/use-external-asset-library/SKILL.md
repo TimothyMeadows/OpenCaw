@@ -45,4 +45,4 @@ Use for 3D model, rig, animation, Blender, WebGL, or game-asset work when `STYLE
 
 - `./commands/list-external-asset-libraries.sh [--style STYLE.md] [--json]`
 - `./commands/inspect-external-asset-library.sh LIBRARY_ID [--style STYLE.md] [--json]`
-- `./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .opencaw/.cache/tasks/<task>/FILE.json]`
+- `./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .hephaera/.cache/tasks/<task>/FILE.json]`

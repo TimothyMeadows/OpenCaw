@@ -22,7 +22,7 @@ Build and operate reproducible generative media pipelines without coupling proje
 
 - Discover image, SFX, music, preset-speech and consented-cloning capabilities separately. Distinguish catalog advertisement, receipt presence and verified installed content; discovery never loads models.
 - Implement explicit cloud/session versus local selection with no silent cross-provider fallback.
-- Use `use-bubo-local-generation` and `bubo-media.sh` for direct LOCAL execution through the exact pinned standalone runtime. Bubo owns algorithms, model/tool pins, platform locks, dependency verification, bounded workers, shared GPU ownership and claim accounting; OpenCaw owns host policy, rights, consent, budgets and acceptance.
+- Use `use-bubo-local-generation` and `bubo-media.sh` for direct LOCAL execution through the exact pinned standalone runtime. Bubo owns algorithms, model/tool pins, platform locks, dependency verification, bounded workers, shared GPU ownership and claim accounting; Hephaera owns host policy, rights, consent, budgets and acceptance.
 - Record actual runtime/model/worker/settings/output identities and seeds without maintaining another model catalog.
 - Separate dry-run setup, explicitly authorized provisioning/registration, no-load inspection, selected zero-sample diagnostics and generation. Verify licenses/hashes and keep secrets ephemeral; generation remains offline and never installs.
 - Confine outputs to staging, generate receipts and manifests, validate budgets, and separate promotion from generation.

@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 runtime_dir="$(mktemp -d "$repo_root/tests/.code-character-evidence-runtime-XXXXXX")"
 project="$runtime_dir/project"
-mkdir -p "$project/.opencaw/.cache/tasks/evidence-test" "$project/src/models" "$project/node_modules/three/build" "$project/fixtures" "$project/evidence"
+mkdir -p "$project/.hephaera/.cache/tasks/evidence-test" "$project/src/models" "$project/node_modules/three/build" "$project/fixtures" "$project/evidence"
 
 cleanup() {
   local resolved
@@ -18,12 +18,12 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 expect_failure() {
   local log="$1"; shift
   set +e
-  OPENCAW_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
+  HEPHAERA_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
   local status=$?
   set -e
   [[ $status -ne 0 ]] || fail "command unexpectedly succeeded: $*"
 }
-project_command() { OPENCAW_PROJECT_ROOT="$project" "$@"; }
+project_command() { HEPHAERA_PROJECT_ROOT="$project" "$@"; }
 
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || fail "Node.js is required for code-character evidence tests"
@@ -34,16 +34,16 @@ printf 'export const REVISION = "180";\n' > "$project/node_modules/three/build/t
 project_command bash commands/generate-style.sh --pipeline PROOF_TO_MODEL --allow-pipeline CODE CEL_SHADED_COMIC >/dev/null
 project_command bash commands/create-code-model-manifest.sh evidence-character \
   --brief 'A deterministic evidence calibration actor' --intended-use 'machine gate calibration' \
-  --prompt-override --output .opencaw/.cache/tasks/evidence-test/code-model.json --source src/models/evidence-character.js \
+  --prompt-override --output .hephaera/.cache/tasks/evidence-test/code-model.json --source src/models/evidence-character.js \
   --part torso --anchor origin --seed 1337 >/dev/null
 printf '%s\n' \
   "import * as THREE from 'three';" \
   'export function createEvidenceCharacter() { return { root: new THREE.Group(), parts: new Map(), anchors: new Map(), dispose() {} }; }' \
   > "$project/src/models/evidence-character.js"
-profile="$project/.opencaw/.cache/tasks/evidence-test/code-character.json"
+profile="$project/.hephaera/.cache/tasks/evidence-test/code-character.json"
 project_command bash commands/create-code-character-profile.sh evidence-character \
-  --manifest .opencaw/.cache/tasks/evidence-test/code-model.json --brief 'A deterministic evidence calibration actor' \
-  --intended-use 'machine gate calibration' --output .opencaw/.cache/tasks/evidence-test/code-character.json \
+  --manifest .hephaera/.cache/tasks/evidence-test/code-model.json --brief 'A deterministic evidence calibration actor' \
+  --intended-use 'machine gate calibration' --output .hephaera/.cache/tasks/evidence-test/code-character.json \
   --signature-part torso --view front --pixel-height 32 --grounding-tolerance-ratio 0.01 \
   --contact-tolerance-ratio 0.02 --construction-runs 3 --lifecycle-cycles 3 >/dev/null
 project_command bash commands/validate-code-character-profile.sh --strict "$profile" >/dev/null
@@ -88,7 +88,7 @@ for gate in structure interaction optimization; do
     --failing "evidence/$gate-fail-report.json" >/dev/null
 done
 project_command bash commands/validate-code-character-profile.sh --strict "$profile" >/dev/null
-stale_calibration_profile="$project/.opencaw/.cache/tasks/evidence-test/stale-calibration-character.json"
+stale_calibration_profile="$project/.hephaera/.cache/tasks/evidence-test/stale-calibration-character.json"
 cp "$profile" "$stale_calibration_profile"
 node_stale_calibration_profile="$stale_calibration_profile"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then node_stale_calibration_profile="$(wslpath -w "$node_stale_calibration_profile")"; fi
@@ -110,7 +110,7 @@ grep -Fq 'does not accept machine calibration' "$runtime_dir/reviewer-calibratio
 
 echo "[3/6] checking structural, motion-mode, lifecycle, budget, capture, and comparison regressions"
 node_analyzer="$repo_root/commands/lib/code-character-evidence-analyzer.cjs"
-node_manifest="$project/.opencaw/.cache/tasks/evidence-test/code-model.json"
+node_manifest="$project/.hephaera/.cache/tasks/evidence-test/code-model.json"
 node_fixture="$project/fixtures/structure-pass.json"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
   node_analyzer="$(wslpath -w "$node_analyzer")"

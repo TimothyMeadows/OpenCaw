@@ -1,6 +1,6 @@
 ---
 name: maintain-repository-map
-description: Create, query, validate, and refresh OpenCaw's tagged semantic repository map. Use at first project startup, when the Git-visible path fingerprint is missing or stale, after structural file changes, or when exploration discovers durable component responsibilities, entry points, configuration, tests, or commands.
+description: Create, query, validate, and refresh Hephaera's tagged semantic repository map. Use at first project startup, when the Git-visible path fingerprint is missing or stale, after structural file changes, or when exploration discovers durable component responsibilities, entry points, configuration, tests, or commands.
 engines: [AGNOSTIC]
 ---
 
@@ -25,6 +25,6 @@ Use before broad repository searches and whenever structural changes or new arch
 ## Guardrails
 
 - Do not replace semantic responsibilities with a raw tree dump.
-- Exclude `.opencaw/.cache` and the mounted OpenCaw baseline from the project fingerprint.
+- Exclude `.hephaera/.cache` and the mounted Hephaera baseline from the project fingerprint.
 - Do not stamp an empty or unverified map.
 - Refresh on versionable path additions, removals, or moves; content-only edits do not require a fingerprint change.

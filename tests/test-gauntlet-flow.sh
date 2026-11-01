@@ -7,15 +7,15 @@ export LANG=C
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
-temp_root="$(mktemp -d "${TMPDIR:-/tmp}/opencaw-gauntlet.XXXXXX")"
+temp_root="$(mktemp -d "${TMPDIR:-/tmp}/hephaera-gauntlet.XXXXXX")"
 network_marker="$temp_root/network-command-used"
 cleanup() {
-  if [[ "${OPENCAW_TEST_PRESERVE_TMP:-0}" == 1 ]]; then
+  if [[ "${HEPHAERA_TEST_PRESERVE_TMP:-0}" == 1 ]]; then
     printf 'Preserved Gauntlet test fixture: %s\n' "$temp_root" >&2
     return
   fi
   case "$temp_root" in
-    */opencaw-gauntlet.*) rm -rf -- "$temp_root" ;;
+    */hephaera-gauntlet.*) rm -rf -- "$temp_root" ;;
   esac
 }
 trap cleanup EXIT
@@ -240,7 +240,7 @@ gauntlet_helper_value() {
   local project="$1"
   local helper="$2"
   shift 2
-  OPENCAW_PROJECT_ROOT="$project" bash -c '
+  HEPHAERA_PROJECT_ROOT="$project" bash -c '
     set -euo pipefail
     source commands/lib/gauntlet-common.sh
     "$@"
@@ -311,7 +311,7 @@ refresh_copied_evidence_hashes() {
   gauntlet_name="$(basename "$gauntlet_dir")"
   while IFS= read -r evidence_file; do
     [[ -n "$evidence_file" ]] || continue
-    relative_path=".opencaw/.cache/gauntlets/$gauntlet_name/${evidence_file#"$gauntlet_dir"/}"
+    relative_path=".hephaera/.cache/gauntlets/$gauntlet_name/${evidence_file#"$gauntlet_dir"/}"
     evidence_hash="$(sha256_file "$evidence_file")"
     case "$relative_path" in
       */rounds/*/round-*.md)
@@ -447,15 +447,15 @@ assert_safe_copied_reference() {
   local referenced_file="$project_root/$referenced"
   case "$kind" in
     opened)
-      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ]] \
+      [[ "$referenced" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ]] \
         || fail "copied round has a noncanonical opened-event reference: $referenced"
       ;;
     root|trigger)
-      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/(rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}|pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}|promotion-events/event-[0-9]{3,})\.md$ ]] \
+      [[ "$referenced" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/(rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}|pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}|promotion-events/event-[0-9]{3,})\.md$ ]] \
         || fail "copied evidence has a noncanonical remediation reference: $referenced"
       ;;
     archive)
-      [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
+      [[ "$referenced" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
         || fail "copied promotion event has a noncanonical report archive: $referenced"
       ;;
     *) fail "unknown copied-reference kind: $kind" ;;
@@ -467,6 +467,17 @@ assert_safe_copied_reference() {
     || fail "copied evidence reference escaped the project root: $referenced"
 }
 
+copied_gauntlet_project_root() {
+  local gauntlet_dir="$1"
+  local canonical_gauntlet_dir project_root gauntlet_name
+  canonical_gauntlet_dir="$(cd "$gauntlet_dir" && pwd -P)"
+  project_root="$(cd "$canonical_gauntlet_dir/../../../.." && pwd -P)"
+  gauntlet_name="$(basename "$canonical_gauntlet_dir")"
+  [[ "$canonical_gauntlet_dir" == "$project_root/.hephaera/.cache/gauntlets/$gauntlet_name" ]] \
+    || fail "copied Gauntlet directory must use the canonical project cache layout: $gauntlet_dir"
+  printf '%s\n' "$project_root"
+}
+
 refresh_copied_checkpoint_hashes() {
   local gauntlet_dir="$1"
   local gauntlet_name project_root gauntlet_file checkpoint checkpoint_relative checkpoint_hash
@@ -474,11 +485,11 @@ refresh_copied_checkpoint_hashes() {
   local remediation_root remediation_root_file remediation_root_hash recorded_root_hash
   local event_file
   gauntlet_name="$(basename "$gauntlet_dir")"
-  project_root="$(cd "$gauntlet_dir/../../.." && pwd -P)"
+  project_root="$(copied_gauntlet_project_root "$gauntlet_dir")"
   gauntlet_file="$gauntlet_dir/GAUNTLET.md"
   while IFS= read -r checkpoint; do
     [[ -n "$checkpoint" ]] || continue
-    checkpoint_relative=".opencaw/.cache/gauntlets/$gauntlet_name/${checkpoint#"$gauntlet_dir"/}"
+    checkpoint_relative=".hephaera/.cache/gauntlets/$gauntlet_name/${checkpoint#"$gauntlet_dir"/}"
     remediation_trigger="$(sed -nE \
       's/^- Remediation trigger: (.*)$/\1/p' "$checkpoint" | head -n 1)"
     if [[ "$remediation_trigger" != none \
@@ -500,9 +511,9 @@ refresh_copied_checkpoint_hashes() {
     remediation_root="$(sed -nE \
       's/^- Remediation root: (.*)$/\1/p' "$checkpoint" | head -n 1)"
     if [[ "$remediation_root" != none \
-      && ( "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
-        || "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ \
-        || "$remediation_root" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ) ]]; then
+      && ( "$remediation_root" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+        || "$remediation_root" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ \
+        || "$remediation_root" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ) ]]; then
       remediation_root_file="$project_root/$remediation_root"
       if [[ -f "$remediation_root_file" && ! -L "$remediation_root_file" ]] \
         && gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -536,7 +547,7 @@ refresh_copied_cross_evidence_hashes() {
   local gauntlet_dir="$1"
   local gauntlet_name project_root round referenced hash promotion archive
   gauntlet_name="$(basename "$gauntlet_dir")"
-  project_root="$(cd "$gauntlet_dir/../../.." && pwd -P)"
+  project_root="$(copied_gauntlet_project_root "$gauntlet_dir")"
   while IFS= read -r round; do
     [[ -n "$round" ]] || continue
     referenced="$(sed -nE 's/^- Opened event: (.*)$/\1/p' "$round" | head -n 1)"
@@ -578,11 +589,11 @@ refresh_copied_report_projections() {
   local promotion consumed_completion report_relative report_file projection
   local archive_count
   gauntlet_name="$(basename "$gauntlet_dir")"
-  project_root="$(cd "$gauntlet_dir/../../.." && pwd -P)"
+  project_root="$(copied_gauntlet_project_root "$gauntlet_dir")"
 
   while IFS= read -r completion; do
     [[ -n "$completion" ]] || continue
-    completion_relative=".opencaw/.cache/gauntlets/$gauntlet_name/${completion#"$gauntlet_dir"/}"
+    completion_relative=".hephaera/.cache/gauntlets/$gauntlet_name/${completion#"$gauntlet_dir"/}"
     report_relative=''
     archive_count=0
     while IFS= read -r promotion; do
@@ -606,8 +617,8 @@ refresh_copied_report_projections() {
       report_relative="$(gauntlet_helper_value "$project_root" \
         gauntlet_section_field "$completion" 'Completion Event Metadata' 'Report')"
     fi
-    [[ "$report_relative" == ".opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md" \
-      || "$report_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
+    [[ "$report_relative" == ".hephaera/.cache/gauntlets/$gauntlet_name/GAUNTLET_REPORT.md" \
+      || "$report_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/promotion-events/GAUNTLET_REPORT-before-event-[0-9]{3,}\.md$ ]] \
       || fail "copied completion resolved a noncanonical report: $report_relative"
     report_file="$project_root/$report_relative"
     [[ -f "$report_file" && ! -L "$report_file" ]] \
@@ -628,7 +639,7 @@ refresh_copied_qa_body_hashes() {
   local gauntlet_name project_root event action head_sha referenced affected
   local body body_hash
   gauntlet_name="$(basename "$gauntlet_dir")"
-  project_root="$(cd "$gauntlet_dir/../../.." && pwd -P)"
+  project_root="$(copied_gauntlet_project_root "$gauntlet_dir")"
 
   while IFS= read -r event; do
     [[ -n "$event" ]] || continue
@@ -639,7 +650,7 @@ refresh_copied_qa_body_hashes() {
       "$event" 'PR Event Metadata' 'Head SHA')"
     referenced="$(gauntlet_helper_value "$project_root" gauntlet_section_field \
       "$event" 'PR Event Metadata' 'Critic round')"
-    [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+    [[ "$referenced" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
       && -f "$project_root/$referenced" && ! -L "$project_root/$referenced" ]] \
       || fail "copied PR QA event references unsafe critic evidence: $referenced"
     gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -665,7 +676,7 @@ refresh_copied_qa_body_hashes() {
       "$event" 'Promotion QA Event Metadata' 'Affected units')"
     [[ "$action" == pass || "$action" == fail ]] \
       || fail "copied promotion event has an invalid verdict: $event"
-    [[ "$referenced" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ \
+    [[ "$referenced" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/completion-events/event-[0-9]{3,}\.md$ \
       && -f "$project_root/$referenced" && ! -L "$project_root/$referenced" ]] \
       || fail "copied promotion QA event references unsafe completion evidence: $referenced"
     gauntlet_helper_value "$project_root" gauntlet_assert_safe_ai_path \
@@ -683,7 +694,7 @@ refresh_copied_qa_body_hashes() {
 copied_markdown_digest() {
   local gauntlet_dir="$1"
   local project_root markdown_file material=''
-  project_root="$(cd "$gauntlet_dir/../../.." && pwd -P)"
+  project_root="$(copied_gauntlet_project_root "$gauntlet_dir")"
   while IFS= read -r markdown_file; do
     [[ -n "$markdown_file" ]] || continue
     material+="${markdown_file#"$project_root"/}"$'\t'
@@ -729,9 +740,9 @@ new_project() {
   local project="$temp_root/$name"
   mkdir -p "$project"
   git -C "$project" init -q -b main
-  git -C "$project" config user.name 'OpenCaw Gauntlet Test'
-  git -C "$project" config user.email 'opencaw-gauntlet@example.invalid'
-  git -C "$project" remote add origin https://github.com/example/opencaw-fixture.git
+  git -C "$project" config user.name 'Hephaera Gauntlet Test'
+  git -C "$project" config user.email 'hephaera-gauntlet@example.invalid'
+  git -C "$project" remote add origin https://github.com/example/hephaera-fixture.git
   printf 'inspectable fixture artifact\n' >"$project/artifact.txt"
   git -C "$project" add artifact.txt
   git -C "$project" commit -qm 'test: initialize fixture'
@@ -747,11 +758,11 @@ create_fixture_commit() {
   local commit_sha
 
   commit_sha="$(printf 'fixture commit %02d\n' "$ordinal" \
-    | GIT_AUTHOR_NAME='OpenCaw Gauntlet Test' \
-      GIT_AUTHOR_EMAIL='opencaw-gauntlet@example.invalid' \
+    | GIT_AUTHOR_NAME='Hephaera Gauntlet Test' \
+      GIT_AUTHOR_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_AUTHOR_DATE="@$timestamp +0000" \
-      GIT_COMMITTER_NAME='OpenCaw Gauntlet Test' \
-      GIT_COMMITTER_EMAIL='opencaw-gauntlet@example.invalid' \
+      GIT_COMMITTER_NAME='Hephaera Gauntlet Test' \
+      GIT_COMMITTER_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_COMMITTER_DATE="@$timestamp +0000" \
       git -C "$project" commit-tree "$tree" -p "$parent")"
   git -C "$project" update-ref "refs/heads/fixture/review-$ordinal" "$commit_sha"
@@ -773,11 +784,11 @@ initialize_fixture_commits() {
   empty_tree="$(git -C "$project" mktree </dev/null)"
   timestamp=946684899
   artifact_absent_sha="$(printf 'fixture commit without artifact\n' \
-    | GIT_AUTHOR_NAME='OpenCaw Gauntlet Test' \
-      GIT_AUTHOR_EMAIL='opencaw-gauntlet@example.invalid' \
+    | GIT_AUTHOR_NAME='Hephaera Gauntlet Test' \
+      GIT_AUTHOR_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_AUTHOR_DATE="@$timestamp +0000" \
-      GIT_COMMITTER_NAME='OpenCaw Gauntlet Test' \
-      GIT_COMMITTER_EMAIL='opencaw-gauntlet@example.invalid' \
+      GIT_COMMITTER_NAME='Hephaera Gauntlet Test' \
+      GIT_COMMITTER_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_COMMITTER_DATE="@$timestamp +0000" \
       git -C "$project" commit-tree "$empty_tree" -p "$parent")"
   git -C "$project" update-ref refs/heads/fixture/artifact-absent "$artifact_absent_sha"
@@ -787,11 +798,11 @@ initialize_fixture_commits() {
 
   orphan_timestamp=946684900
   orphan_sha="$(printf 'fixture orphan commit\n' \
-    | GIT_AUTHOR_NAME='OpenCaw Gauntlet Test' \
-      GIT_AUTHOR_EMAIL='opencaw-gauntlet@example.invalid' \
+    | GIT_AUTHOR_NAME='Hephaera Gauntlet Test' \
+      GIT_AUTHOR_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_AUTHOR_DATE="@$orphan_timestamp +0000" \
-      GIT_COMMITTER_NAME='OpenCaw Gauntlet Test' \
-      GIT_COMMITTER_EMAIL='opencaw-gauntlet@example.invalid' \
+      GIT_COMMITTER_NAME='Hephaera Gauntlet Test' \
+      GIT_COMMITTER_EMAIL='hephaera-gauntlet@example.invalid' \
       GIT_COMMITTER_DATE="@$orphan_timestamp +0000" \
       git -C "$project" commit-tree "$tree")"
   git -C "$project" update-ref refs/heads/fixture/orphan "$orphan_sha"
@@ -834,7 +845,7 @@ fixture_issue_link() {
   # for a progress target without scanning every generated fixture contract.
   if [[ "$head_branch" == gauntlet/* ]]; then
     gauntlet_name="${head_branch#gauntlet/}"
-    candidate="$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
+    candidate="$project/.hephaera/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
     if [[ -f "$candidate" ]]; then
       candidate_integration="$(sed -nE \
         's/\r$//; s/^- Integration branch: (.+)$/\1/p' "$candidate" | head -n 1)"
@@ -848,7 +859,7 @@ fixture_issue_link() {
   fi
   if [[ -z "$link_keyword" && "$base_branch" == gauntlet/* ]]; then
     gauntlet_name="${base_branch#gauntlet/}"
-    candidate="$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
+    candidate="$project/.hephaera/.cache/gauntlets/$gauntlet_name/GAUNTLET.md"
     if [[ -f "$candidate" ]]; then
       candidate_integration="$(sed -nE \
         's/\r$//; s/^- Integration branch: (.+)$/\1/p' "$candidate" | head -n 1)"
@@ -860,7 +871,7 @@ fixture_issue_link() {
   fi
   [[ -n "$link_keyword" ]] || return 1
   issue_url="$(gauntlet_helper_value "$project" gauntlet_section_field \
-    "$project/.opencaw/.cache/gauntlets/$gauntlet_name/GAUNTLET.md" \
+    "$project/.hephaera/.cache/gauntlets/$gauntlet_name/GAUNTLET.md" \
     'Parent Task' 'Issue')"
   issue_number="$(gauntlet_helper_value "$project" \
     gauntlet_github_issue_number "$issue_url")"
@@ -881,7 +892,7 @@ set_pr_observation() {
   local merged_by_bot="${10:-}"
   local base_ref_oid="${11:-}"
   local is_cross_repository="${12:-false}"
-  local head_repository="${13:-example/opencaw-fixture}"
+  local head_repository="${13:-example/hephaera-fixture}"
   local created_at="${14:-${FAKE_DATE_ISO:-2026-08-01T12:00:00Z}}"
   local closed_at="${15:-}"
   local pr_body="${16:-}"
@@ -908,7 +919,7 @@ set_pr_observation() {
       '$1 == url { body=$18 } END { print body }' "$fake_gh_state")"
     if [[ "$observation_exists" -eq 0 \
       && -z "$pr_body_base64" \
-      && "${OPENCAW_TEST_RAW_PR_BODY:-0}" != 1 ]]; then
+      && "${HEPHAERA_TEST_RAW_PR_BODY:-0}" != 1 ]]; then
       canonical_issue_link="$(fixture_issue_link \
         "$project" "$head_branch" "$base_branch" 2>/dev/null || true)"
       if [[ -n "$canonical_issue_link" ]]; then
@@ -917,7 +928,7 @@ set_pr_observation() {
       fi
     fi
   else
-    if [[ "${OPENCAW_TEST_RAW_PR_BODY:-0}" != 1 ]]; then
+    if [[ "${HEPHAERA_TEST_RAW_PR_BODY:-0}" != 1 ]]; then
       canonical_issue_link="$(fixture_issue_link \
         "$project" "$head_branch" "$base_branch" 2>/dev/null || true)"
       if [[ -n "$canonical_issue_link" ]]; then
@@ -1066,7 +1077,7 @@ semantic_comment_body() {
   local affected_units="${5:-none}"
   local source_hash
   source_hash="$(sha256_file "$project/$source_relative")"
-  printf '<!-- opencaw-gauntlet-qa:v1 verdict=%s head-sha=%s source=%s source-sha256=%s affected-units=%s -->\n' \
+  printf '<!-- hephaera-gauntlet-qa:v1 verdict=%s head-sha=%s source=%s source-sha256=%s affected-units=%s -->\n' \
     "$verdict" "$head_sha" "$source_relative" "$source_hash" "$affected_units"
 }
 
@@ -1096,7 +1107,7 @@ latest_event_field() {
   local field="$4"
   local event_file
   event_file="$(gauntlet_helper_value "$project" gauntlet_latest_pr_event_file \
-    "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events/$item")"
+    "$project/.hephaera/.cache/gauntlets/$gauntlet/pr-events/$item")"
   [[ -n "$event_file" ]] || return 1
   sed -nE "s/^- $field: (.*)$/\\1/p" "$event_file" | head -n 1
 }
@@ -1106,7 +1117,7 @@ checkpoint_consumed() {
   local gauntlet="$2"
   local checkpoint_relative="$3"
   grep -R -Fq -- "- Publication checkpoint: $checkpoint_relative" \
-    "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events" 2>/dev/null
+    "$project/.hephaera/.cache/gauntlets/$gauntlet/pr-events" 2>/dev/null
 }
 
 latest_unused_publication_checkpoint() {
@@ -1121,7 +1132,7 @@ latest_unused_publication_checkpoint() {
       printf '%s\n' "$checkpoint"
       return 0
     fi
-  done < <(find "$project/.opencaw/.cache/gauntlets/$gauntlet/publication-checkpoints/$item" \
+  done < <(find "$project/.hephaera/.cache/gauntlets/$gauntlet/publication-checkpoints/$item" \
     -maxdepth 1 -type f -name 'checkpoint-*.md' -print 2>/dev/null \
     | LC_ALL=C sort -r)
   return 1
@@ -1137,8 +1148,8 @@ ensure_publication_marker() {
     "$project" "$gauntlet" "$item" 2>/dev/null || true)"
   if [[ -z "$checkpoint" ]]; then
     readiness_output="$(mktemp "$temp_root/publication-readiness.XXXXXX")"
-    OPENCAW_PROJECT_ROOT="$project" \
-      OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/publication-checkpoint-$gauntlet-$item" \
+    HEPHAERA_PROJECT_ROOT="$project" \
+      HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/publication-checkpoint-$gauntlet-$item" \
       bash commands/pr-readiness-check.sh --gauntlet-progress \
         "$gauntlet" "$item" "$project/progress-validation.md" >"$readiness_output"
     checkpoint_relative="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -1153,7 +1164,7 @@ ensure_publication_marker() {
     checkpoint_hash="$(sha256_file "$checkpoint")"
   fi
   expect_file "$checkpoint"
-  printf '<!-- opencaw-gauntlet-publication:v1 checkpoint=%s checkpoint-sha256=%s -->\n' \
+  printf '<!-- hephaera-gauntlet-publication:v1 checkpoint=%s checkpoint-sha256=%s -->\n' \
     "$checkpoint_relative" "$checkpoint_hash"
 }
 
@@ -1162,7 +1173,7 @@ opened_publication_marker() {
   local gauntlet="$2"
   local item="$3"
   local opened_event checkpoint_relative checkpoint_hash
-  opened_event="$(find "$project/.opencaw/.cache/gauntlets/$gauntlet/pr-events/$item" -maxdepth 1 \
+  opened_event="$(find "$project/.hephaera/.cache/gauntlets/$gauntlet/pr-events/$item" -maxdepth 1 \
     -type f -name 'event-*.md' -print 2>/dev/null | LC_ALL=C sort -r \
     | while IFS= read -r candidate; do
         [[ "$(sed -nE 's/^- Event: (.*)$/\1/p' "$candidate" | head -n 1)" == opened ]] \
@@ -1174,7 +1185,7 @@ opened_publication_marker() {
   checkpoint_hash="$(sed -nE 's/^- Publication checkpoint sha256: (.*)$/\1/p' \
     "$opened_event" | head -n 1)"
   [[ -n "$checkpoint_relative" && -n "$checkpoint_hash" ]] || return 1
-  printf '<!-- opencaw-gauntlet-publication:v1 checkpoint=%s checkpoint-sha256=%s -->\n' \
+  printf '<!-- hephaera-gauntlet-publication:v1 checkpoint=%s checkpoint-sha256=%s -->\n' \
     "$checkpoint_relative" "$checkpoint_hash"
 }
 
@@ -1242,7 +1253,7 @@ prepare_observation_for_command() {
       if [[ "$action" == opened ]]; then
         publication_marker="$(ensure_publication_marker \
           "$project" "$gauntlet_name" "$item")"
-        if [[ "${OPENCAW_TEST_SKIP_REMOTE_PUBLICATION:-0}" != 1 ]]; then
+        if [[ "${HEPHAERA_TEST_SKIP_REMOTE_PUBLICATION:-0}" != 1 ]]; then
           publish_checkpoint_refs "$project" "$publication_marker"
         fi
       else
@@ -1251,19 +1262,19 @@ prepare_observation_for_command() {
       fi
       case "$action" in
         opened|qa-pass|qa-fail)
-          if [[ "${OPENCAW_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
+          if [[ "${HEPHAERA_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
             set_pr_observation "$pr_url" "$head_branch" "$head_sha" "$base_branch" \
               OPEN false none none none none "$base_ref_oid" false \
-              example/opencaw-fixture "$pr_created_at" none "$publication_marker"
-          elif [[ "${OPENCAW_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
+              example/hephaera-fixture "$pr_created_at" none "$publication_marker"
+          elif [[ "${HEPHAERA_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
             && -n "$publication_marker" ]]; then
             set_pr_body_observation "$pr_url" "$publication_marker"
           fi
-          if [[ "$action" == qa-* && "${OPENCAW_TEST_SKIP_COMMENT_OBSERVATION:-0}" != 1 \
+          if [[ "$action" == qa-* && "${HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION:-0}" != 1 \
             && "$evidence_url" == "$pr_url#issuecomment-"* ]]; then
             qa_verdict="${action#qa-}"
             source_file="$(gauntlet_helper_value "$project" gauntlet_latest_round_file \
-              "$project/.opencaw/.cache/gauntlets/$gauntlet_name/rounds/$item")"
+              "$project/.hephaera/.cache/gauntlets/$gauntlet_name/rounds/$item")"
             [[ -n "$source_file" ]] || fail "QA fixture cannot find its critic source: $item"
             source_relative="${source_file#"$project"/}"
             set_semantic_comment_observation "$project" "$evidence_url" "$pr_url" \
@@ -1271,12 +1282,12 @@ prepare_observation_for_command() {
           fi
           ;;
         merged)
-          if [[ "${OPENCAW_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
+          if [[ "${HEPHAERA_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
             set_pr_observation "$pr_url" "$head_branch" "$head_sha" "$base_branch" MERGED false \
               "$fixture_now" human-reviewer "$merge_commit" false "$base_ref_oid" \
-              false example/opencaw-fixture "$pr_created_at" \
+              false example/hephaera-fixture "$pr_created_at" \
               "$fixture_now" "$publication_marker"
-          elif [[ "${OPENCAW_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
+          elif [[ "${HEPHAERA_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
             && -n "$publication_marker" ]]; then
             set_pr_body_observation "$pr_url" "$publication_marker"
           fi
@@ -1284,12 +1295,12 @@ prepare_observation_for_command() {
           set_remote_ref "$project" "$base_branch" "$merge_commit"
           ;;
         closed)
-          if [[ "${OPENCAW_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
+          if [[ "${HEPHAERA_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
             set_pr_observation "$pr_url" "$head_branch" "$head_sha" "$base_branch" \
               CLOSED false none none none none "$base_ref_oid" false \
-              example/opencaw-fixture "$pr_created_at" \
+              example/hephaera-fixture "$pr_created_at" \
               "$fixture_now" "$publication_marker"
-          elif [[ "${OPENCAW_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
+          elif [[ "${HEPHAERA_TEST_SKIP_PUBLICATION_BODY:-0}" != 1 \
             && -n "$publication_marker" ]]; then
             set_pr_body_observation "$pr_url" "$publication_marker"
           fi
@@ -1314,7 +1325,7 @@ prepare_observation_for_command() {
         [[ -n "$pr_created_at" ]] || pr_created_at="$fixture_now"
         set_pr_observation "$pr_url" "$head_branch" "$head_sha" "gauntlet/$gauntlet_name" \
           OPEN false none none none none "$base_ref_oid" false \
-          example/opencaw-fixture "$pr_created_at" none "$publication_marker"
+          example/hephaera-fixture "$pr_created_at" none "$publication_marker"
       fi
       ;;
     commands/record-gauntlet-promotion-qa.sh)
@@ -1327,17 +1338,17 @@ prepare_observation_for_command() {
       pr_created_at="$(awk -F '\t' -v url="${promotion_url%/}" \
         '$1 == url { value=$10 } END { print value }' "$fake_gh_state")"
       [[ -n "$pr_created_at" ]] || pr_created_at="$fixture_now"
-      if [[ "${OPENCAW_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
+      if [[ "${HEPHAERA_TEST_SKIP_OBSERVATION:-0}" != 1 ]]; then
         set_pr_observation "$promotion_url" "gauntlet/$gauntlet_name" "$head_sha" main \
           OPEN false none none none none "$base_ref_oid" false \
-          example/opencaw-fixture "$pr_created_at"
+          example/hephaera-fixture "$pr_created_at"
       fi
-      if [[ "${OPENCAW_TEST_SKIP_COMMENT_OBSERVATION:-0}" != 1 \
+      if [[ "${HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION:-0}" != 1 \
         && "$evidence_url" == "$promotion_url#issuecomment-"* ]]; then
         qa_verdict="${positional_observation[1]}"
         source_file="$(gauntlet_helper_value "$project" \
           gauntlet_latest_completion_event_file \
-          "$project/.opencaw/.cache/gauntlets/$gauntlet_name/completion-events")"
+          "$project/.hephaera/.cache/gauntlets/$gauntlet_name/completion-events")"
         [[ -n "$source_file" ]] || fail 'Promotion QA fixture cannot find its completion source.'
         source_relative="${source_file#"$project"/}"
         qa_affected_units=none
@@ -1375,7 +1386,7 @@ run_for() {
       'HARNESS_SETUP_FAILURE: observation setup failed before command execution.' >&2
     return 125
   fi
-  if OPENCAW_PROJECT_ROOT="$project" "$@"; then
+  if HEPHAERA_PROJECT_ROOT="$project" "$@"; then
     return 0
   else
     command_result=$?
@@ -1391,15 +1402,15 @@ run_for() {
 run_for_without_observation() {
   local project="$1"
   shift
-  OPENCAW_PROJECT_ROOT="$project" "$@"
+  HEPHAERA_PROJECT_ROOT="$project" "$@"
 }
 
 write_parent_task() {
   local project="$1"
   local task_name="$2"
   local issue_number="$3"
-  mkdir -p "$project/.opencaw/.cache/tasks/$task_name"
-  cat >"$project/.opencaw/.cache/tasks/$task_name/TASK.md" <<EOF
+  mkdir -p "$project/.hephaera/.cache/tasks/$task_name"
+  cat >"$project/.hephaera/.cache/tasks/$task_name/TASK.md" <<EOF
 # Gauntlet parent fixture
 
 ## Goal
@@ -1427,7 +1438,7 @@ Run deterministic local checks.
 Use a separate critic identity.
 
 ## Issue
-https://github.com/example/opencaw-fixture/issues/$issue_number
+https://github.com/example/hephaera-fixture/issues/$issue_number
 EOF
 }
 
@@ -1454,7 +1465,7 @@ copy_gauntlet() {
       source_integration_sha="$(git -C "$project" rev-parse --verify \
         "refs/heads/$source_integration_branch" 2>/dev/null || true)"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
-        ".opencaw/.cache/gauntlets/$source_name/" ".opencaw/.cache/gauntlets/$destination_name/"
+        ".hephaera/.cache/gauntlets/$source_name/" ".hephaera/.cache/gauntlets/$destination_name/"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
         "gauntlet/$source_name/" "gauntlet/$destination_name/"
       replace_all_literal "$destination_dir/GAUNTLET.md" \
@@ -1467,7 +1478,7 @@ copy_gauntlet() {
       while IFS= read -r copied_file; do
         [[ -n "$copied_file" ]] || continue
         replace_all_literal "$copied_file" \
-          ".opencaw/.cache/gauntlets/$source_name/" ".opencaw/.cache/gauntlets/$destination_name/"
+          ".hephaera/.cache/gauntlets/$source_name/" ".hephaera/.cache/gauntlets/$destination_name/"
         replace_all_literal "$copied_file" \
           "gauntlet/$source_name" "gauntlet/$destination_name"
         replace_all_literal "$copied_file" \
@@ -1479,7 +1490,7 @@ copy_gauntlet() {
         set_remote_ref "$project" "gauntlet/$destination_name" "$source_integration_sha"
       fi
       if [[ -n "$source_contract_fingerprint" ]]; then
-        destination_contract_fingerprint="$(OPENCAW_PROJECT_ROOT="$project" bash -c '
+        destination_contract_fingerprint="$(HEPHAERA_PROJECT_ROOT="$project" bash -c '
           set -euo pipefail
           source commands/lib/gauntlet-common.sh
           gauntlet_execution_contract_fingerprint "$1"
@@ -1565,7 +1576,7 @@ sync_gauntlet_live_observations() {
       "$event" 'PR Event Metadata' 'Publication checkpoint')"
     checkpoint_hash="$(gauntlet_helper_value "$project" gauntlet_section_field \
       "$event" 'PR Event Metadata' 'Publication checkpoint sha256')"
-    publication_body="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint checkpoint-sha256=$checkpoint_hash -->"
+    publication_body="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint checkpoint-sha256=$checkpoint_hash -->"
     set_pr_observation "$pr_url" "$head_branch" "$head_sha" "$target_branch" \
       "$state" "$draft" "$merged_at" "$merged_by" "$merge_commit" \
       "$merged_by_bot" "$target_base" "$cross_repository" "$head_repository" \
@@ -1642,8 +1653,8 @@ write_ready_gauntlet() {
 
 ## Parent Task
 - Task name: gauntlet-parent
-- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`
-- Issue: https://github.com/example/opencaw-fixture/issues/101
+- Task file: `.hephaera/.cache/tasks/gauntlet-parent/TASK.md`
+- Issue: https://github.com/example/hephaera-fixture/issues/101
 
 ## Objective
 
@@ -2086,28 +2097,28 @@ initialize_fixture_commits "$project"
 base_commit_sha="$(git -C "$project" rev-parse refs/heads/main)"
 closing_reference_count="$(gauntlet_helper_value "$project" \
   gauntlet_github_closing_reference_count \
-  $'Refs #101\nResolves #7, closes: example/opencaw-fixture#101' \
-  'https://github.com/example/opencaw-fixture/issues/101')"
+  $'Refs #101\nResolves #7, closes: example/hephaera-fixture#101' \
+  'https://github.com/example/hephaera-fixture/issues/101')"
 [[ "$closing_reference_count" == 1 ]] \
   || fail 'GitHub closing-keyword parser missed colon, qualified, or comma-separated syntax'
 zero_padded_closing_count="$(gauntlet_helper_value "$project" \
   gauntlet_github_closing_reference_count \
-  $'Closes #0101\nFixes: example/opencaw-fixture#000101\nResolved GH-000101\nClosed https://github.com/example/opencaw-fixture/issues/000101?source=pr\nClose [the parent](https://github.com/example/opencaw-fixture/issues/000101)' \
-  'https://github.com/example/opencaw-fixture/issues/101')"
+  $'Closes #0101\nFixes: example/hephaera-fixture#000101\nResolved GH-000101\nClosed https://github.com/example/hephaera-fixture/issues/000101?source=pr\nClose [the parent](https://github.com/example/hephaera-fixture/issues/000101)' \
+  'https://github.com/example/hephaera-fixture/issues/101')"
 [[ "$zero_padded_closing_count" == 5 ]] \
   || fail 'GitHub closing-keyword parser missed zero-padded, GH-, URL, or Markdown-link aliases'
 expect_failure "$temp_root/noncanonical-progress-directive.log" \
   gauntlet_helper_value "$project" gauntlet_assert_progress_issue_link \
   $'refs #101\n<!-- checkpoint follows -->' \
-  'https://github.com/example/opencaw-fixture/issues/101'
+  'https://github.com/example/hephaera-fixture/issues/101'
 expect_failure "$temp_root/buried-promotion-directive.log" \
   gauntlet_helper_value "$project" gauntlet_assert_promotion_issue_link \
   $'Promotion review\nCloses #101' \
-  'https://github.com/example/opencaw-fixture/issues/101'
+  'https://github.com/example/hephaera-fixture/issues/101'
 expect_failure "$temp_root/markdown-closing-progress-link.log" \
   gauntlet_helper_value "$project" gauntlet_assert_progress_issue_link \
-  $'Refs #101\nCloses [#101](https://github.com/example/opencaw-fixture/issues/101)' \
-  'https://github.com/example/opencaw-fixture/issues/101'
+  $'Refs #101\nCloses [#101](https://github.com/example/hephaera-fixture/issues/101)' \
+  'https://github.com/example/hephaera-fixture/issues/101'
 
 numeric_round_dir="$temp_root/numeric-round-selection"
 mkdir -p "$numeric_round_dir"
@@ -2115,23 +2126,23 @@ cat >"$numeric_round_dir/round-999.md" <<'EOF'
 # Numeric round fixture 999
 
 ## Round Metadata
-- Progress PR: https://github.com/example/opencaw-fixture/pull/900
+- Progress PR: https://github.com/example/hephaera-fixture/pull/900
 EOF
 cat >"$numeric_round_dir/round-1000.md" <<'EOF'
 # Numeric round fixture 1000
 
 ## Round Metadata
-- Progress PR: https://github.com/example/opencaw-fixture/pull/900
+- Progress PR: https://github.com/example/hephaera-fixture/pull/900
 EOF
 cat >"$numeric_round_dir/round-1001.md" <<'EOF'
 # Numeric round fixture 1001
 
 ## Round Metadata
-- Progress PR: https://github.com/example/opencaw-fixture/pull/901
+- Progress PR: https://github.com/example/hephaera-fixture/pull/901
 EOF
 numeric_latest_for_pr="$(gauntlet_helper_value "$project" \
   gauntlet_latest_round_file_for_pr "$numeric_round_dir" \
-  'https://github.com/example/opencaw-fixture/pull/900')"
+  'https://github.com/example/hephaera-fixture/pull/900')"
 [[ "$numeric_latest_for_pr" == "$numeric_round_dir/round-1000.md" ]] \
   || fail 'PR-filtered close replay selected round-999 lexically instead of round-1000 numerically'
 numeric_latest_overall="$(gauntlet_helper_value "$project" \
@@ -2181,24 +2192,24 @@ git -C "$project" cat-file -e "$orphan_sha:artifact.txt" 2>/dev/null \
 if git -C "$project" merge-base --is-ancestor "$base_commit_sha" "$orphan_sha"; then
   fail 'orphan integration fixture unexpectedly descends from the frozen base commit'
 fi
-gh_probe_url='https://github.com/example/opencaw-fixture/pull/199'
+gh_probe_url='https://github.com/example/hephaera-fixture/pull/199'
 gh_pr_jq_filter='[.url, .headRefName, .headRefOid, .baseRefName, .baseRefOid, (.isCrossRepository | tostring), (.headRepository.nameWithOwner // "none"), .state, (.isDraft | tostring), (.createdAt // "none"), (.closedAt // "none"), (.mergedAt // "none"), (.mergedBy.login // "none"), (if .mergedBy == null then "none" elif .mergedBy.is_bot == null then "none" else (.mergedBy.is_bot | tostring) end), (.mergeCommit.oid // "none"), (.body // "" | @base64)] | @tsv'
 set_pr_observation "$gh_probe_url" gauntlet-work/probe/unit-1 "$head_sha_1" gauntlet/probe \
   OPEN false none none none none "$base_commit_sha"
 gh_probe_output="$(env GH_HOST=github.com gh pr view "$gh_probe_url" \
-  --repo example/opencaw-fixture \
+  --repo example/hephaera-fixture \
   --json url,headRefName,headRefOid,baseRefName,baseRefOid,isCrossRepository,headRepository,state,isDraft,createdAt,closedAt,mergedAt,mergedBy,mergeCommit,body \
   --jq "$gh_pr_jq_filter")"
-[[ "$gh_probe_output" == "$gh_probe_url"$'\t'gauntlet-work/probe/unit-1$'\t'"$head_sha_1"$'\t'gauntlet/probe$'\t'"$base_commit_sha"$'\t'false$'\t'example/opencaw-fixture$'\t'OPEN$'\t'false$'\t'2026-08-01T12:00:00Z$'\t'none$'\t'none$'\t'none$'\t'none$'\t'none$'\t' ]] \
+[[ "$gh_probe_output" == "$gh_probe_url"$'\t'gauntlet-work/probe/unit-1$'\t'"$head_sha_1"$'\t'gauntlet/probe$'\t'"$base_commit_sha"$'\t'false$'\t'example/hephaera-fixture$'\t'OPEN$'\t'false$'\t'2026-08-01T12:00:00Z$'\t'none$'\t'none$'\t'none$'\t'none$'\t'none$'\t' ]] \
   || fail 'offline gh fixture did not return its exact deterministic PR observation'
 expect_failure "$temp_root/gh-wrong-fields.log" env GH_HOST=github.com \
-  gh pr view "$gh_probe_url" --repo example/opencaw-fixture \
+  gh pr view "$gh_probe_url" --repo example/hephaera-fixture \
   --json url,state --jq fixture-filter
 run_for "$project" bash commands/create-host-ai-scaffold.sh >/dev/null
 run_for "$project" bash commands/create-host-ai-scaffold.sh >/dev/null
-[[ -d "$project/.opencaw/.cache/gauntlets" ]] || fail 'scaffold omitted .opencaw/.cache/gauntlets'
-[[ -d "$project/.opencaw/.cache/archive/gauntlets" ]] || fail 'scaffold omitted .opencaw/.cache/archive/gauntlets'
-[[ ! -e "$temp_root/.opencaw/.cache" ]] || fail 'scaffold escaped the explicit project root'
+[[ -d "$project/.hephaera/.cache/gauntlets" ]] || fail 'scaffold omitted .hephaera/.cache/gauntlets'
+[[ -d "$project/.hephaera/.cache/archive/gauntlets" ]] || fail 'scaffold omitted .hephaera/.cache/archive/gauntlets'
+[[ ! -e "$temp_root/.hephaera/.cache" ]] || fail 'scaffold escaped the explicit project root'
 
 write_parent_task "$project" gauntlet-parent 101
 dry_run_output="$temp_root/create-dry-run.log"
@@ -2219,7 +2230,7 @@ grep -Eq '^-[[:space:]]\[[[:space:]]\] unit-1 .*\| scope: ' "$dry_run_output" \
   || fail 'create dry-run omitted the required work-unit scope field'
 grep -q -- '- Unit manifest fingerprint: pending' "$dry_run_output" \
   || fail 'create dry-run omitted the pending retained-unit manifest fingerprint'
-[[ ! -e "$project/.opencaw/.cache/gauntlets/dry-run-gauntlet" ]] || fail 'create dry-run changed project state'
+[[ ! -e "$project/.hephaera/.cache/gauntlets/dry-run-gauntlet" ]] || fail 'create dry-run changed project state'
 
 expect_failure "$temp_root/invalid-name.log" run_for "$project" bash commands/create-gauntlet-file.sh 'Invalid_Name' --task gauntlet-parent
 expect_failure "$temp_root/escaping-name.log" run_for "$project" bash commands/create-gauntlet-file.sh '../../escape' --task gauntlet-parent
@@ -2227,11 +2238,11 @@ expect_failure "$temp_root/missing-task.log" run_for "$project" bash commands/cr
 
 create_output="$temp_root/create.log"
 run_for "$project" bash commands/create-gauntlet-file.sh fixture-gauntlet 'Fixture Gauntlet' --task gauntlet-parent >"$create_output"
-gauntlet_dir="$project/.opencaw/.cache/gauntlets/fixture-gauntlet"
+gauntlet_dir="$project/.hephaera/.cache/gauntlets/fixture-gauntlet"
 gauntlet_file="$gauntlet_dir/GAUNTLET.md"
 expect_file "$gauntlet_file"
-grep -Fq '.opencaw/.cache/tasks/gauntlet-parent/TASK.md' "$gauntlet_file" || fail 'Gauntlet did not link its parent task'
-grep -Fq 'https://github.com/example/opencaw-fixture/issues/101' "$gauntlet_file" || fail 'Gauntlet did not link its parent issue'
+grep -Fq '.hephaera/.cache/tasks/gauntlet-parent/TASK.md' "$gauntlet_file" || fail 'Gauntlet did not link its parent task'
+grep -Fq 'https://github.com/example/hephaera-fixture/issues/101' "$gauntlet_file" || fail 'Gauntlet did not link its parent issue'
 expect_line '## Progress PR Ledger' "$gauntlet_file"
 expect_line '## Completion Ledger' "$gauntlet_file"
 expect_line '- No completion events recorded.' "$gauntlet_file"
@@ -2259,21 +2270,22 @@ run_for "$project" bash commands/validate-gauntlet.sh "$gauntlet_dir" --phase re
 run_for "$project" bash commands/validate-gauntlet.sh "$gauntlet_file" --phase ready >/dev/null
 
 linked_root_project="$(new_project linked-gauntlet-root-project)"
-mkdir -p "$linked_root_project/.opencaw/.cache" "$temp_root/outside-gauntlet-root"
+mkdir -p "$linked_root_project/.hephaera/.cache" "$temp_root/outside-gauntlet-root"
 write_parent_task "$linked_root_project" gauntlet-parent 101
-ln -s "$temp_root/outside-gauntlet-root" "$linked_root_project/.opencaw/.cache/gauntlets"
+ln -s "$temp_root/outside-gauntlet-root" "$linked_root_project/.hephaera/.cache/gauntlets"
 expect_failure "$temp_root/linked-gauntlet-root.log" run_for "$linked_root_project" \
   bash commands/create-gauntlet-file.sh escaped-root-gauntlet --task gauntlet-parent
 
 outside_gauntlet_dir="$temp_root/outside-direct-gauntlet"
-copy_gauntlet "$gauntlet_dir" "$outside_gauntlet_dir"
-ln -s "$outside_gauntlet_dir" "$project/.opencaw/.cache/gauntlets/linked-gauntlet"
+# This negative reference is deliberately outside the canonical cache.
+cp -R "$gauntlet_dir" "$outside_gauntlet_dir"
+ln -s "$outside_gauntlet_dir" "$project/.hephaera/.cache/gauntlets/linked-gauntlet"
 expect_failure "$temp_root/linked-gauntlet-dir.log" run_for "$project" \
   bash commands/validate-gauntlet.sh linked-gauntlet --phase ready
 expect_failure "$temp_root/outside-gauntlet-ref.log" run_for "$project" \
   bash commands/validate-gauntlet.sh "$outside_gauntlet_dir/GAUNTLET.md" --phase ready
 
-nested_gauntlet_dir="$project/.opencaw/.cache/gauntlets/nested-container/child"
+nested_gauntlet_dir="$project/.hephaera/.cache/gauntlets/nested-container/child"
 mkdir -p "$nested_gauntlet_dir"
 cp "$gauntlet_file" "$nested_gauntlet_dir/GAUNTLET.md"
 expect_failure "$temp_root/nested-gauntlet-ref.log" run_for "$project" \
@@ -2281,74 +2293,74 @@ expect_failure "$temp_root/nested-gauntlet-ref.log" run_for "$project" \
 
 outside_task_dir="$temp_root/outside-parent-task"
 mkdir -p "$outside_task_dir"
-cp "$project/.opencaw/.cache/tasks/gauntlet-parent/TASK.md" "$outside_task_dir/TASK.md"
-ln -s "$outside_task_dir" "$project/.opencaw/.cache/tasks/symlink-task-dir"
-case_dir="$project/.opencaw/.cache/gauntlets/symlink-task-directory"
+cp "$project/.hephaera/.cache/tasks/gauntlet-parent/TASK.md" "$outside_task_dir/TASK.md"
+ln -s "$outside_task_dir" "$project/.hephaera/.cache/tasks/symlink-task-dir"
+case_dir="$project/.hephaera/.cache/gauntlets/symlink-task-directory"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: symlink-task-dir'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/symlink-task-dir/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.hephaera/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.hephaera/.cache/tasks/symlink-task-dir/TASK.md`'
 expect_failure "$temp_root/symlink-task-directory.log" run_for "$project" \
   bash commands/validate-gauntlet.sh symlink-task-directory --phase ready
 
-mkdir -p "$project/.opencaw/.cache/tasks/symlink-task-file"
-ln -s ../gauntlet-parent/TASK.md "$project/.opencaw/.cache/tasks/symlink-task-file/TASK.md"
-case_dir="$project/.opencaw/.cache/gauntlets/symlink-task-file"
+mkdir -p "$project/.hephaera/.cache/tasks/symlink-task-file"
+ln -s ../gauntlet-parent/TASK.md "$project/.hephaera/.cache/tasks/symlink-task-file/TASK.md"
+case_dir="$project/.hephaera/.cache/gauntlets/symlink-task-file"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: symlink-task-file'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/symlink-task-file/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.hephaera/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.hephaera/.cache/tasks/symlink-task-file/TASK.md`'
 expect_failure "$temp_root/symlink-task-file.log" run_for "$project" \
   bash commands/validate-gauntlet.sh symlink-task-file --phase ready
 
-mkdir -p "$project/.opencaw/.cache/tasks/crlf-task"
-cp "$project/.opencaw/.cache/tasks/gauntlet-parent/TASK.md" "$project/.opencaw/.cache/tasks/crlf-task/TASK.md"
-convert_to_crlf "$project/.opencaw/.cache/tasks/crlf-task/TASK.md"
-case_dir="$project/.opencaw/.cache/gauntlets/crlf-gauntlet"
+mkdir -p "$project/.hephaera/.cache/tasks/crlf-task"
+cp "$project/.hephaera/.cache/tasks/gauntlet-parent/TASK.md" "$project/.hephaera/.cache/tasks/crlf-task/TASK.md"
+convert_to_crlf "$project/.hephaera/.cache/tasks/crlf-task/TASK.md"
+case_dir="$project/.hephaera/.cache/gauntlets/crlf-gauntlet"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: crlf-task'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/crlf-task/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.hephaera/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.hephaera/.cache/tasks/crlf-task/TASK.md`'
 convert_to_crlf "$case_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh crlf-gauntlet --phase ready >/dev/null
 
-case_dir="$project/.opencaw/.cache/gauntlets/missing-objective"
+case_dir="$project/.hephaera/.cache/gauntlets/missing-objective"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" 'Produce an inspectable local artifact that satisfies the approved fixture benchmark.' ''
 expect_failure "$temp_root/missing-objective.log" run_for "$project" bash commands/validate-gauntlet.sh missing-objective --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/missing-progress-pr-ledger"
+case_dir="$project/.hephaera/.cache/gauntlets/missing-progress-pr-ledger"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '## Progress PR Ledger' '## Missing Progress PR Ledger'
 expect_failure "$temp_root/missing-progress-pr-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-progress-pr-ledger --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/unapproved-bar"
+case_dir="$project/.hephaera/.cache/gauntlets/unapproved-bar"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Approval: approved' '- Approval: pending'
 expect_failure "$temp_root/unapproved-bar.log" run_for "$project" bash commands/validate-gauntlet.sh unapproved-bar --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/placeholder-bar"
+case_dir="$project/.hephaera/.cache/gauntlets/placeholder-bar"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- The artifact exists and contains the expected verified behavior.' '- TODO: Define inspectable pass criteria.'
 expect_failure "$temp_root/placeholder-bar.log" run_for "$project" bash commands/validate-gauntlet.sh placeholder-bar --phase ready
 
 write_parent_task "$project" task-without-issue 102
-awk '$0 !~ /^https:\/\/github\.com\/example\/opencaw-fixture\/issues\/102$/' \
-  "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md" >"$project/.opencaw/.cache/tasks/task-without-issue/TASK.md.tmp"
-mv "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md.tmp" "$project/.opencaw/.cache/tasks/task-without-issue/TASK.md"
-case_dir="$project/.opencaw/.cache/gauntlets/missing-issue"
+awk '$0 !~ /^https:\/\/github\.com\/example\/hephaera-fixture\/issues\/102$/' \
+  "$project/.hephaera/.cache/tasks/task-without-issue/TASK.md" >"$project/.hephaera/.cache/tasks/task-without-issue/TASK.md.tmp"
+mv "$project/.hephaera/.cache/tasks/task-without-issue/TASK.md.tmp" "$project/.hephaera/.cache/tasks/task-without-issue/TASK.md"
+case_dir="$project/.hephaera/.cache/gauntlets/missing-issue"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Task name: gauntlet-parent' '- Task name: task-without-issue'
-replace_line "$case_dir/GAUNTLET.md" '- Task file: `.opencaw/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.opencaw/.cache/tasks/task-without-issue/TASK.md`'
-replace_line "$case_dir/GAUNTLET.md" '- Issue: https://github.com/example/opencaw-fixture/issues/101' '- Issue:'
+replace_line "$case_dir/GAUNTLET.md" '- Task file: `.hephaera/.cache/tasks/gauntlet-parent/TASK.md`' '- Task file: `.hephaera/.cache/tasks/task-without-issue/TASK.md`'
+replace_line "$case_dir/GAUNTLET.md" '- Issue: https://github.com/example/hephaera-fixture/issues/101' '- Issue:'
 expect_failure "$temp_root/missing-issue.log" run_for "$project" bash commands/validate-gauntlet.sh missing-issue --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/invalid-unit"
+case_dir="$project/.hephaera/.cache/gauntlets/invalid-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
   '- [ ] unit-1 | status: invented | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
 expect_failure "$temp_root/invalid-unit.log" run_for "$project" bash commands/validate-gauntlet.sh invalid-unit --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/missing-unit-scope"
+case_dir="$project/.hephaera/.cache/gauntlets/missing-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2356,7 +2368,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/missing-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-unit-scope --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/placeholder-unit-scope"
+case_dir="$project/.hephaera/.cache/gauntlets/placeholder-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2364,7 +2376,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/placeholder-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh placeholder-unit-scope --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/pipe-ambiguous-unit-scope"
+case_dir="$project/.hephaera/.cache/gauntlets/pipe-ambiguous-unit-scope"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2372,7 +2384,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/pipe-ambiguous-unit-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pipe-ambiguous-unit-scope --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/reserved-integration-unit"
+case_dir="$project/.hephaera/.cache/gauntlets/reserved-integration-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2380,7 +2392,7 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/reserved-integration-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh reserved-integration-unit --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/reserved-none-unit"
+case_dir="$project/.hephaera/.cache/gauntlets/reserved-none-unit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- [ ] unit-1 | status: pending | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier' \
@@ -2434,51 +2446,51 @@ replace_line "$manifest_normalization_fixture" \
     "$project" "$manifest_normalization_fixture")" ]] \
   || fail 'superseded membership failed to change only active scope while retaining manifest identity'
 
-case_dir="$project/.opencaw/.cache/gauntlets/forbidden-pr-setting"
+case_dir="$project/.hephaera/.cache/gauntlets/forbidden-pr-setting"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Auto-merge: disabled' '- Auto-merge: enabled'
 expect_failure "$temp_root/forbidden-pr.log" run_for "$project" bash commands/validate-gauntlet.sh forbidden-pr-setting --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/missing-base-branch"
+case_dir="$project/.hephaera/.cache/gauntlets/missing-base-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Base branch: main' '- Base branch:'
 expect_failure "$temp_root/missing-base-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-base-branch --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/pending-base-branch"
+case_dir="$project/.hephaera/.cache/gauntlets/pending-base-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Base branch: main' '- Base branch: pending'
 expect_failure "$temp_root/pending-base-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pending-base-branch --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/pending-base-commit"
+case_dir="$project/.hephaera/.cache/gauntlets/pending-base-commit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   '- Base commit SHA: pending'
 expect_failure "$temp_root/pending-base-commit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh pending-base-commit --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/nonexistent-base-commit"
+case_dir="$project/.hephaera/.cache/gauntlets/nonexistent-base-commit"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   '- Base commit SHA: 0000000000000000000000000000000000000000'
 expect_failure "$temp_root/nonexistent-base-commit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh nonexistent-base-commit --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/base-branch-before-creation-point"
+case_dir="$project/.hephaera/.cache/gauntlets/base-branch-before-creation-point"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
   "- Base commit SHA: $head_sha_1"
 expect_failure "$temp_root/base-branch-before-creation-point.log" run_for "$project" \
   bash commands/validate-gauntlet.sh base-branch-before-creation-point --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/prefreeze-integration-ahead"
+case_dir="$project/.hephaera/.cache/gauntlets/prefreeze-integration-ahead"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 set_local_ref "$project" gauntlet/prefreeze-integration-ahead "$head_sha_1"
 expect_failure "$temp_root/prefreeze-integration-ahead.log" run_for "$project" \
   bash commands/validate-gauntlet.sh prefreeze-integration-ahead --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/integration-unrelated-to-base"
+case_dir="$project/.hephaera/.cache/gauntlets/integration-unrelated-to-base"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 set_local_ref "$project" main "$head_sha_1"
 replace_line "$case_dir/GAUNTLET.md" "- Base commit SHA: $base_commit_sha" \
@@ -2488,7 +2500,7 @@ expect_failure "$temp_root/integration-unrelated-to-base.log" run_for "$project"
   bash commands/validate-gauntlet.sh integration-unrelated-to-base --phase ready
 set_local_ref "$project" main "$base_commit_sha"
 
-case_dir="$project/.opencaw/.cache/gauntlets/wrong-integration-branch"
+case_dir="$project/.hephaera/.cache/gauntlets/wrong-integration-branch"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- Integration branch: gauntlet/wrong-integration-branch' \
@@ -2496,13 +2508,13 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/wrong-integration-branch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh wrong-integration-branch --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/forbidden-progress-merge"
+case_dir="$project/.hephaera/.cache/gauntlets/forbidden-progress-merge"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- Progress PR merge: human only' '- Progress PR merge: automatic'
 expect_failure "$temp_root/forbidden-progress-merge.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forbidden-progress-merge --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/forbidden-promotion-gate"
+case_dir="$project/.hephaera/.cache/gauntlets/forbidden-promotion-gate"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" \
   '- Promotion PR readiness confirmation: human required' \
@@ -2510,16 +2522,17 @@ replace_line "$case_dir/GAUNTLET.md" \
 expect_failure "$temp_root/forbidden-promotion-gate.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forbidden-promotion-gate --phase ready
 
-case_dir="$project/.opencaw/.cache/gauntlets/premature-pr-eligibility"
+case_dir="$project/.hephaera/.cache/gauntlets/premature-pr-eligibility"
 copy_gauntlet "$gauntlet_dir" "$case_dir"
 replace_line "$case_dir/GAUNTLET.md" '- PR eligible: no' '- PR eligible: yes'
 expect_failure "$temp_root/premature-pr-eligibility.log" run_for "$project" \
   bash commands/validate-gauntlet.sh premature-pr-eligibility --phase ready
 
 echo '[3/8] enforcing progressive PR publication, ownership, ordering, and path safety'
-ready_snapshot="$temp_root/ready-snapshot"
+# Keep an independent integration ref frozen with this canonical fixture snapshot.
+ready_snapshot="$project/.hephaera/.cache/gauntlets/ready-snapshot"
 copy_gauntlet "$gauntlet_dir" "$ready_snapshot"
-nested_base_fixture_dir="$project/.opencaw/.cache/gauntlets/nested-base-fixture"
+nested_base_fixture_dir="$project/.hephaera/.cache/gauntlets/nested-base-fixture"
 copy_gauntlet "$ready_snapshot" "$nested_base_fixture_dir"
 replace_line "$nested_base_fixture_dir/GAUNTLET.md" \
   '- Base branch: main' '- Base branch: gauntlet/release'
@@ -2538,7 +2551,7 @@ printf '# Progress validation\n\nThe unit branch is locally verified and ready f
 expect_line '- Execution contract fingerprint: pending' "$gauntlet_file"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$(git -C "$project" rev-parse HEAD)"
 set_local_ref "$project" gauntlet-work/fixture-gauntlet/unit-1 "$head_sha_1"
-progress_readiness_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/progress" run_for "$project" \
+progress_readiness_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/progress" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress fixture-gauntlet unit-1 "$project/progress-validation.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=NO$' <<<"$progress_readiness_output" \
   || fail 'approved Gauntlet progress publication unexpectedly required another confirmation'
@@ -2567,10 +2580,10 @@ progress_checkpoint_sha256="$(sed -nE \
 progress_publication_marker="$(sed -nE 's/^PUBLICATION_MARKER=(.+)$/\1/p' \
   <<<"$progress_readiness_output")"
 [[ "$progress_checkpoint_relative" \
-    == '.opencaw/.cache/gauntlets/fixture-gauntlet/publication-checkpoints/unit-1/checkpoint-001.md' \
+    == '.hephaera/.cache/gauntlets/fixture-gauntlet/publication-checkpoints/unit-1/checkpoint-001.md' \
   && -n "$progress_checkpoint_sha256" \
   && "$progress_publication_marker" \
-    == "<!-- opencaw-gauntlet-publication:v1 checkpoint=$progress_checkpoint_relative checkpoint-sha256=$progress_checkpoint_sha256 -->" ]] \
+    == "<!-- hephaera-gauntlet-publication:v1 checkpoint=$progress_checkpoint_relative checkpoint-sha256=$progress_checkpoint_sha256 -->" ]] \
   || fail 'progress readiness omitted its exact append-only publication checkpoint marker'
 progress_checkpoint="$project/$progress_checkpoint_relative"
 expect_file "$progress_checkpoint"
@@ -2596,13 +2609,13 @@ expect_line '- Remote work SHA: absent' "$progress_checkpoint"
 
 prepare_checkpoint_fixture() {
   local fixture_name="$1"
-  checkpoint_case_dir="$project/.opencaw/.cache/gauntlets/$fixture_name"
+  checkpoint_case_dir="$project/.hephaera/.cache/gauntlets/$fixture_name"
   checkpoint_case_head="gauntlet-work/$fixture_name/unit-1"
-  checkpoint_case_url="https://github.com/example/opencaw-fixture/pull/$2"
+  checkpoint_case_url="https://github.com/example/hephaera-fixture/pull/$2"
   copy_gauntlet "$ready_snapshot" "$checkpoint_case_dir"
   set_local_ref "$project" "$checkpoint_case_head" "$head_sha_1"
   set_remote_ref "$project" "$checkpoint_case_head" absent
-  checkpoint_case_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/$fixture_name" \
+  checkpoint_case_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/$fixture_name" \
     run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
       "$fixture_name" unit-1 "$project/progress-validation.md")"
   checkpoint_case_relative="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -2610,7 +2623,7 @@ prepare_checkpoint_fixture() {
   checkpoint_case_hash="$(sed -nE \
     's/^PUBLICATION_CHECKPOINT_SHA256=([0-9a-f]{64})$/\1/p' \
     <<<"$checkpoint_case_output")"
-  checkpoint_case_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_case_hash -->"
+  checkpoint_case_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_case_hash -->"
   expect_file "$project/$checkpoint_case_relative"
 }
 
@@ -2631,10 +2644,10 @@ grep -Fq \
   "$temp_root/remediation-trigger-path-escape.log" \
   || fail 'checkpoint validation did not reject remediation traversal before hashing its target'
 
-baseline_quality_control_dir="$project/.opencaw/.cache/gauntlets/baseline-quality-checkpoint-control"
+baseline_quality_control_dir="$project/.hephaera/.cache/gauntlets/baseline-quality-checkpoint-control"
 copy_gauntlet "$ready_snapshot" "$baseline_quality_control_dir"
 baseline_quality_head='gauntlet-work/baseline-quality-checkpoint-control/unit-1'
-baseline_quality_url='https://github.com/example/opencaw-fixture/pull/302'
+baseline_quality_url='https://github.com/example/hephaera-fixture/pull/302'
 export FAKE_DATE_ISO='2026-08-01T12:00:02Z'
 set_local_ref "$project" "$baseline_quality_head" "$head_sha_1"
 set_remote_ref "$project" "$baseline_quality_head" absent
@@ -2651,10 +2664,10 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   baseline-quality-checkpoint-control --phase ready >/dev/null
 baseline_quality_marker="$(opened_publication_marker \
   "$project" baseline-quality-checkpoint-control unit-1)"
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$baseline_quality_url" "$baseline_quality_head" "$head_sha_1" \
   gauntlet/baseline-quality-checkpoint-control OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture \
+  "$base_commit_sha" false example/hephaera-fixture \
   2026-08-01T12:00:02Z none "$baseline_quality_marker"
 expect_failure "$temp_root/live-open-issue-link-removed.log" run_for "$project" \
   bash commands/validate-gauntlet.sh baseline-quality-checkpoint-control --phase ready
@@ -2663,7 +2676,7 @@ grep -Fq 'Progress PR body requires this exact canonical first line exactly once
   || fail 'ready validation accepted mutable live progress-PR body drift'
 set_pr_observation "$baseline_quality_url" "$baseline_quality_head" "$head_sha_1" \
   gauntlet/baseline-quality-checkpoint-control OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture \
+  "$base_commit_sha" false example/hephaera-fixture \
   2026-08-01T12:00:02Z none "$baseline_quality_marker"
 
 toctou_report="$temp_root/live-round-body-toctou-critic.md"
@@ -2687,11 +2700,11 @@ unset FAKE_GH_MUTATE_BODY_URL FAKE_GH_MUTATE_BODY_TRIGGER \
   FAKE_GH_MUTATE_BODY_BASE64
 set_pr_observation "$baseline_quality_url" "$baseline_quality_head" "$head_sha_1" \
   gauntlet/baseline-quality-checkpoint-control OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture \
+  "$base_commit_sha" false example/hephaera-fixture \
   2026-08-01T12:00:02Z none "$baseline_quality_marker"
 unset FAKE_DATE_ISO
 
-future_baseline_quality_dir="$project/.opencaw/.cache/gauntlets/future-baseline-quality-checkpoint"
+future_baseline_quality_dir="$project/.hephaera/.cache/gauntlets/future-baseline-quality-checkpoint"
 copy_gauntlet "$baseline_quality_control_dir" "$future_baseline_quality_dir"
 future_baseline_quality_approval='2026-08-01T12:00:03Z'
 future_baseline_quality_event_time='2026-08-01T12:00:04Z'
@@ -2723,7 +2736,7 @@ replace_matching_line "$future_baseline_quality_event" '^- Recorded at:' \
   "- Recorded at: $future_baseline_quality_event_time"
 future_baseline_quality_ledger="$(select_ledger_line "$project" \
   "$future_baseline_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
+  '.hephaera/.cache/gauntlets/future-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
 replace_line "$future_baseline_quality_dir/GAUNTLET.md" \
   "$future_baseline_quality_ledger" \
   "${future_baseline_quality_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $future_baseline_quality_event_time}"
@@ -2735,7 +2748,7 @@ set_local_ref "$project" "$future_baseline_quality_head" "$head_sha_1"
 set_remote_ref "$project" "$future_baseline_quality_head" "$head_sha_1"
 set_pr_observation "$baseline_quality_url" "$future_baseline_quality_head" "$head_sha_1" \
   gauntlet/future-baseline-quality-checkpoint OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture \
+  "$base_commit_sha" false example/hephaera-fixture \
   "$future_baseline_quality_event_time" none "$future_baseline_quality_marker"
 expect_line '- Recorded at: 2026-08-01T12:00:02Z' \
   "$future_baseline_quality_checkpoint"
@@ -2747,7 +2760,7 @@ grep -Fq 'Publication checkpoint uses a quality generation not active at its Rec
   "$temp_root/future-baseline-quality-checkpoint.log" \
   || fail 'future baseline quality checkpoint did not reach the generation-authorization gate'
 
-backdated_baseline_quality_dir="$project/.opencaw/.cache/gauntlets/backdated-baseline-quality-checkpoint"
+backdated_baseline_quality_dir="$project/.hephaera/.cache/gauntlets/backdated-baseline-quality-checkpoint"
 copy_gauntlet "$baseline_quality_control_dir" "$backdated_baseline_quality_dir"
 backdated_baseline_quality_approval='2026-08-01T12:00:01Z'
 backdated_baseline_quality_event_time='2026-08-01T12:00:04Z'
@@ -2765,7 +2778,7 @@ replace_matching_line "$backdated_baseline_quality_event" '^- Recorded at:' \
   "- Recorded at: $backdated_baseline_quality_event_time"
 backdated_baseline_quality_ledger="$(select_ledger_line "$project" \
   "$backdated_baseline_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/backdated-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
+  '.hephaera/.cache/gauntlets/backdated-baseline-quality-checkpoint/pr-events/unit-1/event-001.md')"
 replace_line "$backdated_baseline_quality_dir/GAUNTLET.md" \
   "$backdated_baseline_quality_ledger" \
   "${backdated_baseline_quality_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $backdated_baseline_quality_event_time}"
@@ -2777,7 +2790,7 @@ set_local_ref "$project" "$backdated_baseline_quality_head" "$head_sha_1"
 set_remote_ref "$project" "$backdated_baseline_quality_head" "$head_sha_1"
 set_pr_observation "$baseline_quality_url" "$backdated_baseline_quality_head" "$head_sha_1" \
   gauntlet/backdated-baseline-quality-checkpoint OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture \
+  "$base_commit_sha" false example/hephaera-fixture \
   "$backdated_baseline_quality_event_time" none "$backdated_baseline_quality_marker"
 expect_line '- Quality bar approved at: 2026-08-01T12:00:00Z' \
   "$backdated_baseline_quality_checkpoint"
@@ -2796,8 +2809,8 @@ replace_line "$checkpoint_case_dir/GAUNTLET.md" \
   'Produce an unapproved objective changed after the publication checkpoint.'
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-objective-drift OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-objective-drift.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-objective-drift unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2808,8 +2821,8 @@ replace_line "$checkpoint_case_dir/GAUNTLET.md" \
   '- Benchmark: Quality changed after the publication checkpoint.'
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-quality-drift OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-quality-drift.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-quality-drift unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2825,8 +2838,8 @@ replace_matching_line "$checkpoint_case_dir/GAUNTLET.md" \
   "- Unit manifest approval: $checkpoint_scope_manifest | units: unit-1 | approved by: fixture-user | approved at: 2026-08-01T12:00:00Z"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-scope-drift OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-scope-drift.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-scope-drift unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2842,8 +2855,8 @@ replace_matching_line "$checkpoint_case_dir/GAUNTLET.md" \
   "- Unit manifest approval: $checkpoint_added_manifest | units: unit-1,unit-2 | approved by: fixture-user | approved at: 2026-08-01T12:00:00Z"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-manifest-drift OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_case_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-manifest-drift.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-manifest-drift unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2851,19 +2864,19 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
 prepare_checkpoint_fixture checkpoint-missing-marker 274
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-missing-marker OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none ''
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none ''
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-missing-marker.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-missing-marker unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
 prepare_checkpoint_fixture checkpoint-missing-issue-reference 305
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-missing-issue-reference OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-missing-issue-reference.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-missing-issue-reference \
     unit-1 opened "$checkpoint_case_url" "$checkpoint_case_head" none \
@@ -2874,15 +2887,15 @@ grep -Fq 'Progress PR body requires this exact canonical first line exactly once
 
 prepare_checkpoint_fixture checkpoint-forbidden-closing-link 306
 checkpoint_forbidden_closing_body="Refs #101
-Closes: example/opencaw-fixture#101
+Closes: example/hephaera-fixture#101
 
 $checkpoint_case_marker"
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-forbidden-closing-link OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_forbidden_closing_body"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-forbidden-closing-link.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-forbidden-closing-link \
     unit-1 opened "$checkpoint_case_url" "$checkpoint_case_head" none \
@@ -2892,11 +2905,11 @@ grep -Fq 'Progress PR body must not close the parent issue; reserve Closes #101 
   || fail 'progress event accepted a parent-issue closing keyword'
 
 prepare_checkpoint_fixture checkpoint-wrong-marker 275
-checkpoint_wrong_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=0000000000000000000000000000000000000000000000000000000000000000 -->"
+checkpoint_wrong_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=0000000000000000000000000000000000000000000000000000000000000000 -->"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-wrong-marker OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_wrong_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_wrong_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-wrong-marker.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-wrong-marker unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2904,10 +2917,10 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
 prepare_checkpoint_fixture checkpoint-duplicate-marker 276
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-duplicate-marker OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_case_marker
 $checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-duplicate-marker.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-duplicate-marker unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2915,8 +2928,8 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
 prepare_checkpoint_fixture checkpoint-late 277
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-late OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T11:59:59Z none "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T11:59:59Z none "$checkpoint_case_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-late.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-late unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2925,13 +2938,13 @@ prepare_checkpoint_fixture checkpoint-unrelated-head 280
 replace_line "$project/$checkpoint_case_relative" "- Head SHA: $head_sha_1" \
   "- Head SHA: $orphan_sha"
 checkpoint_unrelated_hash="$(sha256_file "$project/$checkpoint_case_relative")"
-checkpoint_unrelated_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_unrelated_hash -->"
+checkpoint_unrelated_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_unrelated_hash -->"
 set_local_ref "$project" "$checkpoint_case_head" "$orphan_sha"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$orphan_sha" \
   gauntlet/checkpoint-unrelated-head OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_unrelated_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-unrelated-head.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-unrelated-head unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$orphan_sha"
@@ -2941,12 +2954,12 @@ replace_line "$project/$checkpoint_case_relative" \
   "- Remote integration SHA: $base_commit_sha" \
   "- Remote integration SHA: $head_sha_1"
 checkpoint_forged_integration_hash="$(sha256_file "$project/$checkpoint_case_relative")"
-checkpoint_forged_integration_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_forged_integration_hash -->"
+checkpoint_forged_integration_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_forged_integration_hash -->"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-forged-integration-ref OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_forged_integration_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-forged-integration-ref.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-forged-integration-ref unit-1 \
     opened "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -2957,17 +2970,17 @@ replace_line "$project/$checkpoint_case_relative" '- Remote work state: absent-c
 replace_line "$project/$checkpoint_case_relative" '- Remote work SHA: absent' \
   "- Remote work SHA: $head_sha_2"
 checkpoint_forged_work_hash="$(sha256_file "$project/$checkpoint_case_relative")"
-checkpoint_forged_work_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_forged_work_hash -->"
+checkpoint_forged_work_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_forged_work_hash -->"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-forged-work-ref OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_forged_work_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-forged-work-ref.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-forged-work-ref unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
-checkpoint_cas_dir="$project/.opencaw/.cache/gauntlets/checkpoint-cas"
+checkpoint_cas_dir="$project/.hephaera/.cache/gauntlets/checkpoint-cas"
 copy_gauntlet "$ready_snapshot" "$checkpoint_cas_dir"
 set_local_ref "$project" gauntlet-work/checkpoint-cas/unit-1 "$head_sha_1"
 set_remote_ref "$project" gauntlet-work/checkpoint-cas/unit-1 absent
@@ -2977,7 +2990,7 @@ checkpoint_cas_output="$temp_root/checkpoint-cas-output.log"
 set +e
 FAKE_GIT_PAUSE_READY="$checkpoint_cas_ready" \
   FAKE_GIT_PAUSE_RELEASE="$checkpoint_cas_release" \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-cas" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-cas" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-cas unit-1 \
     "$project/progress-validation.md" >"$checkpoint_cas_output" 2>&1 &
 checkpoint_cas_pid=$!
@@ -2996,7 +3009,7 @@ set -e
   | wc -l | tr -d ' ')" == 0 ]] \
   || fail 'publication readiness CAS failure installed an orphan checkpoint'
 
-checkpoint_symlink_root_dir="$project/.opencaw/.cache/gauntlets/checkpoint-symlink-root"
+checkpoint_symlink_root_dir="$project/.hephaera/.cache/gauntlets/checkpoint-symlink-root"
 copy_gauntlet "$ready_snapshot" "$checkpoint_symlink_root_dir"
 mkdir -p "$temp_root/outside-publication-checkpoints"
 rmdir "$checkpoint_symlink_root_dir/publication-checkpoints"
@@ -3007,7 +3020,7 @@ expect_failure "$temp_root/checkpoint-symlink-root.log" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-symlink-root unit-1 \
   "$project/progress-validation.md"
 
-checkpoint_symlink_item_dir="$project/.opencaw/.cache/gauntlets/checkpoint-symlink-item"
+checkpoint_symlink_item_dir="$project/.hephaera/.cache/gauntlets/checkpoint-symlink-item"
 copy_gauntlet "$ready_snapshot" "$checkpoint_symlink_item_dir"
 mkdir -p "$temp_root/outside-publication-checkpoint-item"
 ln -s "$temp_root/outside-publication-checkpoint-item" \
@@ -3021,30 +3034,30 @@ prepare_checkpoint_fixture checkpoint-malformed-time 283
 replace_line "$project/$checkpoint_case_relative" \
   '- Recorded at: 2026-08-01T12:00:00Z' '- Recorded at: not-a-canonical-time'
 checkpoint_malformed_time_hash="$(sha256_file "$project/$checkpoint_case_relative")"
-checkpoint_malformed_time_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_malformed_time_hash -->"
+checkpoint_malformed_time_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_case_relative checkpoint-sha256=$checkpoint_malformed_time_hash -->"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-malformed-time OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_malformed_time_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-malformed-time.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-malformed-time unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
 prepare_checkpoint_fixture checkpoint-sequence-gap 284
 checkpoint_gap_original="$project/$checkpoint_case_relative"
-checkpoint_gap_relative='.opencaw/.cache/gauntlets/checkpoint-sequence-gap/publication-checkpoints/unit-1/checkpoint-003.md'
+checkpoint_gap_relative='.hephaera/.cache/gauntlets/checkpoint-sequence-gap/publication-checkpoints/unit-1/checkpoint-003.md'
 mv "$checkpoint_gap_original" "$project/$checkpoint_gap_relative"
 replace_line "$project/$checkpoint_gap_relative" \
   '# Gauntlet Publication Checkpoint: unit-1 / 001' \
   '# Gauntlet Publication Checkpoint: unit-1 / 003'
 replace_line "$project/$checkpoint_gap_relative" '- Sequence: 001' '- Sequence: 003'
 checkpoint_gap_hash="$(sha256_file "$project/$checkpoint_gap_relative")"
-checkpoint_gap_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_gap_relative checkpoint-sha256=$checkpoint_gap_hash -->"
+checkpoint_gap_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_gap_relative checkpoint-sha256=$checkpoint_gap_hash -->"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-sequence-gap OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none "$checkpoint_gap_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none "$checkpoint_gap_marker"
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-sequence-gap.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-sequence-gap unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
@@ -3054,27 +3067,27 @@ cp "$project/$checkpoint_case_relative" \
   "$checkpoint_case_dir/publication-checkpoints/unit-1/checkpoint-extra.md"
 set_pr_observation "$checkpoint_case_url" "$checkpoint_case_head" "$head_sha_1" \
   gauntlet/checkpoint-noncanonical-extra OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_case_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-noncanonical-extra.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-noncanonical-extra unit-1 opened \
     "$checkpoint_case_url" "$checkpoint_case_head" none --head-sha "$head_sha_1"
 
-checkpoint_stale_dir="$project/.opencaw/.cache/gauntlets/checkpoint-stale-replay"
+checkpoint_stale_dir="$project/.hephaera/.cache/gauntlets/checkpoint-stale-replay"
 copy_gauntlet "$ready_snapshot" "$checkpoint_stale_dir"
 checkpoint_stale_head='gauntlet-work/checkpoint-stale-replay/unit-1'
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_1"
 set_remote_ref "$project" "$checkpoint_stale_head" absent
-checkpoint_stale_output_1="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-1" \
+checkpoint_stale_output_1="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-stale-1" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_1="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   <<<"$checkpoint_stale_output_1")"
 checkpoint_stale_hash_1="$(sha256_file "$project/$checkpoint_stale_relative_1")"
-checkpoint_stale_marker_1="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_stale_relative_1 checkpoint-sha256=$checkpoint_stale_hash_1 -->"
+checkpoint_stale_marker_1="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_stale_relative_1 checkpoint-sha256=$checkpoint_stale_hash_1 -->"
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_2"
-checkpoint_stale_output_2="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-2" \
+checkpoint_stale_output_2="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-stale-2" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3084,19 +3097,19 @@ checkpoint_stale_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   || fail 'successive changed-head checkpoints were not issued contiguously'
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_1"
 set_remote_ref "$project" "$checkpoint_stale_head" "$head_sha_1"
-checkpoint_stale_url='https://github.com/example/opencaw-fixture/pull/286'
+checkpoint_stale_url='https://github.com/example/hephaera-fixture/pull/286'
 set_pr_observation "$checkpoint_stale_url" "$checkpoint_stale_head" "$head_sha_1" \
   gauntlet/checkpoint-stale-replay OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_stale_marker_1"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
-  OPENCAW_TEST_SKIP_REMOTE_PUBLICATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
+  HEPHAERA_TEST_SKIP_REMOTE_PUBLICATION=1 \
   expect_failure "$temp_root/checkpoint-stale-replay.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-stale-replay unit-1 opened \
     "$checkpoint_stale_url" "$checkpoint_stale_head" none --head-sha "$head_sha_1"
 set_local_ref "$project" "$checkpoint_stale_head" "$head_sha_3"
 set_remote_ref "$project" "$checkpoint_stale_head" absent
-checkpoint_stale_output_3="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-stale-3" \
+checkpoint_stale_output_3="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-stale-3" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   checkpoint-stale-replay unit-1 "$project/progress-validation.md")"
 checkpoint_stale_relative_3="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3105,7 +3118,7 @@ checkpoint_stale_relative_3="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   && -f "$project/$checkpoint_stale_relative_2" ]] \
   || fail 'aborted newest checkpoint was not retained before contiguous next issuance'
 
-checkpoint_parallel_dir="$project/.opencaw/.cache/gauntlets/checkpoint-parallel"
+checkpoint_parallel_dir="$project/.hephaera/.cache/gauntlets/checkpoint-parallel"
 copy_gauntlet "$ready_snapshot" "$checkpoint_parallel_dir"
 set_local_ref "$project" gauntlet-work/checkpoint-parallel/unit-1 "$head_sha_1"
 set_remote_ref "$project" gauntlet-work/checkpoint-parallel/unit-1 absent
@@ -3113,8 +3126,8 @@ checkpoint_parallel_output_1="$temp_root/checkpoint-parallel-1.log"
 checkpoint_parallel_output_2="$temp_root/checkpoint-parallel-2.log"
 checkpoint_parallel_pause_ready="$temp_root/checkpoint-parallel-pause-ready"
 checkpoint_parallel_pause_release="$temp_root/checkpoint-parallel-pause-release"
-OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-1" \
+HEPHAERA_PROJECT_ROOT="$project" \
+  HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-parallel-1" \
   FAKE_GIT_PAUSE_READY="$checkpoint_parallel_pause_ready" \
   FAKE_GIT_PAUSE_RELEASE="$checkpoint_parallel_pause_release" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
@@ -3122,7 +3135,7 @@ OPENCAW_PROJECT_ROOT="$project" \
 checkpoint_parallel_pid_1=$!
 wait_for_path "$checkpoint_parallel_pause_ready"
 set +e
-OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-2" \
+HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-parallel-2" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
     "$project/progress-validation.md" >"$checkpoint_parallel_output_2" 2>&1
 checkpoint_parallel_status_2=$?
@@ -3132,13 +3145,13 @@ wait "$checkpoint_parallel_pid_1"
 [[ "$checkpoint_parallel_status_2" -ne 0 \
   && "$(find "$checkpoint_parallel_dir/publication-checkpoints/unit-1" -maxdepth 1 \
     -type f -name 'checkpoint-*.md' | wc -l | tr -d ' ')" == 1 \
-  && ! -e "$checkpoint_parallel_dir/.opencaw-gauntlet.lock" ]] \
+  && ! -e "$checkpoint_parallel_dir/.hephaera-gauntlet.lock" ]] \
   || fail 'parallel readiness did not fail fast without residue while one writer held the lock'
 grep -Fq 'Gauntlet is locked' "$checkpoint_parallel_output_2" \
   || fail 'parallel readiness loser did not report the durable lock blocker'
 checkpoint_parallel_relative_1="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   "$checkpoint_parallel_output_1")"
-OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/checkpoint-parallel-retry" \
+HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/checkpoint-parallel-retry" \
   bash commands/pr-readiness-check.sh --gauntlet-progress checkpoint-parallel unit-1 \
     "$project/progress-validation.md" >"$checkpoint_parallel_output_2" 2>&1
 checkpoint_parallel_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -3151,15 +3164,15 @@ checkpoint_parallel_relative_2="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p'
     -type f -name 'checkpoint-*.md' | wc -l | tr -d ' ')" == 2 ]] \
   || fail 'explicit readiness retry did not append a contiguous second checkpoint'
 checkpoint_parallel_hash_1="$(sha256_file "$project/$checkpoint_parallel_relative_1")"
-checkpoint_parallel_marker_1="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_parallel_relative_1 checkpoint-sha256=$checkpoint_parallel_hash_1 -->"
+checkpoint_parallel_marker_1="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_parallel_relative_1 checkpoint-sha256=$checkpoint_parallel_hash_1 -->"
 checkpoint_parallel_hash_2="$(sha256_file "$project/$checkpoint_parallel_relative_2")"
-checkpoint_parallel_marker_2="<!-- opencaw-gauntlet-publication:v1 checkpoint=$checkpoint_parallel_relative_2 checkpoint-sha256=$checkpoint_parallel_hash_2 -->"
-checkpoint_parallel_url='https://github.com/example/opencaw-fixture/pull/278'
+checkpoint_parallel_marker_2="<!-- hephaera-gauntlet-publication:v1 checkpoint=$checkpoint_parallel_relative_2 checkpoint-sha256=$checkpoint_parallel_hash_2 -->"
+checkpoint_parallel_url='https://github.com/example/hephaera-fixture/pull/278'
 set_pr_observation "$checkpoint_parallel_url" gauntlet-work/checkpoint-parallel/unit-1 \
   "$head_sha_1" gauntlet/checkpoint-parallel OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_parallel_marker_1"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-parallel-stale-first.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-parallel unit-1 \
     opened "$checkpoint_parallel_url" gauntlet-work/checkpoint-parallel/unit-1 none \
@@ -3168,9 +3181,9 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
   || fail 'stale checkpoint-001 rejection created immutable PR evidence'
 set_pr_observation "$checkpoint_parallel_url" gauntlet-work/checkpoint-parallel/unit-1 \
   "$head_sha_1" gauntlet/checkpoint-parallel OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_parallel_marker_2"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh checkpoint-parallel unit-1 \
     opened "$checkpoint_parallel_url" gauntlet-work/checkpoint-parallel/unit-1 none \
     --head-sha "$head_sha_1" >/dev/null
@@ -3179,22 +3192,22 @@ run_for "$project" bash commands/validate-gauntlet.sh checkpoint-parallel \
 [[ "$(find "$checkpoint_parallel_dir/publication-checkpoints/unit-1" -maxdepth 1 \
   -type f -name 'checkpoint-*.md' | wc -l | tr -d ' ')" == 2 ]] \
   || fail 'validation removed the harmless unused publication checkpoint'
-set_pr_observation 'https://github.com/example/opencaw-fixture/pull/279' \
+set_pr_observation 'https://github.com/example/hephaera-fixture/pull/279' \
   gauntlet-work/checkpoint-parallel/unit-1 "$head_sha_1" \
   gauntlet/checkpoint-parallel OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$checkpoint_parallel_marker_2"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
   expect_failure "$temp_root/checkpoint-reused.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh checkpoint-parallel unit-1 opened \
-    'https://github.com/example/opencaw-fixture/pull/279' \
+    'https://github.com/example/hephaera-fixture/pull/279' \
     gauntlet-work/checkpoint-parallel/unit-1 none --head-sha "$head_sha_1"
 expect_failure "$temp_root/progress-readiness-unknown-unit.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/unknown-progress" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/unknown-progress" \
   bash commands/pr-readiness-check.sh --gauntlet-progress \
   fixture-gauntlet absent-unit "$project/progress-validation.md"
 
-fixture_pr_url='https://github.com/example/opencaw-fixture/pull/201'
+fixture_pr_url='https://github.com/example/hephaera-fixture/pull/201'
 fixture_head='gauntlet-work/fixture-gauntlet/unit-1'
 gauntlet_before_pr_dry_run="$(git hash-object "$gauntlet_file")"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
@@ -3213,48 +3226,48 @@ expect_failure "$temp_root/pr-event-malformed-head-sha.log" \
   "$fixture_pr_url" "$fixture_head" none --head-sha deadbeef
 
 nonexistent_sha='0000000000000000000000000000000000000000'
-nonexistent_sha_dir="$project/.opencaw/.cache/gauntlets/nonexistent-sha"
+nonexistent_sha_dir="$project/.hephaera/.cache/gauntlets/nonexistent-sha"
 copy_gauntlet "$ready_snapshot" "$nonexistent_sha_dir"
 expect_failure "$temp_root/pr-event-nonexistent-sha.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh nonexistent-sha unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/212' \
+  'https://github.com/example/hephaera-fixture/pull/212' \
   'gauntlet-work/nonexistent-sha/unit-1' none --head-sha "$nonexistent_sha"
 [[ "$(pr_event_file_count "$nonexistent_sha_dir")" == 0 ]] \
   || fail 'a nonexistent commit object produced progress-PR evidence'
 
-origin_binding_dir="$project/.opencaw/.cache/gauntlets/origin-binding"
+origin_binding_dir="$project/.hephaera/.cache/gauntlets/origin-binding"
 copy_gauntlet "$ready_snapshot" "$origin_binding_dir"
 git -C "$project" remote remove origin
 expect_failure "$temp_root/pr-event-missing-origin.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh origin-binding unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/223' \
+  'https://github.com/example/hephaera-fixture/pull/223' \
   gauntlet-work/origin-binding/unit-1 none --head-sha "$head_sha_1"
 git -C "$project" remote add origin https://github.com/different/repository.git
 expect_failure "$temp_root/pr-event-wrong-origin.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh origin-binding unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/223' \
+  'https://github.com/example/hephaera-fixture/pull/223' \
   gauntlet-work/origin-binding/unit-1 none --head-sha "$head_sha_1"
 git -C "$project" remote set-url origin \
-  http://github.com/example/opencaw-fixture.git
+  http://github.com/example/hephaera-fixture.git
 expect_failure "$temp_root/pr-event-plaintext-http-origin.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh origin-binding unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/223' \
+  'https://github.com/example/hephaera-fixture/pull/223' \
   gauntlet-work/origin-binding/unit-1 none --head-sha "$head_sha_1"
 grep -Fq 'Local Git origin does not match the parent task GitHub repository' \
   "$temp_root/pr-event-plaintext-http-origin.log" \
   || fail 'plaintext HTTP origin was not rejected at the repository trust boundary'
-git -C "$project" remote set-url origin git@github.com:example/opencaw-fixture.git
+git -C "$project" remote set-url origin git@github.com:example/hephaera-fixture.git
 [[ "$(pr_event_file_count "$origin_binding_dir")" == 0 ]] \
   || fail 'a missing, mismatched, or plaintext origin produced progress-PR evidence'
 
-push_target_dir="$project/.opencaw/.cache/gauntlets/push-target-binding"
+push_target_dir="$project/.hephaera/.cache/gauntlets/push-target-binding"
 copy_gauntlet "$ready_snapshot" "$push_target_dir"
 push_target_head='gauntlet-work/push-target-binding/unit-1'
-push_target_url='https://github.com/example/opencaw-fixture/pull/226'
+push_target_url='https://github.com/example/hephaera-fixture/pull/226'
 set_local_ref "$project" "$push_target_head" "$head_sha_1"
 git -C "$project" remote set-url --add --push origin \
   https://github.com/different/repository.git
@@ -3271,7 +3284,7 @@ expect_failure "$temp_root/progress-record-wrong-push-target.log" \
   || fail 'mismatched effective push target mutated progress evidence'
 git -C "$project" config --unset-all remote.origin.pushurl
 git -C "$project" remote set-url --add --push origin \
-  http://github.com/example/opencaw-fixture.git
+  http://github.com/example/hephaera-fixture.git
 expect_failure "$temp_root/progress-readiness-plaintext-http-push-target.log" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   push-target-binding unit-1 "$project/progress-validation.md"
@@ -3280,7 +3293,7 @@ grep -Fq 'Git origin push URL does not match the parent task GitHub repository' 
   || fail 'plaintext HTTP push URL was not rejected at the repository trust boundary'
 git -C "$project" config --unset-all remote.origin.pushurl
 git -C "$project" remote set-url --add --push origin \
-  git@github.com:example/opencaw-fixture.git
+  git@github.com:example/hephaera-fixture.git
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   push-target-binding unit-1 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh push-target-binding unit-1 opened \
@@ -3288,50 +3301,50 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh push-target-binding
 expect_file "$push_target_dir/pr-events/unit-1/event-001.md"
 git -C "$project" config --unset-all remote.origin.pushurl
 
-stale_ref_dir="$project/.opencaw/.cache/gauntlets/stale-local-ref"
+stale_ref_dir="$project/.hephaera/.cache/gauntlets/stale-local-ref"
 copy_gauntlet "$ready_snapshot" "$stale_ref_dir"
 set_local_ref "$project" gauntlet/stale-local-ref "$head_sha_1"
 set_local_ref "$project" gauntlet-work/stale-local-ref/unit-1 "$head_sha_1"
-set_pr_observation 'https://github.com/example/opencaw-fixture/pull/213' \
+set_pr_observation 'https://github.com/example/hephaera-fixture/pull/213' \
   gauntlet-work/stale-local-ref/unit-1 "$head_sha_2" gauntlet/stale-local-ref \
   OPEN false none none none
-expect_failure "$temp_root/pr-event-stale-local-ref.log" env OPENCAW_TEST_SKIP_OBSERVATION=1 \
-  OPENCAW_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
-  stale-local-ref unit-1 opened 'https://github.com/example/opencaw-fixture/pull/213' \
+expect_failure "$temp_root/pr-event-stale-local-ref.log" env HEPHAERA_TEST_SKIP_OBSERVATION=1 \
+  HEPHAERA_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
+  stale-local-ref unit-1 opened 'https://github.com/example/hephaera-fixture/pull/213' \
   gauntlet-work/stale-local-ref/unit-1 none --head-sha "$head_sha_2"
 [[ "$(pr_event_file_count "$stale_ref_dir")" == 0 ]] \
   || fail 'a stale local progress ref produced progress-PR evidence'
 
-first_target_drift_dir="$project/.opencaw/.cache/gauntlets/first-target-drift"
+first_target_drift_dir="$project/.hephaera/.cache/gauntlets/first-target-drift"
 copy_gauntlet "$ready_snapshot" "$first_target_drift_dir"
-first_target_url='https://github.com/example/opencaw-fixture/pull/227'
+first_target_url='https://github.com/example/hephaera-fixture/pull/227'
 first_target_head='gauntlet-work/first-target-drift/unit-1'
 set_local_ref "$project" "$first_target_head" "$head_sha_1"
 set_local_ref "$project" gauntlet/first-target-drift "$base_commit_sha"
 set_pr_observation "$first_target_url" "$first_target_head" "$head_sha_1" \
   gauntlet/first-target-drift OPEN false none none none none "$base_commit_sha" \
-  true example/opencaw-fixture
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+  true example/hephaera-fixture
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/first-open-cross-repository.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh first-target-drift unit-1 opened \
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1"
 set_pr_observation "$first_target_url" "$first_target_head" "$head_sha_1" \
   gauntlet/first-target-drift OPEN false none none none none "$base_commit_sha" \
   false different/repository
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/first-open-head-repository-mismatch.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh first-target-drift unit-1 opened \
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1"
 set_pr_observation "$first_target_url" "$first_target_head" "$head_sha_1" \
   gauntlet/first-target-drift OPEN false none none none none "$orphan_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/first-open-unrelated-live-target.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh first-target-drift unit-1 opened \
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1"
 set_local_ref "$project" gauntlet/first-target-drift "$orphan_sha"
 set_pr_observation "$first_target_url" "$first_target_head" "$head_sha_1" \
   gauntlet/first-target-drift OPEN false none none none none "$base_commit_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/first-open-unrelated-local-target.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh first-target-drift unit-1 opened \
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1"
@@ -3342,9 +3355,9 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh first-target-drift 
   "$first_target_url" "$first_target_head" none --head-sha "$head_sha_1" >/dev/null
 expect_file "$first_target_drift_dir/pr-events/unit-1/event-001.md"
 
-absent_artifact_dir="$project/.opencaw/.cache/gauntlets/artifact-absent-at-commit"
+absent_artifact_dir="$project/.hephaera/.cache/gauntlets/artifact-absent-at-commit"
 copy_gauntlet "$ready_snapshot" "$absent_artifact_dir"
-absent_artifact_url='https://github.com/example/opencaw-fixture/pull/214'
+absent_artifact_url='https://github.com/example/hephaera-fixture/pull/214'
 absent_artifact_head='gauntlet-work/artifact-absent-at-commit/unit-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh artifact-absent-at-commit unit-1 opened \
   "$absent_artifact_url" "$absent_artifact_head" none --head-sha "$artifact_absent_sha" >/dev/null
@@ -3382,10 +3395,10 @@ expect_failure "$temp_root/round-without-progress-pr.log" \
 expect_failure "$temp_root/qa-before-open.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-1' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-1' \
   --head-sha "$head_sha_1"
 
-linked_pr_events_dir="$project/.opencaw/.cache/gauntlets/linked-pr-events"
+linked_pr_events_dir="$project/.hephaera/.cache/gauntlets/linked-pr-events"
 copy_gauntlet "$ready_snapshot" "$linked_pr_events_dir"
 mkdir -p "$temp_root/outside-pr-events"
 rmdir "$linked_pr_events_dir/pr-events"
@@ -3393,16 +3406,16 @@ ln -s "$temp_root/outside-pr-events" "$linked_pr_events_dir/pr-events"
 expect_failure "$temp_root/linked-pr-events.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh linked-pr-events unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/202' \
+  'https://github.com/example/hephaera-fixture/pull/202' \
   'gauntlet-work/linked-pr-events/unit-1' none --head-sha "$head_sha_1"
 
 set_remote_ref "$project" gauntlet/fixture-gauntlet absent
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_1" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$progress_publication_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
-  OPENCAW_TEST_SKIP_REMOTE_PUBLICATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
+  HEPHAERA_TEST_SKIP_REMOTE_PUBLICATION=1 \
   expect_failure "$temp_root/first-open-remote-integration-still-absent.log" \
     run_for "$project" bash commands/record-gauntlet-pr-event.sh \
     fixture-gauntlet unit-1 opened "$fixture_pr_url" "$fixture_head" none \
@@ -3412,10 +3425,10 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
 
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_1" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$progress_publication_marker"
 set_pr_merge_automation_observation "$fixture_pr_url" AutoMergeEnabledEvent
-OPENCAW_TEST_SKIP_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 \
   expect_failure "$temp_root/open-progress-auto-merge-history.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
     "$fixture_pr_url" "$fixture_head" none --head-sha "$head_sha_1"
@@ -3437,7 +3450,7 @@ expect_line "- Head SHA: $head_sha_1" "$event_one"
 expect_line '- Target branch: gauntlet/fixture-gauntlet' "$event_one"
 expect_line "- Target base SHA: $base_commit_sha" "$event_one"
 expect_line '- Cross repository: false' "$event_one"
-expect_line '- Head repository: example/opencaw-fixture' "$event_one"
+expect_line '- Head repository: example/hephaera-fixture' "$event_one"
 expect_line '- Created at: 2026-08-01T12:00:00Z' "$event_one"
 expect_line '- Closed at: none' "$event_one"
 expect_line "- Publication checkpoint: $progress_checkpoint_relative" "$event_one"
@@ -3472,11 +3485,11 @@ grep -Eq '^- Scope fingerprint: [0-9a-f]{64}$' "$event_one" \
   || fail 'opened progress PR omitted the frozen unit-scope fingerprint'
 event_one_hash="$(git hash-object "$event_one")"
 event_one_sha256="$(sha256_file "$event_one")"
-grep -Fq '.opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' "$gauntlet_file" \
+grep -Fq '.hephaera/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' "$gauntlet_file" \
   || fail 'opened progress PR was not linked from the durable ledger'
 progress_open_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md')"
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md')"
 [[ "$progress_open_ledger" == *"| checkpoint: $progress_checkpoint_relative | checkpoint-sha256: $progress_checkpoint_sha256 |"* ]] \
   || fail 'opened progress ledger omitted its publication checkpoint binding'
 
@@ -3494,7 +3507,7 @@ replace_line "$gauntlet_file" \
   '- Benchmark: Local artifact quality contract version 1.'
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
-first_open_quality_reset_dir="$project/.opencaw/.cache/gauntlets/first-open-quality-reset"
+first_open_quality_reset_dir="$project/.hephaera/.cache/gauntlets/first-open-quality-reset"
 copy_gauntlet "$gauntlet_dir" "$first_open_quality_reset_dir"
 replace_line "$first_open_quality_reset_dir/GAUNTLET.md" \
   '- Benchmark: Local artifact quality contract version 1.' \
@@ -3508,14 +3521,14 @@ expect_failure "$temp_root/first-open-quality-reset-round.log" run_for "$project
   first-open-reset-builder first-open-reset-critic fresh-session "$valid_fail_report" \
   --head-sha "$head_sha_1" --builder-strategy "$builder_strategy_1"
 
-deleted_frozen_unit_dir="$project/.opencaw/.cache/gauntlets/deleted-frozen-unit"
+deleted_frozen_unit_dir="$project/.hephaera/.cache/gauntlets/deleted-frozen-unit"
 copy_gauntlet "$gauntlet_dir" "$deleted_frozen_unit_dir"
 replace_matching_line "$deleted_frozen_unit_dir/GAUNTLET.md" \
   '^- \[[ xX]\] unit-1 \| status:' ''
 expect_failure "$temp_root/deleted-frozen-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh deleted-frozen-unit --phase ready
 
-renamed_frozen_unit_dir="$project/.opencaw/.cache/gauntlets/renamed-frozen-unit"
+renamed_frozen_unit_dir="$project/.hephaera/.cache/gauntlets/renamed-frozen-unit"
 copy_gauntlet "$gauntlet_dir" "$renamed_frozen_unit_dir"
 replace_matching_line "$renamed_frozen_unit_dir/GAUNTLET.md" \
   '^- \[[ xX]\] unit-1 \| status:' \
@@ -3525,9 +3538,9 @@ set_gauntlet_field "$project" "$renamed_frozen_unit_dir/GAUNTLET.md" \
 expect_failure "$temp_root/renamed-frozen-unit.log" run_for "$project" \
   bash commands/validate-gauntlet.sh renamed-frozen-unit --phase ready
 
-first_open_revision_dir="$project/.opencaw/.cache/gauntlets/first-open-quality-revision"
+first_open_revision_dir="$project/.hephaera/.cache/gauntlets/first-open-quality-revision"
 copy_gauntlet "$gauntlet_dir" "$first_open_revision_dir"
-first_open_revision_old_url='https://github.com/example/opencaw-fixture/pull/201'
+first_open_revision_old_url='https://github.com/example/hephaera-fixture/pull/201'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   first-open-quality-revision unit-1 closed "$first_open_revision_old_url" \
   gauntlet-work/first-open-quality-revision/unit-1 "$first_open_revision_old_url" \
@@ -3554,7 +3567,7 @@ insert_after_matching_line "$first_open_revision_dir/GAUNTLET.md" \
 run_for "$project" bash commands/validate-gauntlet.sh \
   first-open-quality-revision --phase ready >/dev/null
 first_open_revision_head='gauntlet-work/first-open-quality-revision/unit-1-remediation-1'
-first_open_revision_url='https://github.com/example/opencaw-fixture/pull/288'
+first_open_revision_url='https://github.com/example/hephaera-fixture/pull/288'
 set_local_ref "$project" "$first_open_revision_head" "$head_sha_2"
 set_remote_ref "$project" "$first_open_revision_head" absent
 first_open_revision_readiness="$(run_for "$project" bash commands/pr-readiness-check.sh \
@@ -3563,7 +3576,7 @@ first_open_revision_readiness="$(run_for "$project" bash commands/pr-readiness-c
 first_open_revision_checkpoint="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
   <<<"$first_open_revision_readiness")"
 first_open_revision_trigger='quality-revision:precritic-v2'
-first_open_revision_root='.opencaw/.cache/gauntlets/first-open-quality-revision/pr-events/unit-1/event-002.md'
+first_open_revision_root='.hephaera/.cache/gauntlets/first-open-quality-revision/pr-events/unit-1/event-002.md'
 first_open_revision_trigger_sha256="$(sha256_text "$first_open_revision_marker"$'\n')"
 first_open_revision_root_sha256="$(sha256_file "$project/$first_open_revision_root")"
 expect_line "- Remediation trigger: $first_open_revision_trigger" \
@@ -3586,7 +3599,7 @@ expect_line "- Quality bar fingerprint: $first_open_quality_v2" \
   "$first_open_revision_dir/pr-events/unit-1/event-003.md"
 unset FAKE_DATE_ISO
 
-post_revision_close_dir="$project/.opencaw/.cache/gauntlets/post-revision-close"
+post_revision_close_dir="$project/.hephaera/.cache/gauntlets/post-revision-close"
 copy_gauntlet "$first_open_revision_dir" "$post_revision_close_dir"
 post_revision_close_url="$first_open_revision_url"
 post_revision_close_head='gauntlet-work/post-revision-close/unit-1-remediation-1'
@@ -3596,12 +3609,12 @@ export FAKE_DATE_ISO='2026-08-01T12:00:04Z'
 set_local_ref "$project" "$post_revision_close_head" "$head_sha_2"
 set_pr_observation "$post_revision_close_url" "$post_revision_close_head" \
   "$head_sha_2" gauntlet/post-revision-close CLOSED false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:02Z \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:02Z \
   "$FAKE_DATE_ISO" "$post_revision_close_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 run_for "$project" \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh post-revision-close unit-1 closed \
   "$post_revision_close_url" "$post_revision_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/288#issuecomment-2880' \
+  'https://github.com/example/hephaera-fixture/pull/288#issuecomment-2880' \
   --head-sha "$head_sha_2" >/dev/null
 post_revision_close_event="$post_revision_close_dir/pr-events/unit-1/event-004.md"
 expect_file "$post_revision_close_event"
@@ -3617,7 +3630,7 @@ for revision_timing_case in pre equal; do
   revision_timing_approval='2026-08-01T12:00:01Z'
   revision_timing_open='2026-08-01T12:00:03Z'
   revision_timing_name="$revision_timing_case-close-quality-revision"
-  revision_timing_dir="$project/.opencaw/.cache/gauntlets/$revision_timing_name"
+  revision_timing_dir="$project/.hephaera/.cache/gauntlets/$revision_timing_name"
   copy_gauntlet "$first_open_revision_dir" "$revision_timing_dir"
   revision_timing_event="$revision_timing_dir/pr-events/unit-1/event-003.md"
   revision_timing_close_event="$revision_timing_dir/pr-events/unit-1/event-002.md"
@@ -3627,7 +3640,7 @@ for revision_timing_case in pre equal; do
     "- Recorded at: $revision_timing_close"
   revision_timing_close_ledger="$(select_ledger_line "$project" \
     "$revision_timing_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-    ".opencaw/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-002.md")"
+    ".hephaera/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-002.md")"
   replace_line "$revision_timing_dir/GAUNTLET.md" \
     "$revision_timing_close_ledger" \
     "${revision_timing_close_ledger//pr-closed: 2026-08-01T12:00:00Z/pr-closed: $revision_timing_close}"
@@ -3637,7 +3650,7 @@ for revision_timing_case in pre equal; do
     "- Recorded at: $revision_timing_open"
   revision_timing_open_ledger="$(select_ledger_line "$project" \
     "$revision_timing_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-    ".opencaw/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-003.md")"
+    ".hephaera/.cache/gauntlets/$revision_timing_name/pr-events/unit-1/event-003.md")"
   replace_line "$revision_timing_dir/GAUNTLET.md" \
     "$revision_timing_open_ledger" \
     "${revision_timing_open_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $revision_timing_open}"
@@ -3661,7 +3674,7 @@ for revision_timing_case in pre equal; do
   set_remote_ref "$project" "$revision_timing_head" "$head_sha_2"
   set_pr_observation "$first_open_revision_url" "$revision_timing_head" \
     "$head_sha_2" "gauntlet/$revision_timing_name" OPEN false none none none none \
-    "$base_commit_sha" false example/opencaw-fixture "$revision_timing_open" \
+    "$base_commit_sha" false example/hephaera-fixture "$revision_timing_open" \
     none "$revision_timing_publication_marker"
   [[ "$revision_timing_baseline" < "$revision_timing_approval" \
     && ( "$revision_timing_approval" < "$revision_timing_close" \
@@ -3684,7 +3697,7 @@ for revision_timing_case in pre equal; do
     || fail "$revision_timing_case-close quality revision did not reach the closed-root authorization gate"
 done
 
-same_unit_quality_reuse_dir="$project/.opencaw/.cache/gauntlets/same-unit-quality-reuse"
+same_unit_quality_reuse_dir="$project/.hephaera/.cache/gauntlets/same-unit-quality-reuse"
 copy_gauntlet "$post_revision_close_dir" "$same_unit_quality_reuse_dir"
 set_gauntlet_field "$project" "$same_unit_quality_reuse_dir/GAUNTLET.md" \
   'Current State' 'Quality bar fingerprint' pending
@@ -3707,7 +3720,7 @@ grep -Fq \
   || fail 'rejected same-unit quality revision reuse created a publication checkpoint'
 unset FAKE_DATE_ISO
 
-future_quality_dir="$project/.opencaw/.cache/gauntlets/future-quality-checkpoint"
+future_quality_dir="$project/.hephaera/.cache/gauntlets/future-quality-checkpoint"
 copy_gauntlet "$first_open_revision_dir" "$future_quality_dir"
 future_quality_approval_time='2026-08-01T12:00:03Z'
 future_quality_event_time='2026-08-01T12:00:04Z'
@@ -3748,7 +3761,7 @@ replace_matching_line "$future_quality_event" '^- Recorded at:' \
   "- Recorded at: $future_quality_event_time"
 future_quality_event_ledger="$(select_ledger_line "$project" \
   "$future_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-quality-checkpoint/pr-events/unit-1/event-003.md')"
+  '.hephaera/.cache/gauntlets/future-quality-checkpoint/pr-events/unit-1/event-003.md')"
 replace_line "$future_quality_dir/GAUNTLET.md" "$future_quality_event_ledger" \
   "${future_quality_event_ledger//pr-created: 2026-08-01T12:00:02Z/pr-created: $future_quality_event_time}"
 refresh_copied_evidence_hashes "$future_quality_dir"
@@ -3759,7 +3772,7 @@ set_local_ref "$project" "$future_quality_head" "$head_sha_2"
 set_remote_ref "$project" "$future_quality_head" "$head_sha_2"
 set_pr_observation "$first_open_revision_url" "$future_quality_head" "$head_sha_2" \
   gauntlet/future-quality-checkpoint OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture "$future_quality_event_time" \
+  "$base_commit_sha" false example/hephaera-fixture "$future_quality_event_time" \
   none "$future_quality_marker"
 expect_failure "$temp_root/future-quality-checkpoint.log" run_for "$project" \
   bash commands/validate-gauntlet.sh future-quality-checkpoint --phase ready
@@ -3767,7 +3780,7 @@ grep -Fq 'Publication checkpoint remediation trigger was not active at its Recor
   "$temp_root/future-quality-checkpoint.log" \
   || fail 'future quality checkpoint did not reach the trigger-authorization gate'
 
-equal_quality_dir="$project/.opencaw/.cache/gauntlets/equal-quality-checkpoint"
+equal_quality_dir="$project/.hephaera/.cache/gauntlets/equal-quality-checkpoint"
 copy_gauntlet "$future_quality_dir" "$equal_quality_dir"
 equal_quality_revision_marker="${future_quality_revision_marker/approved at: $future_quality_approval_time/approved at: 2026-08-01T12:00:02Z}"
 replace_line "$equal_quality_dir/GAUNTLET.md" \
@@ -3807,7 +3820,7 @@ replace_matching_line "$equal_quality_event" '^- Recorded at:' \
   '- Recorded at: 2026-08-01T12:00:02Z'
 equal_quality_event_ledger="$(select_ledger_line "$project" \
   "$equal_quality_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/equal-quality-checkpoint/pr-events/unit-1/event-003.md')"
+  '.hephaera/.cache/gauntlets/equal-quality-checkpoint/pr-events/unit-1/event-003.md')"
 replace_line "$equal_quality_dir/GAUNTLET.md" "$equal_quality_event_ledger" \
   "${equal_quality_event_ledger//pr-created: $future_quality_event_time/pr-created: 2026-08-01T12:00:02Z}"
 refresh_copied_evidence_hashes "$equal_quality_dir"
@@ -3818,14 +3831,14 @@ set_local_ref "$project" "$equal_quality_head" "$head_sha_2"
 set_remote_ref "$project" "$equal_quality_head" "$head_sha_2"
 set_pr_observation "$first_open_revision_url" "$equal_quality_head" "$head_sha_2" \
   gauntlet/equal-quality-checkpoint OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:02Z \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:02Z \
   none "$equal_quality_marker"
 expect_line '- Created at: 2026-08-01T12:00:02Z' "$equal_quality_event"
 expect_line '- Recorded at: 2026-08-01T12:00:02Z' "$equal_quality_event"
 run_for "$project" bash commands/validate-gauntlet.sh \
   equal-quality-checkpoint --phase ready >/dev/null
 
-reverse_revision_dir="$project/.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer"
+reverse_revision_dir="$project/.hephaera/.cache/gauntlets/reverse-lexical-quality-consumer"
 copy_gauntlet "$gauntlet_dir" "$reverse_revision_dir"
 reverse_baseline_event="$reverse_revision_dir/pr-events/unit-1/event-001.md"
 reverse_baseline_checkpoint_relative="$(gauntlet_helper_value "$project" \
@@ -3884,8 +3897,8 @@ run_for "$project" bash commands/validate-gauntlet.sh \
 export FAKE_DATE_ISO=2026-08-02T00:00:02Z
 reverse_z_head='gauntlet-work/reverse-lexical-quality-consumer/unit-z'
 reverse_a_head='gauntlet-work/reverse-lexical-quality-consumer/unit-a'
-reverse_z_url='https://github.com/example/opencaw-fixture/pull/297'
-reverse_a_url='https://github.com/example/opencaw-fixture/pull/298'
+reverse_z_url='https://github.com/example/hephaera-fixture/pull/297'
+reverse_a_url='https://github.com/example/hephaera-fixture/pull/298'
 set_local_ref "$project" "$reverse_z_head" "$head_sha_1"
 set_local_ref "$project" "$reverse_a_head" "$head_sha_2"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
@@ -3927,10 +3940,10 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   reverse-lexical-quality-consumer --phase ready >/dev/null
 reverse_z_ledger="$(select_ledger_line "$project" \
   "$reverse_revision_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-z/event-001.md')"
+  '.hephaera/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-z/event-001.md')"
 reverse_a_ledger="$(select_ledger_line "$project" \
   "$reverse_revision_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-a/event-001.md')"
+  '.hephaera/.cache/gauntlets/reverse-lexical-quality-consumer/pr-events/unit-a/event-001.md')"
 replace_line "$reverse_revision_dir/GAUNTLET.md" "$reverse_z_ledger" \
   '__REVERSE_Z_LEDGER__'
 replace_line "$reverse_revision_dir/GAUNTLET.md" "$reverse_a_ledger" \
@@ -3949,7 +3962,7 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   reverse-lexical-quality-consumer --phase ready >/dev/null
 unset FAKE_DATE_ISO
 
-objective_drift_dir="$project/.opencaw/.cache/gauntlets/execution-objective-drift"
+objective_drift_dir="$project/.hephaera/.cache/gauntlets/execution-objective-drift"
 copy_gauntlet "$gauntlet_dir" "$objective_drift_dir"
 replace_line "$objective_drift_dir/GAUNTLET.md" \
   'Produce an inspectable local artifact that satisfies the approved fixture benchmark.' \
@@ -3957,7 +3970,7 @@ replace_line "$objective_drift_dir/GAUNTLET.md" \
 expect_failure "$temp_root/execution-objective-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-objective-drift --phase ready
 
-constraints_drift_dir="$project/.opencaw/.cache/gauntlets/execution-constraints-drift"
+constraints_drift_dir="$project/.hephaera/.cache/gauntlets/execution-constraints-drift"
 copy_gauntlet "$gauntlet_dir" "$constraints_drift_dir"
 replace_line "$constraints_drift_dir/GAUNTLET.md" \
   '- Do not use network services or credentials.' \
@@ -3965,14 +3978,14 @@ replace_line "$constraints_drift_dir/GAUNTLET.md" \
 expect_failure "$temp_root/execution-constraints-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-constraints-drift --phase ready
 
-policy_drift_dir="$project/.opencaw/.cache/gauntlets/execution-policy-drift"
+policy_drift_dir="$project/.hephaera/.cache/gauntlets/execution-policy-drift"
 copy_gauntlet "$gauntlet_dir" "$policy_drift_dir"
 replace_line "$policy_drift_dir/GAUNTLET.md" \
   '- Post-promotion QA: required' '- Post-promotion QA: optional'
 expect_failure "$temp_root/execution-policy-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-policy-drift --phase ready
 
-base_drift_dir="$project/.opencaw/.cache/gauntlets/execution-base-drift"
+base_drift_dir="$project/.hephaera/.cache/gauntlets/execution-base-drift"
 copy_gauntlet "$gauntlet_dir" "$base_drift_dir"
 set_local_ref "$project" release "$base_commit_sha"
 replace_line "$base_drift_dir/GAUNTLET.md" '- Base branch: main' '- Base branch: release'
@@ -3997,7 +4010,7 @@ expect_failure "$temp_root/execution-base-drift-pr-event.log" run_for "$project"
   && "$(round_file_count "$base_drift_dir")" == 0 ]] \
   || fail 'execution-contract drift recorder/readiness probes mutated durable evidence'
 
-base_sha_drift_dir="$project/.opencaw/.cache/gauntlets/execution-base-sha-drift"
+base_sha_drift_dir="$project/.hephaera/.cache/gauntlets/execution-base-sha-drift"
 copy_gauntlet "$gauntlet_dir" "$base_sha_drift_dir"
 set_local_ref "$project" main "$head_sha_1"
 set_local_ref "$project" gauntlet/execution-base-sha-drift "$head_sha_1"
@@ -4007,7 +4020,7 @@ expect_failure "$temp_root/execution-base-sha-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh execution-base-sha-drift --phase ready
 set_local_ref "$project" main "$base_commit_sha"
 
-contract_evidence_tamper_dir="$project/.opencaw/.cache/gauntlets/contract-evidence-tamper"
+contract_evidence_tamper_dir="$project/.hephaera/.cache/gauntlets/contract-evidence-tamper"
 copy_gauntlet "$gauntlet_dir" "$contract_evidence_tamper_dir"
 replace_matching_line "$contract_evidence_tamper_dir/pr-events/unit-1/event-001.md" \
   '^- Execution contract fingerprint:' \
@@ -4016,11 +4029,11 @@ refresh_copied_evidence_hashes "$contract_evidence_tamper_dir"
 expect_failure "$temp_root/contract-evidence-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh contract-evidence-tamper --phase ready
 
-contract_ledger_tamper_dir="$project/.opencaw/.cache/gauntlets/contract-ledger-tamper"
+contract_ledger_tamper_dir="$project/.hephaera/.cache/gauntlets/contract-ledger-tamper"
 copy_gauntlet "$gauntlet_dir" "$contract_ledger_tamper_dir"
 contract_ledger_line="$(select_ledger_line "$project" \
   "$contract_ledger_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/contract-ledger-tamper/pr-events/unit-1/event-001.md')"
+  '.hephaera/.cache/gauntlets/contract-ledger-tamper/pr-events/unit-1/event-001.md')"
 contract_ledger_fingerprint="$(sed -nE \
   's/^- Execution contract fingerprint: ([0-9a-f]{64})$/\1/p' \
   "$contract_ledger_tamper_dir/GAUNTLET.md" | head -n 1)"
@@ -4029,34 +4042,34 @@ replace_line "$contract_ledger_tamper_dir/GAUNTLET.md" "$contract_ledger_line" \
 expect_failure "$temp_root/contract-ledger-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh contract-ledger-tamper --phase ready
 
-tampered_event_dir="$project/.opencaw/.cache/gauntlets/tampered-pr-event"
+tampered_event_dir="$project/.hephaera/.cache/gauntlets/tampered-pr-event"
 copy_gauntlet "$gauntlet_dir" "$tampered_event_dir"
 run_for "$project" bash commands/validate-gauntlet.sh tampered-pr-event --phase ready >/dev/null
 replace_line "$tampered_event_dir/pr-events/unit-1/event-001.md" '- Event: opened' '- Event: qa-pass'
 expect_failure "$temp_root/tampered-pr-event.log" run_for "$project" \
   bash commands/validate-gauntlet.sh tampered-pr-event --phase ready
 
-noncontiguous_event_dir="$project/.opencaw/.cache/gauntlets/noncontiguous-pr-event"
+noncontiguous_event_dir="$project/.hephaera/.cache/gauntlets/noncontiguous-pr-event"
 copy_gauntlet "$gauntlet_dir" "$noncontiguous_event_dir"
 cp "$noncontiguous_event_dir/pr-events/unit-1/event-001.md" \
   "$noncontiguous_event_dir/pr-events/unit-1/event-003.md"
 expect_failure "$temp_root/noncontiguous-pr-event.log" run_for "$project" \
   bash commands/validate-gauntlet.sh noncontiguous-pr-event --phase ready
 
-stray_event_root_dir="$project/.opencaw/.cache/gauntlets/stray-pr-event-root"
+stray_event_root_dir="$project/.hephaera/.cache/gauntlets/stray-pr-event-root"
 copy_gauntlet "$gauntlet_dir" "$stray_event_root_dir"
 printf 'unexpected top-level event artifact\n' >"$stray_event_root_dir/pr-events/stray.md"
 expect_failure "$temp_root/stray-pr-event-root.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stray-pr-event-root --phase ready
 
-unexpected_event_file_dir="$project/.opencaw/.cache/gauntlets/unexpected-pr-event-file"
+unexpected_event_file_dir="$project/.hephaera/.cache/gauntlets/unexpected-pr-event-file"
 copy_gauntlet "$gauntlet_dir" "$unexpected_event_file_dir"
 printf 'unexpected item event artifact\n' \
   >"$unexpected_event_file_dir/pr-events/unit-1/notes.md"
 expect_failure "$temp_root/unexpected-pr-event-file.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unexpected-pr-event-file --phase ready
 
-noncanonical_event_file_dir="$project/.opencaw/.cache/gauntlets/noncanonical-pr-event-file"
+noncanonical_event_file_dir="$project/.hephaera/.cache/gauntlets/noncanonical-pr-event-file"
 copy_gauntlet "$gauntlet_dir" "$noncanonical_event_file_dir"
 cp "$noncanonical_event_file_dir/pr-events/unit-1/event-001.md" \
   "$noncanonical_event_file_dir/pr-events/unit-1/event-1.md"
@@ -4066,15 +4079,15 @@ expect_failure "$temp_root/noncanonical-pr-event-file.log" run_for "$project" \
 expect_failure "$temp_root/second-live-pr.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/203' \
+  'https://github.com/example/hephaera-fixture/pull/203' \
   'gauntlet-work/fixture-gauntlet/unit-1-replacement' none --head-sha "$head_sha_2"
 expect_failure "$temp_root/qa-before-round.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-2' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-2' \
   --head-sha "$head_sha_1"
 
-ownership_dir="$project/.opencaw/.cache/gauntlets/pr-ownership"
+ownership_dir="$project/.hephaera/.cache/gauntlets/pr-ownership"
 copy_gauntlet "$ready_snapshot" "$ownership_dir"
 insert_after_matching_line "$ownership_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Independently owned fixture unit | scope: independent ownership fixture'
@@ -4085,22 +4098,22 @@ ownership_manifest_approval="$(grep -F -- '- Unit manifest approval:' \
 replace_line "$ownership_dir/GAUNTLET.md" "$ownership_manifest_approval" \
   "- Unit manifest approval: $ownership_manifest_fingerprint | units: unit-1,unit-2 | approved by: fixture-user | approved at: 2026-08-01T12:00:00Z"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh pr-ownership unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/204' \
+  'https://github.com/example/hephaera-fixture/pull/204' \
   'gauntlet-work/pr-ownership/unit-1' none --head-sha "$head_sha_1" >/dev/null
 expect_failure "$temp_root/cross-unit-pr-ownership.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh pr-ownership unit-2 opened \
-  'https://github.com/example/opencaw-fixture/pull/204' \
+  'https://github.com/example/hephaera-fixture/pull/204' \
   'gauntlet-work/pr-ownership/unit-2' none --head-sha "$head_sha_1"
 
-alias_dir="$project/.opencaw/.cache/gauntlets/pr-url-alias"
+alias_dir="$project/.hephaera/.cache/gauntlets/pr-url-alias"
 copy_gauntlet "$ready_snapshot" "$alias_dir"
-alias_pr_url='https://github.com/example/opencaw-fixture/pull/211'
+alias_pr_url='https://github.com/example/hephaera-fixture/pull/211'
 alias_head='gauntlet-work/pr-url-alias/unit-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh pr-url-alias unit-1 opened \
   "$alias_pr_url" "$alias_head" none --head-sha "$head_sha_1" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh pr-url-alias unit-1 closed \
   "$alias_pr_url" "$alias_head" \
-  'https://github.com/example/opencaw-fixture/pull/211#issuecomment-30' --head-sha "$head_sha_1" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/211#issuecomment-30' --head-sha "$head_sha_1" >/dev/null
 expect_failure "$temp_root/trailing-slash-pr-alias.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh pr-url-alias unit-1 opened \
   "$alias_pr_url/" 'gauntlet-work/pr-url-alias/unit-1-remediation-1' none --head-sha "$head_sha_2"
@@ -4108,7 +4121,7 @@ alias_original_marker="$(opened_publication_marker \
   "$project" pr-url-alias unit-1)"
 set_pr_observation "$alias_pr_url" "$alias_head" "$head_sha_1" \
   gauntlet/pr-url-alias CLOSED false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z \
   2026-08-01T12:00:00Z "$alias_original_marker"
 alias_checkpoint_one="$alias_dir/publication-checkpoints/unit-1/checkpoint-001.md"
 alias_checkpoint_two="$alias_dir/publication-checkpoints/unit-1/checkpoint-002.md"
@@ -4123,18 +4136,18 @@ alias_event_one_created="$(sed -nE 's/^- Created at: (.*)$/\1/p' \
 [[ "$alias_checkpoint_one_time" == "$alias_checkpoint_two_time" \
   && "$alias_checkpoint_two_time" == "$alias_event_one_created" ]] \
   || fail 'future-checkpoint replay fixture did not retain its same-second tie'
-alias_replacement_url='https://github.com/example/opencaw-fixture/pull/299'
+alias_replacement_url='https://github.com/example/hephaera-fixture/pull/299'
 alias_replacement_head='gauntlet-work/pr-url-alias/unit-1-remediation-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh pr-url-alias unit-1 opened \
   "$alias_replacement_url" "$alias_replacement_head" none --head-sha "$head_sha_2" >/dev/null
 expect_file "$alias_dir/pr-events/unit-1/event-003.md"
-expect_line '- Publication checkpoint: .opencaw/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-001.md' \
+expect_line '- Publication checkpoint: .hephaera/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-001.md' \
   "$alias_dir/pr-events/unit-1/event-001.md"
-expect_line '- Publication checkpoint: .opencaw/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-002.md' \
+expect_line '- Publication checkpoint: .hephaera/.cache/gauntlets/pr-url-alias/publication-checkpoints/unit-1/checkpoint-002.md' \
   "$alias_dir/pr-events/unit-1/event-003.md"
 run_for "$project" bash commands/validate-gauntlet.sh pr-url-alias --phase ready >/dev/null
 
-concurrent_dir="$project/.opencaw/.cache/gauntlets/concurrent-recorders"
+concurrent_dir="$project/.hephaera/.cache/gauntlets/concurrent-recorders"
 copy_gauntlet "$ready_snapshot" "$concurrent_dir"
 insert_after_matching_line "$concurrent_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Independently recordable fixture unit | scope: independent second fixture artifact'
@@ -4153,26 +4166,26 @@ publish_checkpoint_refs "$project" "$concurrent_marker_1"
 concurrent_marker_2="$(ensure_publication_marker \
   "$project" concurrent-recorders unit-2)"
 publish_checkpoint_refs "$project" "$concurrent_marker_2"
-concurrent_url_1='https://github.com/example/opencaw-fixture/pull/216'
-concurrent_url_2='https://github.com/example/opencaw-fixture/pull/217'
+concurrent_url_1='https://github.com/example/hephaera-fixture/pull/216'
+concurrent_url_2='https://github.com/example/hephaera-fixture/pull/217'
 set_pr_observation "$concurrent_url_1" gauntlet-work/concurrent-recorders/unit-1 \
   "$head_sha_1" gauntlet/concurrent-recorders OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$concurrent_marker_1"
 set_pr_observation "$concurrent_url_2" gauntlet-work/concurrent-recorders/unit-2 \
   "$head_sha_2" gauntlet/concurrent-recorders OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$concurrent_marker_2"
 set +e
-FAKE_GH_DELAY_SECONDS=1 OPENCAW_PROJECT_ROOT="$project" \
+FAKE_GH_DELAY_SECONDS=1 HEPHAERA_PROJECT_ROOT="$project" \
   bash commands/record-gauntlet-pr-event.sh concurrent-recorders unit-1 opened \
   "$concurrent_url_1" gauntlet-work/concurrent-recorders/unit-1 none \
   --head-sha "$head_sha_1" >"$temp_root/concurrent-first.log" 2>&1 &
 concurrent_first_pid=$!
 set -e
-wait_for_path "$concurrent_dir/.opencaw-gauntlet.lock"
+wait_for_path "$concurrent_dir/.hephaera-gauntlet.lock"
 set +e
-OPENCAW_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
+HEPHAERA_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
   concurrent-recorders unit-2 opened "$concurrent_url_2" \
   gauntlet-work/concurrent-recorders/unit-2 none --head-sha "$head_sha_2" \
   >"$temp_root/concurrent-disjoint-contended.log" 2>&1
@@ -4191,33 +4204,33 @@ expect_file "$concurrent_dir/pr-events/unit-1/event-001.md"
 expect_file "$concurrent_dir/pr-events/unit-2/event-001.md"
 run_for "$project" bash commands/validate-gauntlet.sh concurrent-recorders --phase ready >/dev/null
 
-same_unit_concurrent_dir="$project/.opencaw/.cache/gauntlets/same-unit-concurrent"
+same_unit_concurrent_dir="$project/.hephaera/.cache/gauntlets/same-unit-concurrent"
 copy_gauntlet "$ready_snapshot" "$same_unit_concurrent_dir"
 set_local_ref "$project" gauntlet/same-unit-concurrent "$base_commit_sha"
 set_local_ref "$project" gauntlet-work/same-unit-concurrent/unit-1 "$head_sha_1"
 same_unit_concurrent_marker="$(ensure_publication_marker \
   "$project" same-unit-concurrent unit-1)"
 publish_checkpoint_refs "$project" "$same_unit_concurrent_marker"
-same_unit_url_1='https://github.com/example/opencaw-fixture/pull/218'
-same_unit_url_2='https://github.com/example/opencaw-fixture/pull/219'
+same_unit_url_1='https://github.com/example/hephaera-fixture/pull/218'
+same_unit_url_2='https://github.com/example/hephaera-fixture/pull/219'
 set_pr_observation "$same_unit_url_1" gauntlet-work/same-unit-concurrent/unit-1 \
   "$head_sha_1" gauntlet/same-unit-concurrent OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$same_unit_concurrent_marker"
 set_pr_observation "$same_unit_url_2" gauntlet-work/same-unit-concurrent/unit-1 \
   "$head_sha_1" gauntlet/same-unit-concurrent OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  "$base_commit_sha" false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$same_unit_concurrent_marker"
 set +e
-FAKE_GH_DELAY_SECONDS=1 OPENCAW_PROJECT_ROOT="$project" \
+FAKE_GH_DELAY_SECONDS=1 HEPHAERA_PROJECT_ROOT="$project" \
   bash commands/record-gauntlet-pr-event.sh same-unit-concurrent unit-1 opened \
   "$same_unit_url_1" gauntlet-work/same-unit-concurrent/unit-1 none \
   --head-sha "$head_sha_1" >"$temp_root/same-unit-concurrent-first.log" 2>&1 &
 same_unit_first_pid=$!
 set -e
-wait_for_path "$same_unit_concurrent_dir/.opencaw-gauntlet.lock"
+wait_for_path "$same_unit_concurrent_dir/.hephaera-gauntlet.lock"
 set +e
-OPENCAW_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
+HEPHAERA_PROJECT_ROOT="$project" bash commands/record-gauntlet-pr-event.sh \
   same-unit-concurrent unit-1 opened "$same_unit_url_2" \
   gauntlet-work/same-unit-concurrent/unit-1 none --head-sha "$head_sha_1" \
   >"$temp_root/same-unit-concurrent-contended.log" 2>&1
@@ -4237,7 +4250,7 @@ expect_line "- PR URL: $same_unit_url_1" \
   "$same_unit_concurrent_dir/pr-events/unit-1/event-001.md"
 
 run_for "$project" bash commands/record-gauntlet-pr-event.sh crlf-gauntlet unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/205' \
+  'https://github.com/example/hephaera-fixture/pull/205' \
   'gauntlet-work/crlf-gauntlet/unit-1' none --head-sha "$head_sha_1" >/dev/null
 
 echo '[4/8] rejecting invalid critic evidence without mutating round history'
@@ -4248,7 +4261,7 @@ convert_to_crlf "$crlf_report"
 run_for "$project" bash commands/record-gauntlet-round.sh crlf-gauntlet unit-1 fail \
   crlf-builder crlf-critic fresh-session "$crlf_report" \
   --head-sha "$head_sha_1" --builder-strategy "$builder_strategy_1" --dry-run >/dev/null
-[[ "$(round_file_count "$project/.opencaw/.cache/gauntlets/crlf-gauntlet")" == 0 ]] \
+[[ "$(round_file_count "$project/.hephaera/.cache/gauntlets/crlf-gauntlet")" == 0 ]] \
   || fail 'CRLF record dry-run created evidence'
 
 expect_failure "$temp_root/unknown-unit.log" run_for_without_observation "$project" \
@@ -4383,7 +4396,7 @@ expect_line "- Progress PR: $fixture_pr_url" "$round_one"
 expect_line "- Head branch: $fixture_head" "$round_one"
 expect_line "- Head SHA: $head_sha_1" "$round_one"
 expect_line "- Builder strategy: $builder_strategy_1" "$round_one"
-expect_line '- Opened event: .opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' \
+expect_line '- Opened event: .hephaera/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-001.md' \
   "$round_one"
 expect_line "- Opened event sha256: $event_one_sha256" "$round_one"
 expect_line '- Remediation root: none' "$round_one"
@@ -4413,47 +4426,47 @@ printf '# QA helper summary\n\nThe focused fixture checks completed.\n' \
   >"$project/qa-helper-summary.md"
 : >"$fake_gh_comment_bodies"
 run_for "$project" bash commands/comment-pr-qa-results.sh \
-  'https://github.com/example/opencaw-fixture/pull/240' \
+  'https://github.com/example/hephaera-fixture/pull/240' \
   "$project/qa-helper-summary.md" >"$temp_root/task-qa-helper.log"
 grep -Fq 'The focused fixture checks completed.' "$fake_gh_comment_bodies" \
   || fail 'Task/Goal-compatible QA helper omitted the legacy summary body'
-if grep -Fq 'opencaw-gauntlet-qa:' "$fake_gh_comment_bodies"; then
+if grep -Fq 'hephaera-gauntlet-qa:' "$fake_gh_comment_bodies"; then
   fail 'Task/Goal-compatible QA helper emitted Gauntlet metadata without flags'
 fi
 : >"$fake_gh_comment_bodies"
 run_for "$project" bash commands/comment-pr-qa-results.sh \
-  'https://github.com/example/opencaw-fixture/pull/241' \
+  'https://github.com/example/hephaera-fixture/pull/241' \
   "$project/qa-helper-summary.md" \
   --gauntlet-verdict fail --head-sha "$head_sha_1" \
-  --gauntlet-source '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
+  --gauntlet-source '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
   --gauntlet-affected-units none \
   >"$temp_root/gauntlet-qa-helper.log"
 round_one_sha256="$(sha256_file "$round_one")"
 expect_line "GAUNTLET_SOURCE_SHA256=$round_one_sha256" "$temp_root/gauntlet-qa-helper.log"
-grep -Fq -- "<!-- opencaw-gauntlet-qa:v1 verdict=fail head-sha=$head_sha_1 source=.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md source-sha256=$round_one_sha256 affected-units=none -->" \
+grep -Fq -- "<!-- hephaera-gauntlet-qa:v1 verdict=fail head-sha=$head_sha_1 source=.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md source-sha256=$round_one_sha256 affected-units=none -->" \
   "$fake_gh_comment_bodies" \
   || fail 'Gauntlet QA helper omitted or changed the exact semantic marker'
 expect_failure "$temp_root/incomplete-gauntlet-qa-helper-flags.log" run_for "$project" \
   bash commands/comment-pr-qa-results.sh \
-  'https://github.com/example/opencaw-fixture/pull/242' \
+  'https://github.com/example/hephaera-fixture/pull/242' \
   "$project/qa-helper-summary.md" --gauntlet-verdict fail --head-sha "$head_sha_1"
 
 outside_qa_source_root="$temp_root/outside-qa-source"
 mkdir -p "$outside_qa_source_root/unit-1" \
-  "$project/.opencaw/.cache/gauntlets/qa-source-symlink"
+  "$project/.hephaera/.cache/gauntlets/qa-source-symlink"
 cp "$round_one" "$outside_qa_source_root/unit-1/round-001.md"
 ln -s "$outside_qa_source_root" \
-  "$project/.opencaw/.cache/gauntlets/qa-source-symlink/rounds"
+  "$project/.hephaera/.cache/gauntlets/qa-source-symlink/rounds"
 : >"$fake_gh_comment_bodies"
 expect_failure "$temp_root/qa-helper-intermediate-symlink.log" run_for "$project" \
   bash commands/comment-pr-qa-results.sh \
-  'https://github.com/example/opencaw-fixture/pull/243' \
+  'https://github.com/example/hephaera-fixture/pull/243' \
   "$project/qa-helper-summary.md" \
   --gauntlet-verdict fail --head-sha "$head_sha_1" \
   --gauntlet-source \
-    '.opencaw/.cache/gauntlets/qa-source-symlink/rounds/unit-1/round-001.md' \
+    '.hephaera/.cache/gauntlets/qa-source-symlink/rounds/unit-1/round-001.md' \
   --gauntlet-affected-units none
-grep -Fq 'Gauntlet QA source evidence resolves outside the project .opencaw/.cache directory' \
+grep -Fq 'Gauntlet QA source evidence resolves outside the project .hephaera/.cache directory' \
   "$temp_root/qa-helper-intermediate-symlink.log" \
   || fail 'Gauntlet QA helper did not reject an intermediate source-directory symlink'
 [[ ! -s "$fake_gh_comment_bodies" ]] \
@@ -4470,7 +4483,7 @@ expect_failure "$temp_root/new-round-before-prior-qa.log" run_for "$project" \
 
 expect_failure "$temp_root/qa-pass-for-failed-round.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-10' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-10' \
   --head-sha "$head_sha_1"
 expect_failure "$temp_root/qa-invalid-evidence-url.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
@@ -4481,30 +4494,30 @@ expect_failure "$temp_root/qa-arbitrary-https-evidence.log" run_for "$project" \
 expect_failure "$temp_root/qa-different-pr-comment.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" \
-  'https://github.com/example/opencaw-fixture/pull/999#issuecomment-10' --head-sha "$head_sha_1"
-semantic_source='.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
+  'https://github.com/example/hephaera-fixture/pull/999#issuecomment-10' --head-sha "$head_sha_1"
+semantic_source='.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
 wrong_verdict_comment="$fixture_pr_url#issuecomment-9100"
 wrong_verdict_body="$(semantic_comment_body "$project" pass "$head_sha_1" "$semantic_source")"
 set_comment_observation "$wrong_verdict_comment" "$fixture_pr_url" "$wrong_verdict_body"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-wrong-verdict.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$wrong_verdict_comment" --head-sha "$head_sha_1"
 wrong_head_comment="$fixture_pr_url#issuecomment-9101"
 wrong_head_body="$(semantic_comment_body "$project" fail "$head_sha_2" "$semantic_source")"
 set_comment_observation "$wrong_head_comment" "$fixture_pr_url" "$wrong_head_body"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-wrong-head.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$wrong_head_comment" --head-sha "$head_sha_1"
-unrelated_comment_source='.opencaw/.cache/gauntlets/unrelated-comment-source/rounds/unit-1/round-001.md'
-mkdir -p "$project/.opencaw/.cache/gauntlets/unrelated-comment-source/rounds/unit-1"
+unrelated_comment_source='.hephaera/.cache/gauntlets/unrelated-comment-source/rounds/unit-1/round-001.md'
+mkdir -p "$project/.hephaera/.cache/gauntlets/unrelated-comment-source/rounds/unit-1"
 cp "$round_one" "$project/$unrelated_comment_source"
 unrelated_source_comment="$fixture_pr_url#issuecomment-9102"
 unrelated_source_body="$(semantic_comment_body "$project" fail "$head_sha_1" \
   "$unrelated_comment_source")"
 set_comment_observation "$unrelated_source_comment" "$fixture_pr_url" "$unrelated_source_body"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-unrelated-source.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$unrelated_source_comment" --head-sha "$head_sha_1"
@@ -4512,60 +4525,60 @@ stale_comment="$fixture_pr_url#issuecomment-9103"
 stale_comment_body="$(semantic_comment_body "$project" fail "$head_sha_1" "$semantic_source")"
 set_comment_observation "$stale_comment" "$fixture_pr_url" "$stale_comment_body" \
   fixture-user User MEMBER 2000-01-01T00:00:00Z
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-stale-created-at.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$stale_comment" --head-sha "$head_sha_1"
 edited_comment="$fixture_pr_url#issuecomment-9107"
 set_comment_observation "$edited_comment" "$fixture_pr_url" "$stale_comment_body" \
   fixture-user User MEMBER "$round_one_recorded_at" 2099-01-01T00:00:00Z
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-edited-before-record.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$edited_comment" --head-sha "$head_sha_1"
 untrusted_author_comment="$fixture_pr_url#issuecomment-9104"
 set_comment_observation "$untrusted_author_comment" "$fixture_pr_url" "$stale_comment_body" \
   other-user User MEMBER "$round_one_recorded_at" "$round_one_recorded_at"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-untrusted-author.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$untrusted_author_comment" --head-sha "$head_sha_1"
 bot_author_comment="$fixture_pr_url#issuecomment-9105"
 set_comment_observation "$bot_author_comment" "$fixture_pr_url" "$stale_comment_body" \
   fixture-user Bot MEMBER "$round_one_recorded_at" "$round_one_recorded_at"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-bot-author.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$bot_author_comment" --head-sha "$head_sha_1"
 outsider_comment="$fixture_pr_url#issuecomment-9106"
 set_comment_observation "$outsider_comment" "$fixture_pr_url" "$stale_comment_body" \
   fixture-user User NONE "$round_one_recorded_at" "$round_one_recorded_at"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 \
   expect_failure "$temp_root/qa-comment-outsider.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$outsider_comment" --head-sha "$head_sha_1"
 qa_fail_missing_comment="$fixture_pr_url#issuecomment-9001"
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-fail-missing-live-comment.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$qa_fail_missing_comment" --head-sha "$head_sha_1"
 qa_fail_wrong_pr_comment="$fixture_pr_url#issuecomment-9002"
 set_semantic_comment_observation "$project" "$qa_fail_wrong_pr_comment" \
-  'https://github.com/example/opencaw-fixture/pull/999' fail "$head_sha_1" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+  'https://github.com/example/hephaera-fixture/pull/999' fail "$head_sha_1" \
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md'
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-fail-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" "$qa_fail_wrong_pr_comment" --head-sha "$head_sha_1"
 expect_failure "$temp_root/qa-head-sha-drift.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-10' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-10' \
   --head-sha "$head_sha_2"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-11' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-11' \
   --head-sha "$head_sha_1" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-002.md"
-expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
+expect_line '- Critic round: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md' \
   "$gauntlet_dir/pr-events/unit-1/event-002.md"
 expect_line '- Critic verdict: fail' "$gauntlet_dir/pr-events/unit-1/event-002.md"
 expect_line "- Head SHA: $head_sha_1" "$gauntlet_dir/pr-events/unit-1/event-002.md"
@@ -4581,7 +4594,7 @@ grep -Eq '^- QA comment body sha256: [0-9a-f]{64}$' \
   || fail 'QA event omitted the exact live semantic comment-body hash'
 qa_fail_evidence="$fixture_pr_url#issuecomment-11"
 valid_qa_fail_body="$(semantic_comment_body "$project" fail "$head_sha_1" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
 : >"$fake_gh_api_marker"
 FAKE_GH_AUTH_LOGIN='different-current-user' run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
@@ -4610,17 +4623,17 @@ event_scope_fingerprint="$(sed -nE 's/^- Scope fingerprint: ([0-9a-f]{64})$/\1/p
 [[ -n "$round_scope_fingerprint" && "$round_scope_fingerprint" == "$event_scope_fingerprint" ]] \
   || fail 'round and QA evidence did not retain the same frozen scope fingerprint'
 
-qa_critic_path_dir="$project/.opencaw/.cache/gauntlets/qa-critic-path-traversal"
+qa_critic_path_dir="$project/.hephaera/.cache/gauntlets/qa-critic-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$qa_critic_path_dir"
 run_for "$project" bash commands/validate-gauntlet.sh qa-critic-path-traversal --phase ready >/dev/null
 replace_line "$qa_critic_path_dir/pr-events/unit-1/event-002.md" \
-  '- Critic round: .opencaw/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/round-001.md' \
-  '- Critic round: .opencaw/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/../unit-1/round-001.md'
+  '- Critic round: .hephaera/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/round-001.md' \
+  '- Critic round: .hephaera/.cache/gauntlets/qa-critic-path-traversal/rounds/unit-1/../unit-1/round-001.md'
 refresh_copied_evidence_hashes "$qa_critic_path_dir"
 expect_failure "$temp_root/qa-critic-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh qa-critic-path-traversal --phase ready
 
-round_opened_symlink_dir="$project/.opencaw/.cache/gauntlets/round-opened-symlink"
+round_opened_symlink_dir="$project/.hephaera/.cache/gauntlets/round-opened-symlink"
 copy_gauntlet "$gauntlet_dir" "$round_opened_symlink_dir"
 outside_round_opened_events="$temp_root/outside-round-opened-events"
 mv "$round_opened_symlink_dir/pr-events" "$outside_round_opened_events"
@@ -4632,44 +4645,44 @@ grep -Fq \
   "$temp_root/round-opened-symlink.log" \
   || fail 'round replay did not preflight its opened-event tree before cross-reading it'
 
-round_ledger_path_dir="$project/.opencaw/.cache/gauntlets/round-ledger-path-traversal"
+round_ledger_path_dir="$project/.hephaera/.cache/gauntlets/round-ledger-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$round_ledger_path_dir"
 replace_all_literal "$round_ledger_path_dir/GAUNTLET.md" \
-  '.opencaw/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/round-001.md' \
-  '.opencaw/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/../unit-1/round-001.md'
+  '.hephaera/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/round-001.md' \
+  '.hephaera/.cache/gauntlets/round-ledger-path-traversal/rounds/unit-1/../unit-1/round-001.md'
 expect_failure "$temp_root/round-ledger-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh round-ledger-path-traversal --phase ready
 
-progress_ledger_path_dir="$project/.opencaw/.cache/gauntlets/progress-ledger-path-traversal"
+progress_ledger_path_dir="$project/.hephaera/.cache/gauntlets/progress-ledger-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$progress_ledger_path_dir"
 replace_all_literal "$progress_ledger_path_dir/GAUNTLET.md" \
-  '.opencaw/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/event-002.md' \
-  '.opencaw/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/../unit-1/event-002.md'
+  '.hephaera/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/event-002.md' \
+  '.hephaera/.cache/gauntlets/progress-ledger-path-traversal/pr-events/unit-1/../unit-1/event-002.md'
 expect_failure "$temp_root/progress-ledger-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh progress-ledger-path-traversal --phase ready
 
-wrong_section_hash_dir="$project/.opencaw/.cache/gauntlets/wrong-section-ledger-hash"
+wrong_section_hash_dir="$project/.hephaera/.cache/gauntlets/wrong-section-ledger-hash"
 copy_gauntlet "$gauntlet_dir" "$wrong_section_hash_dir"
 wrong_section_round_line="$(select_ledger_line "$project" \
   "$wrong_section_hash_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/wrong-section-ledger-hash/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/wrong-section-ledger-hash/rounds/unit-1/round-001.md')"
 replace_line "$wrong_section_hash_dir/GAUNTLET.md" "$wrong_section_round_line" ''
 insert_after_matching_line "$wrong_section_hash_dir/GAUNTLET.md" '^## Review Notes$' \
   "$wrong_section_round_line"
 expect_failure "$temp_root/wrong-section-ledger-hash.log" run_for "$project" \
   bash commands/validate-gauntlet.sh wrong-section-ledger-hash --phase ready
 
-stale_ledger_hash_dir="$project/.opencaw/.cache/gauntlets/stale-ledger-hash"
+stale_ledger_hash_dir="$project/.hephaera/.cache/gauntlets/stale-ledger-hash"
 copy_gauntlet "$gauntlet_dir" "$stale_ledger_hash_dir"
 stale_round_line="$(select_ledger_line "$project" \
   "$stale_ledger_hash_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/stale-ledger-hash/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/stale-ledger-hash/rounds/unit-1/round-001.md')"
 replace_line "$stale_ledger_hash_dir/GAUNTLET.md" "$stale_round_line" \
   "${stale_round_line%sha256:*}sha256: 0000000000000000000000000000000000000000000000000000000000000000"
 expect_failure "$temp_root/stale-ledger-hash.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-ledger-hash --phase ready
 
-duplicate_round_metadata_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-metadata"
+duplicate_round_metadata_dir="$project/.hephaera/.cache/gauntlets/duplicate-round-metadata"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_metadata_dir"
 duplicate_round_metadata_file="$duplicate_round_metadata_dir/rounds/unit-1/round-001.md"
 insert_after_matching_line "$duplicate_round_metadata_file" '^- Item: unit-1$' \
@@ -4681,7 +4694,7 @@ grep -Fq "Round requires exactly one 'Item' field" \
   "$temp_root/duplicate-round-metadata.log" \
   || fail 'round replay accepted duplicate authoritative Item metadata'
 
-duplicate_round_heading_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-heading"
+duplicate_round_heading_dir="$project/.hephaera/.cache/gauntlets/duplicate-round-heading"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_heading_dir"
 duplicate_round_heading_file="$duplicate_round_heading_dir/rounds/unit-1/round-001.md"
 printf '\n## Round Metadata\n' >>"$duplicate_round_heading_file"
@@ -4692,36 +4705,36 @@ grep -Fq 'Round requires exactly one metadata heading' \
   "$temp_root/duplicate-round-heading.log" \
   || fail 'round replay accepted a duplicate metadata section'
 
-duplicate_round_ledger_dir="$project/.opencaw/.cache/gauntlets/duplicate-round-ledger"
+duplicate_round_ledger_dir="$project/.hephaera/.cache/gauntlets/duplicate-round-ledger"
 copy_gauntlet "$gauntlet_dir" "$duplicate_round_ledger_dir"
 duplicate_round_line="$(select_ledger_line "$project" \
   "$duplicate_round_ledger_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/duplicate-round-ledger/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/duplicate-round-ledger/rounds/unit-1/round-001.md')"
 insert_after_section_line "$duplicate_round_ledger_dir/GAUNTLET.md" \
   'Round Ledger' "$duplicate_round_line" "$duplicate_round_line"
 expect_failure "$temp_root/duplicate-round-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-round-ledger --phase ready
 
-duplicate_progress_ledger_dir="$project/.opencaw/.cache/gauntlets/duplicate-progress-ledger"
+duplicate_progress_ledger_dir="$project/.hephaera/.cache/gauntlets/duplicate-progress-ledger"
 copy_gauntlet "$gauntlet_dir" "$duplicate_progress_ledger_dir"
 duplicate_progress_line="$(select_ledger_line "$project" \
   "$duplicate_progress_ledger_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/duplicate-progress-ledger/pr-events/unit-1/event-002.md')"
+  '.hephaera/.cache/gauntlets/duplicate-progress-ledger/pr-events/unit-1/event-002.md')"
 insert_after_section_line "$duplicate_progress_ledger_dir/GAUNTLET.md" \
   'Progress PR Ledger' "$duplicate_progress_line" "$duplicate_progress_line"
 expect_failure "$temp_root/duplicate-progress-ledger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-progress-ledger --phase ready
 
-unledgered_evidence_dir="$project/.opencaw/.cache/gauntlets/unledgered-round-evidence"
+unledgered_evidence_dir="$project/.hephaera/.cache/gauntlets/unledgered-round-evidence"
 copy_gauntlet "$gauntlet_dir" "$unledgered_evidence_dir"
 unledgered_round_line="$(select_ledger_line "$project" \
   "$unledgered_evidence_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/unledgered-round-evidence/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/unledgered-round-evidence/rounds/unit-1/round-001.md')"
 replace_line "$unledgered_evidence_dir/GAUNTLET.md" "$unledgered_round_line" ''
 expect_failure "$temp_root/unledgered-round-evidence.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unledgered-round-evidence --phase ready
 
-builder_fingerprint_dir="$project/.opencaw/.cache/gauntlets/builder-fingerprint-tamper"
+builder_fingerprint_dir="$project/.hephaera/.cache/gauntlets/builder-fingerprint-tamper"
 copy_gauntlet "$gauntlet_dir" "$builder_fingerprint_dir"
 replace_matching_line "$builder_fingerprint_dir/rounds/unit-1/round-001.md" \
   '^- Builder strategy fingerprint:' \
@@ -4733,7 +4746,7 @@ expect_failure "$temp_root/builder-fingerprint-tamper.log" run_for "$project" \
 sync_gauntlet_live_observations "$project" "$gauntlet_dir"
 expect_failure "$temp_root/merge-after-failed-round.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-12' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-12' \
   --head-sha "$head_sha_1" --merge-commit "$head_sha_1"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_remote_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
@@ -4741,7 +4754,7 @@ fixture_open_marker="$(opened_publication_marker \
   "$project" fixture-gauntlet unit-1)"
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_1" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha" \
-  false example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  false example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$fixture_open_marker"
 
 changed_fail_report="$critic_dir/changed-fail-round.md"
@@ -4781,7 +4794,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh fixture-gauntlet unit-
   --head-sha "$head_sha_2" --builder-strategy "$builder_strategy_2" >/dev/null
 round_two="$gauntlet_dir/rounds/unit-1/round-002.md"
 expect_file "$round_two"
-expect_line '- Remediation root: .opencaw/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-002.md' \
+expect_line '- Remediation root: .hephaera/.cache/gauntlets/fixture-gauntlet/pr-events/unit-1/event-002.md' \
   "$round_two"
 round_two_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   "$round_two" | head -n 1)"
@@ -4792,10 +4805,10 @@ qa_one_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   || fail 'same-second round replay fixture did not retain its intended timestamp tie'
 round_one_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-001.md')"
 round_two_ledger="$(select_ledger_line "$project" "$gauntlet_file" \
   'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-002.md')"
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-002.md')"
 replace_line "$gauntlet_file" "$round_one_ledger" '__ROUND_ONE_LEDGER__'
 replace_line "$gauntlet_file" "$round_two_ledger" "$round_one_ledger"
 replace_line "$gauntlet_file" '__ROUND_ONE_LEDGER__' "$round_two_ledger"
@@ -4806,12 +4819,12 @@ replace_line "$gauntlet_file" "$round_two_ledger" "$round_one_ledger"
 replace_line "$gauntlet_file" '__ROUND_TWO_LEDGER__' "$round_two_ledger"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
-strict_quality_root_dir="$project/.opencaw/.cache/gauntlets/strict-quality-root-tie"
+strict_quality_root_dir="$project/.hephaera/.cache/gauntlets/strict-quality-root-tie"
 copy_gauntlet "$ready_snapshot" "$strict_quality_root_dir"
 mkdir -p "$strict_quality_root_dir/rounds/unit-1"
 cp "$round_two" "$strict_quality_root_dir/rounds/unit-1/round-002.md"
 replace_all_literal "$strict_quality_root_dir/rounds/unit-1/round-002.md" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/strict-quality-root-tie/'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/' '.hephaera/.cache/gauntlets/strict-quality-root-tie/'
 strict_quality_time='2026-08-02T00:00:01Z'
 replace_matching_line "$strict_quality_root_dir/rounds/unit-1/round-002.md" \
   '^- Recorded at:' "- Recorded at: $strict_quality_time"
@@ -4830,19 +4843,19 @@ strict_quality_root="$(gauntlet_helper_value "$project" \
   gauntlet_remediation_root_for_trigger "$strict_quality_root_dir/GAUNTLET.md" \
   unit-1 quality-revision:strict-tie-v2)"
 [[ "$strict_quality_root" \
-    == '.opencaw/.cache/gauntlets/strict-quality-root-tie/rounds/unit-1/round-002.md' ]] \
+    == '.hephaera/.cache/gauntlets/strict-quality-root-tie/rounds/unit-1/round-002.md' ]] \
   || fail 'strictly earlier non-PR failure was not retained as a quality revision root'
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/reused-live-comment-for-later-round-qa.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$fixture_pr_url" "$fixture_head" \
-  'https://github.com/example/opencaw-fixture/pull/201#issuecomment-11' \
+  'https://github.com/example/hephaera-fixture/pull/201#issuecomment-11' \
   --head-sha "$head_sha_2"
 grep -Fq 'QA comment evidence has already been consumed by a progress event' \
   "$temp_root/reused-live-comment-for-later-round-qa.log" \
   || fail 'reused QA comment was not rejected by the uniqueness invariant'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-13' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-13' \
   --head-sha "$head_sha_2" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-003.md"
 
@@ -4867,7 +4880,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh fixture-gauntlet unit-
   --head-sha "$head_sha_3" --builder-strategy "$builder_strategy_3" >/dev/null
 round_three="$gauntlet_dir/rounds/unit-1/round-003.md"
 expect_file "$round_three"
-nonadjacent_strategy_replay_dir="$project/.opencaw/.cache/gauntlets/nonadjacent-strategy-replay"
+nonadjacent_strategy_replay_dir="$project/.hephaera/.cache/gauntlets/nonadjacent-strategy-replay"
 copy_gauntlet "$gauntlet_dir" "$nonadjacent_strategy_replay_dir"
 builder_strategy_1_fingerprint="$(gauntlet_helper_value "$project" \
   gauntlet_strategy_fingerprint "$builder_strategy_1")"
@@ -4882,30 +4895,30 @@ expect_failure "$temp_root/nonadjacent-strategy-replay.log" run_for "$project" \
   bash commands/validate-gauntlet.sh nonadjacent-strategy-replay --phase ready
 sync_gauntlet_live_observations "$project" "$gauntlet_dir"
 qa_pass_missing_comment="$fixture_pr_url#issuecomment-9003"
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-pass-missing-live-comment.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
   "$fixture_pr_url" "$fixture_head" "$qa_pass_missing_comment" --head-sha "$head_sha_3"
 qa_pass_wrong_pr_comment="$fixture_pr_url#issuecomment-9004"
 set_semantic_comment_observation "$project" "$qa_pass_wrong_pr_comment" \
-  'https://github.com/example/opencaw-fixture/pull/998' pass "$head_sha_3" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md'
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+  'https://github.com/example/hephaera-fixture/pull/998' pass "$head_sha_3" \
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md'
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/qa-pass-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
   "$fixture_pr_url" "$fixture_head" "$qa_pass_wrong_pr_comment" --head-sha "$head_sha_3"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-14' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-14' \
   --head-sha "$head_sha_3" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-004.md"
-expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md' \
+expect_line '- Critic round: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-003.md' \
   "$gauntlet_dir/pr-events/unit-1/event-004.md"
 expect_line '- Critic verdict: pass' "$gauntlet_dir/pr-events/unit-1/event-004.md"
 grep -Eq '^- \[[ x]\] unit-1 \| status: critic-failed \|' "$gauntlet_file" \
   || fail 'independent PR QA failure did not invalidate a critic pass'
 expect_failure "$temp_root/qa-pass-without-new-critic.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-15' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-15' \
   --head-sha "$head_sha_3"
 qa_remediation_report="$critic_dir/qa-remediation-pass.md"
 write_critic_report "$qa_remediation_report" pass artifact.txt "$head_sha_4" \
@@ -4932,7 +4945,7 @@ expect_line "- Progress PR: $fixture_pr_url" "$round_four"
 expect_line "- Head branch: $fixture_head" "$round_four"
 expect_line "- Head SHA: $head_sha_4" "$round_four"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-16' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-16' \
   --head-sha "$head_sha_4" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-005.md"
 after_qa_pass_report="$critic_dir/after-qa-pass.md"
@@ -4945,15 +4958,15 @@ expect_failure "$temp_root/new-round-after-qa-pass.log" run_for "$project" \
   --head-sha "$head_sha_5" --builder-strategy "$builder_strategy_5"
 expect_failure "$temp_root/merge-without-commit.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-17' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-17' \
   --head-sha "$head_sha_4"
 expect_failure "$temp_root/merge-short-commit.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
   --head-sha "$head_sha_4" --merge-commit deadbeef
 expect_failure "$temp_root/merge-head-sha-drift.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
   --head-sha "$head_sha_3" --merge-commit "$head_sha_4"
 premerge_event_count="$(pr_event_file_count "$gauntlet_dir")"
 premerge_gauntlet_hash="$(git hash-object "$gauntlet_file")"
@@ -4961,10 +4974,10 @@ set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_4"
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
   gauntlet/fixture-gauntlet MERGED false 2026-08-01T12:28:00Z human-reviewer \
   "$head_sha_4" false "$head_sha_1"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure "$temp_root/unrecorded-target-before-merge.log" \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure "$temp_root/unrecorded-target-before-merge.log" \
   run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
   "$fixture_pr_url" "$fixture_head" \
-  'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+  'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
   --head-sha "$head_sha_4" --merge-commit "$head_sha_4"
 [[ "$premerge_event_count" == "$(pr_event_file_count "$gauntlet_dir")" \
   && "$premerge_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" ]] \
@@ -4974,10 +4987,10 @@ set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_4"
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
   gauntlet/fixture-gauntlet MERGED false 2026-08-01T12:29:00Z merge-bot \
   "$head_sha_4" true "$base_commit_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure "$temp_root/merge-by-bot.log" run_for "$project" \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure "$temp_root/merge-by-bot.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
   "$fixture_pr_url" "$fixture_head" \
-  'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+  'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
   --head-sha "$head_sha_4" --merge-commit "$head_sha_4"
 for forbidden_actor_type in App Mannequin none; do
   forbidden_actor_login=human-reviewer
@@ -4988,11 +5001,11 @@ for forbidden_actor_type in App Mannequin none; do
     "$head_sha_4" false "$base_commit_sha"
   set_pr_actor_observation "$fixture_pr_url" "$forbidden_actor_type" \
     "$forbidden_actor_login"
-  OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+  HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
     "$temp_root/merge-by-${forbidden_actor_type,,}.log" run_for "$project" \
     bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
     "$fixture_pr_url" "$fixture_head" \
-    'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+    'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
     --head-sha "$head_sha_4" --merge-commit "$head_sha_4"
 done
 for forbidden_merge_automation_event in \
@@ -5004,11 +5017,11 @@ for forbidden_merge_automation_event in \
     "$head_sha_4" false "$base_commit_sha"
   set_pr_merge_automation_observation "$fixture_pr_url" \
     "$forbidden_merge_automation_event"
-  OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+  HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
     "$temp_root/merge-automation-${forbidden_merge_automation_event}.log" \
     run_for "$project" bash commands/record-gauntlet-pr-event.sh \
     fixture-gauntlet unit-1 merged "$fixture_pr_url" "$fixture_head" \
-    'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+    'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
     --head-sha "$head_sha_4" --merge-commit "$head_sha_4"
   grep -Fq 'Gauntlet PR must never enable auto-merge or enter a merge queue' \
     "$temp_root/merge-automation-${forbidden_merge_automation_event}.log" \
@@ -5022,11 +5035,11 @@ set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
   gauntlet/fixture-gauntlet MERGED false 2026-08-01T12:29:00Z human-reviewer \
   "$head_sha_4" false "$base_commit_sha"
 set_pr_actor_observation "$fixture_pr_url" User different-reviewer
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/merge-actor-login-mismatch.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
   "$fixture_pr_url" "$fixture_head" \
-  'https://github.com/example/opencaw-fixture/pull/201#issuecomment-18' \
+  'https://github.com/example/hephaera-fixture/pull/201#issuecomment-18' \
   --head-sha "$head_sha_4" --merge-commit "$head_sha_4"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 premerge_integration_report="$critic_dir/premerge-integration.md"
@@ -5040,7 +5053,7 @@ expect_failure "$temp_root/integration-before-human-merge.log" run_for "$project
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_remote_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
-  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/opencaw-fixture/pull/201#issuecomment-19' \
+  "$fixture_pr_url" "$fixture_head" 'https://github.com/example/hephaera-fixture/pull/201#issuecomment-19' \
   --head-sha "$head_sha_4" --merge-commit "$head_sha_4" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-006.md"
 expect_line '- Event: merged' "$gauntlet_dir/pr-events/unit-1/event-006.md"
@@ -5057,7 +5070,7 @@ expect_line '- Merged by bot: false' "$gauntlet_dir/pr-events/unit-1/event-006.m
 [[ "$(pr_event_file_count "$gauntlet_dir")" == 6 ]] \
   || fail 'valid PR lifecycle events were not auto-incremented immutably'
 set_pr_merge_automation_observation "$fixture_pr_url" AutoMergeEnabledEvent
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/merged-auto-merge-history-replay.log" run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready
 grep -Fq 'Gauntlet PR must never enable auto-merge or enter a merge queue' \
@@ -5069,14 +5082,14 @@ set_pr_merge_automation_observation "$fixture_pr_url" none
   || fail 'failed invocations consumed round numbers or valid rounds were lost'
 grep -Eq '^- \[[ x]\] unit-1 \| status: passed \|' "$gauntlet_file" || fail 'passing verdict did not mark the work unit passed'
 
-scope_mutation_dir="$project/.opencaw/.cache/gauntlets/scope-mutation"
+scope_mutation_dir="$project/.hephaera/.cache/gauntlets/scope-mutation"
 copy_gauntlet "$gauntlet_dir" "$scope_mutation_dir"
 replace_matching_line "$scope_mutation_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: changed artifact boundary that was never re-reviewed'
 expect_failure "$temp_root/scope-mutation-invalidates-evidence.log" run_for "$project" \
   bash commands/validate-gauntlet.sh scope-mutation --phase ready
 
-bot_merge_tamper_dir="$project/.opencaw/.cache/gauntlets/bot-merge-tamper"
+bot_merge_tamper_dir="$project/.hephaera/.cache/gauntlets/bot-merge-tamper"
 copy_gauntlet "$gauntlet_dir" "$bot_merge_tamper_dir"
 replace_line "$bot_merge_tamper_dir/pr-events/unit-1/event-006.md" \
   '- Merged by bot: false' '- Merged by bot: true'
@@ -5084,7 +5097,7 @@ refresh_copied_evidence_hashes "$bot_merge_tamper_dir"
 expect_failure "$temp_root/bot-merge-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh bot-merge-tamper --phase ready
 
-actor_type_tamper_dir="$project/.opencaw/.cache/gauntlets/actor-type-tamper"
+actor_type_tamper_dir="$project/.hephaera/.cache/gauntlets/actor-type-tamper"
 copy_gauntlet "$gauntlet_dir" "$actor_type_tamper_dir"
 replace_line "$actor_type_tamper_dir/pr-events/unit-1/event-006.md" \
   '- Merged by type: User' '- Merged by type: App'
@@ -5092,7 +5105,7 @@ refresh_copied_evidence_hashes "$actor_type_tamper_dir"
 expect_failure "$temp_root/actor-type-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh actor-type-tamper --phase ready
 
-target_base_tamper_dir="$project/.opencaw/.cache/gauntlets/target-base-tamper"
+target_base_tamper_dir="$project/.hephaera/.cache/gauntlets/target-base-tamper"
 copy_gauntlet "$gauntlet_dir" "$target_base_tamper_dir"
 replace_line "$target_base_tamper_dir/pr-events/unit-1/event-006.md" \
   "- Target base SHA: $base_commit_sha" "- Target base SHA: $head_sha_1"
@@ -5100,7 +5113,7 @@ refresh_copied_evidence_hashes "$target_base_tamper_dir"
 expect_failure "$temp_root/target-base-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh target-base-tamper --phase ready
 
-reapproval_dir="$project/.opencaw/.cache/gauntlets/reapproved-bar"
+reapproval_dir="$project/.hephaera/.cache/gauntlets/reapproved-bar"
 copy_gauntlet "$gauntlet_dir" "$reapproval_dir"
 reapproval_execution_contract="$(sed -nE \
   's/^- Execution contract fingerprint: ([0-9a-f]{64})$/\1/p' \
@@ -5108,7 +5121,7 @@ reapproval_execution_contract="$(sed -nE \
 export FAKE_DATE_ISO='2026-08-01T12:00:01Z'
 revision_timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 replace_all_literal "$reapproval_dir/GAUNTLET.md" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/reapproved-bar/'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/' '.hephaera/.cache/gauntlets/reapproved-bar/'
 replace_line "$reapproval_dir/GAUNTLET.md" \
   '- Benchmark: Local artifact quality contract version 1.' \
   '- Benchmark: Local artifact quality contract version 2 with explicit recovery behavior.'
@@ -5136,12 +5149,12 @@ reapproval_unit_report="$critic_dir/reapproval-unit-pass.md"
 write_critic_report "$reapproval_unit_report" pass artifact.txt "$head_sha_5" \
   'The artifact now satisfies every criterion in the explicitly reapproved quality bar.' \
   'Advance the revised artifact to a new independent integration review.'
-reapproval_pr_url='https://github.com/example/opencaw-fixture/pull/206'
+reapproval_pr_url='https://github.com/example/hephaera-fixture/pull/206'
 reapproval_head='gauntlet-work/reapproved-bar/unit-1-remediation-1'
 set_local_ref "$project" "$reapproval_head" "$head_sha_5"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   reapproved-bar unit-1 "$project/progress-validation.md" >/dev/null
-malformed_quality_trigger_dir="$project/.opencaw/.cache/gauntlets/malformed-quality-trigger"
+malformed_quality_trigger_dir="$project/.hephaera/.cache/gauntlets/malformed-quality-trigger"
 copy_gauntlet "$reapproval_dir" "$malformed_quality_trigger_dir"
 malformed_quality_checkpoint="$(find \
   "$malformed_quality_trigger_dir/publication-checkpoints/unit-1" \
@@ -5171,18 +5184,18 @@ expect_line "- Execution contract fingerprint: $reapproval_execution_contract" \
   || fail 'quality-bar reapproval changed retained historical evidence'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh reapproved-bar unit-1 qa-pass \
   "$reapproval_pr_url" "$reapproval_head" \
-  'https://github.com/example/opencaw-fixture/pull/206#issuecomment-20' --head-sha "$head_sha_5" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/206#issuecomment-20' --head-sha "$head_sha_5" >/dev/null
 reapproval_premerge_count="$(pr_event_file_count "$reapproval_dir")"
 reapproval_premerge_hash="$(git hash-object "$reapproval_dir/GAUNTLET.md")"
 set_local_ref "$project" gauntlet/reapproved-bar "$head_sha_6"
 set_pr_observation "$reapproval_pr_url" "$reapproval_head" "$head_sha_5" \
   gauntlet/reapproved-bar MERGED false 2026-08-01T12:29:30Z human-reviewer \
   "$head_sha_6" false "$head_sha_5"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/unrecorded-target-between-merges.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh reapproved-bar unit-1 merged \
   "$reapproval_pr_url" "$reapproval_head" \
-  'https://github.com/example/opencaw-fixture/pull/206#issuecomment-21' \
+  'https://github.com/example/hephaera-fixture/pull/206#issuecomment-21' \
   --head-sha "$head_sha_5" --merge-commit "$head_sha_6"
 [[ "$reapproval_premerge_count" == "$(pr_event_file_count "$reapproval_dir")" \
   && "$reapproval_premerge_hash" == "$(git hash-object "$reapproval_dir/GAUNTLET.md")" ]] \
@@ -5190,7 +5203,7 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
 set_local_ref "$project" gauntlet/reapproved-bar "$head_sha_4"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh reapproved-bar unit-1 merged \
   "$reapproval_pr_url" "$reapproval_head" \
-  'https://github.com/example/opencaw-fixture/pull/206#issuecomment-21' \
+  'https://github.com/example/hephaera-fixture/pull/206#issuecomment-21' \
   --head-sha "$head_sha_5" --merge-commit "$head_sha_5" >/dev/null
 expect_line "- Target base SHA: $head_sha_4" \
   "$reapproval_dir/pr-events/unit-1/event-009.md"
@@ -5210,7 +5223,7 @@ expect_line "- Execution contract fingerprint: $reapproval_execution_contract" \
 quality_bar_v2="$(sed -nE \
   's/^- Quality bar fingerprint: ([0-9a-f]{64})$/\1/p' \
   "$reapproval_dir/GAUNTLET.md" | head -n 1)"
-quality_v3_dir="$project/.opencaw/.cache/gauntlets/quality-v3-chain"
+quality_v3_dir="$project/.hephaera/.cache/gauntlets/quality-v3-chain"
 copy_gauntlet "$reapproval_dir" "$quality_v3_dir"
 export FAKE_DATE_ISO='2026-08-01T12:00:03Z'
 replace_line "$quality_v3_dir/GAUNTLET.md" \
@@ -5243,14 +5256,14 @@ quality_v2_consumer_time="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
 [[ "$quality_v2_consumer_time" < '2026-08-01T12:00:03Z' ]] \
   || fail 'later quality revision was not strictly chronological after its prior consumer'
 
-quality_v3_skipped_parent_dir="$project/.opencaw/.cache/gauntlets/quality-v3-skipped-parent"
+quality_v3_skipped_parent_dir="$project/.hephaera/.cache/gauntlets/quality-v3-skipped-parent"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_skipped_parent_dir"
 replace_all_literal "$quality_v3_skipped_parent_dir/GAUNTLET.md" \
   "supersedes: $quality_bar_v2" "supersedes: $quality_bar_v1"
 expect_failure "$temp_root/quality-v3-skipped-parent.log" run_for "$project" \
   bash commands/validate-gauntlet.sh quality-v3-skipped-parent --phase ready
 
-quality_v3_equal_approval_dir="$project/.opencaw/.cache/gauntlets/quality-v3-equal-approval"
+quality_v3_equal_approval_dir="$project/.hephaera/.cache/gauntlets/quality-v3-equal-approval"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_equal_approval_dir"
 replace_all_literal "$quality_v3_equal_approval_dir/GAUNTLET.md" \
   'approved at: 2026-08-01T12:00:03Z' \
@@ -5258,7 +5271,7 @@ replace_all_literal "$quality_v3_equal_approval_dir/GAUNTLET.md" \
 expect_failure "$temp_root/quality-v3-equal-approval.log" run_for "$project" \
   bash commands/validate-gauntlet.sh quality-v3-equal-approval --phase ready
 
-quality_v3_misordered_dir="$project/.opencaw/.cache/gauntlets/quality-v3-misordered"
+quality_v3_misordered_dir="$project/.hephaera/.cache/gauntlets/quality-v3-misordered"
 copy_gauntlet "$quality_v3_dir" "$quality_v3_misordered_dir"
 quality_v2_revision_line="$(grep -F -- '- Quality bar revision: recovery-v2 ' \
   "$quality_v3_misordered_dir/GAUNTLET.md")"
@@ -5288,14 +5301,14 @@ grep -Eq '^- Remediation trigger sha256: [0-9a-f]{64}$' \
   || fail 'latest quality revision checkpoint omitted its hash-bound trigger'
 unset FAKE_DATE_ISO
 
-topology_order_dir="$project/.opencaw/.cache/gauntlets/topology-ledger-order"
+topology_order_dir="$project/.hephaera/.cache/gauntlets/topology-ledger-order"
 copy_gauntlet "$reapproval_dir" "$topology_order_dir"
 topology_first_merge_line="$(select_ledger_line "$project" \
   "$topology_order_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-006.md')"
+  '.hephaera/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-006.md')"
 topology_second_merge_line="$(select_ledger_line "$project" \
   "$topology_order_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-009.md')"
+  '.hephaera/.cache/gauntlets/topology-ledger-order/pr-events/unit-1/event-009.md')"
 replace_line "$topology_order_dir/GAUNTLET.md" "$topology_first_merge_line" \
   '__TOPOLOGY_FIRST_MERGE__'
 replace_line "$topology_order_dir/GAUNTLET.md" "$topology_second_merge_line" \
@@ -5304,9 +5317,9 @@ replace_line "$topology_order_dir/GAUNTLET.md" '__TOPOLOGY_FIRST_MERGE__' \
   "$topology_second_merge_line"
 run_for "$project" bash commands/validate-gauntlet.sh topology-ledger-order --phase ready >/dev/null
 
-unconsumed_close_dir="$project/.opencaw/.cache/gauntlets/unconsumed-close"
+unconsumed_close_dir="$project/.hephaera/.cache/gauntlets/unconsumed-close"
 copy_gauntlet "$ready_snapshot" "$unconsumed_close_dir"
-unconsumed_close_url='https://github.com/example/opencaw-fixture/pull/215'
+unconsumed_close_url='https://github.com/example/hephaera-fixture/pull/215'
 unconsumed_close_head='gauntlet-work/unconsumed-close/unit-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 opened \
   "$unconsumed_close_url" "$unconsumed_close_head" none --head-sha "$head_sha_1" >/dev/null
@@ -5316,18 +5329,18 @@ run_for "$project" bash commands/record-gauntlet-round.sh unconsumed-close unit-
 expect_failure "$temp_root/close-with-unconsumed-critic-round.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 closed \
   "$unconsumed_close_url" "$unconsumed_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/215#issuecomment-31' --head-sha "$head_sha_1"
+  'https://github.com/example/hephaera-fixture/pull/215#issuecomment-31' --head-sha "$head_sha_1"
 [[ "$(pr_event_file_count "$unconsumed_close_dir")" == 1 ]] \
   || fail 'closing with an unconsumed critic round mutated progress-PR evidence'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 qa-fail \
   "$unconsumed_close_url" "$unconsumed_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/215#issuecomment-32' --head-sha "$head_sha_1" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/215#issuecomment-32' --head-sha "$head_sha_1" >/dev/null
 replace_line "$unconsumed_close_dir/GAUNTLET.md" '- Status: running' '- Status: stopped'
 stopped_close_contract_hash="$(sha256_file "$unconsumed_close_dir/GAUNTLET.md")"
 expect_failure "$temp_root/close-stopped-gauntlet.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 closed \
   "$unconsumed_close_url" "$unconsumed_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/215#issuecomment-33' --head-sha "$head_sha_1"
+  'https://github.com/example/hephaera-fixture/pull/215#issuecomment-33' --head-sha "$head_sha_1"
 expect_line 'Terminal progress-PR events require a ready or running Gauntlet, not stopped.' \
   "$temp_root/close-stopped-gauntlet.log"
 [[ "$(pr_event_file_count "$unconsumed_close_dir")" == 2 ]] \
@@ -5368,10 +5381,10 @@ set +e
 PATH="$terminal_validator_bin:$PATH" REAL_BASH="$terminal_real_bash" \
   FAKE_VALIDATOR_PAUSE_READY="$terminal_validator_ready" \
   FAKE_VALIDATOR_PAUSE_RELEASE="$terminal_validator_release" \
-  OPENCAW_PROJECT_ROOT="$project" "$terminal_real_bash" \
+  HEPHAERA_PROJECT_ROOT="$project" "$terminal_real_bash" \
   commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 closed \
   "$unconsumed_close_url" "$unconsumed_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/215#issuecomment-33' \
+  'https://github.com/example/hephaera-fixture/pull/215#issuecomment-33' \
   --head-sha "$head_sha_1" >"$terminal_cas_output" 2>&1 &
 terminal_cas_pid=$!
 set -e
@@ -5391,17 +5404,17 @@ expect_line "Gauntlet state changed during operation; no mutation was committed:
   || fail 'terminal status CAS failure installed progress-PR evidence'
 [[ "$(sha256_file "$unconsumed_close_dir/GAUNTLET.md")" == "$terminal_concurrent_contract_hash" ]] \
   || fail 'terminal status CAS failure overwrote the concurrent stopped-state transition'
-[[ ! -e "$unconsumed_close_dir/.opencaw-gauntlet.lock" ]] \
+[[ ! -e "$unconsumed_close_dir/.hephaera-gauntlet.lock" ]] \
   || fail 'terminal status CAS failure retained the Gauntlet lock'
 replace_line "$unconsumed_close_dir/GAUNTLET.md" '- Status: stopped' '- Status: running'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh unconsumed-close unit-1 closed \
   "$unconsumed_close_url" "$unconsumed_close_head" \
-  'https://github.com/example/opencaw-fixture/pull/215#issuecomment-33' --head-sha "$head_sha_1" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/215#issuecomment-33' --head-sha "$head_sha_1" >/dev/null
 expect_file "$unconsumed_close_dir/pr-events/unit-1/event-003.md"
 
-closed_dir="$project/.opencaw/.cache/gauntlets/closed-unmerged"
+closed_dir="$project/.hephaera/.cache/gauntlets/closed-unmerged"
 copy_gauntlet "$ready_snapshot" "$closed_dir"
-closed_pr_url='https://github.com/example/opencaw-fixture/pull/207'
+closed_pr_url='https://github.com/example/hephaera-fixture/pull/207'
 closed_head='gauntlet-work/closed-unmerged/unit-1'
 run_for "$project" bash commands/record-gauntlet-pr-event.sh closed-unmerged unit-1 opened \
   "$closed_pr_url" "$closed_head" none --head-sha "$head_sha_3" >/dev/null
@@ -5410,10 +5423,10 @@ run_for "$project" bash commands/record-gauntlet-round.sh closed-unmerged unit-1
   --head-sha "$head_sha_3" --builder-strategy "$builder_strategy_3" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh closed-unmerged unit-1 qa-pass \
   "$closed_pr_url" "$closed_head" \
-  'https://github.com/example/opencaw-fixture/pull/207#issuecomment-22' --head-sha "$head_sha_3" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/207#issuecomment-22' --head-sha "$head_sha_3" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh closed-unmerged unit-1 closed \
   "$closed_pr_url" "$closed_head" \
-  'https://github.com/example/opencaw-fixture/pull/207#issuecomment-23' --head-sha "$head_sha_3" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/207#issuecomment-23' --head-sha "$head_sha_3" >/dev/null
 expect_failure "$temp_root/closed-unmerged-integration.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh closed-unmerged integration pass \
   closed-integration-builder closed-integration-critic fresh-session "$pass_report" \
@@ -5426,7 +5439,7 @@ set_local_ref "$project" gauntlet-work/closed-unmerged/unit-1-remediation-1 "$he
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   closed-unmerged unit-1 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh closed-unmerged unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/210' \
+  'https://github.com/example/hephaera-fixture/pull/210' \
   'gauntlet-work/closed-unmerged/unit-1-remediation-1' none --head-sha "$head_sha_4" >/dev/null
 expect_file "$closed_dir/pr-events/unit-1/event-004.md"
 run_for "$project" bash commands/record-gauntlet-round.sh closed-unmerged unit-1 pass \
@@ -5452,7 +5465,7 @@ grep -Fq 'Gauntlet integration review Head SHA must not be empty.' \
   "$temp_root/premature-complete.log" \
   || fail 'premature completion hit the wrong rejection guard'
 
-stopped_dir="$project/.opencaw/.cache/gauntlets/stopped-gauntlet"
+stopped_dir="$project/.hephaera/.cache/gauntlets/stopped-gauntlet"
 copy_gauntlet "$ready_snapshot" "$stopped_dir"
 stopped_hash="$(git hash-object "$stopped_dir/GAUNTLET.md")"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh stopped-gauntlet --status stopped --dry-run \
@@ -5467,7 +5480,7 @@ grep -Eiq 'PR eligible[^[:alnum:]]+no|not PR[- ]eligible|PR-ineligible' "$stoppe
   || fail 'stopped report was not explicitly PR-ineligible'
 expect_failure "$temp_root/stopped-complete-validation.log" run_for "$project" bash commands/validate-gauntlet.sh stopped-gauntlet --phase complete
 
-blocked_dir="$project/.opencaw/.cache/gauntlets/blocked-gauntlet"
+blocked_dir="$project/.hephaera/.cache/gauntlets/blocked-gauntlet"
 copy_gauntlet "$ready_snapshot" "$blocked_dir"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh blocked-gauntlet --status blocked >/dev/null
 expect_file "$blocked_dir/GAUNTLET_REPORT.md"
@@ -5484,7 +5497,7 @@ write_critic_report "$direct_integration_report" pass artifact.txt "$head_sha_5"
 direct_pre_round_gauntlet_hash="$(git hash-object "$gauntlet_file")"
 direct_pre_round_count="$(round_file_count "$gauntlet_dir")"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_5"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/direct-unrecorded-integration-round.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet integration pass \
   direct-integration-builder direct-integration-critic fresh-session \
@@ -5499,7 +5512,7 @@ write_critic_report "$orphan_integration_report" pass artifact.txt "$orphan_sha"
   'The reviewed integration head does not descend from the frozen base commit.' \
   'Reconstruct the branch from the frozen base and recorded human merge chain.'
 set_local_ref "$project" gauntlet/fixture-gauntlet "$orphan_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/orphan-integration-round.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet integration pass \
   orphan-integration-builder orphan-integration-critic fresh-session \
@@ -5516,7 +5529,7 @@ write_critic_report "$divergent_integration_report" pass artifact.txt "$divergen
 divergent_pre_round_gauntlet_hash="$(git hash-object "$gauntlet_file")"
 divergent_pre_round_count="$(round_file_count "$gauntlet_dir")"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$divergent_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/divergent-integration-round.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet integration pass \
   divergent-integration-builder divergent-integration-critic fresh-session \
@@ -5570,7 +5583,7 @@ grep -q -- '- Verdict: fail' "$gauntlet_file" || fail 'later integration failure
 expect_failure "$temp_root/stale-integration-pass.log" run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 
-forged_integration_reopen_dir="$project/.opencaw/.cache/gauntlets/integration-fail-forged-pass"
+forged_integration_reopen_dir="$project/.hephaera/.cache/gauntlets/integration-fail-forged-pass"
 copy_gauntlet "$gauntlet_dir" "$forged_integration_reopen_dir"
 replace_matching_line "$forged_integration_reopen_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -5594,13 +5607,13 @@ expect_failure "$temp_root/integration-fail-forged-pass-complete.log" run_for "$
   && ! -f "$forged_integration_reopen_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'manual post-integration-failure pass created mutable evidence or completion output'
 
-integration_affected_tamper_dir="$project/.opencaw/.cache/gauntlets/integration-affected-tamper"
+integration_affected_tamper_dir="$project/.hephaera/.cache/gauntlets/integration-affected-tamper"
 copy_gauntlet "$gauntlet_dir" "$integration_affected_tamper_dir"
 replace_line "$integration_affected_tamper_dir/rounds/integration/round-002.md" \
   '- Affected units: unit-1' '- Affected units: none'
 integration_affected_ledger="$(select_ledger_line "$project" \
   "$integration_affected_tamper_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/integration-affected-tamper/rounds/integration/round-002.md')"
+  '.hephaera/.cache/gauntlets/integration-affected-tamper/rounds/integration/round-002.md')"
 replace_line "$integration_affected_tamper_dir/GAUNTLET.md" \
   "$integration_affected_ledger" \
   "${integration_affected_ledger/affected-units: unit-1/affected-units: none}"
@@ -5613,7 +5626,7 @@ grep -Fq 'Integration failure/block requires canonical frozen affected-unit IDs'
     fail 'integration affected-unit tamper hit the wrong rejection guard'
   }
 
-pretip_work_dir="$project/.opencaw/.cache/gauntlets/work-head-before-chain-tip"
+pretip_work_dir="$project/.hephaera/.cache/gauntlets/work-head-before-chain-tip"
 copy_gauntlet "$gauntlet_dir" "$pretip_work_dir"
 pretip_work_head='gauntlet-work/work-head-before-chain-tip/unit-1-remediation-1'
 set_local_ref "$project" "$pretip_work_head" "$head_sha_2"
@@ -5639,33 +5652,33 @@ pretip_checkpoint_relative="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
 replace_line "$project/$pretip_checkpoint_relative" "- Head SHA: $head_sha_7" \
   "- Head SHA: $head_sha_2"
 pretip_checkpoint_hash="$(sha256_file "$project/$pretip_checkpoint_relative")"
-pretip_checkpoint_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$pretip_checkpoint_relative checkpoint-sha256=$pretip_checkpoint_hash -->"
+pretip_checkpoint_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$pretip_checkpoint_relative checkpoint-sha256=$pretip_checkpoint_hash -->"
 set_local_ref "$project" "$pretip_work_head" "$head_sha_2"
-set_pr_observation 'https://github.com/example/opencaw-fixture/pull/287' \
+set_pr_observation 'https://github.com/example/hephaera-fixture/pull/287' \
   "$pretip_work_head" "$head_sha_2" gauntlet/work-head-before-chain-tip \
-  OPEN false none none none none "$head_sha_4" false example/opencaw-fixture \
+  OPEN false none none none none "$head_sha_4" false example/hephaera-fixture \
   2026-08-01T12:00:00Z none "$pretip_checkpoint_marker"
-OPENCAW_TEST_SKIP_OBSERVATION=1 OPENCAW_TEST_SKIP_PUBLICATION_BODY=1 \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 HEPHAERA_TEST_SKIP_PUBLICATION_BODY=1 \
 expect_failure "$temp_root/work-head-before-chain-tip.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh work-head-before-chain-tip unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/287' "$pretip_work_head" none \
+  'https://github.com/example/hephaera-fixture/pull/287' "$pretip_work_head" none \
   --head-sha "$head_sha_2"
 [[ "$(pr_event_file_count "$pretip_work_dir")" \
     == "$(pr_event_file_count "$gauntlet_dir")" ]] \
   || fail 'work head based before the current chain tip created immutable PR evidence'
 
-transitive_retry_dir="$project/.opencaw/.cache/gauntlets/transitive-retry"
+transitive_retry_dir="$project/.hephaera/.cache/gauntlets/transitive-retry"
 copy_gauntlet "$gauntlet_dir" "$transitive_retry_dir"
-transitive_first_url='https://github.com/example/opencaw-fixture/pull/224'
+transitive_first_url='https://github.com/example/hephaera-fixture/pull/224'
 transitive_first_head='gauntlet-work/transitive-retry/unit-1-remediation-1'
 set_local_ref "$project" "$transitive_first_head" "$head_sha_7"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 opened \
   "$transitive_first_url" "$transitive_first_head" none --head-sha "$head_sha_7" >/dev/null
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md' \
   "$transitive_retry_dir/pr-events/unit-1/event-007.md"
-transitive_root_relative='.opencaw/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md'
+transitive_root_relative='.hephaera/.cache/gauntlets/transitive-retry/rounds/integration/round-002.md'
 transitive_root_sha256="$(sha256_file "$project/$transitive_root_relative")"
-transitive_first_open_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-007.md'
+transitive_first_open_relative='.hephaera/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-007.md'
 transitive_first_open_sha256="$(sha256_file "$project/$transitive_first_open_relative")"
 transitive_fail_report="$critic_dir/transitive-remediation-fail.md"
 write_critic_report "$transitive_fail_report" fail artifact.txt "$head_sha_7" \
@@ -5685,13 +5698,13 @@ expect_line "- Remediation root sha256: $transitive_root_sha256" "$transitive_fi
 expect_line '- Affected units: none' "$transitive_first_round"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 qa-fail \
   "$transitive_first_url" "$transitive_first_head" \
-  'https://github.com/example/opencaw-fixture/pull/224#issuecomment-60' \
+  'https://github.com/example/hephaera-fixture/pull/224#issuecomment-60' \
   --head-sha "$head_sha_7" >/dev/null
-transitive_first_qa_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-008.md'
+transitive_first_qa_relative='.hephaera/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-008.md'
 expect_file "$project/$transitive_first_qa_relative"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 closed \
   "$transitive_first_url" "$transitive_first_head" \
-  'https://github.com/example/opencaw-fixture/pull/224#issuecomment-61' \
+  'https://github.com/example/hephaera-fixture/pull/224#issuecomment-61' \
   --head-sha "$head_sha_7" >/dev/null
 expect_file "$transitive_retry_dir/pr-events/unit-1/event-009.md"
 expect_line '- Event: closed' "$transitive_retry_dir/pr-events/unit-1/event-009.md"
@@ -5716,16 +5729,16 @@ transitive_quality_root="$(gauntlet_helper_value "$project" \
   gauntlet_remediation_root_for_trigger "$transitive_retry_dir/GAUNTLET.md" \
   unit-1 quality-revision:transitive-v2 '2026-08-01T12:00:02Z')"
 [[ "$transitive_quality_root" \
-    == '.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-009.md' ]] \
+    == '.hephaera/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-009.md' ]] \
   || fail 'transitive quality revision did not resolve its immediately previous close'
 
 export FAKE_DATE_ISO='2026-08-01T12:00:02Z'
-transitive_second_url='https://github.com/example/opencaw-fixture/pull/225'
+transitive_second_url='https://github.com/example/hephaera-fixture/pull/225'
 transitive_second_head='gauntlet-work/transitive-retry/unit-1-remediation-2'
 set_local_ref "$project" "$transitive_second_head" "$head_sha_8"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 opened \
   "$transitive_second_url" "$transitive_second_head" none --head-sha "$head_sha_8" >/dev/null
-transitive_second_open_relative='.opencaw/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-010.md'
+transitive_second_open_relative='.hephaera/.cache/gauntlets/transitive-retry/pr-events/unit-1/event-010.md'
 transitive_second_open="$project/$transitive_second_open_relative"
 expect_line '- Remediation trigger: quality-revision:transitive-v2' \
   "$transitive_second_open"
@@ -5754,13 +5767,13 @@ gauntlet_helper_value "$project" gauntlet_trace_remediation_trigger \
   "$transitive_root_relative" >/dev/null \
   || fail 'transitive quality-revision close root did not trace to the original integration failure'
 
-containment_tamper_dir="$project/.opencaw/.cache/gauntlets/closed-cycle-containment-tamper"
+containment_tamper_dir="$project/.hephaera/.cache/gauntlets/closed-cycle-containment-tamper"
 copy_gauntlet "$transitive_retry_dir" "$containment_tamper_dir"
 containment_tamper_open="$containment_tamper_dir/pr-events/unit-1/event-010.md"
 containment_tamper_qa="$containment_tamper_dir/pr-events/unit-1/event-008.md"
 containment_tamper_round="$containment_tamper_dir/rounds/unit-1/$(basename "$transitive_first_round")"
-containment_tamper_round_relative=".opencaw/.cache/gauntlets/closed-cycle-containment-tamper/rounds/unit-1/$(basename "$transitive_first_round")"
-containment_tamper_qa_relative='.opencaw/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-008.md'
+containment_tamper_round_relative=".hephaera/.cache/gauntlets/closed-cycle-containment-tamper/rounds/unit-1/$(basename "$transitive_first_round")"
+containment_tamper_qa_relative='.hephaera/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-008.md'
 gauntlet_helper_value "$project" gauntlet_trace_remediation_trigger \
   "$containment_tamper_dir/GAUNTLET.md" unit-1 "$containment_tamper_open" \
   "$containment_tamper_round_relative" >/dev/null \
@@ -5806,7 +5819,7 @@ replace_line "$containment_tamper_round" \
 containment_qa_ledger="$(select_ledger_line "$project" \
   "$containment_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$containment_tamper_qa_relative")"
-containment_close_relative='.opencaw/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-009.md'
+containment_close_relative='.hephaera/.cache/gauntlets/closed-cycle-containment-tamper/pr-events/unit-1/event-009.md'
 containment_close_ledger="$(select_ledger_line "$project" \
   "$containment_tamper_dir/GAUNTLET.md" 'Progress PR Ledger' record \
   "$containment_close_relative")"
@@ -5840,11 +5853,11 @@ expect_line "- Remediation root sha256: $transitive_close_sha256" "$transitive_s
 expect_line '- Affected units: none' "$transitive_second_round"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 qa-pass \
   "$transitive_second_url" "$transitive_second_head" \
-  'https://github.com/example/opencaw-fixture/pull/225#issuecomment-62' \
+  'https://github.com/example/hephaera-fixture/pull/225#issuecomment-62' \
   --head-sha "$head_sha_8" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh transitive-retry unit-1 merged \
   "$transitive_second_url" "$transitive_second_head" \
-  'https://github.com/example/opencaw-fixture/pull/225#issuecomment-63' \
+  'https://github.com/example/hephaera-fixture/pull/225#issuecomment-63' \
   --head-sha "$head_sha_8" --merge-commit "$head_sha_8" >/dev/null
 expect_line "- Target base SHA: $head_sha_4" \
   "$transitive_retry_dir/pr-events/unit-1/event-012.md"
@@ -5895,17 +5908,17 @@ set_pr_observation "$transitive_first_url" "$transitive_first_head" "$head_sha_7
   gauntlet/transitive-retry CLOSED false none none none none "$head_sha_4"
 run_for "$project" bash commands/validate-gauntlet.sh transitive-retry --phase ready >/dev/null
 
-transitive_trigger_rewrite_dir="$project/.opencaw/.cache/gauntlets/transitive-trigger-rewrite"
+transitive_trigger_rewrite_dir="$project/.hephaera/.cache/gauntlets/transitive-trigger-rewrite"
 copy_gauntlet "$transitive_retry_dir" "$transitive_trigger_rewrite_dir"
 replace_line "$transitive_trigger_rewrite_dir/pr-events/unit-1/event-010.md" \
   '- Remediation trigger: quality-revision:transitive-v2' \
-  '- Remediation trigger: .opencaw/.cache/gauntlets/transitive-trigger-rewrite/rounds/integration/round-002.md'
+  '- Remediation trigger: .hephaera/.cache/gauntlets/transitive-trigger-rewrite/rounds/integration/round-002.md'
 refresh_copied_cross_evidence_hashes "$transitive_trigger_rewrite_dir"
 refresh_copied_evidence_hashes "$transitive_trigger_rewrite_dir"
 expect_failure "$temp_root/transitive-trigger-rewrite.log" run_for "$project" \
   bash commands/validate-gauntlet.sh transitive-trigger-rewrite --phase ready
 
-transitive_root_hash_tamper_dir="$project/.opencaw/.cache/gauntlets/transitive-root-hash-tamper"
+transitive_root_hash_tamper_dir="$project/.hephaera/.cache/gauntlets/transitive-root-hash-tamper"
 copy_gauntlet "$transitive_retry_dir" "$transitive_root_hash_tamper_dir"
 replace_matching_line \
   "$transitive_root_hash_tamper_dir/rounds/unit-1/round-006.md" \
@@ -5915,42 +5928,42 @@ refresh_copied_evidence_hashes "$transitive_root_hash_tamper_dir"
 expect_failure "$temp_root/transitive-root-hash-tamper.log" run_for "$project" \
   bash commands/validate-gauntlet.sh transitive-root-hash-tamper --phase ready
 
-unrelated_close_dir="$project/.opencaw/.cache/gauntlets/unrelated-close-trigger"
+unrelated_close_dir="$project/.hephaera/.cache/gauntlets/unrelated-close-trigger"
 copy_gauntlet "$transitive_retry_dir" "$unrelated_close_dir"
 replace_line "$unrelated_close_dir/pr-events/unit-1/event-010.md" \
   '- Remediation trigger: quality-revision:transitive-v2' \
-  '- Remediation trigger: .opencaw/.cache/gauntlets/closed-unmerged/pr-events/unit-1/event-004.md'
+  '- Remediation trigger: .hephaera/.cache/gauntlets/closed-unmerged/pr-events/unit-1/event-004.md'
 refresh_copied_evidence_hashes "$unrelated_close_dir"
 expect_failure "$temp_root/unrelated-close-trigger.log" run_for "$project" \
   bash commands/validate-gauntlet.sh unrelated-close-trigger --phase ready
 
-stale_reference_dir="$project/.opencaw/.cache/gauntlets/stale-integration-reference"
+stale_reference_dir="$project/.hephaera/.cache/gauntlets/stale-integration-reference"
 copy_gauntlet "$gauntlet_dir" "$stale_reference_dir"
 replace_all_literal "$stale_reference_dir/GAUNTLET.md" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/stale-integration-reference/'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/' '.hephaera/.cache/gauntlets/stale-integration-reference/'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Status: running' '- Status: passed'
 replace_matching_line "$stale_reference_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Verdict: fail' '- Verdict: pass'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- Critic ID: integration-critic-2' '- Critic ID: integration-critic-1'
 replace_line "$stale_reference_dir/GAUNTLET.md" \
-  '- Evidence: `.opencaw/.cache/gauntlets/stale-integration-reference/rounds/integration/round-002.md`' \
-  '- Evidence: `.opencaw/.cache/gauntlets/stale-integration-reference/rounds/integration/round-001.md`'
+  '- Evidence: `.hephaera/.cache/gauntlets/stale-integration-reference/rounds/integration/round-002.md`' \
+  '- Evidence: `.hephaera/.cache/gauntlets/stale-integration-reference/rounds/integration/round-001.md`'
 replace_line "$stale_reference_dir/GAUNTLET.md" '- PR eligible: no' '- PR eligible: yes'
 expect_failure "$temp_root/stale-integration-reference.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-integration-reference --phase complete
 
-orphan_dir="$project/.opencaw/.cache/gauntlets/orphan-history"
+orphan_dir="$project/.hephaera/.cache/gauntlets/orphan-history"
 copy_gauntlet "$gauntlet_dir" "$orphan_dir"
 replace_all_literal "$orphan_dir/GAUNTLET.md" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/' '.opencaw/.cache/gauntlets/orphan-history/'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/' '.hephaera/.cache/gauntlets/orphan-history/'
 replace_matching_line "$orphan_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Replacement unit that erased prior history | scope: replacement artifact boundary'
 replace_matching_line "$orphan_dir/GAUNTLET.md" '^- Active work unit:' '- Active work unit: unit-2'
 expect_failure "$temp_root/orphan-history.log" run_for "$project" \
   bash commands/validate-gauntlet.sh orphan-history --phase ready
 
-later_unrelated_dir="$project/.opencaw/.cache/gauntlets/later-unrelated-unit"
+later_unrelated_dir="$project/.hephaera/.cache/gauntlets/later-unrelated-unit"
 copy_gauntlet "$gauntlet_dir" "$later_unrelated_dir"
 insert_after_matching_line "$later_unrelated_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -5968,9 +5981,9 @@ reset_integration_review "$project" "$later_unrelated_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh later-unrelated-unit --phase ready >/dev/null
 export FAKE_DATE_ISO=2026-08-02T00:00:02Z
 later_unrelated_head='gauntlet-work/later-unrelated-unit/unit-2'
-later_unrelated_pr='https://github.com/example/opencaw-fixture/pull/290'
+later_unrelated_pr='https://github.com/example/hephaera-fixture/pull/290'
 set_local_ref "$project" "$later_unrelated_head" "$head_sha_7"
-later_unrelated_readiness="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/later-unrelated" \
+later_unrelated_readiness="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/later-unrelated" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   later-unrelated-unit unit-2 "$project/progress-validation.md")"
 later_unrelated_checkpoint="$(sed -nE 's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' \
@@ -6000,52 +6013,62 @@ run_for "$project" bash commands/validate-gauntlet.sh \
   later-unrelated-unit --phase ready >/dev/null
 unset FAKE_DATE_ISO
 
-future_unit_membership_dir="$project/.opencaw/.cache/gauntlets/future-unit-membership"
-copy_gauntlet "$later_unrelated_dir" "$future_unit_membership_dir"
-future_unit_membership_revision="${later_unrelated_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
+future_unit_membership_dir="$project/.hephaera/.cache/gauntlets/future-unit-membership"
+copy_gauntlet "$ready_snapshot" "$future_unit_membership_dir"
+insert_after_matching_line "$future_unit_membership_dir/GAUNTLET.md" \
+  '^- .*unit-1 .*status:' \
+  '- [ ] unit-2 | status: pending | title: Later independent checkpoint unit | scope: independent checkpoint boundary'
+future_unit_membership_manifest="$(unit_manifest_fingerprint \
+  "$project" "$future_unit_membership_dir/GAUNTLET.md")"
+future_unit_membership_revision="- Unit manifest revision: add-checkpoint-unit-2 | from: $unit_manifest_opened | to: $future_unit_membership_manifest | prior-units: unit-1 | current-units: unit-1,unit-2 | reason: Approve the independent unit before preparing its checkpoint. | approved by: fixture-user | approved at: 2026-08-02T00:00:01Z"
+insert_after_matching_line "$future_unit_membership_dir/GAUNTLET.md" \
+  '^- Unit manifest approval:' "$future_unit_membership_revision"
+set_gauntlet_field "$project" "$future_unit_membership_dir/GAUNTLET.md" \
+  'Current State' 'Unit manifest fingerprint' pending
+set_gauntlet_field "$project" "$future_unit_membership_dir/GAUNTLET.md" \
+  'Current State' 'Active work unit' unit-2
+reset_integration_review "$project" "$future_unit_membership_dir/GAUNTLET.md"
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-unit-membership --phase ready >/dev/null
+export FAKE_DATE_ISO='2026-08-02T00:00:02Z'
+future_unit_membership_head='gauntlet-work/future-unit-membership/unit-2'
+set_local_ref "$project" "$future_unit_membership_head" "$head_sha_1"
+set_remote_ref "$project" "$future_unit_membership_head" absent
+future_unit_membership_readiness="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/future-unit-membership" \
+  run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
+  future-unit-membership unit-2 "$project/progress-validation.md")"
+future_unit_membership_checkpoint_relative="$(sed -nE \
+  's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' <<<"$future_unit_membership_readiness")"
+future_unit_membership_checkpoint="$project/$future_unit_membership_checkpoint_relative"
+expect_file "$future_unit_membership_checkpoint"
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-unit-membership --phase ready >/dev/null
+[[ "$(pr_event_file_count "$future_unit_membership_dir")" == 0 \
+  && -z "$(find "$future_unit_membership_dir/rounds" -type f -name 'round-*.md' -print -quit)" ]] \
+  || fail 'checkpoint-membership fixture must not contain immutable work evidence'
+unset FAKE_DATE_ISO
 replace_line "$future_unit_membership_dir/GAUNTLET.md" \
-  "$later_unrelated_revision" "$future_unit_membership_revision"
-future_unit_membership_checkpoint="$future_unit_membership_dir/publication-checkpoints/unit-2/checkpoint-001.md"
+  "$future_unit_membership_revision" \
+  "${future_unit_membership_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
 replace_matching_line "$future_unit_membership_checkpoint" \
   '^- Unit manifest fingerprint:' \
   "- Unit manifest fingerprint: $unit_manifest_opened"
 replace_matching_line "$future_unit_membership_checkpoint" \
   '^- Unit manifest approved at:' \
   '- Unit manifest approved at: 2026-08-01T12:00:00Z'
-refresh_copied_checkpoint_hashes "$future_unit_membership_dir"
-for future_unit_membership_evidence in \
-  "$future_unit_membership_dir/pr-events/unit-2/event-001.md" \
-  "$future_unit_membership_dir/pr-events/unit-2/event-002.md" \
-  "$future_unit_membership_dir/pr-events/unit-2/event-003.md" \
-  "$future_unit_membership_dir/rounds/unit-2/round-001.md"; do
-  replace_matching_line "$future_unit_membership_evidence" \
-    '^- Unit manifest fingerprint:' \
-    "- Unit manifest fingerprint: $unit_manifest_opened"
-done
-replace_all_literal "$future_unit_membership_dir/GAUNTLET.md" \
-  "manifest: $later_unrelated_manifest" "manifest: $unit_manifest_opened"
-refresh_copied_cross_evidence_hashes "$future_unit_membership_dir"
-future_unit_membership_round_relative='.opencaw/.cache/gauntlets/future-unit-membership/rounds/unit-2/round-001.md'
-future_unit_membership_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
-  "$future_unit_membership_round_relative")"
-replace_matching_line \
-  "$future_unit_membership_dir/pr-events/unit-2/event-002.md" \
-  '^- QA comment body sha256:' \
-  "- QA comment body sha256: $(sha256_text "$future_unit_membership_comment_body")"
-refresh_copied_evidence_hashes "$future_unit_membership_dir"
-sync_gauntlet_live_observations "$project" "$future_unit_membership_dir"
 expect_line '- Recorded at: 2026-08-02T00:00:02Z' \
   "$future_unit_membership_checkpoint"
 expect_line "- Unit manifest fingerprint: $unit_manifest_opened" \
-  "$future_unit_membership_dir/pr-events/unit-2/event-003.md"
+  "$future_unit_membership_checkpoint"
 expect_failure "$temp_root/future-unit-membership.log" run_for "$project" \
   bash commands/validate-gauntlet.sh future-unit-membership --phase ready
+
 grep -Fq \
   'Publication checkpoint item was not part of the active Unit manifest at its Recorded at timestamp' \
   "$temp_root/future-unit-membership.log" \
   || fail 'future unit evidence did not reach the manifest-membership gate'
 
-topology_binding_control_dir="$project/.opencaw/.cache/gauntlets/topology-binding-control"
+topology_binding_control_dir="$project/.hephaera/.cache/gauntlets/topology-binding-control"
 copy_gauntlet "$ready_snapshot" "$topology_binding_control_dir"
 insert_after_matching_line "$topology_binding_control_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -6076,7 +6099,7 @@ reset_integration_review "$project" "$topology_binding_control_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh \
   topology-binding-control --phase ready >/dev/null
 
-topology_binding_backdated_dir="$project/.opencaw/.cache/gauntlets/topology-binding-backdated"
+topology_binding_backdated_dir="$project/.hephaera/.cache/gauntlets/topology-binding-backdated"
 copy_gauntlet "$topology_binding_control_dir" "$topology_binding_backdated_dir"
 topology_binding_backdated_edge="${topology_binding_edge/approved at: 2026-08-02T00:00:03Z/approved at: 2026-08-02T00:00:01Z}"
 replace_line "$topology_binding_backdated_dir/GAUNTLET.md" \
@@ -6088,7 +6111,7 @@ grep -Fq \
   "$temp_root/topology-binding-backdated.log" \
   || fail 'backdated topology edge did not reach the manifest-delta binding gate'
 
-scope_activation_dir="$project/.opencaw/.cache/gauntlets/scope-activation-control"
+scope_activation_dir="$project/.hephaera/.cache/gauntlets/scope-activation-control"
 copy_gauntlet "$gauntlet_dir" "$scope_activation_dir"
 scope_activation_v1="$(unit_scope_fingerprint \
   "$project" "$scope_activation_dir/GAUNTLET.md" unit-1)"
@@ -6112,9 +6135,12 @@ set_gauntlet_field "$project" "$scope_activation_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$scope_activation_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh \
   scope-activation-control --phase ready >/dev/null
+scope_checkpoint_snapshot="$project/.hephaera/.cache/gauntlets/scope-checkpoint-snapshot"
+copy_gauntlet "$scope_activation_dir" "$scope_checkpoint_snapshot"
+sync_gauntlet_live_observations "$project" "$scope_activation_dir"
 export FAKE_DATE_ISO=2026-08-02T00:00:02Z
 scope_activation_head='gauntlet-work/scope-activation-control/unit-1-remediation-1'
-scope_activation_pr='https://github.com/example/opencaw-fixture/pull/304'
+scope_activation_pr='https://github.com/example/hephaera-fixture/pull/304'
 set_local_ref "$project" "$scope_activation_head" "$head_sha_7"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   scope-activation-control unit-1 "$project/progress-validation.md" >/dev/null
@@ -6146,56 +6172,52 @@ expect_line "- Scope fingerprint: $scope_activation_v2" \
   "$scope_activation_dir/pr-events/unit-1/event-007.md"
 unset FAKE_DATE_ISO
 
-future_scope_activation_dir="$project/.opencaw/.cache/gauntlets/future-scope-activation"
-copy_gauntlet "$scope_activation_dir" "$future_scope_activation_dir"
+future_scope_activation_dir="$project/.hephaera/.cache/gauntlets/future-scope-activation"
+copy_gauntlet "$scope_checkpoint_snapshot" "$future_scope_activation_dir"
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-scope-activation --phase ready >/dev/null
+export FAKE_DATE_ISO='2026-08-02T00:00:02Z'
+future_scope_head='gauntlet-work/future-scope-activation/unit-1-remediation-1'
+set_local_ref "$project" "$future_scope_head" "$head_sha_7"
+set_remote_ref "$project" "$future_scope_head" absent
+future_scope_readiness="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/future-scope-activation" \
+  run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
+  future-scope-activation unit-1 "$project/progress-validation.md")"
+future_scope_checkpoint_relative="$(sed -nE \
+  's/^PUBLICATION_CHECKPOINT=(.+)$/\1/p' <<<"$future_scope_readiness")"
+future_scope_checkpoint="$project/$future_scope_checkpoint_relative"
+expect_file "$future_scope_checkpoint"
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-scope-activation --phase ready >/dev/null
+if grep -RFq -- "- Scope fingerprint: $scope_activation_v2" \
+  "$future_scope_activation_dir/pr-events" "$future_scope_activation_dir/rounds"; then
+  fail 'checkpoint-scope fixture must not contain immutable new-scope work evidence'
+fi
+unset FAKE_DATE_ISO
 future_scope_manifest_revision="${scope_activation_manifest_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
 future_scope_revision="${scope_activation_scope_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-02T00:00:03Z}"
 replace_line "$future_scope_activation_dir/GAUNTLET.md" \
   "$scope_activation_manifest_revision" "$future_scope_manifest_revision"
 replace_line "$future_scope_activation_dir/GAUNTLET.md" \
   "$scope_activation_scope_revision" "$future_scope_revision"
-future_scope_open="$future_scope_activation_dir/pr-events/unit-1/event-007.md"
-future_scope_round="$future_scope_activation_dir/rounds/unit-1/round-005.md"
-future_scope_qa="$future_scope_activation_dir/pr-events/unit-1/event-008.md"
-future_scope_merge="$future_scope_activation_dir/pr-events/unit-1/event-009.md"
-future_scope_checkpoint_relative="$(gauntlet_helper_value "$project" \
-  gauntlet_section_field "$future_scope_open" 'PR Event Metadata' \
-  'Publication checkpoint')"
-future_scope_checkpoint="$project/$future_scope_checkpoint_relative"
 replace_matching_line "$future_scope_checkpoint" \
   '^- Unit manifest fingerprint:' \
   "- Unit manifest fingerprint: $unit_manifest_opened"
 replace_matching_line "$future_scope_checkpoint" \
   '^- Unit manifest approved at:' \
   '- Unit manifest approved at: 2026-08-01T12:00:00Z'
-refresh_copied_checkpoint_hashes "$future_scope_activation_dir"
-for future_scope_evidence in "$future_scope_open" "$future_scope_round" \
-  "$future_scope_qa" "$future_scope_merge"; do
-  replace_matching_line "$future_scope_evidence" \
-    '^- Unit manifest fingerprint:' \
-    "- Unit manifest fingerprint: $unit_manifest_opened"
-done
-replace_all_literal "$future_scope_activation_dir/GAUNTLET.md" \
-  "manifest: $scope_activation_manifest" "manifest: $unit_manifest_opened"
-refresh_copied_cross_evidence_hashes "$future_scope_activation_dir"
-future_scope_round_relative='.opencaw/.cache/gauntlets/future-scope-activation/rounds/unit-1/round-005.md'
-future_scope_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
-  "$future_scope_round_relative")"
-replace_matching_line "$future_scope_qa" '^- QA comment body sha256:' \
-  "- QA comment body sha256: $(sha256_text "$future_scope_comment_body")"
-refresh_copied_evidence_hashes "$future_scope_activation_dir"
-sync_gauntlet_live_observations "$project" "$future_scope_activation_dir"
 expect_line '- Recorded at: 2026-08-02T00:00:02Z' "$future_scope_checkpoint"
-expect_line "- Scope fingerprint: $scope_activation_v2" "$future_scope_open"
-expect_line "- Unit manifest fingerprint: $unit_manifest_opened" "$future_scope_round"
+expect_line "- Unit scope fingerprint: $scope_activation_v2" "$future_scope_checkpoint"
+expect_line "- Unit manifest fingerprint: $unit_manifest_opened" "$future_scope_checkpoint"
 expect_failure "$temp_root/future-scope-activation.log" run_for "$project" \
   bash commands/validate-gauntlet.sh future-scope-activation --phase ready
+
 grep -Fq \
   'Publication checkpoint scope was not part of the active Unit manifest at its Recorded at timestamp' \
   "$temp_root/future-scope-activation.log" \
   || fail 'future scope evidence did not reach the manifest-scope gate'
 
-scope_binding_backdated_dir="$project/.opencaw/.cache/gauntlets/scope-binding-backdated"
+scope_binding_backdated_dir="$project/.hephaera/.cache/gauntlets/scope-binding-backdated"
 copy_gauntlet "$scope_activation_dir" "$scope_binding_backdated_dir"
 scope_binding_backdated_revision="${scope_activation_scope_revision/approved at: 2026-08-02T00:00:01Z/approved at: 2026-08-01T12:00:00Z}"
 replace_line "$scope_binding_backdated_dir/GAUNTLET.md" \
@@ -6207,14 +6229,60 @@ grep -Fq \
   "$temp_root/scope-binding-backdated.log" \
   || fail 'backdated scope revision did not reach the manifest-delta binding gate'
 
-superseded_dir="$project/.opencaw/.cache/gauntlets/superseded-history"
-copy_gauntlet "$gauntlet_dir" "$superseded_dir"
+# Give the replacement a focused history with one integration failure to resolve.
+supersession_integration_source_dir="$project/.hephaera/.cache/gauntlets/supersession-integration-source"
+copy_gauntlet "$ready_snapshot" "$supersession_integration_source_dir"
+supersession_source_pr='https://github.com/example/hephaera-fixture/pull/3100'
+supersession_source_head='gauntlet-work/supersession-integration-source/unit-1'
+set_local_ref "$project" "$supersession_source_head" "$head_sha_4"
+run_for "$project" bash commands/record-gauntlet-pr-event.sh \
+  supersession-integration-source unit-1 opened "$supersession_source_pr" \
+  "$supersession_source_head" none --head-sha "$head_sha_4" >/dev/null
+supersession_source_report="$critic_dir/supersession-source-unit-pass.md"
+write_critic_report "$supersession_source_report" pass artifact.txt "$head_sha_4" \
+  'The initial unit passes its complete original boundary.' \
+  'Consume independent QA and inspect the integrated artifact.'
+run_for "$project" bash commands/record-gauntlet-round.sh \
+  supersession-integration-source unit-1 pass supersession-source-builder \
+  supersession-source-critic fresh-session "$supersession_source_report" \
+  --head-sha "$head_sha_4" --builder-strategy 'Build and verify the focused original unit.' >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh \
+  supersession-integration-source unit-1 qa-pass "$supersession_source_pr" \
+  "$supersession_source_head" "$supersession_source_pr#issuecomment-31001" \
+  --head-sha "$head_sha_4" >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh \
+  supersession-integration-source unit-1 merged "$supersession_source_pr" \
+  "$supersession_source_head" "$supersession_source_pr#issuecomment-31002" \
+  --head-sha "$head_sha_4" --merge-commit "$head_sha_4" >/dev/null
+supersession_source_integration_pass="$critic_dir/supersession-source-integration-pass.md"
+write_critic_report "$supersession_source_integration_pass" pass artifact.txt "$head_sha_4" \
+  'The initial integrated artifact passes the frozen benchmark.' \
+  'Retain the positive control before the later integration regression.'
+run_for "$project" bash commands/record-gauntlet-round.sh \
+  supersession-integration-source integration pass supersession-source-integration-builder \
+  supersession-source-integration-critic fresh-session "$supersession_source_integration_pass" \
+  --head-sha "$head_sha_4" --builder-strategy 'Inspect the complete focused initial artifact.' >/dev/null
+export FAKE_DATE_ISO='2026-08-01T12:00:01Z'
+supersession_source_integration_fail="$critic_dir/supersession-source-integration-fail.md"
+write_critic_report "$supersession_source_integration_fail" fail artifact.txt "$head_sha_4" \
+  'A later integration regression requires a replacement unit.' \
+  'Preserve this exact failure as the replacement remediation root.'
+run_for "$project" bash commands/record-gauntlet-round.sh \
+  supersession-integration-source integration fail supersession-source-regression-builder \
+  supersession-source-regression-critic fresh-session "$supersession_source_integration_fail" \
+  --head-sha "$head_sha_4" --builder-strategy 'Inspect the later cross-unit regression independently.' >/dev/null
+unset FAKE_DATE_ISO
+expect_line '- Recorded at: 2026-08-01T12:00:01Z' \
+  "$supersession_integration_source_dir/rounds/integration/round-002.md"
+
+superseded_dir="$project/.hephaera/.cache/gauntlets/superseded-history"
+copy_gauntlet "$supersession_integration_source_dir" "$superseded_dir"
 replace_matching_line "$superseded_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: superseded | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
 insert_after_matching_line "$superseded_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [ ] unit-2 | status: pending | title: Replacement active unit | scope: replacement artifact boundary'
 replace_matching_line "$superseded_dir/GAUNTLET.md" '^- Active work unit:' '- Active work unit: unit-2'
-superseded_scope_fingerprint="$(OPENCAW_PROJECT_ROOT="$project" bash -c '
+superseded_scope_fingerprint="$(HEPHAERA_PROJECT_ROOT="$project" bash -c '
   set -euo pipefail
   source commands/lib/gauntlet-common.sh
   gauntlet_unit_scope_fingerprint "$1" unit-1
@@ -6232,10 +6300,10 @@ set_gauntlet_field "$project" "$superseded_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$superseded_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh superseded-history --phase ready >/dev/null
 
-supersession_authorization_control_dir="$project/.opencaw/.cache/gauntlets/supersession-authorization-control"
+supersession_authorization_control_dir="$project/.hephaera/.cache/gauntlets/supersession-authorization-control"
 copy_gauntlet "$superseded_dir" "$supersession_authorization_control_dir"
-supersession_authorization_pr='https://github.com/example/opencaw-fixture/pull/300'
-supersession_authorization_head='gauntlet-work/supersession-authorization-control/unit-2-remediation-1'
+supersession_authorization_pr='https://github.com/example/hephaera-fixture/pull/300'
+supersession_authorization_head='gauntlet-work/supersession-authorization-control/unit-2'
 supersession_authorization_time='2026-08-02T00:00:02Z'
 export FAKE_DATE_ISO="$supersession_authorization_time"
 set_local_ref "$project" "$supersession_authorization_head" "$head_sha_7"
@@ -6251,7 +6319,7 @@ expect_line "- Created at: $supersession_authorization_time" \
   "$supersession_authorization_open"
 expect_line "- Recorded at: $supersession_authorization_time" \
   "$supersession_authorization_open"
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
   "$supersession_authorization_open"
 supersession_authorization_report="$critic_dir/supersession-authorization-unit-pass.md"
 write_critic_report "$supersession_authorization_report" pass artifact.txt "$head_sha_7" \
@@ -6265,7 +6333,7 @@ run_for "$project" bash commands/record-gauntlet-round.sh \
   >/dev/null
 expect_line "- Recorded at: $supersession_authorization_time" \
   "$supersession_authorization_control_dir/rounds/unit-2/round-001.md"
-expect_line '- Remediation root: .opencaw/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
+expect_line '- Remediation root: .hephaera/.cache/gauntlets/supersession-authorization-control/rounds/integration/round-002.md' \
   "$supersession_authorization_control_dir/rounds/unit-2/round-001.md"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   supersession-authorization-control unit-2 qa-pass "$supersession_authorization_pr" \
@@ -6299,9 +6367,9 @@ run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   supersession-authorization-control --status complete --dry-run >/dev/null
 unset FAKE_DATE_ISO
 
-backdated_manifest_dir="$project/.opencaw/.cache/gauntlets/backdated-manifest-checkpoint"
+backdated_manifest_dir="$project/.hephaera/.cache/gauntlets/backdated-manifest-checkpoint"
 copy_gauntlet "$supersession_authorization_control_dir" "$backdated_manifest_dir"
-backdated_manifest_approval='2026-08-01T12:00:01Z'
+backdated_manifest_approval='2026-08-01T12:00:02Z'
 backdated_manifest_marker="${supersession_marker/approved at: 2026-08-02T00:00:01Z/approved at: $backdated_manifest_approval}"
 backdated_manifest_revision="${superseded_manifest_revision/approved at: 2026-08-02T00:00:01Z/approved at: $backdated_manifest_approval}"
 replace_line "$backdated_manifest_dir/GAUNTLET.md" \
@@ -6317,83 +6385,36 @@ grep -Fq 'Publication checkpoint uses a Unit manifest not active at its Recorded
   "$temp_root/backdated-manifest-checkpoint.log" \
   || fail 'backdated manifest checkpoint did not reach the generation-authorization gate'
 
-future_supersession_dir="$project/.opencaw/.cache/gauntlets/future-supersession-checkpoint"
-copy_gauntlet "$supersession_authorization_control_dir" "$future_supersession_dir"
+# Keep these checkpoint negatives unconsumed so later work cannot mask their gates.
+future_supersession_dir="$project/.hephaera/.cache/gauntlets/future-supersession-checkpoint"
+copy_gauntlet "$superseded_dir" "$future_supersession_dir"
+future_supersession_head='gauntlet-work/future-supersession-checkpoint/unit-2'
+set_local_ref "$project" "$future_supersession_head" "$head_sha_7"
+export FAKE_DATE_ISO="$supersession_authorization_time"
+run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
+  future-supersession-checkpoint unit-2 "$project/progress-validation.md" >/dev/null
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-supersession-checkpoint --phase ready >/dev/null
+unset FAKE_DATE_ISO
+future_supersession_checkpoint="$future_supersession_dir/publication-checkpoints/unit-2/checkpoint-001.md"
+expect_line "- Recorded at: $supersession_authorization_time" \
+  "$future_supersession_checkpoint"
+expect_line "- Unit manifest fingerprint: $superseded_manifest_fingerprint" \
+  "$future_supersession_checkpoint"
+[[ ! -d "$future_supersession_dir/pr-events/unit-2" \
+  && ! -d "$future_supersession_dir/rounds/unit-2" ]] \
+  || fail 'future supersession checkpoint control contains replacement work evidence'
 future_supersession_approval_time='2026-08-02T00:00:03Z'
-future_supersession_evidence_time='2026-08-02T00:00:04Z'
 future_supersession_marker="${supersession_marker/approved at: 2026-08-02T00:00:01Z/approved at: $future_supersession_approval_time}"
 future_supersession_revision="${superseded_manifest_revision/approved at: 2026-08-02T00:00:01Z/approved at: $future_supersession_approval_time}"
 replace_line "$future_supersession_dir/GAUNTLET.md" \
   "$supersession_marker" "$future_supersession_marker"
 replace_line "$future_supersession_dir/GAUNTLET.md" \
   "$superseded_manifest_revision" "$future_supersession_revision"
-
-future_supersession_checkpoint="$future_supersession_dir/publication-checkpoints/unit-2/checkpoint-001.md"
-future_supersession_open="$future_supersession_dir/pr-events/unit-2/event-001.md"
-future_supersession_round="$future_supersession_dir/rounds/unit-2/round-001.md"
-future_supersession_qa="$future_supersession_dir/pr-events/unit-2/event-002.md"
-future_supersession_merge="$future_supersession_dir/pr-events/unit-2/event-003.md"
-future_supersession_integration="$future_supersession_dir/rounds/integration/round-003.md"
-expect_line "- Recorded at: $supersession_authorization_time" \
-  "$future_supersession_checkpoint"
-expect_line "- Unit manifest fingerprint: $superseded_manifest_fingerprint" \
-  "$future_supersession_checkpoint"
 replace_matching_line "$future_supersession_checkpoint" \
   '^- Unit manifest approved at:' \
   "- Unit manifest approved at: $future_supersession_approval_time"
 refresh_copied_checkpoint_hashes "$future_supersession_dir"
-for future_supersession_evidence in "$future_supersession_open" \
-  "$future_supersession_round" "$future_supersession_qa" \
-  "$future_supersession_merge" "$future_supersession_integration"; do
-  replace_matching_line "$future_supersession_evidence" '^- Recorded at:' \
-    "- Recorded at: $future_supersession_evidence_time"
-done
-replace_matching_line "$future_supersession_open" '^- Created at:' \
-  "- Created at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_qa" '^- Created at:' \
-  "- Created at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_qa" '^- QA comment created at:' \
-  "- QA comment created at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_qa" '^- QA comment updated at:' \
-  "- QA comment updated at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_merge" '^- Created at:' \
-  "- Created at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_merge" '^- Closed at:' \
-  "- Closed at: $future_supersession_evidence_time"
-replace_matching_line "$future_supersession_merge" '^- Merged at:' \
-  "- Merged at: $future_supersession_evidence_time"
-refresh_copied_cross_evidence_hashes "$future_supersession_dir"
-future_supersession_round_relative='.opencaw/.cache/gauntlets/future-supersession-checkpoint/rounds/unit-2/round-001.md'
-future_supersession_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
-  "$future_supersession_round_relative")"
-replace_matching_line "$future_supersession_qa" '^- QA comment body sha256:' \
-  "- QA comment body sha256: $(sha256_text "$future_supersession_comment_body")"
-future_supersession_qa_ledger="$(select_ledger_line "$project" \
-  "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
-replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_qa_ledger" \
-  "${future_supersession_qa_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
-future_supersession_qa_ledger="$(select_ledger_line "$project" \
-  "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-002.md')"
-replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_qa_ledger" \
-  "${future_supersession_qa_ledger//qa-created: $supersession_authorization_time/qa-created: $future_supersession_evidence_time}"
-future_supersession_open_ledger="$(select_ledger_line "$project" \
-  "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-001.md')"
-replace_line "$future_supersession_dir/GAUNTLET.md" "$future_supersession_open_ledger" \
-  "${future_supersession_open_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
-future_supersession_merge_ledger="$(select_ledger_line "$project" \
-  "$future_supersession_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  '.opencaw/.cache/gauntlets/future-supersession-checkpoint/pr-events/unit-2/event-003.md')"
-future_supersession_merge_ledger_updated="${future_supersession_merge_ledger//pr-created: $supersession_authorization_time/pr-created: $future_supersession_evidence_time}"
-future_supersession_merge_ledger_updated="${future_supersession_merge_ledger_updated//pr-closed: $supersession_authorization_time/pr-closed: $future_supersession_evidence_time}"
-replace_line "$future_supersession_dir/GAUNTLET.md" \
-  "$future_supersession_merge_ledger" "$future_supersession_merge_ledger_updated"
-refresh_copied_evidence_hashes "$future_supersession_dir"
-sync_gauntlet_live_observations "$project" "$future_supersession_dir"
-expect_line "- Created at: $future_supersession_evidence_time" \
-  "$future_supersession_open"
 expect_line "$future_supersession_marker" "$future_supersession_dir/GAUNTLET.md"
 expect_line "$future_supersession_revision" "$future_supersession_dir/GAUNTLET.md"
 expect_failure "$temp_root/future-supersession-checkpoint-ready.log" run_for "$project" \
@@ -6412,21 +6433,31 @@ expect_failure "$temp_root/future-supersession-checkpoint-complete.log" run_for 
 [[ ! -f "$future_supersession_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'future supersession checkpoint created a completion report'
 
-future_trigger_dir="$project/.opencaw/.cache/gauntlets/future-trigger-checkpoint"
-copy_gauntlet "$future_supersession_dir" "$future_trigger_dir"
-replace_line "$future_trigger_dir/GAUNTLET.md" \
-  "$future_supersession_marker" "$supersession_marker"
-replace_line "$future_trigger_dir/GAUNTLET.md" \
-  "$future_supersession_revision" "$superseded_manifest_revision"
+# Isolate trigger activation within one manifest generation and no later work.
+future_trigger_dir="$project/.hephaera/.cache/gauntlets/future-trigger-checkpoint"
+copy_gauntlet "$supersession_integration_source_dir" "$future_trigger_dir"
+future_trigger_head='gauntlet-work/future-trigger-checkpoint/unit-1-remediation-1'
+set_local_ref "$project" "$future_trigger_head" "$head_sha_7"
+export FAKE_DATE_ISO="$supersession_authorization_time"
+run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
+  future-trigger-checkpoint unit-1 "$project/progress-validation.md" >/dev/null
+run_for "$project" bash commands/validate-gauntlet.sh \
+  future-trigger-checkpoint --phase ready >/dev/null
+unset FAKE_DATE_ISO
+future_trigger_checkpoint="$future_trigger_dir/publication-checkpoints/unit-1/checkpoint-002.md"
 future_trigger_root="$future_trigger_dir/rounds/integration/round-002.md"
+expect_line "- Recorded at: $supersession_authorization_time" \
+  "$future_trigger_checkpoint"
+expect_line '- Recorded at: 2026-08-01T12:00:01Z' "$future_trigger_root"
+expect_line "- Unit manifest fingerprint: $unit_manifest_opened" \
+  "$future_trigger_checkpoint"
+[[ ! -f "$future_trigger_dir/pr-events/unit-1/event-004.md" \
+  && ! -f "$future_trigger_dir/rounds/unit-1/round-002.md" ]] \
+  || fail 'future trigger checkpoint control contains retry work evidence'
 future_trigger_time='2026-08-02T00:00:03Z'
 replace_matching_line "$future_trigger_root" '^- Recorded at:' \
   "- Recorded at: $future_trigger_time"
 future_trigger_root_hash="$(sha256_file "$future_trigger_root")"
-future_trigger_checkpoint="$future_trigger_dir/publication-checkpoints/unit-2/checkpoint-001.md"
-replace_matching_line "$future_trigger_checkpoint" \
-  '^- Unit manifest approved at:' \
-  '- Unit manifest approved at: 2026-08-02T00:00:01Z'
 replace_matching_line "$future_trigger_checkpoint" \
   '^- Remediation trigger sha256:' \
   "- Remediation trigger sha256: $future_trigger_root_hash"
@@ -6435,19 +6466,10 @@ replace_matching_line "$future_trigger_checkpoint" \
   "- Remediation root sha256: $future_trigger_root_hash"
 refresh_copied_checkpoint_hashes "$future_trigger_dir"
 refresh_copied_cross_evidence_hashes "$future_trigger_dir"
-future_trigger_qa="$future_trigger_dir/pr-events/unit-2/event-002.md"
-future_trigger_round_relative='.opencaw/.cache/gauntlets/future-trigger-checkpoint/rounds/unit-2/round-001.md'
-future_trigger_comment_body="$(semantic_comment_body "$project" pass "$head_sha_7" \
-  "$future_trigger_round_relative")"
-replace_matching_line "$future_trigger_qa" '^- QA comment body sha256:' \
-  "- QA comment body sha256: $(sha256_text "$future_trigger_comment_body")"
 refresh_copied_evidence_hashes "$future_trigger_dir"
-sync_gauntlet_live_observations "$project" "$future_trigger_dir"
 expect_line "- Recorded at: $supersession_authorization_time" \
   "$future_trigger_checkpoint"
 expect_line "- Recorded at: $future_trigger_time" "$future_trigger_root"
-expect_line "- Created at: $future_supersession_evidence_time" \
-  "$future_trigger_dir/pr-events/unit-2/event-001.md"
 expect_failure "$temp_root/future-trigger-checkpoint-ready.log" run_for "$project" \
   bash commands/validate-gauntlet.sh future-trigger-checkpoint --phase ready
 grep -Fq 'Publication checkpoint remediation trigger was not active at its Recorded at timestamp' \
@@ -6459,7 +6481,7 @@ expect_failure "$temp_root/future-trigger-checkpoint-complete.log" run_for "$pro
 [[ ! -f "$future_trigger_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'future trigger checkpoint created a completion report'
 
-missing_supersession_dir="$project/.opencaw/.cache/gauntlets/missing-supersession-marker"
+missing_supersession_dir="$project/.hephaera/.cache/gauntlets/missing-supersession-marker"
 copy_gauntlet "$superseded_dir" "$missing_supersession_dir"
 replace_line "$missing_supersession_dir/GAUNTLET.md" \
   "${supersession_marker/superseded-history/missing-supersession-marker}" \
@@ -6467,7 +6489,7 @@ replace_line "$missing_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/missing-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-supersession-marker --phase ready
 
-stale_supersession_scope_dir="$project/.opencaw/.cache/gauntlets/stale-supersession-scope"
+stale_supersession_scope_dir="$project/.hephaera/.cache/gauntlets/stale-supersession-scope"
 copy_gauntlet "$superseded_dir" "$stale_supersession_scope_dir"
 stale_supersession_marker="${supersession_marker/scope: $superseded_scope_fingerprint/scope: 0000000000000000000000000000000000000000000000000000000000000000}"
 replace_line "$stale_supersession_scope_dir/GAUNTLET.md" \
@@ -6475,26 +6497,26 @@ replace_line "$stale_supersession_scope_dir/GAUNTLET.md" \
 expect_failure "$temp_root/stale-supersession-scope.log" run_for "$project" \
   bash commands/validate-gauntlet.sh stale-supersession-scope --phase ready
 
-missing_supersession_replacement_dir="$project/.opencaw/.cache/gauntlets/missing-supersession-replacement"
+missing_supersession_replacement_dir="$project/.hephaera/.cache/gauntlets/missing-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$missing_supersession_replacement_dir"
 replace_all_literal "$missing_supersession_replacement_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: absent-unit'
 expect_failure "$temp_root/missing-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh missing-supersession-replacement --phase ready
 
-self_supersession_replacement_dir="$project/.opencaw/.cache/gauntlets/self-supersession-replacement"
+self_supersession_replacement_dir="$project/.hephaera/.cache/gauntlets/self-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$self_supersession_replacement_dir"
 replace_all_literal "$self_supersession_replacement_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: unit-1'
 expect_failure "$temp_root/self-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh self-supersession-replacement --phase ready
 
-nonactive_supersession_dir="$project/.opencaw/.cache/gauntlets/nonactive-supersession-replacement"
+nonactive_supersession_dir="$project/.hephaera/.cache/gauntlets/nonactive-supersession-replacement"
 copy_gauntlet "$superseded_dir" "$nonactive_supersession_dir"
 insert_after_matching_line "$nonactive_supersession_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
   '- [x] unit-3 | status: superseded | title: Retired intermediate replacement | scope: retired intermediate boundary'
-unit_three_scope="$(OPENCAW_PROJECT_ROOT="$project" bash -c '
+unit_three_scope="$(HEPHAERA_PROJECT_ROOT="$project" bash -c '
   set -euo pipefail
   source commands/lib/gauntlet-common.sh
   gauntlet_unit_scope_fingerprint "$1" unit-3
@@ -6507,7 +6529,7 @@ insert_after_matching_line "$nonactive_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/nonactive-supersession-replacement.log" run_for "$project" \
   bash commands/validate-gauntlet.sh nonactive-supersession-replacement --phase ready
 
-duplicate_supersession_dir="$project/.opencaw/.cache/gauntlets/duplicate-supersession-marker"
+duplicate_supersession_dir="$project/.hephaera/.cache/gauntlets/duplicate-supersession-marker"
 copy_gauntlet "$superseded_dir" "$duplicate_supersession_dir"
 duplicate_supersession_marker="$(grep -F -- '- Unit supersession: unit-1 ' \
   "$duplicate_supersession_dir/GAUNTLET.md")"
@@ -6516,14 +6538,14 @@ insert_after_matching_line "$duplicate_supersession_dir/GAUNTLET.md" \
 expect_failure "$temp_root/duplicate-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh duplicate-supersession-marker --phase ready
 
-early_supersession_dir="$project/.opencaw/.cache/gauntlets/early-supersession-marker"
+early_supersession_dir="$project/.hephaera/.cache/gauntlets/early-supersession-marker"
 copy_gauntlet "$superseded_dir" "$early_supersession_dir"
 replace_all_literal "$early_supersession_dir/GAUNTLET.md" \
   'approved at: 2026-08-02T00:00:01Z' 'approved at: 2000-01-01T00:00:00Z'
 expect_failure "$temp_root/early-supersession-marker.log" run_for "$project" \
   bash commands/validate-gauntlet.sh early-supersession-marker --phase ready
 
-superseded_report_dir="$project/.opencaw/.cache/gauntlets/superseded-report-history"
+superseded_report_dir="$project/.hephaera/.cache/gauntlets/superseded-report-history"
 copy_gauntlet "$superseded_dir" "$superseded_report_dir"
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   superseded-report-history --status stopped >/dev/null
@@ -6532,7 +6554,7 @@ expect_line "${supersession_marker/superseded-history/superseded-report-history}
 grep -Fq -- '- Unit supersession: unit-1 ' "$superseded_report_dir/GAUNTLET_REPORT.md" \
   || fail 'stopped report omitted the canonical retained supersession history'
 
-supersession_chain_dir="$project/.opencaw/.cache/gauntlets/supersession-chain"
+supersession_chain_dir="$project/.hephaera/.cache/gauntlets/supersession-chain"
 copy_gauntlet "$superseded_dir" "$supersession_chain_dir"
 replace_matching_line "$supersession_chain_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
@@ -6557,7 +6579,7 @@ set_gauntlet_field "$project" "$supersession_chain_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$supersession_chain_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh supersession-chain --phase ready >/dev/null
 
-supersession_cycle_dir="$project/.opencaw/.cache/gauntlets/supersession-cycle"
+supersession_cycle_dir="$project/.hephaera/.cache/gauntlets/supersession-cycle"
 copy_gauntlet "$supersession_chain_dir" "$supersession_cycle_dir"
 replace_all_literal "$supersession_cycle_dir/GAUNTLET.md" \
   'replacements: unit-3' 'replacements: unit-1'
@@ -6570,10 +6592,10 @@ expect_failure "$temp_root/supersession-cycle.log" run_for "$project" \
 
 sync_gauntlet_live_observations "$project" "$supersession_chain_dir"
 export FAKE_DATE_ISO=2026-08-02T00:00:02Z
-supersession_chain_pr='https://github.com/example/opencaw-fixture/pull/291'
-supersession_chain_head='gauntlet-work/supersession-chain/unit-3-remediation-1'
+supersession_chain_pr='https://github.com/example/hephaera-fixture/pull/291'
+supersession_chain_head='gauntlet-work/supersession-chain/unit-3'
 set_local_ref "$project" "$supersession_chain_head" "$head_sha_7"
-supersession_chain_readiness="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/supersession-chain" \
+supersession_chain_readiness="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/supersession-chain" \
   run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   supersession-chain unit-3 "$project/progress-validation.md")"
 grep -q "^UNIT_MANIFEST_FINGERPRINT=$supersession_chain_manifest$" \
@@ -6583,7 +6605,7 @@ run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-chain 
   unit-3 opened "$supersession_chain_pr" "$supersession_chain_head" none \
   --head-sha "$head_sha_7" >/dev/null
 supersession_chain_open="$supersession_chain_dir/pr-events/unit-3/event-001.md"
-supersession_chain_root='.opencaw/.cache/gauntlets/supersession-chain/rounds/integration/round-002.md'
+supersession_chain_root='.hephaera/.cache/gauntlets/supersession-chain/rounds/integration/round-002.md'
 expect_line "- Remediation trigger: $supersession_chain_root" \
   "$supersession_chain_open"
 expect_line "- Unit manifest fingerprint: $supersession_chain_manifest" \
@@ -6630,7 +6652,7 @@ run_for "$project" bash commands/validate-gauntlet.sh supersession-chain \
   --phase complete >/dev/null
 unset FAKE_DATE_ISO
 
-supersession_edge_rewrite_dir="$project/.opencaw/.cache/gauntlets/supersession-edge-rewrite"
+supersession_edge_rewrite_dir="$project/.hephaera/.cache/gauntlets/supersession-edge-rewrite"
 copy_gauntlet "$supersession_chain_dir" "$supersession_edge_rewrite_dir"
 replace_all_literal "$supersession_edge_rewrite_dir/GAUNTLET.md" \
   'replacements: unit-2' 'replacements: unit-3'
@@ -6638,7 +6660,7 @@ refresh_copied_evidence_hashes "$supersession_edge_rewrite_dir"
 expect_failure "$temp_root/supersession-edge-rewrite.log" run_for "$project" \
   bash commands/validate-gauntlet.sh supersession-edge-rewrite --phase complete
 
-supersession_split_dir="$project/.opencaw/.cache/gauntlets/supersession-split"
+supersession_split_dir="$project/.hephaera/.cache/gauntlets/supersession-split"
 copy_gauntlet "$superseded_dir" "$supersession_split_dir"
 insert_after_matching_line "$supersession_split_dir/GAUNTLET.md" \
   '^- .*unit-2 .*status:' \
@@ -6655,15 +6677,15 @@ set_gauntlet_field "$project" "$supersession_split_dir/GAUNTLET.md" \
 reset_integration_review "$project" "$supersession_split_dir/GAUNTLET.md"
 run_for "$project" bash commands/validate-gauntlet.sh supersession-split --phase ready >/dev/null
 export FAKE_DATE_ISO=2026-08-02T00:00:01Z
-supersession_split_pr_two='https://github.com/example/opencaw-fixture/pull/292'
-supersession_split_head_two='gauntlet-work/supersession-split/unit-2-remediation-1'
+supersession_split_pr_two='https://github.com/example/hephaera-fixture/pull/292'
+supersession_split_head_two='gauntlet-work/supersession-split/unit-2'
 set_local_ref "$project" "$supersession_split_head_two" "$head_sha_7"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   supersession-split unit-2 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-split \
   unit-2 opened "$supersession_split_pr_two" "$supersession_split_head_two" none \
   --head-sha "$head_sha_7" >/dev/null
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
   "$supersession_split_dir/pr-events/unit-2/event-001.md"
 supersession_split_report_two="$critic_dir/supersession-split-unit-two.md"
 write_critic_report "$supersession_split_report_two" pass artifact.txt "$head_sha_7" \
@@ -6690,15 +6712,15 @@ expect_failure "$temp_root/supersession-split-one-leaf.log" run_for "$project" \
   fresh-session "$supersession_split_premature_report" --head-sha "$head_sha_7" \
   --builder-strategy 'Attempt integration after only one of two required split leaves.'
 
-supersession_split_pr_three='https://github.com/example/opencaw-fixture/pull/293'
-supersession_split_head_three='gauntlet-work/supersession-split/unit-3-remediation-1'
+supersession_split_pr_three='https://github.com/example/hephaera-fixture/pull/293'
+supersession_split_head_three='gauntlet-work/supersession-split/unit-3'
 set_local_ref "$project" "$supersession_split_head_three" "$head_sha_8"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   supersession-split unit-3 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh supersession-split \
   unit-3 opened "$supersession_split_pr_three" "$supersession_split_head_three" none \
   --head-sha "$head_sha_8" >/dev/null
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/supersession-split/rounds/integration/round-002.md' \
   "$supersession_split_dir/pr-events/unit-3/event-001.md"
 supersession_split_report_three="$critic_dir/supersession-split-unit-three.md"
 write_critic_report "$supersession_split_report_three" pass artifact.txt "$head_sha_8" \
@@ -6732,7 +6754,7 @@ run_for "$project" bash commands/validate-gauntlet.sh supersession-split \
   --phase complete >/dev/null
 unset FAKE_DATE_ISO
 
-critic_failure_supersession_dir="$project/.opencaw/.cache/gauntlets/critic-failure-supersession"
+critic_failure_supersession_dir="$project/.hephaera/.cache/gauntlets/critic-failure-supersession"
 copy_gauntlet "$unconsumed_close_dir" "$critic_failure_supersession_dir"
 replace_matching_line "$critic_failure_supersession_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -6756,15 +6778,15 @@ set_gauntlet_field "$project" "$critic_failure_supersession_dir/GAUNTLET.md" \
   'Current State' 'Unit manifest fingerprint' pending
 reset_integration_review "$project" "$critic_failure_supersession_dir/GAUNTLET.md"
 export FAKE_DATE_ISO=2026-08-02T00:00:01Z
-critic_failure_descendant_pr='https://github.com/example/opencaw-fixture/pull/294'
-critic_failure_descendant_head='gauntlet-work/critic-failure-supersession/unit-2-remediation-1'
+critic_failure_descendant_pr='https://github.com/example/hephaera-fixture/pull/294'
+critic_failure_descendant_head='gauntlet-work/critic-failure-supersession/unit-2'
 set_local_ref "$project" "$critic_failure_descendant_head" "$head_sha_2"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   critic-failure-supersession unit-2 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   critic-failure-supersession unit-2 opened "$critic_failure_descendant_pr" \
   "$critic_failure_descendant_head" none --head-sha "$head_sha_2" >/dev/null
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/critic-failure-supersession/pr-events/unit-1/event-003.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/critic-failure-supersession/pr-events/unit-1/event-003.md' \
   "$critic_failure_supersession_dir/pr-events/unit-2/event-001.md"
 critic_failure_descendant_report="$critic_dir/critic-failure-descendant.md"
 write_critic_report "$critic_failure_descendant_report" pass artifact.txt "$head_sha_2" \
@@ -6776,13 +6798,17 @@ run_for "$project" bash commands/record-gauntlet-round.sh \
   --head-sha "$head_sha_2" \
   --builder-strategy 'Replace the critic-failed ancestor with a distinct verified descendant.' \
   >/dev/null
-expect_line '- Remediation root: .opencaw/.cache/gauntlets/critic-failure-supersession/rounds/unit-1/round-001.md' \
+expect_line '- Remediation root: .hephaera/.cache/gauntlets/critic-failure-supersession/pr-events/unit-1/event-003.md' \
   "$critic_failure_supersession_dir/rounds/unit-2/round-001.md"
+expect_line '- Event: closed' "$critic_failure_supersession_dir/pr-events/unit-1/event-003.md"
+expect_line '- Critic round: .hephaera/.cache/gauntlets/critic-failure-supersession/rounds/unit-1/round-001.md' \
+  "$critic_failure_supersession_dir/pr-events/unit-1/event-003.md"
+expect_line '- Critic verdict: fail' "$critic_failure_supersession_dir/pr-events/unit-1/event-003.md"
 unset FAKE_DATE_ISO
 
-qa_failure_supersession_dir="$project/.opencaw/.cache/gauntlets/qa-failure-supersession"
+qa_failure_supersession_dir="$project/.hephaera/.cache/gauntlets/qa-failure-supersession"
 copy_gauntlet "$ready_snapshot" "$qa_failure_supersession_dir"
-qa_failure_ancestor_pr='https://github.com/example/opencaw-fixture/pull/295'
+qa_failure_ancestor_pr='https://github.com/example/hephaera-fixture/pull/295'
 qa_failure_ancestor_head='gauntlet-work/qa-failure-supersession/unit-1'
 set_local_ref "$project" "$qa_failure_ancestor_head" "$head_sha_3"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh qa-failure-supersession \
@@ -6821,15 +6847,15 @@ set_gauntlet_field "$project" "$qa_failure_supersession_dir/GAUNTLET.md" \
   'Current State' 'Unit manifest fingerprint' pending
 reset_integration_review "$project" "$qa_failure_supersession_dir/GAUNTLET.md"
 export FAKE_DATE_ISO=2026-08-02T00:00:01Z
-qa_failure_descendant_pr='https://github.com/example/opencaw-fixture/pull/296'
-qa_failure_descendant_head='gauntlet-work/qa-failure-supersession/unit-2-remediation-1'
+qa_failure_descendant_pr='https://github.com/example/hephaera-fixture/pull/296'
+qa_failure_descendant_head='gauntlet-work/qa-failure-supersession/unit-2'
 set_local_ref "$project" "$qa_failure_descendant_head" "$head_sha_4"
 run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
   qa-failure-supersession unit-2 "$project/progress-validation.md" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh \
   qa-failure-supersession unit-2 opened "$qa_failure_descendant_pr" \
   "$qa_failure_descendant_head" none --head-sha "$head_sha_4" >/dev/null
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-003.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-003.md' \
   "$qa_failure_supersession_dir/pr-events/unit-2/event-001.md"
 qa_failure_descendant_report="$critic_dir/qa-failure-descendant.md"
 write_critic_report "$qa_failure_descendant_report" pass artifact.txt "$head_sha_4" \
@@ -6840,109 +6866,76 @@ run_for "$project" bash commands/record-gauntlet-round.sh qa-failure-supersessio
   fresh-session "$qa_failure_descendant_report" --head-sha "$head_sha_4" \
   --builder-strategy 'Replace the QA-failed ancestor with an independently verified descendant.' \
   >/dev/null
-expect_line '- Remediation root: .opencaw/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-002.md' \
+expect_line '- Remediation root: .hephaera/.cache/gauntlets/qa-failure-supersession/pr-events/unit-1/event-003.md' \
   "$qa_failure_supersession_dir/rounds/unit-2/round-001.md"
-
-later_ancestor_dir="$project/.opencaw/.cache/gauntlets/later-same-second-ancestor-failure"
-copy_gauntlet "$qa_failure_supersession_dir" "$later_ancestor_dir"
-later_ancestor_qa="$later_ancestor_dir/pr-events/unit-1/event-002.md"
-later_ancestor_close="$later_ancestor_dir/pr-events/unit-1/event-003.md"
-earlier_descendant_open="$later_ancestor_dir/pr-events/unit-2/event-001.md"
-earlier_descendant_round="$later_ancestor_dir/rounds/unit-2/round-001.md"
-later_ancestor_time='2026-08-02T00:00:01Z'
-replace_matching_line "$later_ancestor_qa" '^- Recorded at:' \
-  "- Recorded at: $later_ancestor_time"
-replace_matching_line "$later_ancestor_close" '^- Closed at:' \
-  "- Closed at: $later_ancestor_time"
-replace_matching_line "$later_ancestor_close" '^- Recorded at:' \
-  "- Recorded at: $later_ancestor_time"
-later_ancestor_close_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-003.md'
-later_ancestor_qa_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-1/event-002.md'
-replace_line "$earlier_descendant_open" \
-  "- Remediation trigger: $later_ancestor_close_relative" \
-  '- Remediation trigger: none'
-earlier_descendant_checkpoint_relative="$(sed -nE \
-  's/^- Publication checkpoint: (.*)$/\1/p' "$earlier_descendant_open" | head -n 1)"
-earlier_descendant_checkpoint="$project/$earlier_descendant_checkpoint_relative"
-replace_line "$earlier_descendant_checkpoint" \
-  "- Remediation trigger: $later_ancestor_close_relative" \
-  '- Remediation trigger: none'
-replace_matching_line "$earlier_descendant_checkpoint" \
-  '^- Remediation trigger sha256:' '- Remediation trigger sha256: none'
-replace_line "$earlier_descendant_checkpoint" \
-  "- Remediation root: $later_ancestor_qa_relative" '- Remediation root: none'
-replace_matching_line "$earlier_descendant_checkpoint" \
-  '^- Remediation root sha256:' '- Remediation root sha256: none'
-earlier_descendant_root_hash="$(sed -nE \
-  's/^- Remediation root sha256: (.*)$/\1/p' "$earlier_descendant_round" | head -n 1)"
-replace_line "$earlier_descendant_round" \
-  "- Remediation root: $later_ancestor_qa_relative" '- Remediation root: none'
-replace_line "$earlier_descendant_round" \
-  "- Remediation root sha256: $earlier_descendant_root_hash" \
-  '- Remediation root sha256: none'
-replace_all_literal "$later_ancestor_dir/GAUNTLET.md" \
-  "| trigger: $later_ancestor_close_relative |" '| trigger: none |'
-replace_all_literal "$later_ancestor_dir/GAUNTLET.md" \
-  "| root: $later_ancestor_qa_relative | root-sha256: $earlier_descendant_root_hash |" \
-  '| root: none | root-sha256: none |'
-replace_all_literal "$later_ancestor_dir/GAUNTLET.md" \
-  'pr-closed: 2026-08-01T12:00:00Z | checkpoint:' \
-  "pr-closed: $later_ancestor_time | checkpoint:"
-refresh_copied_checkpoint_hashes "$later_ancestor_dir"
-refresh_copied_cross_evidence_hashes "$later_ancestor_dir"
-refresh_copied_evidence_hashes "$later_ancestor_dir"
-
-later_ancestor_qa_ledger="$(select_ledger_line "$project" \
-  "$later_ancestor_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  "$later_ancestor_qa_relative")"
-later_ancestor_close_ledger="$(select_ledger_line "$project" \
-  "$later_ancestor_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  "$later_ancestor_close_relative")"
-earlier_descendant_relative='.opencaw/.cache/gauntlets/later-same-second-ancestor-failure/pr-events/unit-2/event-001.md'
-earlier_descendant_ledger="$(select_ledger_line "$project" \
-  "$later_ancestor_dir/GAUNTLET.md" 'Progress PR Ledger' record \
-  "$earlier_descendant_relative")"
-replace_line "$later_ancestor_dir/GAUNTLET.md" "$later_ancestor_qa_ledger" \
-  '__LATER_ANCESTOR_QA__'
-replace_line "$later_ancestor_dir/GAUNTLET.md" "$later_ancestor_close_ledger" \
-  '__LATER_ANCESTOR_CLOSE__'
-replace_line "$later_ancestor_dir/GAUNTLET.md" "$earlier_descendant_ledger" \
-  '__EARLIER_DESCENDANT_OPEN__'
-replace_line "$later_ancestor_dir/GAUNTLET.md" '__LATER_ANCESTOR_QA__' \
-  "$earlier_descendant_ledger"
-replace_line "$later_ancestor_dir/GAUNTLET.md" '__LATER_ANCESTOR_CLOSE__' \
-  "$later_ancestor_qa_ledger"
-replace_line "$later_ancestor_dir/GAUNTLET.md" '__EARLIER_DESCENDANT_OPEN__' \
-  "$later_ancestor_close_ledger"
+expect_line '- Event: qa-fail' "$qa_failure_supersession_dir/pr-events/unit-1/event-002.md"
+expect_line '- Event: closed' "$qa_failure_supersession_dir/pr-events/unit-1/event-003.md"
+for qa_failure_ancestor_event in event-002.md event-003.md; do
+  expect_line "- PR URL: $qa_failure_ancestor_pr" \
+    "$qa_failure_supersession_dir/pr-events/unit-1/$qa_failure_ancestor_event"
+  expect_line "- Head SHA: $head_sha_3" \
+    "$qa_failure_supersession_dir/pr-events/unit-1/$qa_failure_ancestor_event"
+done
 
 later_ancestor_name='later-same-second-ancestor-failure'
-later_ancestor_integration="gauntlet/$later_ancestor_name"
-later_ancestor_head="gauntlet-work/$later_ancestor_name/unit-1"
-earlier_descendant_head="gauntlet-work/$later_ancestor_name/unit-2-remediation-1"
-later_ancestor_url='https://github.com/example/opencaw-fixture/pull/295'
-earlier_descendant_url='https://github.com/example/opencaw-fixture/pull/296'
-set_local_ref "$project" "$later_ancestor_integration" "$base_commit_sha"
-set_remote_ref "$project" "$later_ancestor_integration" "$base_commit_sha"
+later_ancestor_dir="$project/.hephaera/.cache/gauntlets/later-same-second-ancestor-failure"
+copy_gauntlet "$ready_snapshot" "$later_ancestor_dir"
+insert_after_matching_line "$later_ancestor_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
+  '- [ ] unit-2 | status: pending | title: Independent peer and later replacement | scope: independently reviewed peer boundary'
+later_ancestor_initial_manifest="$(unit_manifest_fingerprint "$project" "$later_ancestor_dir/GAUNTLET.md")"
+later_ancestor_original_approval="$(grep -F -- '- Unit manifest approval: ' "$later_ancestor_dir/GAUNTLET.md")"
+replace_line "$later_ancestor_dir/GAUNTLET.md" "$later_ancestor_original_approval" \
+  "- Unit manifest approval: $later_ancestor_initial_manifest | units: unit-1,unit-2 | approved by: fixture-user | approved at: 2026-08-01T12:00:00Z"
+later_ancestor_url='https://github.com/example/hephaera-fixture/pull/3200'
+later_ancestor_head='gauntlet-work/later-same-second-ancestor-failure/unit-1'
+earlier_descendant_url='https://github.com/example/hephaera-fixture/pull/3201'
+earlier_descendant_head='gauntlet-work/later-same-second-ancestor-failure/unit-2'
+run_for "$project" bash commands/validate-gauntlet.sh later-same-second-ancestor-failure --phase ready >/dev/null
 set_local_ref "$project" "$later_ancestor_head" "$head_sha_3"
-set_remote_ref "$project" "$later_ancestor_head" "$head_sha_3"
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-1 opened "$later_ancestor_url" "$later_ancestor_head" none --head-sha "$head_sha_3" >/dev/null
+later_ancestor_report="$project/critic-reports/ancestor-shape-pass.md"
+write_critic_report "$later_ancestor_report" pass artifact.txt "$head_sha_3" \
+  'The original active unit passes its isolated critic review.' 'Await independent QA while the peer works.'
+run_for "$project" bash commands/record-gauntlet-round.sh later-same-second-ancestor-failure \
+  unit-1 pass ancestor-shape-builder ancestor-shape-critic fresh-session "$later_ancestor_report" \
+  --head-sha "$head_sha_3" --builder-strategy 'Build the original active unit before peer execution.' >/dev/null
+later_ancestor_time='2026-08-02T00:00:01Z'
+export FAKE_DATE_ISO="$later_ancestor_time"
 set_local_ref "$project" "$earlier_descendant_head" "$head_sha_4"
-set_remote_ref "$project" "$earlier_descendant_head" "$head_sha_4"
-later_ancestor_marker="$(opened_publication_marker \
-  "$project" "$later_ancestor_name" unit-1)"
-earlier_descendant_marker="$(opened_publication_marker \
-  "$project" "$later_ancestor_name" unit-2)"
-set_pr_observation "$later_ancestor_url" "$later_ancestor_head" "$head_sha_3" \
-  "$later_ancestor_integration" CLOSED false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture 2026-08-01T12:00:00Z \
-  "$later_ancestor_time" "$later_ancestor_marker"
-set_pr_observation "$earlier_descendant_url" "$earlier_descendant_head" \
-  "$head_sha_4" "$later_ancestor_integration" OPEN false none none none none \
-  "$base_commit_sha" false example/opencaw-fixture "$later_ancestor_time" none \
-  "$earlier_descendant_marker"
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-2 opened "$earlier_descendant_url" "$earlier_descendant_head" none --head-sha "$head_sha_4" >/dev/null
+earlier_descendant_report="$project/critic-reports/peer-shape-pass.md"
+write_critic_report "$earlier_descendant_report" pass artifact.txt "$head_sha_4" \
+  'The independent peer passes before the later same-second QA failure.' 'Retain its actual rootless historical review.'
+run_for "$project" bash commands/record-gauntlet-round.sh later-same-second-ancestor-failure \
+  unit-2 pass peer-shape-builder peer-shape-critic fresh-session "$earlier_descendant_report" \
+  --head-sha "$head_sha_4" --builder-strategy 'Build the independent peer before ancestor QA reports failure.' >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-1 qa-fail "$later_ancestor_url" "$later_ancestor_head" "$later_ancestor_url#issuecomment-32001" --head-sha "$head_sha_3" >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-1 closed "$later_ancestor_url" "$later_ancestor_head" "$later_ancestor_url#issuecomment-32002" --head-sha "$head_sha_3" >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-2 qa-pass "$earlier_descendant_url" "$earlier_descendant_head" "$earlier_descendant_url#issuecomment-32011" --head-sha "$head_sha_4" >/dev/null
+run_for "$project" bash commands/record-gauntlet-pr-event.sh later-same-second-ancestor-failure \
+  unit-2 closed "$earlier_descendant_url" "$earlier_descendant_head" "$earlier_descendant_url#issuecomment-32012" --head-sha "$head_sha_4" >/dev/null
+run_for "$project" bash commands/validate-gauntlet.sh later-same-second-ancestor-failure --phase ready >/dev/null
+export FAKE_DATE_ISO='2026-08-02T00:00:02Z'
+replace_matching_line "$later_ancestor_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
+  '- [x] unit-1 | status: superseded | title: Complete the inspectable fixture artifact | scope: artifact.txt and its focused local verifier'
+later_ancestor_scope="$(unit_scope_fingerprint "$project" "$later_ancestor_dir/GAUNTLET.md" unit-1)"
+later_ancestor_edge="- Unit supersession: unit-1 | scope: $later_ancestor_scope | replacements: unit-2 | reason: Authorize the peer as replacement after its earlier independent work. | approved by: fixture-user | approved at: 2026-08-02T00:00:02Z"
+insert_after_matching_line "$later_ancestor_dir/GAUNTLET.md" '^- Unit manifest approval:' "$later_ancestor_edge"
+later_ancestor_replacement_manifest="$(unit_manifest_fingerprint "$project" "$later_ancestor_dir/GAUNTLET.md")"
+later_ancestor_manifest_revision="- Unit manifest revision: activate-later-replacement | from: $later_ancestor_initial_manifest | to: $later_ancestor_replacement_manifest | prior-units: unit-1,unit-2 | current-units: unit-1,unit-2 | reason: Preserve prior peer work while approving the later replacement relationship. | approved by: fixture-user | approved at: 2026-08-02T00:00:02Z"
+insert_after_matching_line "$later_ancestor_dir/GAUNTLET.md" '^- Unit supersession: unit-1 ' "$later_ancestor_manifest_revision"
+set_gauntlet_field "$project" "$later_ancestor_dir/GAUNTLET.md" 'Current State' 'Unit manifest fingerprint' pending
+reset_integration_review "$project" "$later_ancestor_dir/GAUNTLET.md"
+earlier_descendant_open="$later_ancestor_dir/pr-events/unit-2/event-001.md"
+earlier_descendant_round="$later_ancestor_dir/rounds/unit-2/round-001.md"
 expect_line '- Remediation trigger: none' "$earlier_descendant_open"
 expect_line '- Remediation root: none' "$earlier_descendant_round"
-run_for "$project" bash commands/validate-gauntlet.sh \
-  "$later_ancestor_name" --phase ready >/dev/null
+run_for "$project" bash commands/validate-gauntlet.sh later-same-second-ancestor-failure --phase ready >/dev/null
 unset FAKE_DATE_ISO
 
 post_integration_unit_report="$critic_dir/post-integration-unit-pass.md"
@@ -6950,17 +6943,17 @@ write_critic_report "$post_integration_unit_report" pass artifact.txt "$head_sha
   'The reopened recovery behavior now satisfies the frozen unit criteria.' \
   'Return the corrected complete artifact to a new integration critic.'
 sync_gauntlet_live_observations "$project" "$gauntlet_dir"
-expect_failure "$temp_root/integration-remediation-requires-new-pr.log" run_for "$project" \
+expect_failure "$temp_root/integration-remediation-requires-new-pr.log" run_for_without_observation "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet unit-1 pass \
   builder-without-remediation-pr critic-without-remediation-pr fresh-session "$post_integration_unit_report" \
   --head-sha "$head_sha_7" --builder-strategy "$builder_strategy_6"
 grep -Fq 'Work-unit rounds require a live progress PR: unit-1' \
   "$temp_root/integration-remediation-requires-new-pr.log" \
   || fail 'integration remediation without a new PR hit the wrong rejection guard'
-remediation_pr_url='https://github.com/example/opencaw-fixture/pull/208'
+remediation_pr_url='https://github.com/example/hephaera-fixture/pull/208'
 remediation_head='gauntlet-work/fixture-gauntlet/unit-1-remediation-1'
 set_local_ref "$project" "$remediation_head" "$head_sha_7"
-remediation_readiness_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/remediation" run_for "$project" \
+remediation_readiness_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/remediation" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress \
   fixture-gauntlet unit-1 "$project/progress-validation.md")"
 grep -q '^TARGET_BRANCH=gauntlet/fixture-gauntlet$' <<<"$remediation_readiness_output" \
@@ -6968,19 +6961,19 @@ grep -q '^TARGET_BRANCH=gauntlet/fixture-gauntlet$' <<<"$remediation_readiness_o
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_4"
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/remediation-open-rewound-live-target.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
   "$remediation_pr_url" "$remediation_head" none --head-sha "$head_sha_7"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 opened \
   "$remediation_pr_url" "$remediation_head" none --head-sha "$head_sha_7" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-007.md"
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
   "$gauntlet_dir/pr-events/unit-1/event-007.md"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$head_sha_4"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/remediation-round-rewound-local-target.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet unit-1 pass \
   builder-stale-local-target critic-stale-local-target fresh-session \
@@ -6994,10 +6987,10 @@ expect_file "$gauntlet_dir/rounds/unit-1/round-005.md"
 remediation_stale_pass_comment="$remediation_pr_url#issuecomment-9020"
 set_semantic_comment_observation "$project" "$remediation_stale_pass_comment" \
   "$remediation_pr_url" pass "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$base_commit_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/remediation-qa-pass-rewound-live-target.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
   "$remediation_pr_url" "$remediation_head" "$remediation_stale_pass_comment" \
@@ -7005,11 +6998,11 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
 remediation_stale_fail_comment="$remediation_pr_url#issuecomment-9021"
 set_semantic_comment_observation "$project" "$remediation_stale_fail_comment" \
   "$remediation_pr_url" fail "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
+  '.hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md'
 set_local_ref "$project" gauntlet/fixture-gauntlet "$base_commit_sha"
 set_pr_observation "$remediation_pr_url" "$remediation_head" "$head_sha_7" \
   gauntlet/fixture-gauntlet OPEN false none none none none "$head_sha_4"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/remediation-qa-fail-rewound-local-target.log" run_for "$project" \
   bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-fail \
   "$remediation_pr_url" "$remediation_head" "$remediation_stale_fail_comment" \
@@ -7017,10 +7010,10 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_4"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 qa-pass \
   "$remediation_pr_url" "$remediation_head" \
-  'https://github.com/example/opencaw-fixture/pull/208#issuecomment-24' --head-sha "$head_sha_7" >/dev/null
+  'https://github.com/example/hephaera-fixture/pull/208#issuecomment-24' --head-sha "$head_sha_7" >/dev/null
 run_for "$project" bash commands/record-gauntlet-pr-event.sh fixture-gauntlet unit-1 merged \
   "$remediation_pr_url" "$remediation_head" \
-  'https://github.com/example/opencaw-fixture/pull/208#issuecomment-25' \
+  'https://github.com/example/hephaera-fixture/pull/208#issuecomment-25' \
   --head-sha "$head_sha_7" --merge-commit "$head_sha_7" >/dev/null
 expect_file "$gauntlet_dir/pr-events/unit-1/event-009.md"
 expect_line "- Target base SHA: $head_sha_4" "$gauntlet_dir/pr-events/unit-1/event-009.md"
@@ -7038,9 +7031,9 @@ for same_second_evidence in \
       "$same_second_evidence" | head -n 1)" == "$same_second_chain_time" ]] \
     || fail "explicit remediation chain lost its same-second replay tie: $same_second_evidence"
 done
-expect_line '- Remediation root: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
+expect_line '- Remediation root: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-002.md' \
   "$gauntlet_dir/rounds/unit-1/round-005.md"
-expect_line '- Critic round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md' \
+expect_line '- Critic round: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/unit-1/round-005.md' \
   "$gauntlet_dir/pr-events/unit-1/event-008.md"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase ready >/dev/null
 
@@ -7055,7 +7048,7 @@ write_critic_report "$postmerge_direct_report" pass artifact.txt "$head_sha_8" \
 postmerge_gauntlet_hash="$(git hash-object "$gauntlet_file")"
 postmerge_round_count="$(round_file_count "$gauntlet_dir")"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_8"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/direct-commit-after-merges-integration.log" run_for "$project" \
   bash commands/record-gauntlet-round.sh fixture-gauntlet integration pass \
   postmerge-direct-builder postmerge-direct-critic fresh-session \
@@ -7075,7 +7068,7 @@ expect_failure "$temp_root/integration-origin-drift.log" run_for "$project" \
 [[ "$postmerge_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
   && "$postmerge_round_count" == "$(round_file_count "$gauntlet_dir")" ]] \
   || fail 'origin-drift integration attempt mutated Gauntlet state or evidence'
-git -C "$project" remote set-url origin git@github.com:example/opencaw-fixture.git
+git -C "$project" remote set-url origin git@github.com:example/hephaera-fixture.git
 for remote_topology_case in ahead divergent rewound absent; do
   case "$remote_topology_case" in
     ahead) remote_topology_sha="$head_sha_8" ;;
@@ -7112,20 +7105,20 @@ run_for "$project" bash commands/create-gauntlet-completion-report.sh fixture-ga
 expect_file "$gauntlet_dir/GAUNTLET_REPORT.md"
 assert_no_completion_staging "$gauntlet_dir"
 completion_event="$gauntlet_dir/completion-events/event-001.md"
-completion_event_relative='.opencaw/.cache/gauntlets/fixture-gauntlet/completion-events/event-001.md'
+completion_event_relative='.hephaera/.cache/gauntlets/fixture-gauntlet/completion-events/event-001.md'
 expect_file "$completion_event"
 expect_line '# Gauntlet Completion Event: 001' "$completion_event"
 expect_line '- Sequence: 001' "$completion_event"
 expect_line '- Outcome: complete' "$completion_event"
-expect_line '- Integration round: .opencaw/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-004.md' \
+expect_line '- Integration round: .hephaera/.cache/gauntlets/fixture-gauntlet/rounds/integration/round-004.md' \
   "$completion_event"
 expect_line "- Head SHA: $head_sha_7" "$completion_event"
 expect_line "- Quality bar fingerprint: $quality_bar_v1" "$completion_event"
 expect_line "- Unit manifest fingerprint: $unit_manifest_opened" "$completion_event"
 expect_line "- Execution contract fingerprint: $execution_contract_v1" "$completion_event"
 expect_line "- Base commit SHA: $base_commit_sha" "$completion_event"
-expect_line '- Report: .opencaw/.cache/gauntlets/fixture-gauntlet/GAUNTLET_REPORT.md' "$completion_event"
-completion_report_projection="$(OPENCAW_PROJECT_ROOT="$project" bash -c '
+expect_line '- Report: .hephaera/.cache/gauntlets/fixture-gauntlet/GAUNTLET_REPORT.md' "$completion_event"
+completion_report_projection="$(HEPHAERA_PROJECT_ROOT="$project" bash -c '
   set -euo pipefail
   source commands/lib/gauntlet-common.sh
   gauntlet_report_projection_hash "$1"
@@ -7171,8 +7164,8 @@ for remote_topology_case in ahead divergent rewound absent; do
   expect_failure "$temp_root/complete-validation-remote-$remote_topology_case.log" \
     run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
   expect_failure "$temp_root/final-readiness-remote-$remote_topology_case.log" env \
-    OPENCAW_PROJECT_ROOT="$project" \
-    OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/final-remote-$remote_topology_case" \
+    HEPHAERA_PROJECT_ROOT="$project" \
+    HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/final-remote-$remote_topology_case" \
     bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
     "$project/progress-validation.md"
   [[ "$terminal_remote_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7209,7 +7202,7 @@ expect_failure "$temp_root/tampered-report-regeneration.log" run_for "$project" 
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 assert_no_completion_staging "$gauntlet_dir"
 expect_failure "$temp_root/tampered-report-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/tampered-report" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/tampered-report" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$tampered_report_hash" == "$(git hash-object "$gauntlet_dir/GAUNTLET_REPORT.md")" \
@@ -7219,12 +7212,22 @@ expect_failure "$temp_root/tampered-report-readiness.log" env \
 cp "$report_backup" "$gauntlet_dir/GAUNTLET_REPORT.md"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 
+fixture_first_opened_event="$(gauntlet_helper_value "$project" \
+  gauntlet_opened_event_for_pr "$gauntlet_dir" unit-1 "$fixture_pr_url")"
+expect_file "$fixture_first_opened_event"
+expect_line "- PR URL: $fixture_pr_url" "$fixture_first_opened_event"
+fixture_first_checkpoint="$(gauntlet_helper_value "$project" gauntlet_section_field \
+  "$fixture_first_opened_event" 'PR Event Metadata' 'Publication checkpoint')"
+fixture_first_checkpoint_sha="$(gauntlet_helper_value "$project" gauntlet_section_field \
+  "$fixture_first_opened_event" 'PR Event Metadata' 'Publication checkpoint sha256')"
+fixture_first_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$fixture_first_checkpoint checkpoint-sha256=$fixture_first_checkpoint_sha -->"
+
 restore_fixture_first_merge_observation() {
   set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
     gauntlet/fixture-gauntlet MERGED false 2026-08-01T12:00:00Z \
     human-reviewer "$head_sha_4" false "$base_commit_sha" false \
-    example/opencaw-fixture 2026-08-01T12:00:00Z 2026-08-01T12:00:00Z \
-    "$(opened_publication_marker "$project" fixture-gauntlet unit-1)"
+    example/hephaera-fixture 2026-08-01T12:00:00Z 2026-08-01T12:00:00Z \
+    "$fixture_first_marker"
 }
 merged_requery_gauntlet_hash="$(git hash-object "$gauntlet_file")"
 merged_requery_report_hash="$(git hash-object "$gauntlet_dir/GAUNTLET_REPORT.md")"
@@ -7248,7 +7251,7 @@ set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
 expect_failure "$temp_root/merged-requery-state-mismatch.log" run_for "$project" \
   bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 expect_failure "$temp_root/merged-requery-state-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/merged-state" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/merged-state" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 set_pr_observation "$fixture_pr_url" "$fixture_head" "$head_sha_4" \
@@ -7276,14 +7279,12 @@ set_pr_body_observation "$fixture_pr_url" ''
 expect_failure "$temp_root/merged-requery-publication-body-removed.log" \
   run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
 expect_failure "$temp_root/merged-requery-publication-body-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/merged-publication-body" \
+  HEPHAERA_PROJECT_ROOT="$project" \
+  HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/merged-publication-body" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 restore_fixture_first_merge_observation
-fixture_first_marker="$(opened_publication_marker \
-  "$project" fixture-gauntlet unit-1)"
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_body_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_body_observation \
   "$fixture_pr_url" "$fixture_first_marker"
 expect_failure "$temp_root/merged-requery-issue-reference-removed.log" \
   run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete
@@ -7305,7 +7306,7 @@ expect_failure "$temp_root/direct-complete-validation.log" run_for "$project" \
 expect_failure "$temp_root/direct-completion-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/direct-final-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/direct-final" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/direct-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7321,18 +7322,18 @@ expect_failure "$temp_root/complete-origin-drift-validation.log" run_for "$proje
 expect_failure "$temp_root/complete-origin-drift-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/complete-origin-drift-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/origin-drift-final" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/origin-drift-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
   && "$direct_complete_report_hash" == "$(git hash-object "$gauntlet_dir/GAUNTLET_REPORT.md")" \
   && "$direct_complete_event_hash" == "$(git hash-object "$completion_event")" ]] \
   || fail 'origin-drift terminal probes mutated completion evidence'
-git -C "$project" remote set-url origin git@github.com:example/opencaw-fixture.git
+git -C "$project" remote set-url origin git@github.com:example/hephaera-fixture.git
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   fixture-gauntlet --status complete >/dev/null
-OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/restored-origin-final" run_for "$project" \
+HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/restored-origin-final" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md" >/dev/null
 
@@ -7343,7 +7344,7 @@ expect_failure "$temp_root/complete-push-target-validation.log" run_for "$projec
 expect_failure "$temp_root/complete-push-target-report.log" run_for "$project" \
   bash commands/create-gauntlet-completion-report.sh fixture-gauntlet --status complete
 expect_failure "$temp_root/complete-push-target-readiness.log" env \
-  OPENCAW_PROJECT_ROOT="$project" OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/push-target-final" \
+  HEPHAERA_PROJECT_ROOT="$project" HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/push-target-final" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md"
 [[ "$direct_complete_gauntlet_hash" == "$(git hash-object "$gauntlet_file")" \
@@ -7352,11 +7353,11 @@ expect_failure "$temp_root/complete-push-target-readiness.log" env \
   || fail 'mismatched effective push target mutated terminal completion evidence'
 git -C "$project" config --unset-all remote.origin.pushurl
 git -C "$project" remote set-url --add --push origin \
-  git@github.com:example/opencaw-fixture.git
+  git@github.com:example/hephaera-fixture.git
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 run_for "$project" bash commands/create-gauntlet-completion-report.sh \
   fixture-gauntlet --status complete >/dev/null
-OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/restored-push-target-final" run_for "$project" \
+HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/restored-push-target-final" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet \
   "$project/progress-validation.md" >/dev/null
 git -C "$project" config --unset-all remote.origin.pushurl
@@ -7382,7 +7383,7 @@ write_critic_report "$terminal_demotion_report" pass artifact.txt "$head_sha_8" 
   'Consume the active completion through immutable promotion-failure evidence first.'
 terminal_pr_number=230
 for terminal_variant in terminal-demotion-with-report terminal-demotion-without-report; do
-  terminal_variant_dir="$project/.opencaw/.cache/gauntlets/$terminal_variant"
+  terminal_variant_dir="$project/.hephaera/.cache/gauntlets/$terminal_variant"
   copy_gauntlet "$gauntlet_dir" "$terminal_variant_dir"
   run_for "$project" bash commands/validate-gauntlet.sh "$terminal_variant" --phase complete >/dev/null
   replace_line "$terminal_variant_dir/GAUNTLET.md" '- Status: passed' '- Status: running'
@@ -7408,7 +7409,7 @@ for terminal_variant in terminal-demotion-with-report terminal-demotion-without-
   expect_failure "$temp_root/$terminal_variant-progress.log" \
     run_for_without_observation "$project" \
     bash commands/record-gauntlet-pr-event.sh "$terminal_variant" unit-1 opened \
-    "https://github.com/example/opencaw-fixture/pull/$terminal_pr_number" \
+    "https://github.com/example/hephaera-fixture/pull/$terminal_pr_number" \
     "gauntlet-work/$terminal_variant/unit-1-remediation-2" none --head-sha "$head_sha_8"
   expect_failure "$temp_root/$terminal_variant-report.log" run_for "$project" \
     bash commands/create-gauntlet-completion-report.sh "$terminal_variant" --status complete
@@ -7483,7 +7484,7 @@ sync_gauntlet_live_observations "$project" "$gauntlet_dir"
 expect_line '- Status: passed' "$gauntlet_file"
 run_for "$project" bash commands/validate-gauntlet.sh fixture-gauntlet --phase complete >/dev/null
 
-forged_later_round_dir="$project/.opencaw/.cache/gauntlets/forged-later-round"
+forged_later_round_dir="$project/.hephaera/.cache/gauntlets/forged-later-round"
 copy_gauntlet "$gauntlet_dir" "$forged_later_round_dir"
 forged_round="$forged_later_round_dir/rounds/integration/round-005.md"
 cp "$forged_later_round_dir/rounds/integration/round-004.md" "$forged_round"
@@ -7493,7 +7494,7 @@ replace_line "$forged_round" '- Round: 004' '- Round: 005'
 forged_round_hash="$(sha256_file "$forged_round")"
 final_round_ledger_line="$(select_ledger_line "$project" \
   "$forged_later_round_dir/GAUNTLET.md" 'Round Ledger' evidence \
-  '.opencaw/.cache/gauntlets/forged-later-round/rounds/integration/round-004.md')"
+  '.hephaera/.cache/gauntlets/forged-later-round/rounds/integration/round-004.md')"
 forged_round_ledger_line="${final_round_ledger_line/round: 004/round: 005}"
 forged_round_ledger_line="${forged_round_ledger_line/round-004.md/round-005.md}"
 forged_round_ledger_line="${forged_round_ledger_line%sha256:*}sha256: $forged_round_hash"
@@ -7502,22 +7503,22 @@ insert_after_section_line "$forged_later_round_dir/GAUNTLET.md" \
 expect_failure "$temp_root/forged-later-round.log" run_for "$project" \
   bash commands/validate-gauntlet.sh forged-later-round --phase complete
 
-completed_scope_mutation_dir="$project/.opencaw/.cache/gauntlets/completed-scope-mutation"
+completed_scope_mutation_dir="$project/.hephaera/.cache/gauntlets/completed-scope-mutation"
 copy_gauntlet "$gauntlet_dir" "$completed_scope_mutation_dir"
 replace_matching_line "$completed_scope_mutation_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
   '- [x] unit-1 | status: passed | title: Complete the inspectable fixture artifact | scope: expanded completion scope without new critic evidence'
 expect_failure "$temp_root/completed-scope-mutation.log" run_for "$project" \
   bash commands/validate-gauntlet.sh completed-scope-mutation --phase complete
 
-integration_path_dir="$project/.opencaw/.cache/gauntlets/integration-path-traversal"
+integration_path_dir="$project/.hephaera/.cache/gauntlets/integration-path-traversal"
 copy_gauntlet "$gauntlet_dir" "$integration_path_dir"
 replace_line "$integration_path_dir/GAUNTLET.md" \
-  '- Evidence: `.opencaw/.cache/gauntlets/integration-path-traversal/rounds/integration/round-004.md`' \
-  '- Evidence: `.opencaw/.cache/gauntlets/integration-path-traversal/rounds/integration/../integration/round-004.md`'
+  '- Evidence: `.hephaera/.cache/gauntlets/integration-path-traversal/rounds/integration/round-004.md`' \
+  '- Evidence: `.hephaera/.cache/gauntlets/integration-path-traversal/rounds/integration/../integration/round-004.md`'
 expect_failure "$temp_root/integration-path-traversal.log" run_for "$project" \
   bash commands/validate-gauntlet.sh integration-path-traversal --phase complete
 
-post_pr_reopen_dir="$project/.opencaw/.cache/gauntlets/post-pr-reopen"
+post_pr_reopen_dir="$project/.hephaera/.cache/gauntlets/post-pr-reopen"
 copy_gauntlet "$gauntlet_dir" "$post_pr_reopen_dir"
 post_promotion_report="$critic_dir/post-promotion-remediation.md"
 write_critic_report "$post_promotion_report" pass artifact.txt "$head_sha_9" \
@@ -7530,14 +7531,14 @@ expect_failure "$temp_root/post-pr-round-without-remediation-pr.log" run_for "$p
 expect_failure "$temp_root/passed-progress-readiness-without-promotion-failure.log" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet-progress \
   post-pr-reopen unit-1 "$project/progress-validation.md"
-post_pr_remediation_url='https://github.com/example/opencaw-fixture/pull/209'
+post_pr_remediation_url='https://github.com/example/hephaera-fixture/pull/209'
 post_pr_remediation_head='gauntlet-work/post-pr-reopen/unit-1-remediation-2'
 expect_failure "$temp_root/passed-open-without-promotion-failure.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 opened \
   "$post_pr_remediation_url" "$post_pr_remediation_head" none --head-sha "$head_sha_9"
 
-manual_reopen_dir="$project/.opencaw/.cache/gauntlets/manual-passed-state-reopen"
+manual_reopen_dir="$project/.hephaera/.cache/gauntlets/manual-passed-state-reopen"
 copy_gauntlet "$gauntlet_dir" "$manual_reopen_dir"
 replace_line "$manual_reopen_dir/GAUNTLET.md" '- Status: passed' '- Status: running'
 replace_matching_line "$manual_reopen_dir/GAUNTLET.md" '^- .*unit-1 .*status:' \
@@ -7549,22 +7550,22 @@ rm -f "$manual_reopen_dir/GAUNTLET_REPORT.md"
 expect_failure "$temp_root/manual-passed-state-remediation.log" \
   run_for_without_observation "$project" \
   bash commands/record-gauntlet-pr-event.sh manual-passed-state-reopen unit-1 opened \
-  'https://github.com/example/opencaw-fixture/pull/222' \
+  'https://github.com/example/hephaera-fixture/pull/222' \
   gauntlet-work/manual-passed-state-reopen/unit-1-remediation-2 none --head-sha "$head_sha_9"
 
-promotion_pass_dir="$project/.opencaw/.cache/gauntlets/promotion-qa-pass"
+promotion_pass_dir="$project/.hephaera/.cache/gauntlets/promotion-qa-pass"
 copy_gauntlet "$gauntlet_dir" "$promotion_pass_dir"
 promotion_completion_recorded_at="$(sed -nE 's/^- Recorded at: (.*)$/\1/p' \
   "$promotion_pass_dir/completion-events/event-001.md" | head -n 1)"
 set_local_ref "$project" main "$head_sha_1"
-promotion_pass_url='https://github.com/example/opencaw-fixture/pull/220'
+promotion_pass_url='https://github.com/example/hephaera-fixture/pull/220'
 promotion_pass_evidence="$promotion_pass_url#issuecomment-40"
 set_local_ref "$project" gauntlet/promotion-qa-pass "$head_sha_7"
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$orphan_sha"
 set_semantic_comment_observation "$project" "$promotion_pass_evidence" \
   "$promotion_pass_url" pass "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
+  '.hephaera/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
 export FAKE_GH_DEFAULT_BRANCH='release'
 expect_failure "$temp_root/promotion-pass-nondefault-target.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
@@ -7573,11 +7574,11 @@ grep -Fq 'Gauntlet promotion PR must target the current GitHub default branch' \
   "$temp_root/promotion-pass-nondefault-target.log" \
   || fail 'promotion QA accepted a non-default target that cannot close its parent issue'
 export FAKE_GH_DEFAULT_BRANCH='main'
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1" false \
-  example/opencaw-fixture 2026-08-01T12:00:00Z none 'Refs #101'
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+  example/hephaera-fixture 2026-08-01T12:00:00Z none 'Refs #101'
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-missing-closing-link.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
@@ -7585,13 +7586,13 @@ grep -Fq 'Promotion PR body requires this exact canonical first line exactly onc
   "$temp_root/promotion-pass-missing-closing-link.log" \
   || fail 'promotion QA accepted a PR body without its closing parent-issue link'
 promotion_duplicate_closing_body="Closes #101
-Fixes: example/opencaw-fixture#101"
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+Fixes: example/hephaera-fixture#101"
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1" false \
-  example/opencaw-fixture 2026-08-01T12:00:00Z none \
+  example/hephaera-fixture 2026-08-01T12:00:00Z none \
   "$promotion_duplicate_closing_body"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-duplicate-closing-link.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
@@ -7600,23 +7601,23 @@ grep -Fq 'Promotion PR body must contain exactly one parent-issue closing refere
   || fail 'promotion QA accepted an additional parent-issue closing alias'
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$orphan_sha" false \
-  example/opencaw-fixture 2026-08-01T12:00:00Z none ''
+  example/hephaera-fixture 2026-08-01T12:00:00Z none ''
 promotion_lineage_gauntlet_hash="$(git hash-object "$promotion_pass_dir/GAUNTLET.md")"
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
-  main OPEN false none none none none "$head_sha_1" true example/opencaw-fixture
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+  main OPEN false none none none none "$head_sha_1" true example/hephaera-fixture
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-cross-repository.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1" false different/repository
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-head-repository-mismatch.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$orphan_sha"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-unrelated-target-base.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
@@ -7634,24 +7635,24 @@ expect_failure "$temp_root/promotion-pass-arbitrary-https-evidence.log" run_for 
 expect_failure "$temp_root/promotion-pass-different-pr-comment.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" \
-  'https://github.com/example/opencaw-fixture/pull/999#issuecomment-41' --head-sha "$head_sha_7"
+  'https://github.com/example/hephaera-fixture/pull/999#issuecomment-41' --head-sha "$head_sha_7"
 promotion_pass_missing_comment="$promotion_pass_url#issuecomment-9010"
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-missing-live-comment.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_missing_comment" --head-sha "$head_sha_7"
 promotion_pass_wrong_pr_comment="$promotion_pass_url#issuecomment-9011"
 set_semantic_comment_observation "$project" "$promotion_pass_wrong_pr_comment" \
-  'https://github.com/example/opencaw-fixture/pull/997' pass "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+  'https://github.com/example/hephaera-fixture/pull/997' pass "$head_sha_7" \
+  '.hephaera/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md'
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-pass-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_wrong_pr_comment" --head-sha "$head_sha_7"
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1"
 set_pr_merge_automation_observation "$promotion_pass_url" AutoMergeEnabledEvent
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/open-promotion-auto-merge-history.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
@@ -7672,7 +7673,7 @@ expect_line "- Target base SHA: $head_sha_1" \
   "$promotion_pass_dir/promotion-events/event-001.md"
 expect_line '- Cross repository: false' \
   "$promotion_pass_dir/promotion-events/event-001.md"
-expect_line '- Head repository: example/opencaw-fixture' \
+expect_line '- Head repository: example/hephaera-fixture' \
   "$promotion_pass_dir/promotion-events/event-001.md"
 expect_line '- QA comment author: fixture-user' \
   "$promotion_pass_dir/promotion-events/event-001.md"
@@ -7687,7 +7688,7 @@ expect_line "- QA comment updated at: $promotion_completion_recorded_at" \
 grep -Eq '^- QA comment body sha256: [0-9a-f]{64}$' \
   "$promotion_pass_dir/promotion-events/event-001.md" \
   || fail 'promotion event omitted the exact semantic comment-body hash'
-expect_line '- Completion event: .opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
+expect_line '- Completion event: .hephaera/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
   "$promotion_pass_dir/promotion-events/event-001.md"
 expect_line '- Status: passed' "$promotion_pass_dir/GAUNTLET.md"
 expect_file "$promotion_pass_dir/GAUNTLET_REPORT.md"
@@ -7705,7 +7706,7 @@ grep -Fq 'Gauntlet PR must never enable auto-merge or enter a merge queue' \
   "$(git hash-object "$promotion_pass_dir/promotion-events/event-001.md")" ]] \
   || fail 'promotion validator replay rejection mutated immutable evidence'
 set_pr_merge_automation_observation "$promotion_pass_url" none
-promotion_completion_symlink_dir="$project/.opencaw/.cache/gauntlets/promotion-completion-symlink"
+promotion_completion_symlink_dir="$project/.hephaera/.cache/gauntlets/promotion-completion-symlink"
 copy_gauntlet "$promotion_pass_dir" "$promotion_completion_symlink_dir"
 outside_promotion_completion_events="$temp_root/outside-promotion-completion-events"
 mv "$promotion_completion_symlink_dir/completion-events" \
@@ -7722,15 +7723,15 @@ sync_gauntlet_live_observations "$project" "$promotion_pass_dir"
 restore_promotion_pass_observation() {
   set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
     main OPEN false none none none none "$head_sha_1" false \
-    example/opencaw-fixture 2026-08-01T12:00:00Z none ''
+    example/hephaera-fixture 2026-08-01T12:00:00Z none ''
 }
 promotion_live_replay_gauntlet_hash="$(git hash-object "$promotion_pass_dir/GAUNTLET.md")"
 promotion_live_replay_event_hash="$(git hash-object \
   "$promotion_pass_dir/promotion-events/event-001.md")"
-OPENCAW_TEST_RAW_PR_BODY=1 set_pr_observation \
+HEPHAERA_TEST_RAW_PR_BODY=1 set_pr_observation \
   "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1" false \
-  example/opencaw-fixture 2026-08-01T12:00:00Z none 'Refs #101'
+  example/hephaera-fixture 2026-08-01T12:00:00Z none 'Refs #101'
 expect_failure "$temp_root/promotion-live-closing-link-removed.log" run_for "$project" \
   bash commands/validate-gauntlet.sh promotion-qa-pass --phase complete
 grep -Fq 'Promotion PR body requires this exact canonical first line exactly once: Closes #101' \
@@ -7759,7 +7760,7 @@ expect_failure "$temp_root/promotion-live-base-sha-mismatch.log" run_for "$proje
   bash commands/validate-gauntlet.sh promotion-qa-pass --phase complete
 restore_promotion_pass_observation
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
-  main OPEN false none none none none "$head_sha_1" true example/opencaw-fixture
+  main OPEN false none none none none "$head_sha_1" true example/hephaera-fixture
 expect_failure "$temp_root/promotion-live-cross-repository.log" run_for "$project" \
   bash commands/validate-gauntlet.sh promotion-qa-pass --phase complete
 restore_promotion_pass_observation
@@ -7780,7 +7781,7 @@ expect_failure "$temp_root/promotion-live-state.log" run_for "$project" \
 restore_promotion_pass_observation
 set_pr_observation "$promotion_pass_url" gauntlet/promotion-qa-pass "$head_sha_7" \
   main OPEN false none none none none "$head_sha_1" false \
-  example/opencaw-fixture 2026-08-01T12:01:00Z none
+  example/hephaera-fixture 2026-08-01T12:01:00Z none
 expect_failure "$temp_root/promotion-live-chronology.log" run_for "$project" \
   bash commands/validate-gauntlet.sh promotion-qa-pass --phase complete
 restore_promotion_pass_observation
@@ -7789,7 +7790,7 @@ run_for "$project" bash commands/validate-gauntlet.sh promotion-qa-pass --phase 
   && "$promotion_live_replay_event_hash" == "$(git hash-object \
     "$promotion_pass_dir/promotion-events/event-001.md")" ]] \
   || fail 'promotion live replay probes mutated immutable evidence'
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/reused-live-comment-for-later-promotion-qa.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_pass_evidence" --head-sha "$head_sha_7"
@@ -7800,11 +7801,11 @@ grep -Fq 'QA comment evidence has already been consumed by a promotion event' \
   | wc -l | tr -d ' ')" == 1 ]] \
   || fail 'reused promotion comment evidence created another immutable event'
 
-promotion_duplicate_ledger_dir="$project/.opencaw/.cache/gauntlets/promotion-duplicate-ledger"
+promotion_duplicate_ledger_dir="$project/.hephaera/.cache/gauntlets/promotion-duplicate-ledger"
 copy_gauntlet "$promotion_pass_dir" "$promotion_duplicate_ledger_dir"
 promotion_duplicate_line="$(select_ledger_line "$project" \
   "$promotion_duplicate_ledger_dir/GAUNTLET.md" 'Promotion QA Ledger' record \
-  '.opencaw/.cache/gauntlets/promotion-duplicate-ledger/promotion-events/event-001.md')"
+  '.hephaera/.cache/gauntlets/promotion-duplicate-ledger/promotion-events/event-001.md')"
 insert_after_section_line "$promotion_duplicate_ledger_dir/GAUNTLET.md" \
   'Promotion QA Ledger' "$promotion_duplicate_line" "$promotion_duplicate_line"
 expect_failure "$temp_root/promotion-duplicate-ledger.log" run_for "$project" \
@@ -7815,7 +7816,7 @@ promotion_repeat_pass_evidence="$promotion_pass_url#issuecomment-42"
 expect_failure "$temp_root/promotion-pass-repeat-same-completion.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_repeat_pass_evidence" --head-sha "$head_sha_7"
-promotion_reversed_order_dir="$project/.opencaw/.cache/gauntlets/promotion-reversed-comment-order"
+promotion_reversed_order_dir="$project/.hephaera/.cache/gauntlets/promotion-reversed-comment-order"
 copy_gauntlet "$promotion_pass_dir" "$promotion_reversed_order_dir"
 promotion_reversed_evidence="$promotion_pass_url#issuecomment-39"
 expect_failure "$temp_root/promotion-pass-to-fail-reversed-comment-order.log" \
@@ -7833,18 +7834,18 @@ run_for "$project" bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pa
 expect_file "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- Verdict: fail' "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- QA comment ID: 43' "$promotion_pass_dir/promotion-events/event-002.md"
-expect_line '- Completion event: .opencaw/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
+expect_line '- Completion event: .hephaera/.cache/gauntlets/promotion-qa-pass/completion-events/event-001.md' \
   "$promotion_pass_dir/promotion-events/event-002.md"
 expect_line '- Status: running' "$promotion_pass_dir/GAUNTLET.md"
 [[ ! -f "$promotion_pass_dir/GAUNTLET_REPORT.md" ]] \
   || fail 'allowed pass-to-fail promotion transition did not consume the completion report'
-promotion_order_token_dir="$project/.opencaw/.cache/gauntlets/promotion-order-token-tamper"
+promotion_order_token_dir="$project/.hephaera/.cache/gauntlets/promotion-order-token-tamper"
 copy_gauntlet "$promotion_pass_dir" "$promotion_order_token_dir"
 replace_line "$promotion_order_token_dir/promotion-events/event-002.md" \
   '- QA comment ID: 43' '- QA comment ID: 39'
 promotion_order_ledger_line="$(select_ledger_line "$project" \
   "$promotion_order_token_dir/GAUNTLET.md" 'Promotion QA Ledger' record \
-  '.opencaw/.cache/gauntlets/promotion-order-token-tamper/promotion-events/event-002.md')"
+  '.hephaera/.cache/gauntlets/promotion-order-token-tamper/promotion-events/event-002.md')"
 replace_line "$promotion_order_token_dir/GAUNTLET.md" "$promotion_order_ledger_line" \
   "${promotion_order_ledger_line/qa-comment-id: 43/qa-comment-id: 39}"
 refresh_copied_evidence_hashes "$promotion_order_token_dir"
@@ -7861,9 +7862,9 @@ expect_failure "$temp_root/promotion-fail-to-pass-same-completion.log" run_for "
   bash commands/record-gauntlet-promotion-qa.sh promotion-qa-pass pass \
   "$promotion_pass_url" "$promotion_fail_to_pass_evidence" --head-sha "$head_sha_7"
 
-promotion_forged_pass_dir="$project/.opencaw/.cache/gauntlets/promotion-fail-forged-pass"
+promotion_forged_pass_dir="$project/.hephaera/.cache/gauntlets/promotion-fail-forged-pass"
 copy_gauntlet "$post_pr_reopen_dir" "$promotion_forged_pass_dir"
-promotion_forged_url='https://github.com/example/opencaw-fixture/pull/243'
+promotion_forged_url='https://github.com/example/hephaera-fixture/pull/243'
 promotion_forged_evidence="$promotion_forged_url#issuecomment-46"
 run_for "$project" bash commands/record-gauntlet-promotion-qa.sh \
   promotion-fail-forged-pass fail "$promotion_forged_url" \
@@ -7887,16 +7888,16 @@ expect_failure "$temp_root/promotion-fail-forged-pass-integration.log" run_for "
   || fail 'manual post-promotion-failure pass mutated integration evidence'
 
 sync_gauntlet_live_observations "$project" "$post_pr_reopen_dir"
-promotion_fail_url='https://github.com/example/opencaw-fixture/pull/221'
+promotion_fail_url='https://github.com/example/hephaera-fixture/pull/221'
 promotion_fail_evidence="$promotion_fail_url#issuecomment-50"
 set_local_ref "$project" gauntlet/post-pr-reopen "$head_sha_7"
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_7" \
   main OPEN false none none none none "$orphan_sha"
 set_semantic_comment_observation "$project" "$promotion_fail_evidence" \
   "$promotion_fail_url" fail "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
+  '.hephaera/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
 promotion_fail_lineage_hash="$(git hash-object "$post_pr_reopen_dir/GAUNTLET.md")"
-OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-unrelated-target-base.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
   "$promotion_fail_url" "$promotion_fail_evidence" --head-sha "$head_sha_7" \
@@ -7906,16 +7907,16 @@ OPENCAW_TEST_SKIP_OBSERVATION=1 expect_failure \
     | wc -l | tr -d ' ')" == 0 ]] \
   || fail 'unrelated promotion target base created promotion-fail evidence'
 promotion_fail_missing_comment="$promotion_fail_url#issuecomment-9012"
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-missing-live-comment.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
   "$promotion_fail_url" "$promotion_fail_missing_comment" --head-sha "$head_sha_7" \
   --affected-unit unit-1
 promotion_fail_wrong_pr_comment="$promotion_fail_url#issuecomment-9013"
 set_semantic_comment_observation "$project" "$promotion_fail_wrong_pr_comment" \
-  'https://github.com/example/opencaw-fixture/pull/996' fail "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+  'https://github.com/example/hephaera-fixture/pull/996' fail "$head_sha_7" \
+  '.hephaera/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' unit-1
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-wrong-live-comment-pr.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
   "$promotion_fail_url" "$promotion_fail_wrong_pr_comment" --head-sha "$head_sha_7" \
@@ -7923,8 +7924,8 @@ OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
 promotion_fail_wrong_affected_comment="$promotion_fail_url#issuecomment-9014"
 set_semantic_comment_observation "$project" "$promotion_fail_wrong_affected_comment" \
   "$promotion_fail_url" fail "$head_sha_7" \
-  '.opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' none
-OPENCAW_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
+  '.hephaera/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' none
+HEPHAERA_TEST_SKIP_COMMENT_OBSERVATION=1 expect_failure \
   "$temp_root/promotion-fail-wrong-comment-affected-units.log" run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen fail \
   "$promotion_fail_url" "$promotion_fail_wrong_affected_comment" \
@@ -7952,7 +7953,7 @@ expect_file "$promotion_fail_archive"
 expect_line '- Verdict: fail' "$promotion_fail_event"
 expect_line '- Affected units: unit-1' "$promotion_fail_event"
 expect_line "- Target base SHA: $head_sha_1" "$promotion_fail_event"
-expect_line '- Completion event: .opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' \
+expect_line '- Completion event: .hephaera/.cache/gauntlets/post-pr-reopen/completion-events/event-001.md' \
   "$promotion_fail_event"
 expect_line '- Status: running' "$post_pr_reopen_dir/GAUNTLET.md"
 expect_line '- PR eligible: no' "$post_pr_reopen_dir/GAUNTLET.md"
@@ -7974,7 +7975,7 @@ post_pr_manifest_v1="$(gauntlet_helper_value "$project" gauntlet_section_field \
 [[ "$post_pr_manifest_v1" == "$unit_manifest_opened" ]] \
   || fail 'consumed completion C1 did not retain its original M1 manifest generation'
 
-post_pr_unapproved_scope_dir="$project/.opencaw/.cache/gauntlets/post-pr-unapproved-scope"
+post_pr_unapproved_scope_dir="$project/.hephaera/.cache/gauntlets/post-pr-unapproved-scope"
 copy_gauntlet "$post_pr_reopen_dir" "$post_pr_unapproved_scope_dir"
 replace_matching_line "$post_pr_unapproved_scope_dir/GAUNTLET.md" \
   '^- .*unit-1 .*status:' \
@@ -8000,7 +8001,7 @@ set_gauntlet_field "$project" "$post_pr_reopen_dir/GAUNTLET.md" \
   'Current State' 'Unit manifest fingerprint' pending
 reset_integration_review "$project" "$post_pr_reopen_dir/GAUNTLET.md"
 
-post_pr_misordered_manifest_dir="$project/.opencaw/.cache/gauntlets/post-pr-misordered-manifest"
+post_pr_misordered_manifest_dir="$project/.hephaera/.cache/gauntlets/post-pr-misordered-manifest"
 copy_gauntlet "$post_pr_reopen_dir" "$post_pr_misordered_manifest_dir"
 replace_all_literal "$post_pr_misordered_manifest_dir/GAUNTLET.md" \
   'approved at: 2026-08-01T12:00:01Z' 'approved at: 2026-08-01T12:00:00Z'
@@ -8019,7 +8020,7 @@ run_for "$project" bash commands/pr-readiness-check.sh --gauntlet-progress \
 run_for "$project" bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 opened \
   "$post_pr_remediation_url" "$post_pr_remediation_head" none --head-sha "$head_sha_9" >/dev/null
 expect_file "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
-expect_line '- Remediation trigger: .opencaw/.cache/gauntlets/post-pr-reopen/promotion-events/event-001.md' \
+expect_line '- Remediation trigger: .hephaera/.cache/gauntlets/post-pr-reopen/promotion-events/event-001.md' \
   "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
 expect_line "- Unit manifest fingerprint: $post_pr_manifest_v2" \
   "$post_pr_reopen_dir/pr-events/unit-1/event-010.md"
@@ -8046,11 +8047,21 @@ consumed_completion="$post_pr_reopen_dir/completion-events/event-001.md"
 consumed_completion_hash="$(git hash-object "$consumed_completion")"
 run_for "$project" bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 qa-pass \
   "$post_pr_remediation_url" "$post_pr_remediation_head" \
-  'https://github.com/example/opencaw-fixture/pull/209#issuecomment-52' \
+  'https://github.com/example/hephaera-fixture/pull/209#issuecomment-52' \
   --head-sha "$head_sha_9" >/dev/null
+post_pr_promotion_created_at="$(gauntlet_helper_value "$project" gauntlet_section_field \
+  "$promotion_fail_event" 'Promotion QA Event Metadata' 'Created at')"
+post_pr_promotion_target_base="$(gauntlet_helper_value "$project" gauntlet_section_field \
+  "$promotion_fail_event" 'Promotion QA Event Metadata' 'Target base SHA')"
+restore_post_pr_promotion_h2_observation() {
+  set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
+    main OPEN false none none none none "$post_pr_promotion_target_base" false \
+    example/hephaera-fixture "$post_pr_promotion_created_at" none
+}
+restore_post_pr_promotion_h2_observation
 run_for "$project" bash commands/record-gauntlet-pr-event.sh post-pr-reopen unit-1 merged \
   "$post_pr_remediation_url" "$post_pr_remediation_head" \
-  'https://github.com/example/opencaw-fixture/pull/209#issuecomment-53' \
+  'https://github.com/example/hephaera-fixture/pull/209#issuecomment-53' \
   --head-sha "$head_sha_9" --merge-commit "$head_sha_9" >/dev/null
 expect_file "$post_pr_reopen_dir/pr-events/unit-1/event-012.md"
 expect_line "- Target base SHA: $head_sha_7" \
@@ -8080,7 +8091,7 @@ replacement_completion="$post_pr_reopen_dir/completion-events/event-002.md"
 expect_file "$replacement_completion"
 expect_line '# Gauntlet Completion Event: 002' "$replacement_completion"
 expect_line '- Sequence: 002' "$replacement_completion"
-expect_line '- Integration round: .opencaw/.cache/gauntlets/post-pr-reopen/rounds/integration/round-005.md' \
+expect_line '- Integration round: .hephaera/.cache/gauntlets/post-pr-reopen/rounds/integration/round-005.md' \
   "$replacement_completion"
 expect_line "- Head SHA: $head_sha_9" "$replacement_completion"
 expect_line "- Unit manifest fingerprint: $post_pr_manifest_v2" \
@@ -8098,15 +8109,6 @@ expect_line "- Unit manifest fingerprint: $post_pr_manifest_v2" \
   || fail 'C1/M1 to C2/M2 recovery did not retain exactly two completion ledger entries'
 expect_line '- Status: passed' "$post_pr_reopen_dir/GAUNTLET.md"
 expect_line '- PR eligible: yes' "$post_pr_reopen_dir/GAUNTLET.md"
-post_pr_promotion_created_at="$(gauntlet_helper_value "$project" gauntlet_section_field \
-  "$promotion_fail_event" 'Promotion QA Event Metadata' 'Created at')"
-post_pr_promotion_target_base="$(gauntlet_helper_value "$project" gauntlet_section_field \
-  "$promotion_fail_event" 'Promotion QA Event Metadata' 'Target base SHA')"
-restore_post_pr_promotion_h2_observation() {
-  set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
-    main OPEN false none none none none "$post_pr_promotion_target_base" false \
-    example/opencaw-fixture "$post_pr_promotion_created_at" none
-}
 restore_post_pr_promotion_h2_observation
 post_pr_unrecorded_h3="$artifact_absent_sha"
 git -C "$project" merge-base --is-ancestor "$head_sha_9" "$post_pr_unrecorded_h3" \
@@ -8114,7 +8116,7 @@ git -C "$project" merge-base --is-ancestor "$head_sha_9" "$post_pr_unrecorded_h3
 set_remote_ref "$project" gauntlet/post-pr-reopen "$post_pr_unrecorded_h3"
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen \
   "$post_pr_unrecorded_h3" main OPEN false none none none none \
-  "$post_pr_promotion_target_base" false example/opencaw-fixture \
+  "$post_pr_promotion_target_base" false example/hephaera-fixture \
   "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-live-and-origin-h3.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase ready
@@ -8133,7 +8135,7 @@ set_remote_ref "$project" gauntlet/post-pr-reopen "$head_sha_9"
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
   main CLOSED false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" \
+  example/hephaera-fixture "$post_pr_promotion_created_at" \
   2026-08-01T12:00:01Z
 expect_failure "$temp_root/post-pr-promotion-current-h2-closed.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase ready
@@ -8143,7 +8145,7 @@ grep -Fq 'Live promotion PR identity differs from immutable QA history' \
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
   main OPEN true none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" none
+  example/hephaera-fixture "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-current-h2-draft.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase ready
 grep -Fq 'Live promotion PR identity differs from immutable QA history' \
@@ -8154,25 +8156,25 @@ run_for "$project" bash commands/validate-gauntlet.sh post-pr-reopen --phase com
 
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_6" \
   main OPEN false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" none
+  example/hephaera-fixture "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-rewound-head.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase complete
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$orphan_sha" \
   main OPEN false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" none
+  example/hephaera-fixture "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-unrelated-head.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase complete
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/unrelated "$head_sha_9" \
   main OPEN false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" none
+  example/hephaera-fixture "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-source-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase complete
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
   release OPEN false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture "$post_pr_promotion_created_at" none
+  example/hephaera-fixture "$post_pr_promotion_created_at" none
 expect_failure "$temp_root/post-pr-promotion-base-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase complete
 restore_post_pr_promotion_h2_observation
@@ -8184,20 +8186,20 @@ expect_failure "$temp_root/post-pr-promotion-repo-drift.log" run_for "$project" 
 restore_post_pr_promotion_h2_observation
 set_pr_observation "$promotion_fail_url" gauntlet/post-pr-reopen "$head_sha_9" \
   main OPEN false none none none none "$post_pr_promotion_target_base" false \
-  example/opencaw-fixture 2026-08-01T12:00:02Z none
+  example/hephaera-fixture 2026-08-01T12:00:02Z none
 expect_failure "$temp_root/post-pr-promotion-created-at-drift.log" run_for "$project" \
   bash commands/validate-gauntlet.sh post-pr-reopen --phase complete
 restore_post_pr_promotion_h2_observation
 
 post_pr_promotion_pass_evidence="$promotion_fail_url#issuecomment-78"
-OPENCAW_TEST_SKIP_OBSERVATION=1 run_for "$project" \
+HEPHAERA_TEST_SKIP_OBSERVATION=1 run_for "$project" \
   bash commands/record-gauntlet-promotion-qa.sh post-pr-reopen pass \
   "$promotion_fail_url" "$post_pr_promotion_pass_evidence" \
   --head-sha "$head_sha_9" >/dev/null
 post_pr_promotion_pass_event="$post_pr_reopen_dir/promotion-events/event-002.md"
 expect_file "$post_pr_promotion_pass_event"
 expect_line '- Verdict: pass' "$post_pr_promotion_pass_event"
-expect_line '- Completion event: .opencaw/.cache/gauntlets/post-pr-reopen/completion-events/event-002.md' \
+expect_line '- Completion event: .hephaera/.cache/gauntlets/post-pr-reopen/completion-events/event-002.md' \
   "$post_pr_promotion_pass_event"
 expect_line "- Head SHA: $head_sha_9" "$post_pr_promotion_pass_event"
 expect_line "- Created at: $post_pr_promotion_created_at" \
@@ -8207,11 +8209,11 @@ expect_line "- Created at: $post_pr_promotion_created_at" \
 run_for "$project" bash commands/validate-gauntlet.sh post-pr-reopen --phase complete >/dev/null
 unset FAKE_DATE_ISO
 
-numeric_round_dir="$temp_root/numeric-round-selection"
+numeric_round_dir="$temp_root/numeric-latest-round-selection"
 mkdir -p "$numeric_round_dir"
 : >"$numeric_round_dir/round-999.md"
 : >"$numeric_round_dir/round-1000.md"
-numeric_latest="$(OPENCAW_PROJECT_ROOT="$project" bash -c \
+numeric_latest="$(HEPHAERA_PROJECT_ROOT="$project" bash -c \
   'source commands/lib/gauntlet-common.sh; gauntlet_latest_round_file "$1"' \
   _ "$numeric_round_dir")"
 [[ "$numeric_latest" == "$numeric_round_dir/round-1000.md" ]] \
@@ -8219,18 +8221,18 @@ numeric_latest="$(OPENCAW_PROJECT_ROOT="$project" bash -c \
 
 echo '[7/8] preserving task, goal, progress, and promotion PR-readiness behavior'
 printf '# Validation Summary\n\nAll local Gauntlet fixture checks passed.\n' >"$project/validation-summary.md"
-task_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/task" run_for "$project" \
+task_pr_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/task" run_for "$project" \
   bash commands/pr-readiness-check.sh gauntlet-parent "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=YES$' <<<"$task_pr_output" || fail 'task readiness lost its human confirmation gate'
 grep -q '^GOAL_FLOW_AUTOMATION=NO$' <<<"$task_pr_output" || fail 'task readiness enabled goal automation'
 
-goal_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/goal" run_for "$project" \
+goal_pr_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/goal" run_for "$project" \
   bash commands/pr-readiness-check.sh --goal gauntlet-parent "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=NO$' <<<"$goal_pr_output" || fail 'goal readiness lost its automatic PR exception'
 grep -q '^GOAL_FLOW_AUTOMATION=YES$' <<<"$goal_pr_output" || fail 'goal readiness did not identify goal automation'
 
 sync_gauntlet_live_observations "$project" "$gauntlet_dir"
-gauntlet_pr_output="$(OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/gauntlet" run_for "$project" \
+gauntlet_pr_output="$(HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/gauntlet" run_for "$project" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet "$project/validation-summary.md")"
 grep -q '^USER_CONFIRMATION_REQUIRED=YES$' <<<"$gauntlet_pr_output" || fail 'Gauntlet readiness bypassed human confirmation'
 grep -q '^GOAL_FLOW_AUTOMATION=NO$' <<<"$gauntlet_pr_output" || fail 'Gauntlet readiness enabled goal automation'
@@ -8246,18 +8248,18 @@ grep -q "^UNIT_MANIFEST_FINGERPRINT=$unit_manifest_opened$" \
   || fail 'Gauntlet readiness did not emit the active completion manifest generation'
 
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_6"
-expect_failure "$temp_root/stale-promotion-source-ref.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/stale-promotion-source" \
+expect_failure "$temp_root/stale-promotion-source-ref.log" env HEPHAERA_PROJECT_ROOT="$project" \
+  HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/stale-promotion-source" \
   bash commands/pr-readiness-check.sh --gauntlet fixture-gauntlet "$project/validation-summary.md"
 set_local_ref "$project" gauntlet/fixture-gauntlet "$head_sha_7"
 
-expect_failure "$temp_root/stopped-pr-readiness.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/stopped" bash commands/pr-readiness-check.sh --gauntlet stopped-gauntlet "$project/validation-summary.md"
-expect_failure "$temp_root/blocked-pr-readiness.log" env OPENCAW_PROJECT_ROOT="$project" \
-  OPENCAW_REPORT_DIR="$project/.opencaw/.cache/reports/blocked" bash commands/pr-readiness-check.sh --gauntlet blocked-gauntlet "$project/validation-summary.md"
+expect_failure "$temp_root/stopped-pr-readiness.log" env HEPHAERA_PROJECT_ROOT="$project" \
+  HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/stopped" bash commands/pr-readiness-check.sh --gauntlet stopped-gauntlet "$project/validation-summary.md"
+expect_failure "$temp_root/blocked-pr-readiness.log" env HEPHAERA_PROJECT_ROOT="$project" \
+  HEPHAERA_REPORT_DIR="$project/.hephaera/.cache/reports/blocked" bash commands/pr-readiness-check.sh --gauntlet blocked-gauntlet "$project/validation-summary.md"
 
 echo '[8/8] checking owned shell syntax and offline isolation'
-bash -n tests/test-gauntlet-flow.sh commands/validate-opencaw.sh \
+bash -n tests/test-gauntlet-flow.sh commands/validate-hephaera.sh \
   commands/create-gauntlet-file.sh commands/validate-gauntlet.sh \
   commands/record-gauntlet-round.sh commands/record-gauntlet-pr-event.sh \
   commands/record-gauntlet-promotion-qa.sh \

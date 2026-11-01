@@ -9,9 +9,9 @@ static func _check(condition: bool, message: String, result: Dictionary) -> void
         push_error(message)
 
 static func run(tree: SceneTree) -> void:
-    var result := {"fixture": "opencaw-native-godot", "status": "pass", "checks": 0,
+    var result := {"fixture": "hephaera-native-godot", "status": "pass", "checks": 0,
         "engineVersion": Engine.get_version_info()["string"], "failures": []}
-    tree.root.set_meta("opencaw_fixture_exits", 0)
+    tree.root.set_meta("hephaera_fixture_exits", 0)
     var packed: PackedScene = load("res://actor.tscn")
     if packed == null:
         _check(false, "Actor scene failed to load", result)
@@ -27,10 +27,10 @@ static func run(tree: SceneTree) -> void:
         actor.queue_free()
         await tree.process_frame
         _check(reference.get_ref() == null, "Queued actor remained alive", result)
-        _check(int(tree.root.get_meta("opencaw_fixture_exits")) == 1, "Exit callback count changed", result)
-    if OS.get_environment("OPENCAW_FIXTURE_FORCE_FAILURE") == "1":
+        _check(int(tree.root.get_meta("hephaera_fixture_exits")) == 1, "Exit callback count changed", result)
+    if OS.get_environment("HEPHAERA_FIXTURE_FORCE_FAILURE") == "1":
         _check(false, "Intentional failure verifies the harness exit status", result)
-    var destination := OS.get_environment("OPENCAW_FIXTURE_REPORT")
+    var destination := OS.get_environment("HEPHAERA_FIXTURE_REPORT")
     var file := FileAccess.open(destination, FileAccess.WRITE)
     if file == null:
         push_error("Fixture report could not be written")

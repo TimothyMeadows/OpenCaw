@@ -40,7 +40,7 @@ Design original TCG battlefield and board UI direction that makes cards, tokens,
 - Do not obscure card counts, card names, targeting states, or token stats with decorative art.
 - Do not use motion or VFX that prevents state inspection.
 - Do not design only for desktop if the host app needs mobile or embedded-browser play.
-- Do not add project-specific board assets to OpenCaw baseline.
+- Do not add project-specific board assets to Hephaera baseline.
 
 # Collaboration
 

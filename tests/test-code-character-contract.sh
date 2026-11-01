@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 runtime_dir="$(mktemp -d "$repo_root/tests/.code-character-runtime-XXXXXX")"
 project="$runtime_dir/project"
-mkdir -p "$project/.opencaw/.cache/tasks/character-test" "$project/src/models" "$project/evidence" "$project/node_modules/three"
+mkdir -p "$project/.hephaera/.cache/tasks/character-test" "$project/src/models" "$project/evidence" "$project/node_modules/three"
 
 cleanup() {
   local resolved
@@ -18,25 +18,25 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 expect_failure() {
   local log="$1"; shift
   set +e
-  OPENCAW_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
+  HEPHAERA_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
   local status=$?
   set -e
   [[ $status -ne 0 ]] || fail "command unexpectedly succeeded: $*"
 }
-project_command() { OPENCAW_PROJECT_ROOT="$project" "$@"; }
+project_command() { HEPHAERA_PROJECT_ROOT="$project" "$@"; }
 
 echo "[1/5] creating a source-independent character profile"
 printf '{"name":"three","version":"0.180.0"}\n' > "$project/node_modules/three/package.json"
 project_command bash commands/generate-style.sh --pipeline PROOF_TO_MODEL --allow-pipeline CODE CEL_SHADED_COMIC >/dev/null
 project_command bash commands/create-code-model-manifest.sh test-character \
   --brief 'A deterministic mechanical mascot with readable ears' --intended-use 'runtime actor' \
-  --prompt-override --output .opencaw/.cache/tasks/character-test/code-model.json --source src/models/test-character.ts \
+  --prompt-override --output .hephaera/.cache/tasks/character-test/code-model.json --source src/models/test-character.ts \
   --part torso --part left-ear --part right-ear --anchor origin --anchor head-pivot >/dev/null
-manifest="$project/.opencaw/.cache/tasks/character-test/code-model.json"
-profile="$project/.opencaw/.cache/tasks/character-test/code-character.json"
+manifest="$project/.hephaera/.cache/tasks/character-test/code-model.json"
+profile="$project/.hephaera/.cache/tasks/character-test/code-character.json"
 project_command bash commands/create-code-character-profile.sh test-character --manifest "$manifest" \
   --brief 'A friendly mechanical mascot whose ears define its identity' --intended-use 'runtime actor' \
-  --output .opencaw/.cache/tasks/character-test/code-character.json --identity 'Friendly mechanical mascot with paired expressive ears' \
+  --output .hephaera/.cache/tasks/character-test/code-character.json --identity 'Friendly mechanical mascot with paired expressive ears' \
   --signature-part left-ear --signature-part right-ear --builder primary-builder --max-gate-attempts 5 >/dev/null
 [[ -f "$profile" ]] || fail "character profile was not created"
 [[ ! -f "$project/src/models/test-character.ts" ]] || fail "profile creation unexpectedly authored source"
@@ -91,14 +91,14 @@ for (const target of machineIds) {
       checks: [{ id: 'calibration-contract', status: id === target && decision === 'fail' ? 'fail' : 'pass', observed: decision, expected: id === target ? decision : 'pass', rationale: 'Focused transaction-contract calibration fixture.' }]
     }));
     const report = {
-      schemaVersion: 'opencaw-code-character-evidence/v1',
+      schemaVersion: 'hephaera-code-character-evidence/v1',
       characterId: profile.characterId,
       captureMode: 'fixture',
       trustedMachineEvidence: false,
       trustReason: 'Transaction-contract calibration fixture.',
       contracts: {
-        profile: { path: '.opencaw/.cache/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
-        manifest: { path: '.opencaw/.cache/tasks/character-test/code-model.json', sha256: hashes.manifest },
+        profile: { path: '.hephaera/.cache/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
+        manifest: { path: '.hephaera/.cache/tasks/character-test/code-model.json', sha256: hashes.manifest },
         source: { path: 'src/models/test-character.ts', sha256: fileSha(sourcePath) }
       },
       observationSha256: '0'.repeat(64),
@@ -110,14 +110,14 @@ for (const target of machineIds) {
     fs.writeFileSync(path.join(evidenceDir, `${target}-${decision}.json`), `${JSON.stringify(report, null, 2)}\n`);
   }
   const browserReport = {
-    schemaVersion: 'opencaw-code-character-evidence/v1',
+    schemaVersion: 'hephaera-code-character-evidence/v1',
     characterId: profile.characterId,
     captureMode: 'browser',
     trustedMachineEvidence: true,
     trustReason: 'Sandboxed browser transaction fixture.',
     contracts: {
-      profile: { path: '.opencaw/.cache/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
-      manifest: { path: '.opencaw/.cache/tasks/character-test/code-model.json', sha256: hashes.manifest },
+      profile: { path: '.hephaera/.cache/tasks/character-test/code-character.json', sha256: hashes.profile, measurementSpecSha256: objectSha(profileMeasurementProjection(profile)) },
+      manifest: { path: '.hephaera/.cache/tasks/character-test/code-model.json', sha256: hashes.manifest },
       source: { path: 'src/models/test-character.ts', sha256: fileSha(sourcePath) },
       adapter: { path: 'evidence/adapter.mjs', sha256: fileSha(adapterPath) },
       captureConfiguration: { sha256: objectSha({ target, fixture: 'transaction' }) }
@@ -136,7 +136,7 @@ for gate in structure-integrity interaction-runtime optimization-budget; do
   project_command bash commands/record-code-character-calibration.sh "$profile" --gate "$gate" \
     --passing "evidence/$gate-pass.json" --failing "evidence/$gate-fail.json" >/dev/null
 done
-cycle_profile="$project/.opencaw/.cache/tasks/character-test/cyclic-character.json"
+cycle_profile="$project/.hephaera/.cache/tasks/character-test/cyclic-character.json"
 cp "$profile" "$cycle_profile"
 node_cycle_profile="$cycle_profile"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then node_cycle_profile="$(wslpath -w "$cycle_profile")"; fi
@@ -150,7 +150,7 @@ NODE
 expect_failure "$runtime_dir/part-cycle.log" bash commands/validate-code-character-profile.sh --strict "$cycle_profile"
 grep -Fq 'structure.parts contains a parent cycle' "$runtime_dir/part-cycle.log" \
   || fail "cyclic structure did not reach the parent-cycle gate"
-gate_tamper_profile="$project/.opencaw/.cache/tasks/character-test/optional-gate-character.json"
+gate_tamper_profile="$project/.hephaera/.cache/tasks/character-test/optional-gate-character.json"
 cp "$profile" "$gate_tamper_profile"
 node_gate_tamper_profile="$gate_tamper_profile"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then node_gate_tamper_profile="$(wslpath -w "$gate_tamper_profile")"; fi

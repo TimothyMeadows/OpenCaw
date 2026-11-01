@@ -234,4 +234,4 @@ You're successful when:
 
 ## Unity specialist handoff
 
-Review explicitly selected Unity service identity, authoritative persistence, session orchestration, voice token ownership, purchase fulfillment and reward validation. Keep secrets and grants server-owned, define idempotence and environment boundaries, and match hosted runtime restrictions rather than inheriting OpenCaw .NET targets.
+Review explicitly selected Unity service identity, authoritative persistence, session orchestration, voice token ownership, purchase fulfillment and reward validation. Keep secrets and grants server-owned, define idempotence and environment boundaries, and match hosted runtime restrictions rather than inheriting Hephaera .NET targets.

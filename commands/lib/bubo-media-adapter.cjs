@@ -1,12 +1,13 @@
 'use strict';
 
-// OpenCaw owns policy and receipts. Bubo owns installation verification,
+// Hephaera owns policy and receipts. Bubo owns installation verification,
 // inference, GPU/process ownership, acceptance claims and native measurements.
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const runtime = require('./bubo-runtime.cjs');
 const host = require('./bubo-host-adapter.cjs');
 const styles = require('./style-contract.cjs');
-const CACHE = '.opencaw/.cache', SHA = /^[a-f0-9]{64}$/, ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/;
+const transition = require('./state-transition.cjs');
+const CACHE = '.hephaera/.cache', SHA = /^[a-f0-9]{64}$/, ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/;
 const FLAGS = new Set(['root','task','manifest','workspace','media-state','media','selection','platform-modules','timeout','max-log-bytes','max-private-bytes','execute','load']);
 const fail = message => { throw new Error(message); };
 const canonical = value => JSON.stringify(runtime.canonical(value));
@@ -46,7 +47,7 @@ function validateMedia(file) {
     if (!lines.includes(heading)) fail('MEDIA policy is missing '+heading+'.');
   let listing=false; const selected=[];
   for (const line of lines) {
-    if (line==='Generated from OpenCaw media pipeline templates:') { listing=true; continue; }
+    if (line==='Generated from Hephaera media pipeline templates:') { listing=true; continue; }
     if (listing && line==='---') { listing=false; continue; }
     if (listing && line.startsWith('- ')) selected.push(line.slice(2));
   }
@@ -82,6 +83,7 @@ function compareBinding(file,binding) {
 }
 function bindSharedState(prepared) {
   if (!prepared.sharedBinding) return null;
+  transition.assertProductionAllowed(prepared.root, 'shared approval binding');
   const file=sharedPath(prepared.root,prepared.sharedBinding.approvalSha256);
   compareBinding(file,prepared.sharedBinding);
   if (!fs.existsSync(file)) {
@@ -105,6 +107,8 @@ function contextFor(operation,options,info,{policyReferences=[]}={}) {
   runtime.syntax(runtime.native(options.get('root')));
   const root=path.resolve(runtime.native(options.get('root'))); runtime.components(root);
   if (!fs.statSync(root).isDirectory()) fail('Project root must be a real directory.');
+  if (operation==='generate' || operation==='setup' && options.has('execute') || operation==='inspect' && options.has('load'))
+    transition.assertProductionAllowed(root, 'native media '+operation);
   const task=options.get('task'), relative=file=>path.relative(root,file).split(path.sep).join('/');
   const scoped=value=>runtime.projectPath(root,value);
   const cache=runtime.projectPath(root,CACHE);
@@ -254,13 +258,13 @@ function contextFor(operation,options,info,{policyReferences=[]}={}) {
         fail('Acceptance requires its original bounded approval; the host never creates an allowance.');
       if (operation==='generate' && approval.sharedStateRoot!==mediaState)
         fail('Approval root differs from canonical execution root; preserve historical claims and refresh execution scope explicitly.');
-      sharedBinding={schemaVersion:'opencaw-local-media-acceptance-root/v1',approvalSha256:request.acceptance.approval.sha256,mediaState};
+      sharedBinding={schemaVersion:'hephaera-local-media-acceptance-root/v1',approvalSha256:request.acceptance.approval.sha256,mediaState};
       compareBinding(sharedPath(root,sharedBinding.approvalSha256),sharedBinding);
     }
   }
   if (options.has('platform-modules')) {
     const file=reference(options.get('platform-modules')), modules=document(file);
-    if (modules.schemaVersion!=='opencaw-platform-modules/v1' || !Array.isArray(modules.modules) || modules.modules.length>64
+    if (modules.schemaVersion!=='hephaera-platform-modules/v1' || !Array.isArray(modules.modules) || modules.modules.length>64
         || Object.keys(modules).some(key=>!['schemaVersion','modules'].includes(key)))
       fail('Explicit bounded platform module manifest required.');
     for (const identity of modules.modules) {
@@ -301,7 +305,7 @@ function exportProvenance(prepared,result,info,dispatchDirectory) {
   const dispatch=runtime.projectPath(root,dispatchDirectory);
   if (!runtime.within(runtime.projectPath(root,prepared.stateRoot),dispatch)) fail('Provenance dispatch must stay in task-owned state.');
   const native=result.data, request=prepared.request;
-  if (result.schemaVersion!=='bubo-execution-result/v1' || result.apiVersion!==1
+  if (result.schemaVersion!=='bubo-execution-result/v1' || result.apiVersion!==2
       || result.status!=='succeeded' || result.workflow!=='media' || result.operation!=='generate' || native?.status!=='generated-staged'
       || native.promotion!==false || native.humanReview!=='pending' || !Array.isArray(native.outputs) || native.outputs.length!==request.items.length)
     fail('Only successful staged native generation can produce host provenance.');

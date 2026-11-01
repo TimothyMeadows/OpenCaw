@@ -26,9 +26,9 @@ For model-to-animation production, hand the reviewed model to `build-model-anima
 
 ## Guardrails
 
-- Use the exact initialized and explicitly built `runtime/bubo` dependency through OpenCaw's verified launcher. No sibling checkout or source-run fallback is allowed. Native process guards are not an OS sandbox.
+- Use the exact initialized and explicitly built `runtime/bubo` dependency through Hephaera's verified launcher. No sibling checkout or source-run fallback is allowed. Native process guards are not an OS sandbox.
 - No threshold matte fallback, placeholder stages, automatic human approval, hidden downloads, silent pipeline changes or unreviewed promotion.
-- Keep stage state under `.opencaw/.cache/tasks/<task>/`, candidates under `.art-staging/proof-to-model/`, tools under ignored `.local/tools/proof-to-model/`, and reviewed runtime packages under `assets/models/`.
+- Keep stage state under `.hephaera/.cache/tasks/<task>/`, candidates under `.art-staging/proof-to-model/`, tools under ignored `.local/tools/proof-to-model/`, and reviewed runtime packages under `assets/models/`.
 - Preserve failed attempts and immutable originals, hashes, model/tool/script/recipe identity and logs. An exhausted finishing budget requires an actual human decision and a current hash-bound `--finish-budget` receipt for exactly one more attempt; never reset counters or manufacture approval. Distinguish simulated-process tests from live engine and Blender acceptance.
 - Large solver inputs may use explicitly selected, measured `quadriFlow.simplification` with world-box vertices held by exact identity/coordinate checks, per-part input caps and full vertex/surface error checks. Preserve source preparation and all topology/component guards; never increase tolerances or caps automatically. Smaller input does not bound QuadriFlow's internal growth or certify visual quality.
 - Generated/revised proofs and reconstruction renders never become classification evidence. Hidden anatomy and unseen surfaces remain inferred design completions after approval.

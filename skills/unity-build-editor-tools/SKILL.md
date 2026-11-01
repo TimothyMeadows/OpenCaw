@@ -12,7 +12,7 @@ Build or repair Unity authoring tools: custom inspectors, property drawers, IMGU
 
 ## Activation and inputs
 
-Resolve the engine and `unity-build-editor-tools` skill through OpenCaw commands; require compatible `UNITY` before edits or tool launches. Revalidate override scope for every output. Inspect Editor/package versions, current assemblies, asset formats, multi-object requirements and the intended authoring action. Store project observations only under the resolved `.opencaw/.cache/`.
+Resolve the engine and `unity-build-editor-tools` skill through Hephaera commands; require compatible `UNITY` before edits or tool launches. Revalidate override scope for every output. Inspect Editor/package versions, current assemblies, asset formats, multi-object requirements and the intended authoring action. Store project observations only under the resolved `.hephaera/.cache/`.
 
 ## Workflow
 

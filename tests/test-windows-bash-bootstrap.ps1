@@ -27,7 +27,7 @@ if ($env:OS -ne 'Windows_NT') {
 }
 
 $tempParent = [System.IO.Path]::GetTempPath()
-$tempRoot = Join-Path $tempParent ("opencaw-windows-bash-{0}" -f [guid]::NewGuid().ToString('N'))
+$tempRoot = Join-Path $tempParent ("hephaera-windows-bash-{0}" -f [guid]::NewGuid().ToString('N'))
 $resolvedTempParent = [System.IO.Path]::GetFullPath($tempParent)
 $resolvedTempRoot = [System.IO.Path]::GetFullPath($tempRoot)
 Assert-True ($resolvedTempRoot.StartsWith($resolvedTempParent, [System.StringComparison]::OrdinalIgnoreCase)) 'temporary test root escaped the system temp directory'
@@ -41,16 +41,16 @@ try {
     Assert-True ($discoveryOutput -contains 'WINDOWS_BASH_STATUS=FOUND') 'explicit Git Bash discovery failed'
     Assert-True ($discoveryOutput -contains 'WINDOWS_BASH_PROVIDER=GitBash') 'Git Bash provider was not selected'
     Assert-True ($discoveryOutput -contains "WINDOWS_BASH_COMMAND=$fakeBash") 'resolved Git Bash path was not reported'
-    Assert-True ($discoveryOutput -contains 'OPENCAW_SCAFFOLD_RUN=false') 'discovery unexpectedly ran the scaffold'
+    Assert-True ($discoveryOutput -contains 'HEPHAERA_SCAFFOLD_RUN=false') 'discovery unexpectedly ran the scaffold'
 
     $hostFixture = Join-Path $tempRoot 'fresh-host'
-    $installedCommands = Join-Path $hostFixture '.opencaw/commands'
+    $installedCommands = Join-Path $hostFixture '.hephaera/commands'
     New-Item -ItemType Directory -Path $installedCommands -Force | Out-Null
     $installedScript = Join-Path $installedCommands 'install-windows-bash.ps1'
     Copy-Item -LiteralPath $installer -Destination $installedScript
     Copy-Item -LiteralPath (Join-Path $repoRoot 'commands/create-host-ai-scaffold.sh') -Destination $installedCommands
     $fixedOutput = @(& $installedScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $hostFixture -WhatIf)
-    Assert-True ($fixedOutput -contains 'OPENCAW_SCAFFOLD_RUN=planned') 'fixed .opencaw install was not accepted'
+    Assert-True ($fixedOutput -contains 'HEPHAERA_SCAFFOLD_RUN=planned') 'fixed .hephaera install was not accepted'
     $mismatchRejected = $false
     try { & $installedScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $tempRoot -WhatIf | Out-Null }
     catch { $mismatchRejected = $_.Exception.Message -match 'direct parent' }
@@ -62,12 +62,12 @@ try {
         Copy-Item -LiteralPath $installer -Destination $invalidScript
         $rejected = $false
         try { & $invalidScript -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $hostFixture -WhatIf | Out-Null }
-        catch { $rejected = $_.Exception.Message -match '\.opencaw' }
+        catch { $rejected = $_.Exception.Message -match '\.hephaera' }
         Assert-True $rejected "PowerShell accepted invalid installation folder $folder"
     }
 
     $plannedOutput = @(& $installer -Provider GitBash -GitBashPath $fakeBash -RunScaffold -ProjectRoot $repoRoot -WhatIf)
-    Assert-True ($plannedOutput -contains 'OPENCAW_SCAFFOLD_RUN=planned') 'WhatIf did not report a planned scaffold run'
+    Assert-True ($plannedOutput -contains 'HEPHAERA_SCAFFOLD_RUN=planned') 'WhatIf did not report a planned scaffold run'
 
     $invalidRootFailed = $false
     try {

@@ -44,9 +44,9 @@ resolve_gh() {
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/brainstorm-common.sh"
 brainstorm_require_delivery_creation_allowed 'Task import'
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-host_tasks_dir="$OPENCAW_PROJECT_CACHE_DIR/tasks"
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+host_tasks_dir="$HEPHAERA_PROJECT_CACHE_DIR/tasks"
 open_issues_file="$host_tasks_dir/OPEN_ISSUES.md"
 
 detect_repo_root() {
@@ -55,8 +55,8 @@ detect_repo_root() {
     return
   fi
 
-  if git -C "$opencaw_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    printf '%s\n' "$opencaw_root"
+  if git -C "$hephaera_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf '%s\n' "$hephaera_root"
     return
   fi
 

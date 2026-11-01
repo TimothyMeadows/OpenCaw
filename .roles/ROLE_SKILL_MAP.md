@@ -26,7 +26,8 @@ Role mappings use domain-qualified identifiers. Shared capabilities apply after 
 - `commands/create-task-issue.sh`
 - `commands/import-task-from-issue.sh`
 - `commands/sync-task-issues.sh`
-- `commands/resolve-opencaw-paths.sh`
+- `commands/resolve-hephaera-paths.sh`
+- `commands/state-transition.sh`
 - `commands/install-windows-bash.ps1`
 - `commands/query-project-context.sh`
 - `commands/append-project-memory.sh`
@@ -677,7 +678,7 @@ Commands:
 
 - `commands/generate-architecture.sh`
 - `commands/web-performance-report.sh`
-- `commands/validate-opencaw.sh`
+- `commands/validate-hephaera.sh`
 
 ### computer-science/backend-architect
 
@@ -734,7 +735,7 @@ Commands:
 - `commands/audit-agent-source.sh`
 - `commands/build-originality-evidence.sh`
 - `commands/dependency-check.sh`
-- `commands/validate-opencaw.sh`
+- `commands/validate-hephaera.sh`
 
 ### computer-science/database-optimizer
 
@@ -769,7 +770,7 @@ Commands:
 - `commands/generate-architecture.sh`
 - `commands/create-host-ai-scaffold.sh`
 - `commands/audit-agent-source.sh`
-- `commands/validate-opencaw.sh`
+- `commands/validate-hephaera.sh`
 
 ### computer-science/frontend-developer
 
@@ -1252,7 +1253,7 @@ Commands:
 - `commands/generate-architecture.sh`
 - `commands/audit-agent-source.sh`
 - `commands/web-performance-report.sh`
-- `commands/validate-opencaw.sh`
+- `commands/validate-hephaera.sh`
 
 ### computer-science/sre
 

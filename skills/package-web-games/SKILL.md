@@ -10,7 +10,7 @@ Use when a web game needs a native application build, platform package or releas
 
 ## Workflow
 
-Read `docs/WEB_GAME_PACKAGING.md` and `.packaging/maui/PACKAGING.md` from the shared baseline root. Use `commands/web-game-package.sh` through the installed `.opencaw/` path.
+Read `docs/WEB_GAME_PACKAGING.md` and `.packaging/maui/PACKAGING.md` from the shared baseline root. Use `commands/web-game-package.sh` through the installed `.hephaera/` path.
 
 1. Resolve packaging and run read-only `doctor` for the requested official target. Keep missing tools/signing/device access explicit. Automatic selection installs nothing.
 2. Initialize a fresh host using the user's app identity. Compile the web distribution with its locked toolchain, then `sync` exact assets. Review stale source/native/configuration changes before resync. Use explicit `recover` for an interrupted journal; never overwrite changed or foreign state.

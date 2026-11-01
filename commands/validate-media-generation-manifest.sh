@@ -29,7 +29,7 @@ done
 [[ -z "$project_root" || -d "$project_root" ]] || { echo "Project root not found: $project_root" >&2; exit 1; }
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-opencaw_root="$(cd "$script_dir/.." && pwd)"
+hephaera_root="$(cd "$script_dir/.." && pwd)"
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required to validate media manifests." >&2; exit 1; }
 if [[ -n "$project_root" ]]; then
@@ -42,7 +42,7 @@ else
   manifest_for_node="$(realpath "$manifest")"
   project_for_node=''
 fi
-schema_for_node="$opencaw_root/.styles/.pipelines/_shared/media-generation-manifest.schema.json"
+schema_for_node="$hephaera_root/.styles/.pipelines/_shared/media-generation-manifest.schema.json"
 if [[ "$node_bin" == *.exe && -n "$(command -v wslpath 2>/dev/null || true)" ]]; then
   if [[ -n "$project_for_node" ]]; then
     # wslpath can canonicalize Windows junctions while translating a path.

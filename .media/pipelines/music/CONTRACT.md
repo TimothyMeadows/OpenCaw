@@ -1,6 +1,6 @@
 # MUSIC.md
 
-<!-- opencaw-media-pipeline:v1 domain=MUSIC -->
+<!-- hephaera-media-pipeline:v1 domain=MUSIC -->
 
 ## Pipeline Selection
 - MUSIC
@@ -14,7 +14,7 @@ Provider selection comes from MEDIA.md and explicit task authorization. MUSIC se
 
 ## Brief Requirements
 
-Record instrumental versus supplied lyrics, purpose, mood/instrumentation/structure in the caption, exact supplied text and lyric rights, explicit LOCAL/CLOUD provider, supported whole-second duration, variations, spatialization/loop intent and finite output/runtime budgets in an opencaw-music-brief/v1 brief. Preserve native maximum* budget and seconds names. ACE-Step planning LM and generated lyrics are disabled. Stems, mastering, editing, reference audio, automatic normalization and hidden fallback are unsupported. AUDIO and VOICE remain separately loadable domains. CLOUD execution is import-only unless a compatible session capability is separately selected.
+Record instrumental versus supplied lyrics, purpose, mood/instrumentation/structure in the caption, exact supplied text and lyric rights, explicit LOCAL/CLOUD provider, supported whole-second duration, variations, spatialization/loop intent and finite output/runtime budgets in a hephaera-music-brief/v1 brief. Preserve native maximum* budget and seconds names. ACE-Step planning LM and generated lyrics are disabled. Stems, mastering, editing, reference audio, automatic normalization and hidden fallback are unsupported. AUDIO and VOICE remain separately loadable domains. CLOUD execution is import-only unless a compatible session capability is separately selected.
 
 ## State And Ancestry
 

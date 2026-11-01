@@ -4,8 +4,8 @@
 const assert = require('assert/strict'), fs = require('fs'), path = require('path'), cp = require('child_process');
 const contracts = require('../commands/lib/media-pipeline-contract.cjs');
 const runtime = require('../commands/lib/bubo-runtime.cjs');
-const cache = path.basename(contracts.BASE) === '.opencaw' ? path.join(contracts.BASE, '.cache') : path.join(contracts.BASE, '.opencaw/.cache');
-const evidence = path.join(cache, 'tasks/opencaw-media-pipeline-domains/evidence/contract-tests');
+const cache = path.basename(contracts.BASE) === '.hephaera' ? path.join(contracts.BASE, '.cache') : path.join(contracts.BASE, '.hephaera/.cache');
+const evidence = path.join(cache, 'tasks/hephaera-media-pipeline-domains/evidence/contract-tests');
 fs.mkdirSync(evidence, { recursive: true });
 const root = fs.mkdtempSync(path.join(evidence, 'owned-'));
 let assertions = 0; const skips = [];
@@ -113,14 +113,14 @@ try {
   } catch (error) { if (!['EPERM','EACCES','ENOTSUP'].includes(error.code)) throw error; skips.push('Directory-link fixture unavailable: '+error.code); }
 
   // Real cloned-baseline module placement, no native dependency needed.
-  for (const file of ['media-pipeline-contract.cjs','bubo-runtime.cjs','style-contract.cjs','engine-contract.cjs']) copy('commands/lib/'+file,'.opencaw/commands/lib/'+file);
-  copy('.media/pipelines/registry.json','.opencaw/.media/pipelines/registry.json');
+  for (const file of ['media-pipeline-contract.cjs','bubo-runtime.cjs','state-transition.cjs','style-contract.cjs','engine-contract.cjs']) copy('commands/lib/'+file,'.hephaera/commands/lib/'+file);
+  copy('.media/pipelines/registry.json','.hephaera/.media/pipelines/registry.json');
   for (const definition of Object.values(contracts.registry().domains))
-    if (definition.implementation.status==='implemented') copy(definition.implementation.entryPoint,'.opencaw/'+definition.implementation.entryPoint);
-  for (const domain of contracts.DOMAINS) for (const file of ['PIPELINE.md','CONTRACT.md']) copy('.media/pipelines/'+domain.toLowerCase()+'/'+file,'.opencaw/.media/pipelines/'+domain.toLowerCase()+'/'+file);
-  const host = require(path.join(root,'.opencaw/commands/lib/media-pipeline-contract.cjs'));
+    if (definition.implementation.status==='implemented') copy(definition.implementation.entryPoint,'.hephaera/'+definition.implementation.entryPoint);
+  for (const domain of contracts.DOMAINS) for (const file of ['PIPELINE.md','CONTRACT.md']) copy('.media/pipelines/'+domain.toLowerCase()+'/'+file,'.hephaera/.media/pipelines/'+domain.toLowerCase()+'/'+file);
+  const host = require(path.join(root,'.hephaera/commands/lib/media-pipeline-contract.cjs'));
   const hostAudio = host.resolve({root,domain:'AUDIO'}), hostMusic = host.resolve({root,domain:'MUSIC'});
-  const registryPath=path.join(root,'.opencaw/.media/pipelines/registry.json');
+  const registryPath=path.join(root,'.hephaera/.media/pipelines/registry.json');
   const data=JSON.parse(fs.readFileSync(registryPath,'utf8'));data.domains.MUSIC.aliases.push('music-score');fs.writeFileSync(registryPath,JSON.stringify(data));
   check(host.resolve({root,domain:'AUDIO'}).policySha256===hostAudio.policySha256,'unrelated registry entry does not invalidate AUDIO');
   check(host.resolve({root,domain:'MUSIC'}).policySha256!==hostMusic.policySha256,'selected registry entry invalidates MUSIC');
@@ -129,27 +129,27 @@ try {
   const linkText=fs.readFileSync(path.join(root,'linked-audio.md'),'utf8');
   write('wrong-link.md',linkText.replace('audio/PIPELINE.md','music/PIPELINE.md'));
   rejects(()=>host.validate({root,domain:'AUDIO',contract:'wrong-link.md'}),/selected shared declaration/,'cross-domain directive rejected');
-  write('escape-link.md',linkText.replace('./.opencaw/.media/pipelines/audio/PIPELINE.md','../outside/PIPELINE.md'));
+  write('escape-link.md',linkText.replace('./.hephaera/.media/pipelines/audio/PIPELINE.md','../outside/PIPELINE.md'));
   rejects(()=>host.validate({root,domain:'AUDIO',contract:'escape-link.md'}),/Traversal|escapes|reserved/,'read-directive traversal rejected');
-  fs.appendFileSync(path.join(root,'.opencaw/.media/pipelines/voice/PIPELINE.md'),'\nChanged declaration fixture.\n');
+  fs.appendFileSync(path.join(root,'.hephaera/.media/pipelines/voice/PIPELINE.md'),'\nChanged declaration fixture.\n');
   check(host.resolve({root,domain:'AUDIO'}).policySha256===hostAudio.policySha256,'unrelated declaration change does not invalidate AUDIO');
   rejects(()=>host.resolve({root,domain:'VOICE'}),/stale/,'selected declaration change invalidates inline host definition');
 
   // Existing visual resolver remains the visual owner for every primary.
-  copy('.media/pipelines/voice/PIPELINE.md','.opencaw/.media/pipelines/voice/PIPELINE.md');
-  for (const file of ['.styles/INDEX.md','.styles/CEL_SHADED_COMIC.md','.styles/.pipelines/INDEX.md']) copy(file,'.opencaw/'+file);
-  for (const directory of ['cloud','local','proof-to-model','code','blender']) copy('.styles/.pipelines/'+directory+'/PIPELINE.md','.opencaw/.styles/.pipelines/'+directory+'/PIPELINE.md');
+  copy('.media/pipelines/voice/PIPELINE.md','.hephaera/.media/pipelines/voice/PIPELINE.md');
+  for (const file of ['.styles/INDEX.md','.styles/CEL_SHADED_COMIC.md','.styles/.pipelines/INDEX.md']) copy(file,'.hephaera/'+file);
+  for (const directory of ['cloud','local','proof-to-model','code','blender']) copy('.styles/.pipelines/'+directory+'/PIPELINE.md','.hephaera/.styles/.pipelines/'+directory+'/PIPELINE.md');
   const sourceStyle=fs.readFileSync(path.join(contracts.BASE,'STYLE.md'),'utf8');
   write('STYLE.md',sourceStyle);
-  copy('.engine/registry.json','.opencaw/.engine/registry.json');copy('.engine/THREEJS.md','.opencaw/.engine/THREEJS.md');
-  write('ENGINE.md',fs.readFileSync(path.join(contracts.BASE,'ENGINE.md'),'utf8').replaceAll('./.engine/','./.opencaw/.engine/'));
+  copy('.engine/registry.json','.hephaera/.engine/registry.json');copy('.engine/THREEJS.md','.hephaera/.engine/THREEJS.md');
+  write('ENGINE.md',fs.readFileSync(path.join(contracts.BASE,'ENGINE.md'),'utf8').replaceAll('./.engine/','./.hephaera/.engine/'));
   for (const primary of ['CLOUD','LOCAL','PROOF_TO_MODEL','CODE','BLENDER']) {
-    write('STYLE.md',sourceStyle.replace('Primary OpenCaw art pipeline:\r\n- PROOF_TO_MODEL','Primary OpenCaw art pipeline:\r\n- '+primary).replace('Primary OpenCaw art pipeline:\n- PROOF_TO_MODEL','Primary OpenCaw art pipeline:\n- '+primary));
+    write('STYLE.md',sourceStyle.replace('Primary Hephaera art pipeline:\r\n- PROOF_TO_MODEL','Primary Hephaera art pipeline:\r\n- '+primary).replace('Primary Hephaera art pipeline:\n- PROOF_TO_MODEL','Primary Hephaera art pipeline:\n- '+primary));
     const aggregate=host.resolveAll({root,visual:true});
     check(aggregate.contexts.visual.pipeline===primary,'visual primary remains owned by existing resolver: '+primary);
     check(aggregate.contexts.audio.domain==='AUDIO' && aggregate.contexts.music.domain==='MUSIC' && aggregate.contexts.voice.domain==='VOICE','four contexts coexist under '+primary);
   }
-  const bash=process.env.OPENCAW_BASH || (process.platform==='win32' ? path.join(process.env.ProgramFiles || 'C:/Program Files','Git/bin/bash.exe') : 'bash');
+  const bash=process.env.HEPHAERA_BASH || (process.platform==='win32' ? path.join(process.env.ProgramFiles || 'C:/Program Files','Git/bin/bash.exe') : 'bash');
   for (const command of ['generate-media-pipeline-contract','validate-media-pipeline-contract','resolve-media-pipeline']) {
     const script=path.join(contracts.BASE,'commands',command+'.sh').replace(/\\/g,'/');
     const help=cp.spawnSync(bash,[script,'--help'],{cwd:root,encoding:'utf8'});

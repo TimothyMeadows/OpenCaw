@@ -1,8 +1,8 @@
-# OpenCaw asset command arguments
+# Hephaera asset command arguments
 
-These host commands use the pinned Bubo API v1. Run them from the project root through `./.opencaw/commands/`. Maintainer checkouts use `./commands/`. Initialize the recorded dependency and explicitly build with `initialize-bubo-runtime.sh` and `build-bubo-runtime.sh` before native work; production never builds or installs software.
+These host commands use the pinned Bubo API v1. Run them from the project root through `./.hephaera/commands/`. Maintainer checkouts use `./commands/`. Initialize the recorded dependency and explicitly build with `initialize-bubo-runtime.sh` and `build-bubo-runtime.sh` before native work; production never builds or installs software.
 
-All three asset commands accept `--root PROJECT` (otherwise the shell wrapper resolves the installed host). Every operation except `init` requires `--manifest FILE`. `init` requires `--task ID --asset ID --version ID --actor ID` and defaults to `.opencaw/.cache/tasks/<task>/<workflow>/<asset>/<version>/manifest.json`. Proof and motion may select another manifest beneath that active task cache; action init requires its exact canonical path. Inputs must be repository-local and rights, selection, review and tool identities must be current. OpenCaw supplies protected execution context internally.
+All three asset commands accept `--root PROJECT` (otherwise the shell wrapper resolves the installed host). Every operation except `init` requires `--manifest FILE`. `init` requires `--task ID --asset ID --version ID --actor ID` and defaults to `.hephaera/.cache/tasks/<task>/<workflow>/<asset>/<version>/manifest.json`. Proof and motion may select another manifest beneath that active task cache; action init requires its exact canonical path. Inputs must be repository-local and rights, selection, review and tool identities must be current. Hephaera supplies protected execution context internally.
 
 ## Proof to model
 
@@ -24,7 +24,7 @@ Use `proof-to-model.sh OPERATION` with common arguments above.
 
 Single-view diagnostic continuations require `--mode single-view-diagnostic` explicitly on applicable operations. They cannot complete six-view production or promote. Diagnostic `init --reuse-manifest FILE` remains subject to donor checks; multi-view init rejects that shortcut. Missing tools, models, rights, source evidence or selected-pipeline capability stop the operation.
 
-Pinned resources are under `.opencaw/runtime/bubo/resources/proof-to-model/`, including `recipes/static-prop.json`, `toolchain.json`, schemas and technical contracts. `PIPELINE.md` remains OpenCaw policy; Bubo resources do not grant generation or human approval.
+Pinned resources are under `.hephaera/runtime/bubo/resources/proof-to-model/`, including `recipes/static-prop.json`, `toolchain.json`, schemas and technical contracts. `PIPELINE.md` remains Hephaera policy; Bubo resources do not grant generation or human approval.
 
 ## Model to animation
 
@@ -39,7 +39,7 @@ Use `model-to-animation.sh OPERATION` with common arguments.
 | `doctor`, `inspect`, `prepare`, `rig`, `bake`, `export`, `review`, `validate`, `status` | No additional operation arguments; use the selected recipe, tool and current manifest. |
 | `promote` | `--destination assets/models/NAME`; current rig, complete motion, independent and human runtime acceptance are required. |
 
-Recipes, schemas, audited scripts and engine adapters live under `.opencaw/runtime/bubo/resources/model-to-animation/`. Read the OpenCaw `MODEL_TO_ANIMATION` policy contract. No Adobe provider, implicit installation, skeleton substitution or automatic asset acceptance is permitted.
+Recipes, schemas, audited scripts and engine adapters live under `.hephaera/runtime/bubo/resources/model-to-animation/`. Read the Hephaera `MODEL_TO_ANIMATION` policy contract. No Adobe provider, implicit installation, skeleton substitution or automatic asset acceptance is permitted.
 
 ## Model to action
 
@@ -52,7 +52,7 @@ Use `model-to-action.sh OPERATION` with common arguments.
 | `doctor`, `inspect`, `compose`, `export`, `review`, `validate`, `status` | No additional operation arguments. |
 | `promote` | `--destination assets/models/NAME`; separate action, independent and human runtime acceptance must be current. |
 
-Action resources live under `.opencaw/runtime/bubo/resources/model-to-action/`. Initial composition requires in-place clips; missing clips/anchors or unsupported root extraction stop execution. Presentation cues never own authoritative targeting, movement or damage.
+Action resources live under `.hephaera/runtime/bubo/resources/model-to-action/`. Initial composition requires in-place clips; missing clips/anchors or unsupported root extraction stop execution. Presentation cues never own authoritative targeting, movement or damage.
 
 ## Review receipts and continuation
 

@@ -172,16 +172,16 @@ else
   progress_head="$GAUNTLET_PROGRESS_HEAD_BRANCH"
   affected_units='none'
   opened_event_file="$(gauntlet_opened_event_for_pr "$gauntlet_dir" "$item_id" "$progress_pr")"
-  opened_event_relative="${opened_event_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+  opened_event_relative="${opened_event_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
   opened_event_hash="$(gauntlet_hash_file "$opened_event_file")"
   remediation_root="$(gauntlet_resolve_remediation_root "$gauntlet_file" "$item_id" "$opened_event_file")"
   if [[ "$GAUNTLET_PROGRESS_EVENT" == 'qa-fail' ]]; then
-    remediation_root="${GAUNTLET_PROGRESS_EVENT_FILE#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    remediation_root="${GAUNTLET_PROGRESS_EVENT_FILE#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
   fi
   if [[ "$remediation_root" == 'none' ]]; then
     remediation_root_hash='none'
   else
-    remediation_root_hash="$(gauntlet_hash_file "$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_root")"
+    remediation_root_hash="$(gauntlet_hash_file "$HEPHAERA_PROJECT_ROOT_RESOLVED/$remediation_root")"
   fi
   issue_url="$(gauntlet_section_field "$gauntlet_file" 'Parent Task' 'Issue')"
   issue_repo="$(gauntlet_github_repo_from_url "$issue_url")"
@@ -231,7 +231,7 @@ fi
 latest_prior_round="$(gauntlet_latest_round_file "$item_round_dir")"
 if [[ "$item_id" != 'integration' ]]; then
   if [[ -n "$latest_prior_round" ]]; then
-    prior_round_relative="${latest_prior_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    prior_round_relative="${latest_prior_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     prior_round_pr="$(gauntlet_section_field "$latest_prior_round" 'Round Metadata' 'Progress PR')"
     prior_round_head_sha="$(gauntlet_section_field "$latest_prior_round" 'Round Metadata' 'Head SHA')"
     if [[ "${prior_round_pr%/}" == "$progress_pr" ]]; then
@@ -272,7 +272,7 @@ if [[ -d "$item_round_dir" ]]; then
     gauntlet_round_has_retained_failure "$gauntlet_file" "$prior_strategy_round" || continue
     prior_builder_strategy_fingerprint="$(gauntlet_section_field "$prior_strategy_round" 'Round Metadata' 'Builder strategy fingerprint')"
     [[ "$builder_strategy_fingerprint" != "$prior_builder_strategy_fingerprint" ]] || {
-      echo "A repeated attempt cannot reuse any retained failed, blocked, or QA-failed builder strategy; it matches ${prior_strategy_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}." >&2
+      echo "A repeated attempt cannot reuse any retained failed, blocked, or QA-failed builder strategy; it matches ${prior_strategy_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}." >&2
       exit 1
     }
   done < <(find "$item_round_dir" -maxdepth 1 -type f -name 'round-*.md' -print | LC_ALL=C sort)
@@ -280,8 +280,8 @@ fi
 
 next_round=$((max_round + 1))
 printf -v round_label '%03d' "$next_round"
-round_relative=".opencaw/.cache/gauntlets/$gauntlet_name/rounds/$item_id/round-$round_label.md"
-round_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$round_relative"
+round_relative=".hephaera/.cache/gauntlets/$gauntlet_name/rounds/$item_id/round-$round_label.md"
+round_target="$HEPHAERA_PROJECT_ROOT_RESOLVED/$round_relative"
 [[ ! -e "$round_target" ]] || { echo "Round evidence already exists: $round_relative" >&2; exit 1; }
 
 recorded_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"

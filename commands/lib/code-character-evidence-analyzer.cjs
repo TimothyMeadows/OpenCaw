@@ -319,8 +319,8 @@ function analyze(profile, manifest, observation, context) {
   requireObject(manifest, 'manifest');
   requireObject(observation, 'observation');
   onlyKeys(observation, ['schemaVersion', 'capture', 'structure', 'motion', 'runtime'], 'observation');
-  if (observation.schemaVersion !== 'opencaw-code-character-observation/v1') {
-    fail('Observation schemaVersion must be opencaw-code-character-observation/v1.');
+  if (observation.schemaVersion !== 'hephaera-code-character-observation/v1') {
+    fail('Observation schemaVersion must be hephaera-code-character-observation/v1.');
   }
   const captureMode = context.captureMode;
   if (!['browser', 'fixture'].includes(captureMode)) fail('captureMode must be browser or fixture.');
@@ -331,7 +331,7 @@ function analyze(profile, manifest, observation, context) {
   ];
   if (!comparisonStatus(gateResults.map((item) => item.id), MACHINE_GATES)) fail('Analyzer emitted a non-machine gate.');
   const report = {
-    schemaVersion: 'opencaw-code-character-evidence/v1',
+    schemaVersion: 'hephaera-code-character-evidence/v1',
     characterId: profile.characterId,
     captureMode,
     trustedMachineEvidence: captureMode === 'browser',

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Produce images, sound effects, music, preset speech and consented local-reference cloning through the pinned standalone Bubo runtime and local GPU. OpenCaw supplies host policy and acceptance; Bubo owns direct offline execution, model/tool catalogs, platform locks, setup/registration verification and shared GPU ownership.
+Produce images, sound effects, music, preset speech and consented local-reference cloning through the pinned standalone Bubo runtime and local GPU. Hephaera supplies host policy and acceptance; Bubo owns direct offline execution, model/tool catalogs, platform locks, setup/registration verification and shared GPU ownership.
 
 ## Inputs
 
@@ -16,7 +16,7 @@ Produce images, sound effects, music, preset speech and consented local-referenc
 - Use `use-bubo-local-generation`, `inspect-local-media-host.sh` and `bubo-media.sh`; initialize/build the exact `runtime/bubo` dependency explicitly before production.
 - Discovery is read-only and startup-safe when the runtime is unavailable. Distinguish declared capability, receipt presence and full installed-content verification. Never load a model during discovery.
 - Keep setup dry-run unless explicitly authorized with `--execute`. Preserve Bubo's distinct provision and existing-installation registration schemas. Setup accepts no terms and grants no generation or promotion authority.
-- Keep exact model/tool pins and dependency locks in Bubo's audited catalog. Do not duplicate inference logic or model manifests in OpenCaw.
+- Keep exact model/tool pins and dependency locks in Bubo's audited catalog. Do not duplicate inference logic or model manifests in Hephaera.
 - Use only verified offline workers, explicit supported settings and bounded sequential batches. Generation never installs/downloads, uses remote reference URLs, or silently changes provider/device/precision.
 - Retain one shared media-state root per approval identity across tasks and workspace changes. Preserve candidate/revision limits and all started attempts; a one-candidate-plus-one-revision allowance does not reset during migration or registration.
 - Keep immutable dispatch/results/settings/build evidence and per-output provider-neutral manifests. Stage and hash outputs before human review; technical checks do not certify visual quality, spoken content, speaker match or music quality.

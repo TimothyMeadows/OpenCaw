@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-TASK = ROOT / ".opencaw/.cache/tasks/model-to-animation-design"
+TASK = ROOT / ".hephaera/.cache/tasks/model-to-animation-design"
 
 
 def confined(value, label):

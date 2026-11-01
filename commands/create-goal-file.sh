@@ -9,7 +9,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/create-goal-file.sh "<goal_name>" ["Goal Title"] [--dry-run]
 
-Creates <project-root>/.opencaw/.cache/goals/<goal_name>/GOAL.md when it does not already exist.
+Creates <project-root>/.hephaera/.cache/goals/<goal_name>/GOAL.md when it does not already exist.
 Use --dry-run to print the goal scaffold without writing files.
 EOF
 }
@@ -60,7 +60,7 @@ if [[ $dry_run -eq 0 ]]; then
   brainstorm_require_delivery_creation_allowed 'Goal creation'
 fi
 
-goal_dir="$(opencaw_workflow_directory goals "$goal_name")"
+goal_dir="$(hephaera_workflow_directory goals "$goal_name")"
 target="$goal_dir/GOAL.md"
 [[ ! -L "$target" ]] || { echo "Goal file must not be a symbolic link: $target" >&2; exit 1; }
 
@@ -83,7 +83,7 @@ write_goal() {
 ## Constraints
 
 ## Task Queue
-1. [ ] TODO task name (\`.opencaw/.cache/tasks/<task-name>/TASK.md\`)
+1. [ ] TODO task name (\`.hephaera/.cache/tasks/<task-name>/TASK.md\`)
 
 ## Current Task
 

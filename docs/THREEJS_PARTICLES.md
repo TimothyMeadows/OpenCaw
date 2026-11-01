@@ -13,8 +13,8 @@ The initial real-library CPU acceptance set is `three@0.182.0`, `three.quarks@0.
 From an installed host project's root:
 
 ```bash
-bash .opencaw/commands/resolve-engine.sh
-bash .opencaw/commands/threejs-particles.sh inspect --renderer WebGLRenderer
+bash .hephaera/commands/resolve-engine.sh
+bash .hephaera/commands/threejs-particles.sh inspect --renderer WebGLRenderer
 ```
 
 Inspect reads bounded project/package/lock metadata without importing third-party JavaScript. It compares root declarations, lock and installed versions, and detects unsupported nested Three/core resolution. An exact metadata match is **not** installed-content verification, executable readiness or rendering proof. `executionReadiness`, installed content and actual rendering remain `unverified`. npm lockfile v2/v3 and ordinary direct node_modules layouts have executable discovery coverage. Other package managers, workspace links, aliases, complex version ranges and dependency graphs need their own explicit lock/resolution review; do not convert or reinstall a project just to make this inspector green.
@@ -27,16 +27,16 @@ For a new explicitly authorized npm setup with this tested baseline, the project
 npm install --save-exact three@0.182.0 three.quarks@0.17.1 quarks.core@0.17.1
 ```
 
-Inspect the existing host lock first. Never run that command to overwrite an older Three revision without an explicit migration decision. Respect the host's package manager and normal supply-chain policy. Keep one compatible Three copy; preserve Three, Quarks and core MIT notices. The baseline test fixture uses exact versions, a committed npm lock and scripts-disabled installation. OpenCaw production commands install nothing.
+Inspect the existing host lock first. Never run that command to overwrite an older Three revision without an explicit migration decision. Respect the host's package manager and normal supply-chain policy. Keep one compatible Three copy; preserve Three, Quarks and core MIT notices. The baseline test fixture uses exact versions, a committed npm lock and scripts-disabled installation. Hephaera production commands install nothing.
 
 ## Integrate a bounded runtime
 
 ```bash
-bash .opencaw/commands/threejs-particles.sh scaffold \
+bash .hephaera/commands/threejs-particles.sh scaffold \
   --output src/engine/particles --renderer WebGLRenderer
 ```
 
-Scaffold copies the reviewed helper, example and usage contract into a new owned directory. Existing output, unsafe paths, linked components, incompatible engine projects and invalid override scopes are refused. It records source and engine identities in `opencaw-particles.json`. It does not modify package declarations, lockfiles or renderers, and it does not overwrite or automatically migrate an older helper. An interrupted unpublished copy stays in durable project-local scaffold state for inspection.
+Scaffold copies the reviewed helper, example and usage contract into a new owned directory. Existing output, unsafe paths, linked components, incompatible engine projects and invalid override scopes are refused. It records source and engine identities in `hephaera-particles.json`. It does not modify package declarations, lockfiles or renderers, and it does not overwrite or automatically migrate an older helper. An interrupted unpublished copy stays in durable project-local scaffold state for inspection.
 
 Use the copied `example.mjs` with host-installed imports; read `.engine/threejs/particles/README.md` in the shared baseline for the exact helper API. The helper owns one BatchedRenderer for its scene and uses the existing presentation update loop. The host remains responsible for the canvas, renderer, scene, camera and simulation.
 
@@ -54,7 +54,7 @@ Use finite quality tiers, reduced-motion/flash settings and bounded transparent 
 
 Pinned Bubo motion/action sample adapters retain their historical CPU Points implementations and hashes. They are not relabeled Quarks, and this change does not rewrite a submodule or its prior approvals. For new host particle production use this selected Quarks owner. Reusing a legacy sample's built-in particles requires an explicit reviewed host migration/integration; a current engine metadata field does not transform that sample. Animation/clip handoff and effect authority remain separate.
 
-MAUI packages bundle the host's static build normally. Route `opencaw:lifecycle` suspend/resume into the particle owner and existing presentation clock, and clean up on scene/window teardown. A browser or CPU pass does not establish WebGL, transparency, context-loss, input, frame pacing, thermal or memory behavior in Windows/Android WebViews or Apple WKWebView. Actual target/game/device QA remains required; WebGPU support and deterministic particle replay are not implied.
+MAUI packages bundle the host's static build normally. Route `hephaera:lifecycle` suspend/resume into the particle owner and existing presentation clock, and clean up on scene/window teardown. A browser or CPU pass does not establish WebGL, transparency, context-loss, input, frame pacing, thermal or memory behavior in Windows/Android WebViews or Apple WKWebView. Actual target/game/device QA remains required; WebGPU support and deterministic particle replay are not implied.
 
 ## Verification and provenance
 

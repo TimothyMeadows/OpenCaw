@@ -3,8 +3,8 @@
 // Owned native-shaped metadata only: no synthesis, decoding or real human verdicts.
 const assert=require('assert/strict'),fs=require('fs'),path=require('path'),crypto=require('crypto');
 const runtime=require('../commands/lib/bubo-runtime.cjs'),spec=require('../commands/lib/music-pipeline.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-music-pipeline/evidence/spec-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-music-pipeline/evidence/spec-fixtures');fs.mkdirSync(evidence,{recursive:true});
 const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-music',observations=[];let sequence=0;
 const check=(value,message)=>{assert(value,message);observations.push(message);};
 const rejects=(action,pattern,message)=>{assert.throws(action,pattern,message);observations.push(message);};
@@ -17,13 +17,13 @@ const license=identity(write('inputs/license.json',{schemaVersion:'bubo-media-li
 const installation=identity(write('inputs/installation.json',{schemaVersion:'bubo-media-installation/v1',backend:spec.backend,licenses:[license]}));
 const rights=identity(write('inputs/rights.json',{schemaVersion:'bubo-media-rights/v1',task,owner:'Owned fixture',promptRightsConfirmed:true,generationAllowed:true}));
 write('MEDIA.md','Owned policy-source assertion, no configured provider');
-const base={schemaVersion:'opencaw-music-brief/v1',kind:'instrumental',purpose:'Owned test purpose',provider:'LOCAL',spatialization:'2d',loopIntent:false,
+const base={schemaVersion:'hephaera-music-brief/v1',kind:'instrumental',purpose:'Owned test purpose',provider:'LOCAL',spatialization:'2d',loopIntent:false,
   request:{rights,installation,settings:{device:'cuda:0',precision:'bfloat16',offload:'none'},budget:{maximumOutputs:1,maximumBytesPerOutput:268435456,maximumTotalBytes:268435456,maximumPixels:4096,maximumAudioSeconds:600},
     items:[{id:'owned',prompt:'Original instrumental fixture, calm piano, rising middle then resolve',negativePrompt:'',seed:9,steps:8,guidance:1,seconds:10,loopCandidate:false,
       music:{mode:'instrumental',lyrics:'',vocalLanguage:'unknown',bpm:null,keyScale:'',timeSignature:'',shift:3}}]},technical:{maxPeak:null,maxClippedFraction:null,maxSilentFraction:null}};
 function authorizeLyrics(brief,changes={}){
   const assertion=identity(write('inputs/lyrics-source-'+(++sequence)+'.txt','Owned original-lyrics fixture; not actual rights consent'));
-  brief.lyricsRights=identity(write('inputs/lyrics-rights-'+sequence+'.json',{schemaVersion:'opencaw-music-lyrics-rights/v1',task,purpose:brief.purpose,
+  brief.lyricsRights=identity(write('inputs/lyrics-rights-'+sequence+'.json',{schemaVersion:'hephaera-music-lyrics-rights/v1',task,purpose:brief.purpose,
     lyrics:brief.request.items.map(item=>({itemId:item.id,lyricsSha256:sha(item.music.lyrics)})),rightsConfirmed:true,generationAllowed:true,sourceEvidence:assertion,...changes}));
   return brief;
 }
@@ -58,7 +58,7 @@ function fixture(brief=base,{mutateSource=()=>{},mutateNative=()=>{},mutateNeutr
     outputs,humanReview:'pending',promotion:false,resourceCatalogSha256:build.resourceCatalogSha256,catalogSha256:modelCatalog.sha256,workerSourceSha256:'4'.repeat(64),completedAt:'2026-10-30T01:00:00Z'};
   mutateNative(native);const nativeManifest=identity(write(prefix+'/native.json',native));
   const sourceRevisionEvidence=identity(write(prefix+'/build.json',{schemaVersion:'bubo-build/v1',sourceRevision,sourceDirty:false,capabilities:{build}}));
-  const nativeResult=identity(write(prefix+'/result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:1,workflow:'media',operation:'generate',status:'succeeded',runtime:build,data:native,hostContextSha256:hostContext.sha256}));
+  const nativeResult=identity(write(prefix+'/result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:2,workflow:'media',operation:'generate',status:'succeeded',runtime:build,data:native,hostContextSha256:hostContext.sha256}));
   const manifests=native.outputs.map(output=>{
     const neutral={schemaVersion:1,runId:request.requestId+'-'+output.id,createdAt:native.completedAt,modality:'music',backend:{kind:'local',provider:'Bubo',capability:spec.backend,toolVersion:sourceRevision},
       model:{name:spec.backend,revision:'owned-snapshot',digest:modelDigest,license:'OWNED fixture'},workflow:{name:spec.backend,revision:sourceRevision,digest:native.workerSourceSha256},
@@ -157,7 +157,7 @@ try{
   rejects(()=>spec.request(cloud,{root,asset:{task}}),/session capability/,'CLOUD dispatch never silently falls back to LOCAL');
   check(spec.technical({...context,brief:cloud,candidate:{...context.candidate,provider:'CLOUD'}}).checks[0].status==='unavailable','Unsupported CLOUD measurements remain unavailable');
   const human=identity(write('inputs/human-source.json',{fixture:'Not actual human listening'}));
-  const content={schemaVersion:'opencaw-media-review/v1',assetSha256:context.status.assetSha256,outputs:context.candidate.outputs,kind:'content',verdict:'accepted',reviewer:'Owned fixture',reason:'Schema plumbing only',sourceEvidence:human,
+  const content={schemaVersion:'hephaera-media-review/v1',assetSha256:context.status.assetSha256,outputs:context.candidate.outputs,kind:'content',verdict:'accepted',reviewer:'Owned fixture',reason:'Schema plumbing only',sourceEvidence:human,
     criteria:{listenedEntireOutput:true,matchesBrief:true,intendedVocalContentReviewed:true,artifactsAcceptable:true,headTailAccepted:true}};
   check(spec.validateReview(content,context)===content,'Complete instrumental/vocal-intent/full-track criteria validate fixture review plumbing');
   for(const key of Object.keys(content.criteria)){const missed=copy(content);missed.criteria[key]=false;rejects(()=>spec.validateReview(missed,context),/complete-track/,key+' cannot be skipped in accepted full-track review');}
@@ -168,20 +168,20 @@ try{
   const falseClaim=copy(content);falseClaim.criteria.loopSeamReviewed=false;rejects(()=>spec.validateReview(falseClaim,context),/loop-seam/,'A claimed loop-review field cannot be silently ignored on nonloop briefs');
   const rejected={...copy(content),verdict:'rejected',criteria:{matchesBrief:false}};check(spec.validateReview(rejected,context).verdict==='rejected','Failed complete listening remains explicitly recordable without invented positive criteria');
   const engine={engine:'THREEJS',sha256:'3'.repeat(64)},distributionSource=identity(write('inputs/distribution-source.txt','Owned synthetic distribution assertion'));
-  const rightsEvidence=identity(write('inputs/distribution.json',{schemaVersion:'opencaw-music-distribution/v1',task,purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
+  const rightsEvidence=identity(write('inputs/distribution.json',{schemaVersion:'hephaera-music-distribution/v1',task,purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
   const playbackSource=identity(write('inputs/playback-source.txt','Owned synthetic target assertion'));
-  const targetEvidence=identity(write('inputs/target.json',{schemaVersion:'opencaw-music-runtime-evidence/v1',task,engine,outputs:context.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
+  const targetEvidence=identity(write('inputs/target.json',{schemaVersion:'hephaera-music-runtime-evidence/v1',task,engine,outputs:context.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
   const runtimeReview={...copy(content),kind:'runtime',criteria:{targetPlaybackReviewed:true,loadDisposeReviewed:true,spatializationReviewed:true},engine,target:{spatialization:'2d',loopIntent:false},rightsEvidence,targetEvidence};
   check(spec.validateRuntimeReview(runtimeReview,context)===runtimeReview,'Separate current distribution and exact selected-engine playback/load/dispose evidence validate fixture plumbing');
   const noDistribution=copy(runtimeReview);delete noDistribution.rightsEvidence;rejects(()=>spec.validateRuntimeReview(noDistribution,context),/identity|object/,'Prompt generation rights cannot substitute for current runtime distribution rights');
-  const wrongPermission=identity(write('inputs/other-distribution.json',{schemaVersion:'opencaw-music-distribution/v1',task:'other-task',purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
+  const wrongPermission=identity(write('inputs/other-distribution.json',{schemaVersion:'hephaera-music-distribution/v1',task:'other-task',purpose:base.purpose,rightsConfirmed:true,sourceEvidence:distributionSource}));
   rejects(()=>spec.validateRuntimeReview({...copy(runtimeReview),rightsEvidence:wrongPermission},context),/current MUSIC distribution/,'Historical or another-task distribution evidence cannot authorize this runtime handoff');
-  const wrongPlayback=identity(write('inputs/other-target.json',{schemaVersion:'opencaw-music-runtime-evidence/v1',task,engine,outputs:[],spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
+  const wrongPlayback=identity(write('inputs/other-target.json',{schemaVersion:'hephaera-music-runtime-evidence/v1',task,engine,outputs:[],spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
   rejects(()=>spec.validateRuntimeReview({...copy(runtimeReview),targetEvidence:wrongPlayback},context),/output set/,'Playback of another track set cannot establish current target acceptance');
   const wrongTarget=copy(runtimeReview);wrongTarget.target.spatialization='3d';rejects(()=>spec.validateRuntimeReview(wrongTarget,context),/spatialization/,'Target cannot silently change intended spatialization');
   const stale=copy(runtimeReview);stale.assetSha256='b'.repeat(64);rejects(()=>spec.validateRuntimeReview(stale,context),/fingerprint/,'Runtime review is bound to exact current composite asset identity');
   for(const [label,ref] of [['distribution',distributionSource],['playback',playbackSource]]){const bytes=fs.readFileSync(path.join(root,ref.path));write(ref.path,'changed');rejects(()=>spec.validateRuntimeReview(runtimeReview,context),/changed/,label+' underlying source mutation invalidates runtime acceptance');fs.writeFileSync(path.join(root,ref.path),bytes);}
-  const songTarget=identity(write('inputs/song-target.json',{schemaVersion:'opencaw-music-runtime-evidence/v1',task,engine,outputs:songContext.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
+  const songTarget=identity(write('inputs/song-target.json',{schemaVersion:'hephaera-music-runtime-evidence/v1',task,engine,outputs:songContext.candidate.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:playbackSource}));
   const songRuntime={...copy(runtimeReview),outputs:songContext.candidate.outputs,targetEvidence:songTarget};check(spec.validateRuntimeReview(songRuntime,songContext)===songRuntime,'Exact song target evidence and current distribution remain separate from lyric-generation authority');
   const lyricSourceBytes=fs.readFileSync(path.join(root,lyricsSource.path));write(lyricsSource.path,'changed after song target review');
   rejects(()=>spec.validateRuntimeReview(songRuntime,songContext),/changed/,'Song runtime revalidation rehashes underlying lyric rights before handoff or promotion');fs.writeFileSync(path.join(root,lyricsSource.path),lyricSourceBytes);

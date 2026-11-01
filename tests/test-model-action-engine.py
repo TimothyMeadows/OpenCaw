@@ -13,7 +13,7 @@ import sys
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
-DEPENDENCIES = ROOT / '.opencaw/.cache/tasks/model-to-animation-design/dependency-audit/browser-fixture/node_modules'
+DEPENDENCIES = ROOT / '.hephaera/.cache/tasks/model-to-animation-design/dependency-audit/browser-fixture/node_modules'
 
 
 def confined(value, label, exists=True):

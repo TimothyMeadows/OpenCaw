@@ -84,8 +84,8 @@ function contract(root, value = 'ENGINE.md') {
     return { projectEngine: registry().defaultEngine, selectionSource: 'default', contract: file.relative, contractSha256: null };
   }
   const text = read(file.absolute);
-  const matches = [...text.matchAll(/^Selected OpenCaw engine:\s*\n((?:- [^\n]+\n?)+)/gm)];
-  if (matches.length !== 1) fail('ENGINE.md must declare exactly one Selected OpenCaw engine block. Regenerate or migrate it explicitly.');
+  const matches = [...text.matchAll(/^Selected Hephaera engine:\s*\n((?:- [^\n]+\n?)+)/gm)];
+  if (matches.length !== 1) fail('ENGINE.md must declare exactly one Selected Hephaera engine block. Regenerate or migrate it explicitly.');
   const values = matches[0][1].trim().split('\n').map(v => v.replace(/^- /, '').trim());
   if (values.length !== 1 || !Object.hasOwn(registry().engines, values[0])) fail('ENGINE.md must select one canonical registered engine. Use generate-engine.sh to migrate.');
   const projectEngine = values[0];
@@ -98,7 +98,7 @@ function contract(root, value = 'ENGINE.md') {
   }
   if (directives.length && text.includes('### Inline Engine Definition')) fail('ENGINE.md contains both read directives and an inline definition. Regenerate its managed block.');
   if (!directives.length) {
-    const inline = text.match(/### Inline Engine Definition\n\n([\s\S]*?)\n\n<!-- opencaw-engine:end -->/);
+    const inline = text.match(/### Inline Engine Definition\n\n([\s\S]*?)\n\n<!-- hephaera-engine:end -->/);
     if (!inline || inline[1].trim() !== read(path.join(BASE, '.engine', registry().engines[projectEngine].definition)).trim()) fail('ENGINE.md needs its matching read directive or current complete generated inline definition. Regenerate stale inline content.');
   }
   return { projectEngine, selectionSource: 'contract', contract: file.relative, contractSha256: hash(file.absolute) };
@@ -135,7 +135,7 @@ function prototypeEngines(root) {
     for (const id of existingEngines(dir)) found.add(id);
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       if (entry.isSymbolicLink()) fail('Prototype output must not contain symbolic links.');
-      if (entry.isDirectory() && !['.git', '.opencaw', 'node_modules', '.local', 'Library', 'Temp', 'bin', 'obj'].includes(entry.name)) visit(path.join(dir, entry.name), depth + 1);
+      if (entry.isDirectory() && !['.git', '.hephaera', '.cache', 'node_modules', '.local', 'Library', 'Temp', 'bin', 'obj'].includes(entry.name)) visit(path.join(dir, entry.name), depth + 1);
     }
   }
   visit(root, 0); return [...found].sort();
@@ -150,7 +150,7 @@ function productionEngines(root) {
     : path.resolve(dir) === dependency;
   // Directory entries are single components; excluding the installed baseline
   // also excludes its private cache and historical engine fixtures.
-  const excluded = new Set(['.git', '.opencaw', '.local', '.engine', '.styles', '.architecture', '.roles', 'skills', 'commands', 'tests', 'prototypes', 'node_modules', 'Library', 'Temp', 'bin', 'obj']);
+  const excluded = new Set(['.git', '.hephaera', '.cache', '.local', '.engine', '.styles', '.architecture', '.roles', 'skills', 'commands', 'tests', 'prototypes', 'node_modules', 'Library', 'Temp', 'bin', 'obj']);
   function visit(dir, depth) {
     if (isDependency(dir)) return;
     if (depth > 12 || ++visited > 20000) fail('Existing engine discovery exceeded its bound; narrow the project root or migrate engine evidence explicitly.');
@@ -163,7 +163,7 @@ function productionEngines(root) {
 }
 function validateOutput(root, value, selection, hasReceipt) {
   const output = inside(root, value, 'Output');
-  if (!hasReceipt && (/^prototypes\//.test(output.relative) || /^\.opencaw\/\.cache\/tasks\/[^/]+\/prototypes\//.test(output.relative))) fail('Isolated prototype writes require their recorded engine override evidence.');
+  if (!hasReceipt && (/^prototypes\//.test(output.relative) || /^\.hephaera\/\.cache\/tasks\/[^/]+\/prototypes\//.test(output.relative))) fail('Isolated prototype writes require their recorded engine override evidence.');
   let current = root;
   for (const part of path.relative(root, path.dirname(output.absolute)).split(path.sep).filter(Boolean)) {
     current = path.join(current, part);
@@ -183,13 +183,13 @@ function resolve(root, options = {}) {
   if (options.recordOverride) {
     if (!options.override || !/^[a-z0-9][a-z0-9-]*$/.test(options.task || '')) fail('Record an explicit --override ENGINE and safe --task TASK.');
     const scope = inside(root, options.scope, 'Override output scope');
-    const taskPrefix = `.opencaw/.cache/tasks/${options.task}/prototypes/`;
-    if (!/^prototypes\/[a-z0-9][a-z0-9-]*$/.test(scope.relative) && !(scope.relative.startsWith(taskPrefix) && /^[a-z0-9][a-z0-9-]*$/.test(scope.relative.slice(taskPrefix.length)))) fail('Overrides require an isolated prototypes/NAME or .opencaw/.cache/tasks/TASK/prototypes/NAME directory. Existing game paths are not permitted.');
-    const taskFile = inside(root, `.opencaw/.cache/tasks/${options.task}/TASK.md`, 'Task contract');
+    const taskPrefix = `.hephaera/.cache/tasks/${options.task}/prototypes/`;
+    if (!/^prototypes\/[a-z0-9][a-z0-9-]*$/.test(scope.relative) && !(scope.relative.startsWith(taskPrefix) && /^[a-z0-9][a-z0-9-]*$/.test(scope.relative.slice(taskPrefix.length)))) fail('Overrides require an isolated prototypes/NAME or .hephaera/.cache/tasks/TASK/prototypes/NAME directory. Existing game paths are not permitted.');
+    const taskFile = inside(root, `.hephaera/.cache/tasks/${options.task}/TASK.md`, 'Task contract');
     if (!fs.existsSync(taskFile.absolute)) fail('An existing task contract is required before recording an override.');
     if (fs.existsSync(scope.absolute) && (!fs.statSync(scope.absolute).isDirectory() || fs.readdirSync(scope.absolute).length)) fail('Record a new override before creating prototype output; the scope must be absent or empty.');
     const receipt = { ...result, selectionSource: 'prompt', effectiveEngine: engineId(options.override), ...packagingSelection(engineId(options.override)), ...particleSelection(engineId(options.override)), ...postprocessingSelection(engineId(options.override)), task: options.task, taskSha256: hash(taskFile.absolute), outputScope: scope.relative, effectiveDefinitionSha256: hash(path.join(BASE, '.engine', registry().engines[engineId(options.override)].definition)) };
-    const file = inside(root, `.opencaw/.cache/tasks/${options.task}/engine-override.json`, 'Override evidence');
+    const file = inside(root, `.hephaera/.cache/tasks/${options.task}/engine-override.json`, 'Override evidence');
     const digest = inside(root, `${file.relative}.sha256`, 'Override digest');
     if (fs.existsSync(file.absolute)) fail('Override evidence already exists. Use a new task for a different selection; do not overwrite evidence.');
     fs.writeFileSync(file.absolute, JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' });
@@ -201,15 +201,15 @@ function resolve(root, options = {}) {
     const digest = inside(root, `${file.relative}.sha256`, 'Override digest');
     if (!fs.existsSync(digest.absolute) || read(digest.absolute).trim() !== hash(file.absolute)) fail('Override evidence changed or has no integrity digest; review and record a new task receipt.');
     let receipt; try { receipt = JSON.parse(read(file.absolute)); } catch { fail('Missing or malformed engine override evidence.'); }
-    if (!/^[a-z0-9][a-z0-9-]*$/.test(receipt.task || '') || file.relative !== `.opencaw/.cache/tasks/${receipt.task}/engine-override.json`) fail('Override evidence must belong to its recorded task.');
-    const taskFile = inside(root, `.opencaw/.cache/tasks/${receipt.task}/TASK.md`, 'Task contract');
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(receipt.task || '') || file.relative !== `.hephaera/.cache/tasks/${receipt.task}/engine-override.json`) fail('Override evidence must belong to its recorded task.');
+    const taskFile = inside(root, `.hephaera/.cache/tasks/${receipt.task}/TASK.md`, 'Task contract');
     if (receipt.schemaVersion !== 1 || receipt.selectionSource !== 'prompt' || receipt.taskSha256 !== hash(taskFile.absolute) || receipt.projectEngine !== result.projectEngine || receipt.contract !== result.contract || receipt.contractSha256 !== result.contractSha256 || receipt.definitionSha256 !== result.definitionSha256 || receipt.registrySha256 !== result.registrySha256) fail('Stale or mismatched engine override evidence; review changed contracts and create a new task receipt.');
     const effective = engineId(receipt.effectiveEngine);
     if (receipt.effectiveDefinitionSha256 !== hash(path.join(BASE, '.engine', registry().engines[effective].definition))) fail('Override engine definition changed; evidence is stale.');
     if (options.task && options.task !== receipt.task) fail('Override evidence belongs to another task.');
     if (options.override && engineId(options.override) !== effective) fail('Override selection differs from recorded evidence.');
     const scope = inside(root, receipt.outputScope, 'Override scope');
-    if (!/^prototypes\/[a-z0-9][a-z0-9-]*$/.test(scope.relative) && !new RegExp(`^\\.opencaw/\\.cache/tasks/${receipt.task}/prototypes/[a-z0-9][a-z0-9-]*$`).test(scope.relative)) fail('Override scope is not an isolated prototype.');
+    if (!/^prototypes\/[a-z0-9][a-z0-9-]*$/.test(scope.relative) && !new RegExp(`^\\.hephaera/\\.cache/tasks/${receipt.task}/prototypes/[a-z0-9][a-z0-9-]*$`).test(scope.relative)) fail('Override scope is not an isolated prototype.');
     if (prototypeEngines(scope.absolute).some(id => id !== effective)) fail('Existing prototype engine evidence conflicts with the recorded override. Do not edit an incompatible game.');
     if (options.output) {
       const output = validateOutput(root, options.output, receipt, true);
@@ -262,7 +262,7 @@ function codeProduction(root, kind, operation, values) {
     const check = value => {
       if (!value) return;
       const located = validateOutput(root, value, selection, false);
-      if (located.relative === '.ai' || located.relative.startsWith('.ai/')) fail('The .ai layout is retired. Create fresh task artifacts under .opencaw/.cache/tasks/.');
+      if (located.relative === '.ai' || located.relative.startsWith('.ai/')) fail('The .ai layout is retired. Create fresh task artifacts under .hephaera/.cache/tasks/.');
     };
     const load = value => {
       if (!value) return null;
@@ -308,7 +308,7 @@ function codeProduction(root, kind, operation, values) {
   const source = value => resolve(root, { evidence, output: value });
   function taskArtifact(value) {
     const located = inside(root, value, 'Task artifact');
-    if (!located.relative.startsWith(`.opencaw/.cache/tasks/${selected.task}/`) || /(?:^|\/)(?:TASK\.md|engine-override\.json(?:\.sha256)?)$/i.test(located.relative)) fail('Override manifests and review outputs must stay in their recorded task without overwriting the task or receipt.');
+    if (!located.relative.startsWith(`.hephaera/.cache/tasks/${selected.task}/`) || /(?:^|\/)(?:TASK\.md|engine-override\.json(?:\.sha256)?)$/i.test(located.relative)) fail('Override manifests and review outputs must stay in their recorded task without overwriting the task or receipt.');
     return located;
   }
   function model(value) {
@@ -319,10 +319,10 @@ function codeProduction(root, kind, operation, values) {
     const file = taskArtifact(value); const data = JSON.parse(read(file.absolute)); model(data.codeModel?.manifest);
   }
   if (kind === 'model') {
-    if (operation === 'create') { taskArtifact(option('output', `.opencaw/.cache/tasks/${first}/code-model.json`)); source(option('source', `src/models/${first}.ts`)); }
+    if (operation === 'create') { taskArtifact(option('output', `.hephaera/.cache/tasks/${first}/code-model.json`)); source(option('source', `src/models/${first}.ts`)); }
     else model(first);
   } else if (kind === 'character') {
-    if (operation === 'create') { taskArtifact(option('output', `.opencaw/.cache/tasks/${first}/code-character.json`)); model(option('manifest')); }
+    if (operation === 'create') { taskArtifact(option('output', `.hephaera/.cache/tasks/${first}/code-character.json`)); model(option('manifest')); }
     else profile(first);
   } else if (kind === 'evidence') {
     profile(first);
@@ -347,11 +347,11 @@ function generate(root, value, options = {}) {
   const postprocessing = postprocessingSelection(id);
   const relative = path.relative(root, BASE).split(path.sep).join('/');
   const directive = `Read \`${relative ? './' + relative + '/' : './'}.engine/${def.definition}\` instructions`;
-  const body = ['<!-- opencaw-engine:start -->', '## Engine Selection', '', 'Selected OpenCaw engine:', `- ${id}`, '', options.inline ? `### Inline Engine Definition\n\n${read(path.join(BASE, '.engine', def.definition)).trim()}` : directive, '', '<!-- opencaw-engine:end -->'].join('\n');
+  const body = ['<!-- hephaera-engine:start -->', '## Engine Selection', '', 'Selected Hephaera engine:', `- ${id}`, '', options.inline ? `### Inline Engine Definition\n\n${read(path.join(BASE, '.engine', def.definition)).trim()}` : directive, '', '<!-- hephaera-engine:end -->'].join('\n');
   let content;
   if (!exists) content = `# ENGINE.md\n\nThis project selects one game engine. Architecture and art pipeline selection remain separate.\n\n${body}\n\n## Project Engine Instructions\n\nUse host-locked versions and explicit dependencies.\n`;
   else {
-    const blocks = [...current.matchAll(/<!-- opencaw-engine:start -->[\s\S]*?<!-- opencaw-engine:end -->/g)];
+    const blocks = [...current.matchAll(/<!-- hephaera-engine:start -->[\s\S]*?<!-- hephaera-engine:end -->/g)];
     if (blocks.length !== 1) fail('Existing ENGINE.md has no unique managed block. Migrate it explicitly; custom content was preserved.');
     content = current.replace(blocks[0][0], body);
   }

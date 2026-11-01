@@ -46,11 +46,11 @@ require_text '.roles/ROLE_SKILL_MAP.json' '"commands/resolve-art-pipeline.sh"'
 for skill in "${skills[@]}"; do require_text '.roles/ROLE_SKILL_MAP.json' "\"$skill\""; done
 for command in "${commands[@]}"; do require_file "$command"; [[ -x "$command" ]] || fail "$command is not executable"; bash -n "$command"; done
 style_project="$temp_root/style-project"
-mkdir -p "$style_project/.opencaw/.cache/tasks/blender-pipeline-test"
-OPENCAW_PROJECT_ROOT="$style_project" bash commands/generate-style.sh --pipeline blender --allow-pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
-OPENCAW_PROJECT_ROOT="$style_project" bash commands/validate-style-contract.sh "$style_project/STYLE.md" >/dev/null
-grep -A1 '^Primary OpenCaw art pipeline:' "$style_project/STYLE.md" | grep -Fxq -- '- BLENDER' || fail "blender alias did not select BLENDER"
-selection="$(OPENCAW_PROJECT_ROOT="$style_project" bash commands/resolve-art-pipeline.sh --style "$style_project/STYLE.md" --override bpy --json)"
+mkdir -p "$style_project/.hephaera/.cache/tasks/blender-pipeline-test"
+HEPHAERA_PROJECT_ROOT="$style_project" bash commands/generate-style.sh --pipeline blender --allow-pipeline PROOF_TO_MODEL CEL_SHADED_COMIC >/dev/null
+HEPHAERA_PROJECT_ROOT="$style_project" bash commands/validate-style-contract.sh "$style_project/STYLE.md" >/dev/null
+grep -A1 '^Primary Hephaera art pipeline:' "$style_project/STYLE.md" | grep -Fxq -- '- BLENDER' || fail "blender alias did not select BLENDER"
+selection="$(HEPHAERA_PROJECT_ROOT="$style_project" bash commands/resolve-art-pipeline.sh --style "$style_project/STYLE.md" --override bpy --json)"
 grep -Fq '"pipeline": "BLENDER"' <<<"$selection" || fail "bpy override did not resolve to BLENDER"
 
 echo "[2/8] checking deterministic production brief"
@@ -98,7 +98,7 @@ texture_hash="$(hash_file "$fixture_root/assets/texture.bin")"
 valid_report="$temp_root/valid.json"
 cat >"$valid_report" <<EOF
 {
-  "schemaVersion": "opencaw-blender-scene/v1",
+  "schemaVersion": "hephaera-blender-scene/v1",
   "profile": "static-asset",
   "blenderVersion": "4.5.3",
   "source": {"path": "scene.blend", "sha256": "$scene_hash"},
@@ -129,7 +129,7 @@ make_variant() {
   "$node_bin" - "$(node_path "$valid_report")" "$(node_path "$destination")" "$kind" <<'NODE'
 const fs=require('fs'); const [source,destination,kind]=process.argv.slice(2); const d=JSON.parse(fs.readFileSync(source,'utf8'));
 switch(kind) {
-  case 'schema': d.schemaVersion='opencaw-blender-scene/v2'; break;
+  case 'schema': d.schemaVersion='hephaera-blender-scene/v2'; break;
   case 'version': d.blenderVersion='4.4.9'; break;
   case 'duplicate-id': d.objects[1].id=d.objects[0].id; break;
   case 'duplicate-name': d.objects[1].name=d.objects[0].name; break;

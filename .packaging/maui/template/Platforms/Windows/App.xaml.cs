@@ -1,4 +1,4 @@
-namespace OpenCaw.GameHost.WinUI;
+namespace Hephaera.GameHost.WinUI;
 
 public partial class App : Microsoft.Maui.MauiWinUIApplication
 {

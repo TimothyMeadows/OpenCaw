@@ -1,7 +1,7 @@
 using Android.Webkit;
 using Microsoft.Maui.Controls;
 
-namespace OpenCaw.GameHost.Services;
+namespace Hephaera.GameHost.Services;
 
 public static class GameWebViewPolicy
 {

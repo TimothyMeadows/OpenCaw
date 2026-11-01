@@ -31,7 +31,7 @@ Exercise real bound-property changes, pause, stop/restore, natural completion, r
 
 ## Output
 
-Native sequence/map assets, binding and playback contract, clock/restore/cancel ownership, native tests and representative shot findings. Record environment, expected/observed results and blocked/not-run checks under the active `.opencaw/.cache/tasks/` task.
+Native sequence/map assets, binding and playback contract, clock/restore/cancel ownership, native tests and representative shot findings. Record environment, expected/observed results and blocked/not-run checks under the active `.hephaera/.cache/tasks/` task.
 
 ## Boundaries
 

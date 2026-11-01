@@ -14,7 +14,7 @@ Implement locomotion modes, collision-aware character movement, root-motion disp
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-movement` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate task override evidence and permitted output scope. Skill selection never selects the engine.
 
-Read actor type, engine release, selected movement implementation, animation/root motion, navigation agent and network topology. Mover is an explicit version-qualified selection. Keep observed context/evidence in resolved `.opencaw/.cache/tasks/<task>/`; preserve `ENGINE.md`.
+Read actor type, engine release, selected movement implementation, animation/root motion, navigation agent and network topology. Mover is an explicit version-qualified selection. Keep observed context/evidence in resolved `.hephaera/.cache/tasks/<task>/`; preserve `ENGINE.md`.
 
 ## Workflow
 

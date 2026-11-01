@@ -19,7 +19,7 @@ for(const file of ['commands/bubo-media.sh','commands/install-bubo-media.sh','co
 for(const file of ['commands/install-comfyui-local.sh','commands/install-comfyui-models.sh','commands/run-comfyui-workflow.sh','.styles/.pipelines/local/toolchain.json','.styles/.pipelines/local/model-packs.json','skills/use-comfyui-local-generation/SKILL.md'])
   if(fs.existsSync(file)) throw new Error(`Retired active integration remains: ${file}`);
 const lock=JSON.parse(fs.readFileSync('runtime/bubo.lock.json','utf8'));
-if(lock.schemaVersion!==1||lock.path!=='runtime/bubo'||lock.apiVersion!==1||!/^[a-f0-9]{40}$/.test(lock.revision)||!/^[a-f0-9]{64}$/.test(lock.resourceCatalogSha256)) throw new Error('Invalid pinned Bubo media execution boundary.');
+if(lock.schemaVersion!==1||lock.path!=='runtime/bubo'||lock.apiVersion!==2||!/^[a-f0-9]{40}$/.test(lock.revision)||!/^[a-f0-9]{64}$/.test(lock.resourceCatalogSha256)) throw new Error('Invalid pinned Bubo media execution boundary.');
 // Policy validation remains usable before dependency initialization. Native
 // production separately verifies the exact source/build/catalog on every call.
 const policy=fs.readFileSync('.styles/.pipelines/local/PIPELINE.md','utf8');

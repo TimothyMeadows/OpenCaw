@@ -1,7 +1,7 @@
 {
   "__shared__": {
     "skills": ["create-task-file", "manage-task-issues", "maintain-memory", "maintain-repository-map", "clean-context", "pr-readiness-gate", "link-pr-to-task-issue", "post-pr-qa", "record-correction-pattern", "record-debug-resolution", "verify-and-explain"],
-    "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/resolve-opencaw-paths.sh", "commands/install-windows-bash.ps1", "commands/query-project-context.sh", "commands/append-project-memory.sh", "commands/append-system-memory.sh", "commands/repo-map-status.sh", "commands/validate-memory.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh", "commands/generate-engine.sh", "commands/validate-engine-contract.sh", "commands/validate-engines.sh", "commands/resolve-engine.sh", "commands/resolve-skill.sh", "commands/resolve-role-capabilities.sh"]
+    "commands": ["commands/create-task-file.sh", "commands/create-task-issue.sh", "commands/import-task-from-issue.sh", "commands/sync-task-issues.sh", "commands/resolve-hephaera-paths.sh", "commands/state-transition.sh", "commands/install-windows-bash.ps1", "commands/query-project-context.sh", "commands/append-project-memory.sh", "commands/append-system-memory.sh", "commands/repo-map-status.sh", "commands/validate-memory.sh", "commands/pr-readiness-check.sh", "commands/link-pr-to-task-issue.sh", "commands/comment-pr-qa-results.sh", "commands/update-todo-checklist.sh", "commands/generate-engine.sh", "commands/validate-engine-contract.sh", "commands/validate-engines.sh", "commands/resolve-engine.sh", "commands/resolve-skill.sh", "commands/resolve-role-capabilities.sh"]
   },
   "arts/art-director": {
     "skills": ["build-model-actions", "build-model-animations", "select-art-pipeline", "use-external-asset-library", "maintain-art-style-contract", "develop-original-brand-directions", "design-ui-from-constraints", "source-licensed-visual-assets", "audit-reference-originality", "plan-generative-media-pipeline", "use-bubo-local-generation", "validate-generated-media", "prepare-rigged-runtime-actors", "prepare-game-art-handoff", "direct-blender-production", "author-blender-materials-and-lookdev", "light-and-frame-blender-scenes", "render-and-composite-blender-output", "review-blender-deliverables", "iterate-art-to-sanity", "enforce-art-language-safety", "build-proof-to-model-assets", "build-game-ui", "threejs-animate-actors", "threejs-build-materials", "threejs-build-ui", "babylonjs-animate-actors", "babylonjs-build-materials", "babylonjs-build-ui", "phaserjs-build-ui", "unity-animate-actors", "unity-build-materials", "unity-build-ui", "unreal-integrate-assets", "unreal-animate-actors", "unreal-build-materials", "unreal-build-ui", "godot-animate-actors", "godot-build-shaders", "godot-build-ui", "unreal-build-cameras", "unreal-build-vfx", "unreal-build-cinematics", "unreal-build-worlds", "unreal-build-procedural-content", "unity-build-2d-content", "unity-localize-content", "unity-configure-rendering", "threejs-build-particles", "threejs-build-postprocessing"],
@@ -89,7 +89,7 @@
   },
   "computer-science/autonomous-optimization-architect": {
     "skills": ["generate-architecture", "verify-and-explain", "profile-application-performance", "optimize-web-games"],
-    "commands": ["commands/generate-architecture.sh", "commands/web-performance-report.sh", "commands/validate-opencaw.sh"]
+    "commands": ["commands/generate-architecture.sh", "commands/web-performance-report.sh", "commands/validate-hephaera.sh"]
   },
   "computer-science/backend-architect": {
     "skills": ["generate-architecture", "verify-and-explain", "solution-build", "test-dotnet", "unity-integrate-live-services", "unity-integrate-multiplayer-services", "unity-integrate-voice-chat", "unity-integrate-purchases", "unity-integrate-ads"],
@@ -101,7 +101,7 @@
   },
   "computer-science/code-reviewer": {
     "skills": ["verify-and-explain", "audit-untrusted-agent-source", "audit-reference-originality", "dependency-audit-dotnet"],
-    "commands": ["commands/audit-agent-source.sh", "commands/build-originality-evidence.sh", "commands/dependency-check.sh", "commands/validate-opencaw.sh"]
+    "commands": ["commands/audit-agent-source.sh", "commands/build-originality-evidence.sh", "commands/dependency-check.sh", "commands/validate-hephaera.sh"]
   },
   "computer-science/database-optimizer": {
     "skills": ["install-database-cli-tools", "database-cli-query", "verify-and-explain", "profile-application-performance"],
@@ -109,7 +109,7 @@
   },
   "computer-science/devops-automator": {
     "skills": ["generate-architecture", "create-host-ai-scaffold", "audit-untrusted-agent-source", "verify-and-explain", "unity-run-tooling", "unity-optimize-web", "unity-integrate-live-services", "unity-integrate-multiplayer-services"],
-    "commands": ["commands/generate-architecture.sh", "commands/create-host-ai-scaffold.sh", "commands/audit-agent-source.sh", "commands/validate-opencaw.sh"]
+    "commands": ["commands/generate-architecture.sh", "commands/create-host-ai-scaffold.sh", "commands/audit-agent-source.sh", "commands/validate-hephaera.sh"]
   },
   "computer-science/frontend-developer": {
     "skills": ["build-model-actions", "build-model-animations", "select-art-pipeline", "use-external-asset-library", "threejs-build-code-models", "threejs-build-code-characters", "design-ui-from-constraints", "build-accessible-motion-systems", "build-interactive-web-effects", "build-webgl-experiences", "optimize-web-motion", "capture-full-page-evidence", "produce-browser-demo", "profile-application-performance", "maintain-art-style-contract", "prepare-game-art-handoff", "threejs-build-scenes", "threejs-build-controls", "threejs-animate-actors", "threejs-build-materials", "threejs-build-ui", "babylonjs-build-scenes", "babylonjs-build-controls", "babylonjs-integrate-physics", "babylonjs-animate-actors", "babylonjs-build-materials", "babylonjs-build-ui", "babylonjs-build-audio", "phaserjs-build-scenes", "phaserjs-build-controls", "phaserjs-build-physics", "phaserjs-build-tilemaps", "phaserjs-animate-sprites", "phaserjs-build-ui", "phaserjs-build-audio", "unity-build-controls", "unity-build-ui", "unity-run-tooling", "unreal-build-controls", "unreal-build-ui", "unreal-run-tooling", "godot-build-controls", "godot-build-ui", "godot-run-tooling", "build-game-ui", "unity-build-2d-content", "unity-localize-content", "unity-build-editor-tools", "unity-optimize-web", "threejs-build-particles", "threejs-build-postprocessing"],
@@ -165,7 +165,7 @@
   },
   "computer-science/software-architect": {
     "skills": ["generate-architecture", "verify-and-explain", "audit-untrusted-agent-source", "profile-application-performance"],
-    "commands": ["commands/generate-architecture.sh", "commands/audit-agent-source.sh", "commands/web-performance-report.sh", "commands/validate-opencaw.sh"]
+    "commands": ["commands/generate-architecture.sh", "commands/audit-agent-source.sh", "commands/web-performance-report.sh", "commands/validate-hephaera.sh"]
   },
   "computer-science/sre": {
     "skills": ["verify-and-explain", "profile-application-performance", "record-debug-resolution", "audit-untrusted-agent-source"],

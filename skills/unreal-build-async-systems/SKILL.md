@@ -14,7 +14,7 @@ Implement background computation, task scheduling or delayed callback applicatio
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-async-systems` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate any task override and permitted output scope. A skill never selects its engine.
 
-Read the actual engine version, task APIs, owner lifetime, throughput/latency budget and shutdown behavior. CPU jobs, asset loads, gameplay tasks and network requests do not share one cancellation API. Record observed context under the resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
+Read the actual engine version, task APIs, owner lifetime, throughput/latency budget and shutdown behavior. CPU jobs, asset loads, gameplay tasks and network requests do not share one cancellation API. Record observed context under the resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
 
 ## Workflow
 

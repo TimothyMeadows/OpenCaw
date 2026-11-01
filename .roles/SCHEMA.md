@@ -1,6 +1,6 @@
 # Roles Schema
 
-This document defines the **standard structure, expectations, and validation rules** for all roles in OpenCaw.
+This document defines the **standard structure, expectations, and validation rules** for all roles in Hephaera.
 
 All roles must follow this schema to ensure:
 
@@ -179,7 +179,7 @@ before falling back to other security tooling.
 
 # Cloud and CI Alignment Rules
 
-Role defaults must align to the OpenCaw cloud and pipeline baseline:
+Role defaults must align to the Hephaera cloud and pipeline baseline:
 
 1. Prefer `GitHub` for repository and collaboration workflows
 2. Prefer `GitHub Actions` for CI/CD automation and release orchestration

@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="OpenCawGame.props" Condition="Exists('OpenCawGame.props')" />
-  <Import Project="$(OpenCawSigningProps)" Condition="'$(OpenCawSigningProps)' != '' And Exists('$(OpenCawSigningProps)')" />
+  <Import Project="HephaeraGame.props" Condition="Exists('HephaeraGame.props')" />
+  <Import Project="$(HephaeraSigningProps)" Condition="'$(HephaeraSigningProps)' != '' And Exists('$(HephaeraSigningProps)')" />
   <PropertyGroup>
     <TargetFrameworks Condition="'$(TargetFrameworks)' == '' And $([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(TargetFrameworks)' == '' And $([MSBuild]::IsOSPlatform('osx'))">net10.0-maccatalyst</TargetFrameworks>
     <TargetFrameworks Condition="'$(TargetFrameworks)' == ''">net10.0-android</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <RootNamespace>OpenCaw.GameHost</RootNamespace>
+    <RootNamespace>Hephaera.GameHost</RootNamespace>
     <AssemblyName>GameHost</AssemblyName>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
@@ -14,10 +14,10 @@
     <Nullable>enable</Nullable>
     <MauiVersion>10.0.20</MauiVersion>
     <ApplicationTitle Condition="'$(ApplicationTitle)' == ''">GameHost</ApplicationTitle>
-    <ApplicationId Condition="'$(ApplicationId)' == ''">com.opencaw.gamehost</ApplicationId>
+    <ApplicationId Condition="'$(ApplicationId)' == ''">com.hephaera.gamehost</ApplicationId>
     <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0.0</ApplicationDisplayVersion>
     <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
-    <OpenCawDefaultFile Condition="'$(OpenCawDefaultFile)' == ''">index.html</OpenCawDefaultFile>
+    <HephaeraDefaultFile Condition="'$(HephaeraDefaultFile)' == ''">index.html</HephaeraDefaultFile>
     <PublishAot>false</PublishAot>
     <TrimMode>partial</TrimMode>
     <MauiHybridWebViewSupported>true</MauiHybridWebViewSupported>
@@ -31,16 +31,16 @@
     <CodesignEntitlements Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">Platforms/MacCatalyst/Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
-    <MauiIcon Include="Resources/AppIcon/appicon.svg" ForegroundFile="Resources/AppIcon/appiconfg.svg" Color="#10141C" />
-    <MauiSplashScreen Include="Resources/Splash/splash.svg" Color="#10141C" BaseSize="128,128" />
+    <MauiIcon Include="Resources/AppIcon/appicon.svg" ForegroundFile="Resources/AppIcon/appiconfg.svg" Color="#202A32" />
+    <MauiSplashScreen Include="Resources/Splash/splash.svg" Color="#202A32" BaseSize="128,128" />
     <MauiAsset Include="Resources/Raw/**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-    <AssemblyMetadata Include="OpenCawDefaultFile" Value="$(OpenCawDefaultFile)" />
+    <AssemblyMetadata Include="HephaeraDefaultFile" Value="$(HephaeraDefaultFile)" />
   </ItemGroup>
-  <Target Name="CheckOpenCawGameConfiguration" BeforeTargets="PrepareForBuild">
-    <Error Condition="!Exists('OpenCawGame.props')" Text="Run the OpenCaw web-game packaging init command before building this template." />
-    <Error Condition="'$(OpenCawSigningProps)' != '' And !Exists('$(OpenCawSigningProps)')" Text="The explicitly selected signing property file is missing." />
+  <Target Name="CheckHephaeraGameConfiguration" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('HephaeraGame.props')" Text="Run the Hephaera web-game packaging init command before building this template." />
+    <Error Condition="'$(HephaeraSigningProps)' != '' And !Exists('$(HephaeraSigningProps)')" Text="The explicitly selected signing property file is missing." />
     <Error Condition="'$(PublishAot)' == 'true' Or '$(TrimMode)' == 'full'" Text="This .NET 10 HybridWebView host requires partial trimming and no Native AOT." />
-    <Error Condition="!Exists('Resources/Raw/wwwroot/$(OpenCawDefaultFile)')" Text="The packaged web entry is missing. Build the game and run web-game-package.sh sync." />
+    <Error Condition="!Exists('Resources/Raw/wwwroot/$(HephaeraDefaultFile)')" Text="The packaged web entry is missing. Build the game and run web-game-package.sh sync." />
   </Target>
 </Project>

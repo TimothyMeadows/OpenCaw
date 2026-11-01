@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Maui.Controls;
 
-namespace OpenCaw.GameHost.Services;
+namespace Hephaera.GameHost.Services;
 
 public sealed class GameLifecycle(HybridWebView webView) : IDisposable
 {
@@ -30,8 +30,8 @@ public sealed class GameLifecycle(HybridWebView webView) : IDisposable
         {
             // Fixed script and finite wait: no game-provided native invocation.
             var script = _active
-                ? "window.dispatchEvent(new CustomEvent('opencaw:lifecycle',{detail:{state:'resume'}}));"
-                : "window.dispatchEvent(new CustomEvent('opencaw:lifecycle',{detail:{state:'suspend'}}));";
+                ? "window.dispatchEvent(new CustomEvent('hephaera:lifecycle',{detail:{state:'resume'}}));"
+                : "window.dispatchEvent(new CustomEvent('hephaera:lifecycle',{detail:{state:'suspend'}}));";
             await webView.EvaluateJavaScriptAsync(script).WaitAsync(TimeSpan.FromSeconds(2));
         }
         catch (Exception)

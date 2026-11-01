@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-audio-brief/v1",
+  "schemaVersion": "hephaera-audio-brief/v1",
   "kind": "ambience",
   "purpose": "Example only: import a separately authorized session-provided ambience",
   "provider": "CLOUD",

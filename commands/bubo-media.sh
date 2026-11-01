@@ -10,8 +10,8 @@ for argument in "$@"; do
 done
 if [[ "$has_root" == false && "$is_help" == false ]]; then
   source "$command_dir/lib/memory-common.sh"
-  opencaw_resolve_paths
-  set -- "$@" --root "$OPENCAW_PROJECT_ROOT_RESOLVED"
+  hephaera_resolve_paths
+  set -- "$@" --root "$HEPHAERA_PROJECT_ROOT_RESOLVED"
 fi
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo 'Node.js is required for the Bubo host adapter; nothing was installed.' >&2; exit 1; }

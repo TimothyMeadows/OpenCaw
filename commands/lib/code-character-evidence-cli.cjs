@@ -84,7 +84,7 @@ function reportContext(root, validated, captureMode, comparisonPath = null) {
   if (comparisonPath) {
     const located = regularFile(root, comparisonPath, 'Comparison report');
     const previous = readJson(located.absolute, 'Comparison report');
-    if (previous.schemaVersion !== 'opencaw-code-character-evidence/v1') fail('Comparison report has an unsupported schemaVersion.');
+    if (previous.schemaVersion !== 'hephaera-code-character-evidence/v1') fail('Comparison report has an unsupported schemaVersion.');
     if (previous.characterId !== validated.profile.characterId) fail('Comparison report belongs to a different character.');
     comparison = {
       report: { path: located.relative, sha256: sha256(located.absolute) },
@@ -115,12 +115,12 @@ function analyzeOperation(root, values) {
 }
 
 function locatePackage(root, packageName) {
-  const hostRequire = createRequire(path.join(root, '__opencaw-evidence-host__.cjs'));
+  const hostRequire = createRequire(path.join(root, '__hephaera-evidence-host__.cjs'));
   let entry;
   try {
     entry = hostRequire.resolve(packageName);
   } catch {
-    fail(`${packageName === 'three' ? 'Three.js' : 'Playwright'} is unavailable in the host project; install or approve it through the host architecture. OpenCaw installed nothing.`);
+    fail(`${packageName === 'three' ? 'Three.js' : 'Playwright'} is unavailable in the host project; install or approve it through the host architecture. Hephaera installed nothing.`);
   }
   let current = path.dirname(entry);
   while (current !== path.dirname(current)) {
@@ -165,7 +165,7 @@ function safeServeFile(response, base, relative, label) {
 function pageSource(adapterUrl) {
   return `<!doctype html>
 <meta charset="utf-8">
-<title>OpenCaw code-character evidence</title>
+<title>Hephaera code-character evidence</title>
 <style>html,body{margin:0;background:#111;color:#eee}#stage{position:relative;overflow:hidden;width:800px;height:800px}canvas{display:block}</style>
 <div id="stage"></div>
 <script type="module">
@@ -173,7 +173,7 @@ import * as THREE from '/three/three.module.js';
 import { createCodeCharacterEvidenceAdapter } from '${adapterUrl}';
 const stage = document.querySelector('#stage');
 let adapter;
-window.__opencawEvidence = {
+window.__hephaeraEvidence = {
   async start(config) {
     if (typeof createCodeCharacterEvidenceAdapter !== 'function') throw new Error('Adapter must export createCodeCharacterEvidenceAdapter.');
     adapter = await createCodeCharacterEvidenceAdapter({ THREE, stage, profile: config.profile, seed: config.seed });
@@ -281,7 +281,7 @@ async function captureOperation(root, values) {
     try {
       browser = await playwright.chromium.launch({ headless: true, chromiumSandbox: true });
     } catch (error) {
-      fail(`Playwright Chromium browser is unavailable or failed its sandboxed launch: ${error.message}. OpenCaw installed nothing and did not disable the sandbox.`);
+      fail(`Playwright Chromium browser is unavailable or failed its sandboxed launch: ${error.message}. Hephaera installed nothing and did not disable the sandbox.`);
     }
     const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: pixelRatio, serviceWorkers: 'block' });
     const page = await context.newPage();
@@ -295,12 +295,12 @@ async function captureOperation(root, values) {
     });
     await page.goto(options.origin, { waitUntil: 'networkidle' });
     const seed = validated.linked.manifest.runtime.deterministicSeed;
-    await page.evaluate(async ({ profile, seed: deterministicSeed }) => window.__opencawEvidence.start({ profile, seed: deterministicSeed }), { profile: validated.profile, seed });
+    await page.evaluate(async ({ profile, seed: deterministicSeed }) => window.__hephaeraEvidence.start({ profile, seed: deterministicSeed }), { profile: validated.profile, seed });
     fs.mkdirSync(output.absolute);
     const stage = page.locator('#stage');
     const captured = [];
     const captureOne = async (request, key) => {
-      await page.evaluate((value) => window.__opencawEvidence.capture(value), request);
+      await page.evaluate((value) => window.__hephaeraEvidence.capture(value), request);
       const filename = artifactName(key);
       const absolute = path.join(output.absolute, filename);
       await stage.screenshot({ path: absolute, animations: 'disabled' });
@@ -326,10 +326,10 @@ async function captureOperation(root, values) {
       groundingToleranceRatio: structureThresholds.groundingToleranceRatio,
       contactToleranceRatio: interactionThresholds.contactToleranceRatio
     };
-    const sampled = await page.evaluate((config) => window.__opencawEvidence.sample(config), sampleConfig);
-    await page.evaluate(() => window.__opencawEvidence.stop());
+    const sampled = await page.evaluate((config) => window.__hephaeraEvidence.sample(config), sampleConfig);
+    await page.evaluate(() => window.__hephaeraEvidence.stop());
     const observation = {
-      schemaVersion: 'opencaw-code-character-observation/v1',
+      schemaVersion: 'hephaera-code-character-observation/v1',
       capture: { seed, viewport: { width, height, pixelRatio }, views: captured, externalRequests, serviceWorkers: 'blocked' },
       structure: sampled.structure,
       motion: sampled.motion,

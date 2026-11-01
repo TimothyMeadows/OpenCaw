@@ -4,22 +4,22 @@
 
 brainstorm_lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$brainstorm_lib_dir/memory-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
-OPENCAW_BRAINSTORM_FILE="$OPENCAW_PROJECT_ROOT_RESOLVED/BRAINSTORM.md"
-OPENCAW_BRAINSTORM_SUMMARY_FILE="$OPENCAW_PROJECT_ROOT_RESOLVED/BRAINSTORM_SUMMARY.md"
+HEPHAERA_BRAINSTORM_FILE="$HEPHAERA_PROJECT_ROOT_RESOLVED/BRAINSTORM.md"
+HEPHAERA_BRAINSTORM_SUMMARY_FILE="$HEPHAERA_PROJECT_ROOT_RESOLVED/BRAINSTORM_SUMMARY.md"
 
 brainstorm_detect_state() {
-  local file="${1:-$OPENCAW_BRAINSTORM_FILE}"
+  local file="${1:-$HEPHAERA_BRAINSTORM_FILE}"
   local status_count status
 
   if [[ -L "$file" ]]; then
-    OPENCAW_BRAINSTORM_STATE='malformed'
+    HEPHAERA_BRAINSTORM_STATE='malformed'
     return 2
   fi
 
   if [[ ! -f "$file" ]]; then
-    OPENCAW_BRAINSTORM_STATE='absent'
+    HEPHAERA_BRAINSTORM_STATE='absent'
     return 0
   fi
 
@@ -38,11 +38,11 @@ brainstorm_detect_state() {
   ' "$file")"
 
   if [[ "$status_count" != '1' || ( "$status" != 'active' && "$status" != 'inactive' ) ]]; then
-    OPENCAW_BRAINSTORM_STATE='malformed'
+    HEPHAERA_BRAINSTORM_STATE='malformed'
     return 2
   fi
 
-  OPENCAW_BRAINSTORM_STATE="$status"
+  HEPHAERA_BRAINSTORM_STATE="$status"
 }
 
 brainstorm_require_delivery_creation_allowed() {
@@ -53,17 +53,17 @@ brainstorm_require_delivery_creation_allowed() {
     return 1
   fi
 
-  if [[ "$OPENCAW_BRAINSTORM_STATE" == 'active' ]]; then
+  if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'active' ]]; then
     echo "$operation is blocked while Brainstorm mode is active. The user must explicitly exit Brainstorm mode and request a plan before creating task, Goal, or Gauntlet state." >&2
     return 1
   fi
 
-  if [[ "$OPENCAW_BRAINSTORM_STATE" == 'inactive' ]]; then
-    if ! brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" inactive; then
+  if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'inactive' ]]; then
+    if ! brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" inactive; then
       echo "$operation is blocked because inactive Brainstorm state is malformed." >&2
       return 1
     fi
-    if ! brainstorm_validate_summary "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_SUMMARY_FILE"; then
+    if ! brainstorm_validate_summary "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE"; then
       echo "$operation is blocked because inactive Brainstorm state lacks a current exit summary. Explicitly stop Brainstorm mode again to repair it." >&2
       return 1
     fi
@@ -80,7 +80,7 @@ brainstorm_utc_now() {
 }
 
 brainstorm_validate_file() {
-  local file="${1:-$OPENCAW_BRAINSTORM_FILE}"
+  local file="${1:-$HEPHAERA_BRAINSTORM_FILE}"
   local required_state="${2:-any}"
   local status=0 line section='' current_idea='' current_subsection=''
   local citation_regex='https?://[^[:space:])}]+'
@@ -323,30 +323,30 @@ brainstorm_validate_file() {
     fi
   done
 
-  OPENCAW_BRAINSTORM_MODE_STATUS="$mode_status"
-  OPENCAW_BRAINSTORM_ACTIVE_SESSION="$active_session"
-  OPENCAW_BRAINSTORM_DEACTIVATED_AT="$deactivated_at"
-  OPENCAW_BRAINSTORM_BRANCH_COUNT="${#branch_ids[@]}"
-  OPENCAW_BRAINSTORM_ELEMENT_COUNT="${#idea_ids[@]}"
-  OPENCAW_BRAINSTORM_BRANCH_IDS=("${branch_ids[@]}")
-  OPENCAW_BRAINSTORM_IDEA_IDS=("${idea_ids[@]}")
-  declare -gA OPENCAW_BRAINSTORM_BRANCH_PARENT=()
-  declare -gA OPENCAW_BRAINSTORM_BRANCH_TITLE=()
-  declare -gA OPENCAW_BRAINSTORM_IDEA_BRANCH=()
-  declare -gA OPENCAW_BRAINSTORM_IDEA_TITLE=()
-  declare -gA OPENCAW_BRAINSTORM_IDEA_STATUS=()
-  declare -gA OPENCAW_BRAINSTORM_IDEA_READINESS=()
-  declare -gA OPENCAW_BRAINSTORM_IDEA_SUMMARY=()
+  HEPHAERA_BRAINSTORM_MODE_STATUS="$mode_status"
+  HEPHAERA_BRAINSTORM_ACTIVE_SESSION="$active_session"
+  HEPHAERA_BRAINSTORM_DEACTIVATED_AT="$deactivated_at"
+  HEPHAERA_BRAINSTORM_BRANCH_COUNT="${#branch_ids[@]}"
+  HEPHAERA_BRAINSTORM_ELEMENT_COUNT="${#idea_ids[@]}"
+  HEPHAERA_BRAINSTORM_BRANCH_IDS=("${branch_ids[@]}")
+  HEPHAERA_BRAINSTORM_IDEA_IDS=("${idea_ids[@]}")
+  declare -gA HEPHAERA_BRAINSTORM_BRANCH_PARENT=()
+  declare -gA HEPHAERA_BRAINSTORM_BRANCH_TITLE=()
+  declare -gA HEPHAERA_BRAINSTORM_IDEA_BRANCH=()
+  declare -gA HEPHAERA_BRAINSTORM_IDEA_TITLE=()
+  declare -gA HEPHAERA_BRAINSTORM_IDEA_STATUS=()
+  declare -gA HEPHAERA_BRAINSTORM_IDEA_READINESS=()
+  declare -gA HEPHAERA_BRAINSTORM_IDEA_SUMMARY=()
   for branch_id in "${branch_ids[@]}"; do
-    OPENCAW_BRAINSTORM_BRANCH_PARENT["$branch_id"]="${branch_parent[$branch_id]}"
-    OPENCAW_BRAINSTORM_BRANCH_TITLE["$branch_id"]="${branch_title[$branch_id]}"
+    HEPHAERA_BRAINSTORM_BRANCH_PARENT["$branch_id"]="${branch_parent[$branch_id]}"
+    HEPHAERA_BRAINSTORM_BRANCH_TITLE["$branch_id"]="${branch_title[$branch_id]}"
   done
   for idea_id in "${idea_ids[@]}"; do
-    OPENCAW_BRAINSTORM_IDEA_BRANCH["$idea_id"]="${idea_branch[$idea_id]}"
-    OPENCAW_BRAINSTORM_IDEA_TITLE["$idea_id"]="${idea_title[$idea_id]}"
-    OPENCAW_BRAINSTORM_IDEA_STATUS["$idea_id"]="${idea_status[$idea_id]}"
-    OPENCAW_BRAINSTORM_IDEA_READINESS["$idea_id"]="${idea_readiness[$idea_id]}"
-    OPENCAW_BRAINSTORM_IDEA_SUMMARY["$idea_id"]="${idea_summary[$idea_id]}"
+    HEPHAERA_BRAINSTORM_IDEA_BRANCH["$idea_id"]="${idea_branch[$idea_id]}"
+    HEPHAERA_BRAINSTORM_IDEA_TITLE["$idea_id"]="${idea_title[$idea_id]}"
+    HEPHAERA_BRAINSTORM_IDEA_STATUS["$idea_id"]="${idea_status[$idea_id]}"
+    HEPHAERA_BRAINSTORM_IDEA_READINESS["$idea_id"]="${idea_readiness[$idea_id]}"
+    HEPHAERA_BRAINSTORM_IDEA_SUMMARY["$idea_id"]="${idea_summary[$idea_id]}"
   done
 
   [[ $status -eq 0 ]]
@@ -358,8 +358,8 @@ brainstorm_branch_path() {
   local -a parts=()
 
   while [[ "$cursor" != 'ROOT' ]]; do
-    parts+=("${OPENCAW_BRAINSTORM_BRANCH_TITLE[$cursor]}")
-    cursor="${OPENCAW_BRAINSTORM_BRANCH_PARENT[$cursor]}"
+    parts+=("${HEPHAERA_BRAINSTORM_BRANCH_TITLE[$cursor]}")
+    cursor="${HEPHAERA_BRAINSTORM_BRANCH_PARENT[$cursor]}"
   done
   local index
   for (( index=${#parts[@]}-1; index>=0; index-- )); do
@@ -375,13 +375,13 @@ brainstorm_write_summary() {
   local -a sorted_branches=() sorted_ideas=()
 
   brainstorm_validate_file "$source_file" inactive
-  generated_at="$OPENCAW_BRAINSTORM_DEACTIVATED_AT"
+  generated_at="$HEPHAERA_BRAINSTORM_DEACTIVATED_AT"
   hash="$(brainstorm_sha256 "$source_file")"
-  if [[ ${#OPENCAW_BRAINSTORM_BRANCH_IDS[@]} -gt 0 ]]; then
-    mapfile -t sorted_branches < <(printf '%s\n' "${OPENCAW_BRAINSTORM_BRANCH_IDS[@]}" | sort)
+  if [[ ${#HEPHAERA_BRAINSTORM_BRANCH_IDS[@]} -gt 0 ]]; then
+    mapfile -t sorted_branches < <(printf '%s\n' "${HEPHAERA_BRAINSTORM_BRANCH_IDS[@]}" | sort)
   fi
-  if [[ ${#OPENCAW_BRAINSTORM_IDEA_IDS[@]} -gt 0 ]]; then
-    mapfile -t sorted_ideas < <(printf '%s\n' "${OPENCAW_BRAINSTORM_IDEA_IDS[@]}" | sort)
+  if [[ ${#HEPHAERA_BRAINSTORM_IDEA_IDS[@]} -gt 0 ]]; then
+    mapfile -t sorted_ideas < <(printf '%s\n' "${HEPHAERA_BRAINSTORM_IDEA_IDS[@]}" | sort)
   fi
 
   {
@@ -401,15 +401,15 @@ brainstorm_write_summary() {
       for branch_id in "${sorted_branches[@]}"; do
         local has_ideas=0
         for idea_id in "${sorted_ideas[@]}"; do
-          if [[ "${OPENCAW_BRAINSTORM_IDEA_BRANCH[$idea_id]}" == "$branch_id" ]]; then has_ideas=1; break; fi
+          if [[ "${HEPHAERA_BRAINSTORM_IDEA_BRANCH[$idea_id]}" == "$branch_id" ]]; then has_ideas=1; break; fi
         done
         [[ $has_ideas -eq 1 ]] || continue
         path="$(brainstorm_branch_path "$branch_id")"
         echo "## $path (\`$branch_id\`)"
         echo
         for idea_id in "${sorted_ideas[@]}"; do
-          [[ "${OPENCAW_BRAINSTORM_IDEA_BRANCH[$idea_id]}" == "$branch_id" ]] || continue
-          echo "- [$idea_id](BRAINSTORM.md#${idea_id,,}) | status: ${OPENCAW_BRAINSTORM_IDEA_STATUS[$idea_id]} | plan-ready: ${OPENCAW_BRAINSTORM_IDEA_READINESS[$idea_id]} | ${OPENCAW_BRAINSTORM_IDEA_TITLE[$idea_id]} — ${OPENCAW_BRAINSTORM_IDEA_SUMMARY[$idea_id]}"
+          [[ "${HEPHAERA_BRAINSTORM_IDEA_BRANCH[$idea_id]}" == "$branch_id" ]] || continue
+          echo "- [$idea_id](BRAINSTORM.md#${idea_id,,}) | status: ${HEPHAERA_BRAINSTORM_IDEA_STATUS[$idea_id]} | plan-ready: ${HEPHAERA_BRAINSTORM_IDEA_READINESS[$idea_id]} | ${HEPHAERA_BRAINSTORM_IDEA_TITLE[$idea_id]} — ${HEPHAERA_BRAINSTORM_IDEA_SUMMARY[$idea_id]}"
         done
         echo
       done
@@ -418,8 +418,8 @@ brainstorm_write_summary() {
 }
 
 brainstorm_validate_summary() {
-  local source_file="${1:-$OPENCAW_BRAINSTORM_FILE}"
-  local summary_file="${2:-$OPENCAW_BRAINSTORM_SUMMARY_FILE}"
+  local source_file="${1:-$HEPHAERA_BRAINSTORM_FILE}"
+  local summary_file="${2:-$HEPHAERA_BRAINSTORM_SUMMARY_FILE}"
   local expected_hash actual_hash summary_hash idea_id count
 
   brainstorm_validate_file "$source_file" inactive || return 1
@@ -437,7 +437,7 @@ brainstorm_validate_summary() {
     echo 'Brainstorm summary source hash does not match BRAINSTORM.md.' >&2
     return 1
   fi
-  for idea_id in "${OPENCAW_BRAINSTORM_IDEA_IDS[@]}"; do
+  for idea_id in "${HEPHAERA_BRAINSTORM_IDEA_IDS[@]}"; do
     count="$(grep -Fc -- "- [$idea_id](BRAINSTORM.md#${idea_id,,}) |" "$summary_file" || true)"
     if [[ "$count" -ne 1 ]]; then
       echo "Brainstorm summary must index $idea_id exactly once." >&2
@@ -445,7 +445,7 @@ brainstorm_validate_summary() {
     fi
   done
   actual_hash="$(grep -Ec '^- \[IDEA-[0-9]{3,}\]\(BRAINSTORM\.md#idea-[0-9]{3,}\) \|' "$summary_file" || true)"
-  if [[ "$actual_hash" -ne "${#OPENCAW_BRAINSTORM_IDEA_IDS[@]}" ]]; then
+  if [[ "$actual_hash" -ne "${#HEPHAERA_BRAINSTORM_IDEA_IDS[@]}" ]]; then
     echo 'Brainstorm summary contains missing or unexpected element entries.' >&2
     return 1
   fi

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/music-brief-v1.json",
+  "$id": "https://hephaera.dev/schemas/music-brief-v1.json",
   "title": "MUSIC instrumental and supplied-lyric brief",
   "description": "The command additionally checks current evidence hashes, item order/mode/loop consistency, aggregate budgets and exact lyric rights. This schema grants no execution or review permission.",
   "type": "object", "additionalProperties": false,
   "required": ["schemaVersion", "kind", "purpose", "provider", "spatialization", "loopIntent", "request", "technical"],
   "properties": {
-    "schemaVersion": {"const": "opencaw-music-brief/v1"},
+    "schemaVersion": {"const": "hephaera-music-brief/v1"},
     "kind": {"enum": ["instrumental", "supplied-lyrics"]},
     "purpose": {"type": "string", "minLength": 1, "maxLength": 1024},
     "provider": {"enum": ["LOCAL", "CLOUD"]},

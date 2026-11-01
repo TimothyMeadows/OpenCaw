@@ -22,8 +22,8 @@ class BlenderProduction(unittest.TestCase):
     def setUpClass(cls):
         if not Path(BLENDER).is_file():
             raise unittest.SkipTest("Blender 4.5 executable unavailable; set BLENDER_EXE")
-        configured = os.environ.get("OPENCAW_PROOF_BLENDER_EVIDENCE_ROOT")
-        evidence = Path(configured) if configured else ROOT / ".opencaw/.cache/tasks/proof-multiview-classification/evidence"
+        configured = os.environ.get("HEPHAERA_PROOF_BLENDER_EVIDENCE_ROOT")
+        evidence = Path(configured) if configured else ROOT / ".hephaera/.cache/tasks/proof-multiview-classification/evidence"
         if not evidence.is_absolute():
             evidence = ROOT / evidence
         if ".." in evidence.parts:
@@ -492,10 +492,10 @@ for view in report["cameras"]:
         self.assertFalse((ROOT / value["result"]).exists())
 
     def test_21_corrected_proof_frame_is_not_flipped_twice(self):
-        job, value = self.multiview("six-corrected", frame="opencaw-proof-z-up")
+        job, value = self.multiview("six-corrected", frame="hephaera-proof-z-up")
         self.run_blender(SCRIPTS / "review.py", job, "six-corrected")
         result = json.loads((ROOT / value["result"]).read_text())
-        self.assertEqual(result["alignment"]["inputFrame"], "opencaw-proof-z-up")
+        self.assertEqual(result["alignment"]["inputFrame"], "hephaera-proof-z-up")
         self.assertEqual(result["alignment"]["engineExportToProofFrame"], [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
         for expected, actual in zip(value["proofSet"]["views"], result["cameras"]):
             for row in range(4):
@@ -1200,7 +1200,7 @@ for mode in ['cancel','throw','partial']:
     finally:finish.bpy=original_bpy
     assert low.data==original and finish.mesh_identity(low)==before
     assert set(bpy.data.objects)==objects and set(bpy.data.meshes)==meshes
-    assert low.data.attributes.get('_opencaw_prepared_component_id') is None
+    assert low.data.attributes.get('_hephaera_prepared_component_id') is None
 """)
 
     def test_55_actual_full_surface_error_failure_rolls_back(self):
@@ -1317,7 +1317,7 @@ weights=[[(weight.group,weight.weight) for weight in vertex.groups] for vertex i
 regions=[{'id':'small-north','min':[-.5,-.5,.8],'max':[.5,.5,1.1]}]
 result=finish.simplify_quadriflow_input(low,selection(error=.5,regions=regions),1024)
 assert [(item.name,item.index) for item in low.vertex_groups]==definitions
-assert [entry for entry in low.vertex_groups if entry.name.startswith('OpenCawHeldDetailVertices')]==[]
+assert [entry for entry in low.vertex_groups if entry.name.startswith('HephaeraHeldDetailVertices')]==[]
 saved=low.data;low.data=source_mesh
 assert finish.mesh_identity(low)==source_hash
 assert [[(weight.group,weight.weight) for weight in vertex.groups] for vertex in source_mesh.vertices]==weights
@@ -1332,7 +1332,7 @@ for mode in ['missing-id','duplicate-id','invented-id','missing-attribute','move
     real_apply=bpy.ops.object.modifier_apply;calls=[0]
     def faulty(*args,**kwargs):
         calls[0]+=1;result=real_apply(*args,**kwargs);candidate=bpy.context.object
-        attribute=candidate.data.attributes.get('_opencaw_prepared_vertex_id')
+        attribute=candidate.data.attributes.get('_hephaera_prepared_vertex_id')
         values=finish.np.empty(len(candidate.data.vertices),dtype=finish.np.int32);attribute.data.foreach_get('value',values)
         selected=finish.np.flatnonzero(values)
         assert len(selected)>1
@@ -1361,7 +1361,7 @@ assert result['operatorCalls']==0 and result['status']=='already-within-cap'
 assert result['heldVertexProof']['heldVertices']==result['protectedVertexCount']>0
 assert result['heldVertexProof']['float32CoordinatesBitIdentical']
 assert 'unchanged mesh identity' in result['heldVertexProof']['verificationMethod']
-assert finish.mesh_identity(low)==before and low.data.attributes.get('_opencaw_prepared_vertex_id') is None
+assert finish.mesh_identity(low)==before and low.data.attributes.get('_hephaera_prepared_vertex_id') is None
 """)
 
     def test_66_unachievable_cap_with_all_vertices_held_never_retries_or_raises_cap(self):
@@ -1380,7 +1380,7 @@ assert calls[0]==1 and low.data==original and finish.mesh_identity(low)==before
 
     def test_67_existing_reserved_held_attribute_is_preserved_and_refused(self):
         self.helper_probe("simplification-held-attribute-collision", self.simplification_fixture_source() + """low=sphere();before=finish.mesh_identity(low)
-attribute=low.data.attributes.new('_opencaw_prepared_vertex_id','INT','POINT')
+attribute=low.data.attributes.new('_hephaera_prepared_vertex_id','INT','POINT')
 values=finish.np.full(len(low.data.vertices),77,dtype=finish.np.int32);attribute.data.foreach_set('value',values)
 try:finish.simplify_quadriflow_input(low,selection(regions=[{'id':'north','min':[-.5,-.5,.8],'max':[.5,.5,1.1]}]),1024)
 except ValueError as error:assert 'reserved simplification vertex identity' in str(error),str(error)
@@ -1485,7 +1485,7 @@ for mode in ['corner-attribute','face-identity']:
     def corrupted(mesh,*args,**kwargs):
         calls[0]+=1
         if calls[0]==2:
-            marker=mesh.attributes['_opencaw_retained_face_id'];ids=finish.np.empty(len(mesh.polygons),dtype=finish.np.int32);marker.data.foreach_get('value',ids)
+            marker=mesh.attributes['_hephaera_retained_face_id'];ids=finish.np.empty(len(mesh.polygons),dtype=finish.np.int32);marker.data.foreach_get('value',ids)
             selected=finish.np.flatnonzero(ids)
             if mode=='face-identity':marker.data[int(selected[0])].value=int(ids[selected[1]])
             else:mesh.attributes['OwnedCorner'].data[mesh.polygons[int(selected[0])].loop_start].value+=1

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/code-character-observation-v1.json",
-  "title": "OpenCaw Code Character Observation",
+  "$id": "https://hephaera.dev/schemas/code-character-observation-v1.json",
+  "title": "Hephaera Code Character Observation",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "capture", "structure", "motion", "runtime"],
   "properties": {
-    "schemaVersion": { "const": "opencaw-code-character-observation/v1" },
+    "schemaVersion": { "const": "hephaera-code-character-observation/v1" },
     "capture": {
       "type": "object",
       "required": ["seed", "viewport", "views", "externalRequests", "serviceWorkers"],

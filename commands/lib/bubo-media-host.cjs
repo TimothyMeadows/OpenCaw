@@ -47,8 +47,8 @@ function inspect(rootArgument, workspaceArgument) {
   if (!rootArgument) fail('The resolved project --root is required.');
   const root = path.resolve(runtime.native(rootArgument)); runtime.syntax(root); runtime.components(root);
   if (!fs.statSync(root).isDirectory()) fail('Project root must be an existing directory.');
-  const cache = runtime.projectPath(root, '.opencaw/.cache');
-  const workspace = runtime.projectPath(root, workspaceArgument || '.opencaw/.cache/bubo-media');
+  const cache = runtime.projectPath(root, '.hephaera/.cache');
+  const workspace = runtime.projectPath(root, workspaceArgument || '.hephaera/.cache/bubo-media');
   if (!runtime.within(cache, workspace) || runtime.samePath(cache, workspace)) fail('Media workspace must be a scoped project-cache child; external installations are not inspected.');
   let initialized = false, built = false, revision = null, reason = null, backends = [], catalogSha256 = null;
   try {
@@ -78,7 +78,7 @@ function inspect(rootArgument, workspaceArgument) {
     const states = new Set(value.backends.map(item => item.readiness));
     value.readiness = states.size === 1 ? [...states][0] : 'mixed-readiness';
   }
-  return { schemaVersion: 'opencaw-local-media-host/v1', pipeline: 'LOCAL', projectRoot: root,
+  return { schemaVersion: 'hephaera-local-media-host/v1', pipeline: 'LOCAL', projectRoot: root,
     workspace: path.relative(root, workspace).split(path.sep).join('/'), platform: process.platform, platformSupported: ['win32', 'linux'].includes(process.platform),
     runtime: { initialized, built, revision, catalogSha256, reason }, gpu: gpu(), modalities,
     generation: false, modelLoading: false, installation: false, externalInstallationsInspected: false,

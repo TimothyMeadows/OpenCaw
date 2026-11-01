@@ -1,6 +1,6 @@
 # AUDIO.md
 
-<!-- opencaw-media-pipeline:v1 domain=AUDIO -->
+<!-- hephaera-media-pipeline:v1 domain=AUDIO -->
 
 ## Pipeline Selection
 - AUDIO
@@ -14,7 +14,7 @@ Provider selection comes from MEDIA.md and explicit task authorization. AUDIO se
 
 ## Brief Requirements
 
-Record effect/environment, duration, variation, explicit LOCAL/CLOUD provider, spatialization/loop intent and finite output/runtime budgets in an opencaw-audio-brief/v1 brief. Use supported SFX controls and native maximum* budget/seconds names; do not silently tile, trim, normalize or downmix long ambience. MUSIC and VOICE are separately loadable domains. CLOUD execution is import-only unless a compatible session capability is separately selected.
+Record effect/environment, duration, variation, explicit LOCAL/CLOUD provider, spatialization/loop intent and finite output/runtime budgets in a hephaera-audio-brief/v1 brief. Use supported SFX controls and native maximum* budget/seconds names; do not silently tile, trim, normalize or downmix long ambience. MUSIC and VOICE are separately loadable domains. CLOUD execution is import-only unless a compatible session capability is separately selected.
 
 ## State And Ancestry
 

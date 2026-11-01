@@ -5,19 +5,19 @@
 const assert=require('assert/strict'), fs=require('fs'),path=require('path'),cp=require('child_process');
 const runtime=require('../commands/lib/bubo-runtime.cjs'),contracts=require('../commands/lib/media-pipeline-contract.cjs');
 const state=require('../commands/lib/media-pipeline-state.cjs'),engines=require('../commands/lib/engine-contract.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-media-pipeline-domains/evidence/state-fixtures');fs.mkdirSync(evidence,{recursive:true});
-const root=fs.mkdtempSync(path.join(evidence,'owned-')), task='owned-media', workspace='.opencaw/.cache/owned-media', mediaState='.opencaw/.cache/shared-allowance';
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-media-pipeline-domains/evidence/state-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const root=fs.mkdtempSync(path.join(evidence,'owned-')), task='owned-media', workspace='.hephaera/.cache/owned-media', mediaState='.hephaera/.cache/shared-allowance';
 const observations=[];
 const check=(value,message)=>{assert(value,message);observations.push(message);};
 const rejects=(action,pattern,message)=>{assert.throws(action,pattern,message);observations.push(message);};
 function write(name,value) {const file=path.join(root,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,typeof value==='string'||Buffer.isBuffer(value)?value:JSON.stringify(value,null,2)+'\n');return name;}
 const ref=name=>state.identity(root,name);
 const unavailable={unavailable:true,reason:'Owned fixture; no provider or inference involved.'};
-const media='# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'
+const media='# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'
   +['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')
   +'Image, music, sound-effect SFX and voice are separately declared. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
-write('MEDIA.md',media);write(`.opencaw/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task only\n');
+write('MEDIA.md',media);write(`.hephaera/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task only\n');
 write('inputs/rights.json',{fixture:'Synthetic rights metadata, no actual approval'});
 write('inputs/brief.json',{fixture:'Owned brief; no real media requested',rights:ref('inputs/rights.json')});
 for(const domain of ['AUDIO','MUSIC','VOICE'])contracts.generate({root,domain,inline:true});
@@ -49,7 +49,7 @@ function candidate(asset,name='owned',extra={}) {
   return {output,provenance,manifestFile,outputs:[ref(output)]};
 }
 function technical(asset,selected,suffix='technical',extra={}) {
-  const report={schemaVersion:'opencaw-media-technical/v1',assetSha256:state.status(options(asset)).assetSha256,outputs:selected.outputs,
+  const report={schemaVersion:'hephaera-media-technical/v1',assetSha256:state.status(options(asset)).assetSha256,outputs:selected.outputs,
     status:'passed',checks:[{id:'owned-metadata',status:'passed',reason:'Synthetic metadata fixture; no actual acoustic measurement'}],
     measurements:selected.outputs.map(output=>({...output,bytes:fs.statSync(path.join(root,output.path)).size,durationSeconds:1,sampleRate:24000,channels:1})),...extra};
   const file=write(`inputs/${asset.asset.nativeRequestId}.${suffix}.json`,report);
@@ -57,7 +57,7 @@ function technical(asset,selected,suffix='technical',extra={}) {
 }
 function review(asset,selected,kind='content',suffix='',extra={}) {
   const sourceEvidence=ref(write(`inputs/${asset.asset.nativeRequestId}.${kind}${suffix}.source.json`,{fixture:'Synthetic human-source metadata only; not a real user approval'}));
-  const value={schemaVersion:'opencaw-media-review/v1',assetSha256:state.status(options(asset)).assetSha256,outputs:selected.outputs,
+  const value={schemaVersion:'hephaera-media-review/v1',assetSha256:state.status(options(asset)).assetSha256,outputs:selected.outputs,
     kind,verdict:'accepted',reviewer:'Owned fixture identity; no human listening',reason:'Exercise explicit evidence plumbing only',sourceEvidence,...extra};
   const file=write(`inputs/${asset.asset.nativeRequestId}.${kind}${suffix}.review.json`,value);
   state.recordReview({...options(asset),review:file});return {file,value};
@@ -128,7 +128,7 @@ async function main() {
   rejects(()=>state.admitHandoff(options(assets[0])),/technical/,'Handoff is ineligible without actual current technical evidence');
   technical(assets[0],selected);review(assets[0],selected);
   rejects(()=>state.admitHandoff(options(assets[0])),/runtime/,'Content and technical review do not imply target acceptance');
-  const badReview=write('inputs/wrong-review.json',{schemaVersion:'opencaw-media-review/v1',assetSha256:'0'.repeat(64),outputs:selected.outputs});
+  const badReview=write('inputs/wrong-review.json',{schemaVersion:'hephaera-media-review/v1',assetSha256:'0'.repeat(64),outputs:selected.outputs});
   rejects(()=>state.recordReview({...options(assets[0]),review:badReview}),/different/,'Review for another fingerprint is rejected');
   engines.generate(root,'THREEJS',{inline:true});
   const target={directory:'assets/audio/owned-v1',codecs:['wav'],sampleRates:[24000],channels:[1],maxOutputBytes:4096,maxAudioSeconds:2};
@@ -137,7 +137,7 @@ async function main() {
   check(handoff.promotion===false && !fs.existsSync(path.join(root,target.directory)),'Handoff returns a guarded plan without runtime writes');
   rejects(()=>state.admitPromotion({...options(assets[0]),authorization:'inputs/missing.json'}),/ENOENT/,'Promotion requires separate explicit authorization');
   const promotionSource=ref(write('inputs/explicit-promotion-source.json',{fixture:'Separate synthetic promotion assertion, never a real authorization'}));
-  const authorization=write('inputs/promotion.json',{schemaVersion:'opencaw-media-promotion/v1',authorized:true,assetSha256:handoff.assetSha256,
+  const authorization=write('inputs/promotion.json',{schemaVersion:'hephaera-media-promotion/v1',authorized:true,assetSha256:handoff.assetSha256,
     target,outputs:handoff.outputs,authorizedBy:'Owned fixture only',reason:'Exercise admission without copying runtime files',sourceEvidence:promotionSource});
   const admitted=state.admitPromotion({...options(assets[0]),authorization});
   check(admitted.admitted===true,'Exact explicit authorization admits a promotion plan');
@@ -166,7 +166,7 @@ async function main() {
   review(assets[0],selected,'content','-accepted');
   for(const [suffix,changed,pattern,message] of [
     ['traversal',{directory:'../outside'},/Traversal|escapes/,'Target traversal is rejected before any runtime write'],
-    ['cache',{directory:'.opencaw/.cache/runtime'},/assets child/,'Runtime handoff cannot target the cache'],
+    ['cache',{directory:'.hephaera/.cache/runtime'},/assets child/,'Runtime handoff cannot target the cache'],
     ['bytes',{maxOutputBytes:1},/exceeds/,'Actual candidate bytes enforce target byte budget'],
     ['duration',{maxAudioSeconds:0.5},/exceeds/,'Actual declared duration enforces target budget'],
     ['rate',{sampleRates:[48000]},/format/,'Unsupported target sample-rate acceptance is rejected'],
@@ -209,7 +209,7 @@ async function main() {
     const nativeAsset=initialize('AUDIO','native','native owned'),otherAsset=initialize('AUDIO','other-native','different asset');
     const otherCandidate=candidate(otherAsset,'other',{provider:'LOCAL',record:false});
     let generated;
-    const platformModules=write('inputs/platform-modules.json',{schemaVersion:'opencaw-platform-modules/v1',modules:[]});
+    const platformModules=write('inputs/platform-modules.json',{schemaVersion:'hephaera-platform-modules/v1',modules:[]});
     const controls={timeout:120,'max-log-bytes':65536,'max-private-bytes':1048576,'platform-modules':platformModules};
     adapter.invoke=async(operation,parsed)=>{
       check(operation==='generate' && parsed.get('media-state')===mediaState,'Dispatch forwards the original physical shared allowance root');

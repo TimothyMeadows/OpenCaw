@@ -22,12 +22,12 @@ module.exports = {
                 },
                 async evaluate(callback, argument) {
                   const source = callback.toString();
-                  if (source.includes('__opencawEvidence.start')) {
+                  if (source.includes('__hephaeraEvidence.start')) {
                     profile = argument.profile;
                     return true;
                   }
-                  if (source.includes('__opencawEvidence.capture') || source.includes('__opencawEvidence.stop')) return undefined;
-                  if (source.includes('__opencawEvidence.sample')) {
+                  if (source.includes('__hephaeraEvidence.capture') || source.includes('__hephaeraEvidence.stop')) return undefined;
+                  if (source.includes('__hephaeraEvidence.sample')) {
                     const attachmentGaps = profile.structure.attachments.map(({ part, host }) => ({ part, host, gapRatio: 0 }));
                     const symmetry = profile.structure.symmetryGroups.map(({ id }) => ({ id, deviationRatio: 0 }));
                     return {

@@ -34,7 +34,7 @@ Create concise documentation that helps its intended audience make correct decis
 
 - Do not invent commands, configuration, benchmark results, or product behavior.
 - Do not expose secrets, personal paths, internal identifiers, or private links.
-- Do not copy protected prose or distinctive examples into OpenCaw artifacts.
+- Do not copy protected prose or distinctive examples into Hephaera artifacts.
 - Do not publish documentation externally without explicit authorization.
 
 # Collaboration

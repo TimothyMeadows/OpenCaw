@@ -9,7 +9,7 @@ const crypto = require('node:crypto');
 const engines = require('../commands/lib/engine-contract.cjs');
 const packaging = require('../commands/lib/web-game-package.cjs');
 const base=path.resolve(__dirname,'..');
-const area=path.join(base,'.opencaw/.cache/tasks/opencaw-maui-web-packaging');
+const area=path.join(base,'.hephaera/.cache/tasks/hephaera-maui-web-packaging');
 fs.mkdirSync(area,{recursive:true});
 const fixtures=fs.mkdtempSync(path.join(area,'transaction-fixtures-'));
 const original={renameSync:fs.renameSync,writeFileSync:fs.writeFileSync,unlinkSync:fs.unlinkSync,spawn:cp.spawn,spawnSync:cp.spawnSync,platform:Object.getOwnPropertyDescriptor(process,'platform')};
@@ -24,7 +24,7 @@ function host(name){const dir=path.join(fixtures,name);fs.mkdirSync(dir);engines
 const config={appId:'com.example.game',title:'Transaction Game',webRoot:'dist',output:'platforms/maui'};
 function init(name){const dir=host(name);packaging.init(dir,config);return dir;}
 async function ready(name){const dir=init(name);write(dir,'dist/index.html','<!doctype html><p>original</p>');write(dir,'dist/game.js','original-game');await packaging.sync(dir,{});return dir;}
-function nativeState(dir){const host=path.join(dir,'platforms/maui');return {props:bytes(path.join(host,'OpenCawGame.props')),snapshot:bytes(path.join(host,'.opencaw-web-snapshot.json')),assets:packaging.tree(path.join(host,'Resources/Raw/wwwroot'))};}
+function nativeState(dir){const host=path.join(dir,'platforms/maui');return {props:bytes(path.join(host,'HephaeraGame.props')),snapshot:bytes(path.join(host,'.hephaera-web-snapshot.json')),assets:packaging.tree(path.join(host,'Resources/Raw/wwwroot'))};}
 function configChange(dir){const file=path.join(dir,'web-game-package.json');const data=JSON.parse(fs.readFileSync(file,'utf8'));data.buildNumber++;fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');write(dir,'dist/game.js','updated-game');}
 function state(dir){return packaging.context(dir).state;}
 function restore(){fs.renameSync=original.renameSync;fs.writeFileSync=original.writeFileSync;fs.unlinkSync=original.unlinkSync;cp.spawn=original.spawn;cp.spawnSync=original.spawnSync;Object.defineProperty(process,'platform',original.platform);}
@@ -49,7 +49,7 @@ function filesNamed(dir,name){const found=[];function visit(current){for(const e
   try{throws(()=>packaging.init(initFailure,config),/injected/);}finally{restore();assertInitHit();}
   eq(fs.existsSync(path.join(initFailure,'platforms/maui')),false);
   eq(fs.existsSync(path.join(initFailure,'web-game-package.json')),false);
-  const initCache=path.join(initFailure,'.opencaw/.cache/packaging');
+  const initCache=path.join(initFailure,'.hephaera/.cache/packaging');
   eq(filesNamed(initCache,'pending-transaction.json').length,0);
   eq(filesNamed(initCache,'transaction-result.json').map(f=>JSON.parse(fs.readFileSync(f,'utf8')).status),['rolled-back']);
   packaging.init(initFailure,config);ok(fs.existsSync(path.join(initFailure,'platforms/maui/GameHost.csproj')));
@@ -84,7 +84,7 @@ function filesNamed(dir,name){const found=[];function visit(current){for(const e
   // exact prior props/assets/snapshot and retry can complete without deleting data.
   for(const role of ['props','wwwroot','snapshot']){
     const dir=await ready('sync-failure-'+role), prior=nativeState(dir), ownedState=state(dir);configChange(dir);
-    const suffix={props:'OpenCawGame.props',wwwroot:'wwwroot',snapshot:'.opencaw-web-snapshot.json'}[role];
+    const suffix={props:'HephaeraGame.props',wwwroot:'wwwroot',snapshot:'.hephaera-web-snapshot.json'}[role];
     const assertHit=injectRename((from,to)=>to===path.join(dir,'platforms/maui',role==='wwwroot'?'Resources/Raw/wwwroot':suffix));
     try{await rejects(()=>packaging.sync(dir,{}),/injected/);}finally{restore();assertHit();}
     eq(nativeState(dir),prior);eq(fs.existsSync(path.join(ownedState,'pending-transaction.json')),false);
@@ -104,7 +104,7 @@ function filesNamed(dir,name){const found=[];function visit(current){for(const e
   const interrupted=await ready('interrupted'), interruptedPrior=nativeState(interrupted), interruptedState=state(interrupted);configChange(interrupted);
   let publicationFailed=false,rollbackFailed=false;
   fs.renameSync=(from,to)=>{
-    if(!publicationFailed&&String(to)===path.join(interrupted,'platforms/maui/.opencaw-web-snapshot.json')){publicationFailed=true;throw new Error('injected interruption');}
+    if(!publicationFailed&&String(to)===path.join(interrupted,'platforms/maui/.hephaera-web-snapshot.json')){publicationFailed=true;throw new Error('injected interruption');}
     if(publicationFailed&&!rollbackFailed&&String(from)===path.join(interrupted,'platforms/maui/Resources/Raw/wwwroot')){rollbackFailed=true;throw new Error('injected rollback interruption');}
     return original.renameSync(from,to);
   };

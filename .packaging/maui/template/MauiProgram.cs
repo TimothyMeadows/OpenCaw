@@ -1,7 +1,7 @@
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 public static class MauiProgram
 {

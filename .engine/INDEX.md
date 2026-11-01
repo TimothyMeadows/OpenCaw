@@ -17,7 +17,7 @@ Select one engine in repository-root ENGINE.md. Unconfigured repositories defaul
 
 ## Explicit task overrides
 
-Record before producing output: `resolve-engine.sh --override UNITY --task TASK --scope prototypes/unity-demo --record-override`. An existing task and absent/empty isolated output directory are required. Consumers use `--evidence .opencaw/.cache/tasks/TASK/engine-override.json --output prototypes/unity-demo/file`. Evidence binds project/effective engine, task and contract/definition/registry hashes; its adjacent SHA-256 digest detects accidental receipt edits. Changed inputs require a new reviewed task receipt. This is cooperative validation, not an OS sandbox or an unforgeable authorization token.
+Record before producing output: `resolve-engine.sh --override UNITY --task TASK --scope prototypes/unity-demo --record-override`. An existing task and absent/empty isolated output directory are required. Consumers use `--evidence .hephaera/.cache/tasks/TASK/engine-override.json --output prototypes/unity-demo/file`. Evidence binds project/effective engine, task and contract/definition/registry hashes; its adjacent SHA-256 digest detects accidental receipt edits. Changed inputs require a new reviewed task receipt. This is cooperative validation, not an OS sandbox or an unforgeable authorization token.
 
 ## Dependencies and licensing
 
@@ -25,7 +25,7 @@ The baseline adds no AI model, service or paid middleware. It installs nothing a
 
 ## Independent authorship
 
-The six source packs informed the requested capability inventory; no source code, prose, scripts or assets were imported. The custom-licensed design-theory package is excluded from reuse. Standard design methods are independently authored. Engine APIs are checked against official, host-version-specific documentation. Prior Three.js/Babylon/Phaser architecture guidance moved within OpenCaw, with legacy redirects retained.
+The six source packs informed the requested capability inventory; no source code, prose, scripts or assets were imported. The custom-licensed design-theory package is excluded from reuse. Standard design methods are independently authored. Engine APIs are checked against official, host-version-specific documentation. Prior Three.js/Babylon/Phaser architecture guidance moved within Hephaera, with legacy redirects retained.
 
 ## Migration
 

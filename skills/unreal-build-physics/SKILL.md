@@ -12,7 +12,7 @@ Build Unreal Chaos bodies, collision queries and constraints with measured stabi
 
 ## Activation and prerequisites
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-physics` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-physics` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
 
 Identify Unreal version, Chaos settings, target hardware, world scale, movement components, collision channels, fixed/substep configuration and required stability budgets. Separate gameplay collision requirements from rendering detail.
 

@@ -21,7 +21,7 @@ function copy(library, root, evidence) {
 try {
   const library = project('library'); write(library, 'model.glb', 'File-copy fixture; not a geometry acceptance test.');
   const fresh = project('fresh');
-  const receipt = '.opencaw/.cache/tasks/copy/copy.json';
+  const receipt = '.hephaera/.cache/tasks/copy/copy.json';
   const result = copy(library, fresh, receipt);
   check(result.status === 0, result.stderr);
   check(fs.existsSync(path.join(fresh, receipt)), 'fresh copy writes task evidence to the installed private cache');
@@ -31,7 +31,7 @@ try {
   // Windows Node can report access denial when inspecting a WSL-created link.
   // Deny the operation without claiming that permission denial proves a link.
   const inspect = fs.lstatSync;
-  const blockedComponent = path.join(fresh, '.opencaw', '.cache');
+  const blockedComponent = path.join(fresh, '.hephaera', '.cache');
   try {
     for (const code of ['EACCES', 'EPERM', 'ELOOP']) {
       fs.lstatSync = function (file, ...args) {
@@ -46,11 +46,11 @@ try {
 
   const retired = project('retired');
   const denied = copy(library, retired, '.ai/tasks/copy/copy.json');
-  check(denied.status === 1 && denied.stderr.includes('.opencaw/.cache/tasks'), 'retired copy-evidence path is rejected');
+  check(denied.status === 1 && denied.stderr.includes('.hephaera/.cache/tasks'), 'retired copy-evidence path is rejected');
   check(!fs.existsSync(path.join(retired, 'assets')), 'retired evidence does not authorize an asset copy');
 
-  for (const component of ['.opencaw', '.opencaw/.cache']) {
-    const root = project(component === '.opencaw' ? 'mount-link' : 'cache-link');
+  for (const component of ['.hephaera', '.hephaera/.cache']) {
+    const root = project(component === '.hephaera' ? 'mount-link' : 'cache-link');
     const target = path.join(root, 'elsewhere'); fs.mkdirSync(target);
     const link = path.join(root, component); fs.mkdirSync(path.dirname(link), { recursive: true });
     try { fs.symlinkSync(target, link, process.platform === 'win32' ? 'junction' : 'dir'); }
@@ -72,7 +72,7 @@ try {
     ['model', 'create', ['fixture', '--output', '.ai/tasks/fixture/model.json']],
     ['model', 'record', ['.ai/tasks/fixture/model.json']],
     ['character', 'create', ['fixture', '--manifest', '.ai/tasks/fixture/model.json']],
-    ['model', 'record', ['.opencaw/.cache/tasks/fixture/model.json', '--evidence', 'front=.ai/tasks/fixture/front.png']]
+    ['model', 'record', ['.hephaera/.cache/tasks/fixture/model.json', '--evidence', 'front=.ai/tasks/fixture/front.png']]
   ]) rejects(() => engine.codeProduction(producer, kind, operation, args), /\.ai layout is retired/);
   check(!fs.existsSync(path.join(producer, '.ai')), 'retired CODE receipts are rejected without creating their paths');
   console.log(`Runtime cache layout tests passed (${checks} assertions).`);

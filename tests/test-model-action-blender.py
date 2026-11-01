@@ -16,7 +16,7 @@ import tracemalloc
 
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[1]
-TASK=Path(os.environ.get('OPENCAW_ACTION_TEST_EVIDENCE_ROOT', ROOT/'.opencaw/.cache/tasks/model-to-action')).resolve()
+TASK=Path(os.environ.get('HEPHAERA_ACTION_TEST_EVIDENCE_ROOT', ROOT/'.hephaera/.cache/tasks/model-to-action')).resolve()
 TASK.relative_to(ROOT)
 SCRIPTS=ROOT/'runtime/bubo/resources/model-to-action/blender'
 BLENDER=os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe'
@@ -201,7 +201,7 @@ class ActionProduction(unittest.TestCase):
         if not success:
             if result.exists():raise AssertionError('Failed Blender operation emitted passing-looking result')
             return run
-        report=json.loads(result.read_text());assert report['schemaVersion']=='opencaw-action-stage/v1' and report['operation']==operation
+        report=json.loads(result.read_text());assert report['schemaVersion']=='hephaera-action-stage/v1' and report['operation']==operation
         for relative in report['artifacts'].values():assert (cls.project/relative).is_file(),relative
         return report
 
@@ -430,7 +430,7 @@ Path('''+repr(str(result))+''').write_text(json.dumps(values))
 sys.dont_write_bytecode=True
 bpy.ops.wm.open_mainfile(filepath='''+repr(str(self.project/self.results['compose']['artifacts']['blend']))+''',load_ui=False,use_scripts=False)
 bpy.ops.mesh.primitive_grid_add(x_subdivisions=201,y_subdivisions=201,size=.25,location=(.6,0,.8))
-mesh=bpy.context.object;mesh.name='OwnedDenseVerificationPanel';mesh.data['opencaw_action_mesh']='dense-owned-panel'
+mesh=bpy.context.object;mesh.name='OwnedDenseVerificationPanel';mesh.data['hephaera_action_mesh']='dense-owned-panel'
 matrix=mesh.matrix_world.copy();rig=next(obj for obj in bpy.context.scene.objects if obj.type=='ARMATURE');mesh.parent=rig;mesh.matrix_world=matrix
 group=mesh.vertex_groups.new(name='root');group.add(list(range(len(mesh.data.vertices))),1,'REPLACE')
 modifier=mesh.modifiers.new('OwnedFixtureRig','ARMATURE');modifier.object=rig

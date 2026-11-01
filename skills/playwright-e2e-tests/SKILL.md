@@ -44,6 +44,6 @@ When adding or changing Playwright coverage:
 - Read `ARCHITECTURE.md` first. If the host repository uses the `PLAYWRIGHT` template, follow it as the testing contract.
 - Identify the workflow owner: smoke, regression, discovery, data-entry, visual/report comparison, or CI validation.
 - Keep specs orchestration-focused. Put selectors and browser interactions in page objects or host-local helpers when the workflow is reusable.
-- Keep credentials and environment selectors in host-owned env vars, CI secrets, or artifact files. Never add secrets to OpenCaw skills, commands, or assets.
+- Keep credentials and environment selectors in host-owned env vars, CI secrets, or artifact files. Never add secrets to Hephaera skills, commands, or assets.
 - Prefer a narrow targeted run before a broad suite run. Capture the command, browser project, grep/tag filter, and artifact locations in the final verification notes.
 - When interactive UI/report viewers are unavailable, generate evidence with `commands/playwright-evidence-report.sh` and cite the resulting Markdown report paths.

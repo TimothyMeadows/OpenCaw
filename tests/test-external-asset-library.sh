@@ -6,7 +6,7 @@ cd "$repo_root"
 runtime_dir="$(mktemp -d "$repo_root/tests/.external-assets-runtime-XXXXXX")"
 project="$runtime_dir/project"
 library="$runtime_dir/External Library"
-mkdir -p "$project/.opencaw/.cache/tasks/library-test" "$library/characters/Hero Rig/textures" "$library/props" "$library/bad-bundle"
+mkdir -p "$project/.hephaera/.cache/tasks/library-test" "$library/characters/Hero Rig/textures" "$library/props" "$library/bad-bundle"
 
 cleanup() {
   local resolved
@@ -19,12 +19,12 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 expect_failure() {
   local log="$1"; shift
   set +e
-  OPENCAW_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
+  HEPHAERA_PROJECT_ROOT="$project" "$@" >"$log" 2>&1
   local status=$?
   set -e
   [[ $status -ne 0 ]] || fail "command unexpectedly succeeded: $*"
 }
-project_command() { OPENCAW_PROJECT_ROOT="$project" "$@"; }
+project_command() { HEPHAERA_PROJECT_ROOT="$project" "$@"; }
 contains_exact_line() {
   sed 's/\r$//' "$2" | grep -Fqx -- "$1"
 }
@@ -114,26 +114,26 @@ grep -Fq 'props/crate.glb' <<< "$inventory" || fail 'inventory omitted glb asset
 ! grep -Fq 'props/readme.txt' <<< "$inventory" || fail 'inventory included unsupported text file'
 grep -Fq 'linked.glb' <<< "$inventory" || fail 'inventory did not report skipped symbolic link'
 expect_failure "$runtime_dir/missing-id.log" bash commands/inspect-external-asset-library.sh missing --json
-project_command bash commands/generate-style.sh --asset-library 'missing=/definitely/not/an/opencaw/library' CEL_SHADED_COMIC >/dev/null
+project_command bash commands/generate-style.sh --asset-library 'missing=/definitely/not/an/hephaera/library' CEL_SHADED_COMIC >/dev/null
 project_command bash commands/validate-style-contract.sh "$project/STYLE.md" >/dev/null
 expect_failure "$runtime_dir/missing-root.log" bash commands/inspect-external-asset-library.sh missing --json
 
 echo '[4/7] copying a single asset with hash-bound task evidence'
 project_command bash commands/generate-style.sh --asset-library "studio=$library" CEL_SHADED_COMIC >/dev/null
-copy_result="$(project_command bash commands/copy-external-asset.sh studio props/crate.glb --evidence .opencaw/.cache/tasks/library-test/crate-copy.json)"
+copy_result="$(project_command bash commands/copy-external-asset.sh studio props/crate.glb --evidence .hephaera/.cache/tasks/library-test/crate-copy.json)"
 crate_copy="$project/assets/models/studio/props/crate.glb"
 [[ -f "$crate_copy" ]] || fail 'single asset was not copied to its deterministic destination'
 [[ "$(hash_file "$crate_copy")" == "$source_hash_before" ]] || fail 'copied asset hash differs from source'
 grep -Fq '"sourceReadOnly": true' <<< "$copy_result" || fail 'copy output omitted source read-only state'
-grep -Fq '"destination": "assets/models/studio/props/crate.glb"' "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence destination is wrong'
-grep -Fq "$source_hash_before" "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence omitted hash'
-! grep -Fq "$library" "$project/.opencaw/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence duplicated the absolute library root'
+grep -Fq '"destination": "assets/models/studio/props/crate.glb"' "$project/.hephaera/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence destination is wrong'
+grep -Fq "$source_hash_before" "$project/.hephaera/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence omitted hash'
+! grep -Fq "$library" "$project/.hephaera/.cache/tasks/library-test/crate-copy.json" || fail 'copy evidence duplicated the absolute library root'
 [[ "$(hash_file "$library/props/crate.glb")" == "$source_hash_before" ]] || fail 'copy mutated source bytes'
 [[ "$(stat -c '%Y:%s' "$library/props/crate.glb")" == "$source_stat_before" ]] || fail 'copy mutated source metadata'
 expect_failure "$runtime_dir/overwrite.log" bash commands/copy-external-asset.sh studio props/crate.glb
 
 echo '[5/7] copying complete bundles and rejecting unsafe sources'
-project_command bash commands/copy-external-asset.sh studio 'characters/Hero Rig' --evidence .opencaw/.cache/tasks/library-test/hero-copy.json >/dev/null
+project_command bash commands/copy-external-asset.sh studio 'characters/Hero Rig' --evidence .hephaera/.cache/tasks/library-test/hero-copy.json >/dev/null
 hero_copy="$project/assets/models/studio/characters/Hero Rig"
 [[ -f "$hero_copy/hero.blend" && -f "$hero_copy/walk.bvh" && -f "$hero_copy/textures/hero.png" ]] || fail 'complete asset bundle was not copied'
 [[ -w "$hero_copy/hero.blend" ]] || fail 'project-local template copy is not writable'
@@ -143,7 +143,7 @@ expect_failure "$runtime_dir/absolute.log" bash commands/copy-external-asset.sh 
 expect_failure "$runtime_dir/source-link.log" bash commands/copy-external-asset.sh studio linked.glb
 expect_failure "$runtime_dir/bundle-link.log" bash commands/copy-external-asset.sh studio bad-bundle
 [[ ! -e "$project/assets/models/studio/bad-bundle" ]] || fail 'failed bundle copy left a destination'
-! find "$project/assets/models" -maxdepth 1 -name '.opencaw-copy-*' -print -quit | grep -q . || fail 'failed copy left temporary residue'
+! find "$project/assets/models" -maxdepth 1 -name '.hephaera-copy-*' -print -quit | grep -q . || fail 'failed copy left temporary residue'
 
 echo '[6/7] enforcing project confinement, non-overlap, and evidence boundaries'
 mkdir -p "$library/symlinked"
@@ -168,7 +168,7 @@ grep -Fq '`use-external-asset-library`' skills/INDEX.md || fail 'skill catalog o
 grep -Fq 'use-external-asset-library' .roles/ROLE_SKILL_MAP.json || fail 'role map omits external asset library skill'
 grep -Fiq 'optional external 3D asset libraries' README.md || fail 'README omits optional external library documentation'
 grep -Fq 'Never load, import, execute, or use an asset directly from an external library' AGENTS.md || fail 'AGENTS omits copy-first boundary'
-grep -Fq './tests/test-external-asset-library.sh' commands/validate-opencaw.sh || fail 'integrated validation omits external asset library tests'
+grep -Fq './tests/test-external-asset-library.sh' commands/validate-hephaera.sh || fail 'integrated validation omits external asset library tests'
 bash commands/generate-role-skill-map.sh --check >/dev/null
 bash commands/validate-role-skill-map.sh >/dev/null
 bash commands/validate-commands.sh >/dev/null

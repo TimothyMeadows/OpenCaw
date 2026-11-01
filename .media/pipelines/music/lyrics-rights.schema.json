@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/music-lyrics-rights-v1.json",
+  "$id": "https://hephaera.dev/schemas/music-lyrics-rights-v1.json",
   "title": "Exact supplied MUSIC lyrics rights",
   "description": "Source-backed assertion for the complete ordered item set. The command rehashes exact UTF-8 lyrics and source evidence; generation additionally requires current-task generationAllowed:true. Distribution permission remains separate.",
   "type": "object", "additionalProperties": false,
   "required": ["schemaVersion", "task", "purpose", "lyrics", "rightsConfirmed", "generationAllowed", "sourceEvidence"],
   "properties": {
-    "schemaVersion": {"const": "opencaw-music-lyrics-rights/v1"},
+    "schemaVersion": {"const": "hephaera-music-lyrics-rights/v1"},
     "task": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"},
     "purpose": {"type": "string", "minLength": 1, "maxLength": 1024},
     "lyrics": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["itemId", "lyricsSha256"], "properties": {"itemId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"}, "lyricsSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}},

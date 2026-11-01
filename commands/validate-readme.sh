@@ -25,13 +25,31 @@ const errors = [];
 
 const expectedOpening = [
   '',
-  '# OpenCaw',
+  '# Hephaera',
   '',
-  '![](OpenCaw.png)',
+  '![Hephaera robotic owl and wordmark](Hephaera.svg)',
   ''
 ];
 if (JSON.stringify(lines.slice(0, expectedOpening.length)) !== JSON.stringify(expectedOpening)) {
-  errors.push('The README logo/video opening changed.');
+  errors.push('The README title/logo opening changed.');
+}
+
+const logoPath = path.join(repoRoot, 'logo.png');
+const sharedLogoPath = path.join(repoRoot, 'runtime/bubo/logo.png');
+if (!fs.existsSync(logoPath)) errors.push('The shared Hephaera logo is missing.');
+else if (fs.existsSync(sharedLogoPath) && !fs.readFileSync(logoPath).equals(fs.readFileSync(sharedLogoPath))) {
+  errors.push('Hephaera and Bubo must use the same unmodified logo bytes.');
+}
+
+const wordmarkPath = path.join(repoRoot, 'Hephaera.svg');
+if (!fs.existsSync(wordmarkPath)) errors.push('The Hephaera owl-and-text wordmark is missing.');
+else if (fs.existsSync(logoPath)) {
+  const wordmark = fs.readFileSync(wordmarkPath, 'utf8');
+  const embedded = wordmark.match(/xlink:href="data:image\/png;base64,([A-Za-z0-9+/=]+)"/);
+  if (!embedded || !Buffer.from(embedded[1], 'base64').equals(fs.readFileSync(logoPath))) {
+    errors.push('The Hephaera wordmark must embed the unmodified shared Bubo owl.');
+  }
+  if (!wordmark.includes('>Hephaera</text>')) errors.push('The Hephaera wordmark text is missing.');
 }
 
 function slug(value) {
@@ -58,7 +76,7 @@ const tocSet = new Set(tocAnchors);
 if (tocSet.size !== tocAnchors.length) errors.push('The table of contents contains duplicate anchors.');
 
 const expectedToc = headings
-  .filter(item => item.level <= 2 && !['opencaw', 'table-of-contents'].includes(item.anchor))
+  .filter(item => item.level <= 2 && !['hephaera', 'table-of-contents'].includes(item.anchor))
   .map(item => item.anchor);
 for (const anchor of expectedToc) {
   if (!tocSet.has(anchor)) errors.push(`TOC omits heading: ${anchor}`);

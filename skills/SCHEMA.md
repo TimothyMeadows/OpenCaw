@@ -1,6 +1,6 @@
 # Skills Schema
 
-This document defines the structure for all skills in OpenCaw.
+This document defines the structure for all skills in Hephaera.
 
 Skills represent **reusable reasoning patterns**, not tools or commands.
 
@@ -75,7 +75,7 @@ A skill must:
 - define clear inputs/outputs
 - be composable with other skills
 
-Skills that keep project context must resolve paths through OpenCaw and write it only under `<project-root>/.opencaw/.cache/`. This is durable host state ignored by baseline Git, even though it is nested inside the fixed `.opencaw/` installation. Shared configuration and reusable assets stay outside `.cache/`; project `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, optional `MEDIA.md`, and optional Brainstorm contracts remain at the host root. Project-root command examples use `./.opencaw/commands/`; alternate install folders and install-location migration are unsupported.
+Skills that keep project context must resolve paths through Hephaera and write it only under `<project-root>/.hephaera/.cache/`. This is durable host state ignored by baseline Git, even though it is nested inside the fixed `.hephaera/` installation. Shared configuration and reusable assets stay outside `.cache/`; project `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, optional `MEDIA.md`, and optional Brainstorm contracts remain at the host root. Project-root command examples use `./.hephaera/commands/`; alternate install folders and install-location migration are unsupported.
 
 ---
 
@@ -155,4 +155,4 @@ Rules:
 
 Every skill has exactly one inline `engines: [AGNOSTIC]` or `engines: [ENGINE]` frontmatter declaration. V1 registered engines are THREEJS, BABYLONJS, PHASERJS, UNITY, UNREAL and GODOT. Empty, mixed, duplicate and unknown declarations are invalid. Engine skills use their canonical lowercase engine prefix (for example `unity-build-ui`); AGNOSTIC skills cannot use engine prefixes. Feature names may place the engine prefix before the action.
 
-Run `commands/resolve-skill.sh SKILL` before activation or delegation. An incompatible result excludes the skill; requesting it never selects its engine. AGNOSTIC means shared engine policy, not universal platform/tool availability. Browser QA still requires a browser surface; native UI requires native evidence. Legacy Three.js names are aliases in the OpenCaw resolver, not duplicate skill folders or a promise of host-native alias support.
+Run `commands/resolve-skill.sh SKILL` before activation or delegation. An incompatible result excludes the skill; requesting it never selects its engine. AGNOSTIC means shared engine policy, not universal platform/tool availability. Browser QA still requires a browser surface; native UI requires native evidence. Legacy Three.js names are aliases in the Hephaera resolver, not duplicate skill folders or a promise of host-native alias support.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/voice-local-use-v1.json",
+  "$id": "https://hephaera.dev/schemas/voice-local-use-v1.json",
   "title": "Purpose-bound local VOICE cloning use",
   "description": "Source-backed assertion only. Runtime rehashes all nested sources and exact task/purpose/item/output bindings; a schema match is not actual human permission.",
   "type": "object",
@@ -16,7 +16,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "opencaw-voice-local-use/v1"
+      "const": "hephaera-voice-local-use/v1"
     },
     "task": {
       "type": "string",
