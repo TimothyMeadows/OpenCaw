@@ -1,36 +1,36 @@
 # AGENTS.md
 
 ## Purpose
-This repository is the shared AI baseline for the division. Every host project installs it directly at `<project-root>/.opencaw/`, using a clone or Git submodule. Other install directory names are unsupported; this layout requires a fresh installation.
+This repository is the shared AI baseline for the division. Every host project installs it directly at `<project-root>/.hephaera/`, using a clone or Git submodule. Other install directory names are unsupported; this layout requires a fresh installation.
 
 ## Layering contract
-The tracked files in `.opencaw/` are the shared configuration layer. Its ignored `.cache/` child holds durable state for the host project and must never be committed to the shared baseline or treated as disposable download data.
+The tracked files in `.hephaera/` are the shared configuration layer. Its ignored `.cache/` child holds durable state for the host project and must never be committed to the shared baseline or treated as disposable download data.
 
 All memory and context artifacts live under the resolved repository root:
-- always-loaded system memory: `<project-root>/.opencaw/.cache/SYSTEM_MEMORY.md`
-- tagged project memory: `<project-root>/.opencaw/.cache/MEMORY.md`
-- semantic repository map: `<project-root>/.opencaw/.cache/REPO_MAP.md`
-- project rules: `<project-root>/.opencaw/.cache/RULES.md`
-- debug history: `<project-root>/.opencaw/.cache/DEBUG.md`
-- task notes: `<project-root>/.opencaw/.cache/tasks/`
+- always-loaded system memory: `<project-root>/.hephaera/.cache/SYSTEM_MEMORY.md`
+- tagged project memory: `<project-root>/.hephaera/.cache/MEMORY.md`
+- semantic repository map: `<project-root>/.hephaera/.cache/REPO_MAP.md`
+- project rules: `<project-root>/.hephaera/.cache/RULES.md`
+- debug history: `<project-root>/.hephaera/.cache/DEBUG.md`
+- task notes: `<project-root>/.hephaera/.cache/tasks/`
 
 Optional pre-planning Brainstorm state lives at the resolved repository root:
 - full durable ideas and active state: `<project-root>/BRAINSTORM.md`
 - generated exit index: `<project-root>/BRAINSTORM_SUMMARY.md`
 
-Resolve these paths with `./commands/resolve-opencaw-paths.sh`. Never infer a broad workspace parent when resolution fails.
+Resolve these paths with `./commands/resolve-hephaera-paths.sh`. Never infer a broad workspace parent when resolution fails.
 
-Write project-specific learned state only under the resolved `.opencaw/.cache/`. Modify shared baseline files outside `.cache/` only when the user explicitly requests baseline changes. Root `AGENTS.md` uses a managed bootstrap that reads only `./.opencaw/AGENTS.md`; engine, architecture, style, optional media and Brainstorm contracts remain at the project root.
+Write project-specific learned state only under the resolved `.hephaera/.cache/`. Modify shared baseline files outside `.cache/` only when the user explicitly requests baseline changes. Root `AGENTS.md` uses a managed bootstrap that reads only `./.hephaera/AGENTS.md`; engine, architecture, style, optional media and Brainstorm contracts remain at the project root.
 
-Command examples below are relative to `.opencaw/` unless a project-root path is explicitly shown. From the project root, invoke commands through `./.opencaw/commands/`. Maintainer source checkouts are for baseline development and testing, not alternate host installation layouts.
+Command examples below are relative to `.hephaera/` unless a project-root path is explicitly shown. From the project root, invoke commands through `./.hephaera/commands/`. Maintainer source checkouts are for baseline development and testing, not alternate host installation layouts.
 
 ## Session startup review
 At session start, follow this memory-first sequence:
 
 On Windows without a usable Bash runtime, run the PowerShell bootstrap described in **Windows Bash bootstrap** before this sequence.
 
-1. Resolve the project root and repository-local `.opencaw/.cache` paths with `./commands/resolve-opencaw-paths.sh`.
-2. Run `./commands/create-host-ai-scaffold.sh` automatically when required files are missing. The command is idempotent, creates `.opencaw/.cache/`, and preserves project content outside the managed root `AGENTS.md` bootstrap block. It does not discover, import, or support previous install locations.
+1. Resolve the project root and repository-local `.hephaera/.cache` paths with `./commands/resolve-hephaera-paths.sh`.
+2. Run `./commands/create-host-ai-scaffold.sh` automatically when required files are missing. The command is idempotent, creates `.hephaera/.cache/`, and preserves project content outside the managed root `AGENTS.md` bootstrap block. It does not discover, import, or support previous install locations.
 3. Load all of `SYSTEM_MEMORY.md`. It has precedence over project memory and rules, but never over actual system, developer, or current user instructions.
 4. Run `./commands/brainstorm-mode.sh status` when the command is available. If `BRAINSTORM.md` is active, load all of it and restore Brainstorm mode before planning, task tracking, Goal, or Gauntlet selection; reconstitute its two researcher subagents before processing ideas.
 5. Review project `RULES.md`, `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, active goal or Gauntlet state, and open issues when present. Read `DEBUG.md` only for debugging work.
@@ -40,17 +40,21 @@ On Windows without a usable Bash runtime, run the PowerShell bootstrap described
 
 Read `../MEDIA.md` only when the current task configures, generates, validates, or promotes image or audio media. Do not load it for unrelated work.
 
-You should send a message to the user that you are an OpenCaw session and ready for usage.
+You should send a message to the user that you are a Hephaera session and ready for usage.
+
+## Existing installation state
+
+New installations and active context use `.hephaera/`. Read `./docs/STATE_TRANSITION.md` before carrying forward legacy context. `./commands/state-transition.sh inspect` is read-only; explicit prepare records a persistent fence while preserving original state. Never relabel old approvals, journals or receipt chains or reset attempt budgets. Fresh projects without legacy state are unaffected.
 
 ## Windows Bash bootstrap
 
 - Linux and macOS use their existing Bash runtime; do not run Windows bootstrap or installation logic there.
 - On Windows, prefer an existing Git Bash runtime for native filesystem performance and lower startup overhead.
-- If Bash is missing, run `powershell -NoProfile -ExecutionPolicy Bypass -File "./.opencaw/commands/install-windows-bash.ps1"` from the project root to inspect providers.
+- If Bash is missing, run `powershell -NoProfile -ExecutionPolicy Bypass -File "./.hephaera/commands/install-windows-bash.ps1"` from the project root to inspect providers.
 - Install software only when the user explicitly requests it or runs the installer with `-Install`; never install Bash during ordinary scaffold creation.
 - Use `-Provider GitBash -Install` for the recommended native Windows provider or `-Provider WSL -Install` when Linux tooling compatibility is required.
 - Use `-RunScaffold -ProjectRoot <path>` after discovery or installation to invoke the canonical Bash scaffold.
-- The scaffold writes `.opencaw/.cache/WINDOWS_BASH.md` only when it detects a Windows host, Git Bash/MSYS/Cygwin, or WSL.
+- The scaffold writes `.hephaera/.cache/WINDOWS_BASH.md` only when it detects a Windows host, Git Bash/MSYS/Cygwin, or WSL.
 
 ## Architecture workflow
 The canonical architecture contract for the host repository is:
@@ -68,7 +72,7 @@ Architecture templates live in:
 - Ask the user which architecture templates in `./.architecture/` apply to the repository.
 - Support selecting multiple templates for multi-architecture repositories.
 - After the user answers, generate `../ARCHITECTURE.md` with `./commands/generate-architecture.sh "<TEMPLATE1>" ["TEMPLATE2" ...]`.
-- Default generation must use concise read directives (for example `Read \`./.opencaw/.architecture/DOTNET.md\` instructions`) instead of inlining template text.
+- Default generation must use concise read directives (for example `Read \`./.hephaera/.architecture/DOTNET.md\` instructions`) instead of inlining template text.
 - Use `--inline` only when the user explicitly asks for fully embedded template content.
 - Once generated, use `../ARCHITECTURE.md` as the authoritative architecture contract.
 
@@ -86,7 +90,7 @@ Before activating any skill or assigning it to a subagent, run `./commands/resol
 
 After role identity resolution, use `./commands/resolve-role-capabilities.sh DOMAIN/ROLE` to obtain filtered capabilities and exclusion reasons. Keep the canonical role map complete across engines. Apply the effective engine's language/runtime rules to engine-owned code; standalone services and tools retain their own architecture contracts.
 
-A current-prompt engine override is allowed only for an isolated prototype. Record it with `./commands/resolve-engine.sh --override ENGINE --task TASK --scope prototypes/NAME --record-override`. The task must exist and the output scope must be absent or empty. Consumers pass `--evidence .opencaw/.cache/tasks/TASK/engine-override.json --output prototypes/NAME/file`; receipts bind project/effective engine, contract/definition/registry/task hashes and permitted output scope. Revalidate every output before writes or tool launches. Do not write incompatible code into an existing game, reuse stale evidence, rewrite ENGINE.md for a task override or select an engine implicitly from a skill.
+A current-prompt engine override is allowed only for an isolated prototype. Record it with `./commands/resolve-engine.sh --override ENGINE --task TASK --scope prototypes/NAME --record-override`. The task must exist and the output scope must be absent or empty. Consumers pass `--evidence .hephaera/.cache/tasks/TASK/engine-override.json --output prototypes/NAME/file`; receipts bind project/effective engine, contract/definition/registry/task hashes and permitted output scope. Revalidate every output before writes or tool launches. Do not write incompatible code into an existing game, reuse stale evidence, rewrite ENGINE.md for a task override or select an engine implicitly from a skill.
 
 Web-engine selections (`runtimeKind: web` in the engine registry) automatically select the MAUI packaging profile for Windows, macOS via Mac Catalyst, Android and iOS. Read-directive ENGINE contracts pick up this capability without regeneration; stale inline definitions require explicit regeneration as usual. MAUI is a packaging capability, not another engine, visual/media pipeline or architecture selector. Use `package-web-games`, `./commands/web-game-package.sh` and `./docs/WEB_GAME_PACKAGING.md` for explicit host initialization, verified static web staging, native builds, signing and release preparation. Startup/selection never scaffolds a host or installs workloads. Native engines keep their own exporters. Linux/TV are unsupported; Wine/Proton operation is unverified. Keep unavailable build hosts, platform SDKs, signing and actual device/game QA explicit; package preparation grants no store/publication authorization.
 
@@ -114,7 +118,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDE
 ### When `../STYLE.md` exists
 - Read it and follow it as the authoritative art style and pipeline contract for visual, game-art, generated-image, UI-art, code-model, and asset-production work.
 - Resolve the current pipeline with `./commands/resolve-art-pipeline.sh`. An explicit current-prompt pipeline selection takes precedence over the primary pipeline, applies only to that task, may select any registered pipeline, and does not rewrite `STYLE.md`.
-- Record prompt-override evidence below the active `.opencaw/.cache/tasks/<task>/` folder with `selectionSource: prompt` and the current style-contract hash.
+- Record prompt-override evidence below the active `.hephaera/.cache/tasks/<task>/` folder with `selectionSource: prompt` and the current style-contract hash.
 
 ### When `../STYLE.md` is missing
 - Ask the user which style templates in `./.styles/` apply to the repository, unless the user already named the desired style.
@@ -122,7 +126,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDE
 - Default the primary art pipeline to `PROOF_TO_MODEL` unless the user explicitly selects `CLOUD`, `LOCAL`, `CODE`, or `BLENDER`.
 - After the user answers, generate `../STYLE.md` with `./commands/generate-style.sh [--pipeline PIPELINE] [--allow-pipeline PIPELINE ...] [--asset-library ID=ABSOLUTE_PATH ...] "<STYLE1>" ["STYLE2" ...]`.
 - External asset libraries are optional. Never ask for or probe a library during startup or initial setup unless the user explicitly requests one.
-- Default generation must use concise read directives (for example `Read \`./.opencaw/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
+- Default generation must use concise read directives (for example `Read \`./.hephaera/.styles/ISOMETRIC_2_5D.md\` instructions`) instead of inlining template text.
 - Use `--inline` only when the user explicitly asks for fully embedded template content.
 - Validate generated or edited style contracts with `./commands/validate-style-contract.sh`.
 - Once generated, use `../STYLE.md` as the authoritative art style contract.
@@ -137,7 +141,7 @@ Registered pipelines are `CLOUD`, `LOCAL`, `PROOF_TO_MODEL`, `CODE`, and `BLENDE
 ### Pipeline responsibilities
 
 - `CLOUD`: use compatible generation exposed by the active session with explicit budgets, non-runtime staging, provenance, and human review.
-- `LOCAL`: use direct offline Bubo image, SFX, music, preset-speech and consented-cloning execution on local GPU resources through `use-bubo-local-generation` and `bubo-media.sh`. Bubo owns model/tool pins, dependency verification, bounded workers and shared GPU ownership; OpenCaw owns policy, rights, consent, budgets and reviews. Setup is a separate explicitly authorized operation.
+- `LOCAL`: use direct offline Bubo image, SFX, music, preset-speech and consented-cloning execution on local GPU resources through `use-bubo-local-generation` and `bubo-media.sh`. Bubo owns model/tool pins, dependency verification, bounded workers and shared GPU ownership; Hephaera owns policy, rights, consent, budgets and reviews. Setup is a separate explicitly authorized operation.
 - `PROOF_TO_MODEL`: classify/research immutable original sources first, prepare and obtain human approval of six consistent views, then run native per-view preprocessing, pinned Pixal3D multi-view reconstruction and Blender 4.5 LTS finishing with immutable ancestry, independent review and separate human promotion; use `build-proof-to-model-assets`.
 - `CODE`: author host-native Three.js TypeScript/JavaScript models; do not use downloaded/generated mesh assets or a model library as the primary implementation.
 - `BLENDER`: author Blender 4.5 LTS scenes, assets, renders, and runtime exports through immutable working-copy, validation, staging, and human-review controls.
@@ -172,7 +176,7 @@ MODEL_TO_ANIMATION is a downstream asset-production workflow, defined in `./.sty
 - Native authoring and explicit owned/licensed clip retargeting are the baseline. Adobe products, services, adapters and Adobe-dependent authoring integrations are excluded; do not add Mixamo support. Optional AI models, hosted services, paid libraries, uploads, installations and license acceptance require separate selection and authorization.
 - Preserve versioned model, rig/hierarchy, clip, retarget, tool/script/recipe and engine identities. Review complete motion ranges and transitions, including contact, loops, deformation and interruption; a manifest or a single rendered frame does not certify motion quality.
 - Keep authoritative movement/collision/gameplay separate from clip playback and particles. Speed/acceleration/turn and explicit warp phases drive bounded selected-engine presentation through stable anchors, clocks, cancellation, pooling and accessibility controls. GPU effect replay does not imply deterministic gameplay.
-- State and reviews remain under `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs remain in versioned non-runtime staging. Require current rig/hierarchy and motion review, independent review and separate human runtime acceptance before explicit promotion.
+- State and reviews remain under `.hephaera/.cache/tasks/<task>/`; originals, working copies and motion proofs remain in versioned non-runtime staging. Require current rig/hierarchy and motion review, independent review and separate human runtime acceptance before explicit promotion.
 - A GLB does not contain a portable engine state machine or native particle system. Use compatible engine owners and actual target evidence. Phaser's 2D path requires an explicit sprite/pre-rendered handoff; CODE remains THREEJS-specific source authoring. Missing native or browser prerequisites remain blocked/not-run, without a silent fallback or installation.
 
 ## Model-to-action workflow
@@ -197,7 +201,7 @@ Cloud/local media policy and shared provenance schemas live in:
 - `./.styles/.pipelines/local/`
 - `./.styles/.pipelines/_shared/`
 
-Direct LOCAL execution uses the pinned, explicitly built `./runtime/bubo` dependency. Its media catalog and platform locks own exact model/tool identities; do not duplicate those pins in OpenCaw. Use `./commands/inspect-local-media-host.sh` for read-only discovery and `./commands/bubo-media.sh <setup|inspect|generate>` for explicit task-bound requests. Discovery must distinguish declared capabilities, receipt presence and verified installed content; it never loads models or provisions software. `inspect --load true` is a separately selected zero-sample load/unload diagnostic.
+Direct LOCAL execution uses the pinned, explicitly built `./runtime/bubo` dependency. Its media catalog and platform locks own exact model/tool identities; do not duplicate those pins in Hephaera. Use `./commands/inspect-local-media-host.sh` for read-only discovery and `./commands/bubo-media.sh <setup|inspect|generate>` for explicit task-bound requests. Discovery must distinguish declared capabilities, receipt presence and verified installed content; it never loads models or provisions software. `inspect --load true` is a separately selected zero-sample load/unload diagnostic.
 
 ### Independent audio, music and voice domains
 
@@ -243,7 +247,7 @@ MEDIA.md remains the shared provider, authorization and provenance authority. Au
 
 ## Role casting
 
-OpenCaw supports **role casting** using role definitions stored in:
+Hephaera supports **role casting** using role definitions stored in:
 
 - `./.roles/<domain>/<role-name>/ROLE.md`
 - current computer science catalog: `./.roles/computer-science/<role-name>/ROLE.md`
@@ -260,7 +264,7 @@ Resolution behavior:
 - If an unqualified role name or alias maps to exactly one role across all domains, activate it directly.
 - If an unqualified role name or alias maps to multiple roles across domains, pause and ask the user which domain-qualified role they mean before continuing.
 - If both an exact role-name match and alias match exist, prefer exact role-name match.
-- If no match exists, continue using normal OpenCaw baseline behavior.
+- If no match exists, continue using normal Hephaera baseline behavior.
 - Prefer deterministic resolution with `./commands/resolve-role.sh` when available.
 
 ### Alias support
@@ -288,7 +292,7 @@ When multiple roles are requested:
 ### Behavior
 - If a matching role file exists, use that role definition in the session
 - If multiple matching role files exist, compose them in request order
-- If no matching role exists, continue using the normal OpenCaw baseline behavior
+- If no matching role exists, continue using the normal Hephaera baseline behavior
 - Role casting is additive to the baseline unless the user explicitly says the role should dominate the session
 
 ### Guidance
@@ -298,7 +302,7 @@ When multiple roles are requested:
 
 ## Work hierarchy and modes
 
-- OpenCaw's hierarchy is optional Brainstorm discovery, then planning, then exactly one delivery mode: `Brainstorm -> Plan -> Task | Goal | Gauntlet`.
+- Hephaera's hierarchy is optional Brainstorm discovery, then planning, then exactly one delivery mode: `Brainstorm -> Plan -> Task | Goal | Gauntlet`.
 - Brainstorm mode is an optional, explicitly activated pre-planning stage for researched ideas. It is not a delivery mode and creates no task, issue, Goal, Gauntlet, implementation, commit, or PR state.
 - Activate Brainstorm only when the user explicitly says `Brainstorm mode`, `start Brainstorm mode`, or `enter Brainstorm mode`; ordinary use of the verb “brainstorm” does not activate persistent mode.
 - Once active, Brainstorm persists in repository-root `BRAINSTORM.md` across conversations until the user explicitly turns it off. Never infer exit from inactivity or completeness.
@@ -325,7 +329,7 @@ When multiple roles are requested:
 
 ## Subagent strategy
 - Use the `computer-science/project-manager` planning lens before subagent execution when the user requests multiple agents/developers/workers or when natural parallelism is clear
-- Create or update `../.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md` for substantial parallel work using `./commands/create-subagent-plan.sh`, then validate it with `./commands/validate-subagent-plan.sh`
+- Create or update `../.hephaera/.cache/tasks/<task_name>/SUBAGENTS.md` for substantial parallel work using `./commands/create-subagent-plan.sh`, then validate it with `./commands/validate-subagent-plan.sh`
 - Brainstorm is the only exception to task-backed `SUBAGENTS.md`: maintain exactly three participants consisting of the main `computer-science/project-manager` and two persistent read-only `computer-science/researcher` subagents; keep their reports ephemeral and let only the project-manager write Brainstorm artifacts.
 - If two researcher slots are unavailable, preserve active Brainstorm state and block idea processing. Never use a smaller team or sequential fallback.
 - Resolve every lane role with `./commands/resolve-role.sh` before assigning work; do not spawn a lane with unresolved role ambiguity, missing verification, overlapping write scope, or an immediate critical-path dependency
@@ -382,7 +386,7 @@ When multiple roles are requested:
 - Goal task PRs and approved Gauntlet progress PRs are the only scoped exceptions to the human PR readiness confirmation requirement. Use `./commands/pr-readiness-check.sh --goal [task_or_issue_ref] [validation_summary_file]` or `./commands/pr-readiness-check.sh --gauntlet-progress <gauntlet_ref> <item_id> [validation_summary_file]` to record the applicable automatic-publication boundary
 - Gauntlet progress-PR publication becomes automatic only after the user approves the Gauntlet quality bar and delivery contract. Every progress PR targets the recorded Gauntlet integration branch, and every merge remains human-controlled
 - Use case-sensitive `Refs #<issue-number>` as the exact first body line for Gauntlet progress and remediation PRs; reserve every closing-keyword alias for the human-gated promotion PR, whose exact first line is `Closes #<issue-number>` and whose target must be the current GitHub default branch
-- `pr-readiness-check.sh --gauntlet-progress` creates an immutable publication checkpoint under `publication-checkpoints/<item-id>/`, including the exact quality-bar fingerprint plus `Quality bar approved at` value and unit-manifest fingerprint plus `Unit manifest approved at` value active at issuance. Gauntlet GitHub evidence accepts only authenticated SSH or HTTPS `github.com` remotes, rejects plaintext HTTP, and pins live API queries to `github.com` rather than ambient `GH_HOST`. Put its exact `<!-- opencaw-gauntlet-publication:v1 checkpoint=<path> checkpoint-sha256=<sha> -->` marker after the required issue-reference first line; the opened-event recorder must query that body, verify the checkpoint still matches the live contract, refs, remote observations, and remediation cause, and consume it exactly once
+- `pr-readiness-check.sh --gauntlet-progress` creates an immutable publication checkpoint under `publication-checkpoints/<item-id>/`, including the exact quality-bar fingerprint plus `Quality bar approved at` value and unit-manifest fingerprint plus `Unit manifest approved at` value active at issuance. Gauntlet GitHub evidence accepts only authenticated SSH or HTTPS `github.com` remotes, rejects plaintext HTTP, and pins live API queries to `github.com` rather than ambient `GH_HOST`. Put its exact `<!-- hephaera-gauntlet-publication:v1 checkpoint=<path> checkpoint-sha256=<sha> -->` marker after the required issue-reference first line; the opened-event recorder must query that body, verify the checkpoint still matches the live contract, refs, remote observations, and remediation cause, and consume it exactly once
 - That scoped publication approval does not authorize force-pushing shared branches, deleting branches, changing the delivery base, approving reviews, merging, or enabling auto-merge
 - Use `./commands/pr-readiness-check.sh --gauntlet <gauntlet_ref> [validation_summary_file]` only after all active progress PRs are QA-passed and human-merged and the integration review passes. Verify the integration branch still matches the emitted reviewed source SHA; explicit human confirmation remains required before the promotion PR to the delivery base
 - Goal flow may automatically push/open a PR for the completed task, but it must still run post-PR QA before moving to the next goal task
@@ -393,7 +397,7 @@ When multiple roles are requested:
   2. an available `github` CLI executable or repository-provided GitHub CLI wrapper
   3. GitHub MCP/app connector tools only when both CLI options are unavailable or unsuitable
 - After the applicable readiness gate authorizes publication and the PR number or URL is confirmed available, start QA immediately without waiting for another prompt
-- Post each QA pass/fail verdict to the PR as a new GitHub comment; when screenshots are part of the evidence, include inline screenshot URLs in the comment. Gauntlet comments carry `<!-- opencaw-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`; recorders must query the exact same-PR comment and reject missing, edited, wrong-author, wrong-PR, semantically stale, or reused evidence
+- Post each QA pass/fail verdict to the PR as a new GitHub comment; when screenshots are part of the evidence, include inline screenshot URLs in the comment. Gauntlet comments carry `<!-- hephaera-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`; recorders must query the exact same-PR comment and reject missing, edited, wrong-author, wrong-PR, semantically stale, or reused evidence
 - Prefer `./commands/comment-pr-qa-results.sh "<pr_number_or_url>" "<results_summary_file>" [screenshot_or_artifact ...]` for non-Gauntlet PR QA comments. For a Gauntlet PR, use `./commands/comment-pr-qa-results.sh "<pr_number_or_url>" "<results_summary_file>" --gauntlet-verdict "<pass|fail>" --head-sha "<sha>" --gauntlet-source "<project-relative-evidence>" [--gauntlet-affected-units "<none|comma-sorted-ids>"] [screenshot_or_artifact ...]`; the bare form does not emit the semantic marker required by Gauntlet recorders
 - Mirror or link QA evidence to the task issue when a task issue exists, but the PR comment is the primary post-PR signal
 - If QA fails on an open Gauntlet progress PR, keep that unit PR as the evidence surface, record the failure comment, rebuild with a changed builder strategy, and use a new critic invocation against the new PR-head SHA before repeating QA
@@ -410,22 +414,22 @@ When multiple roles are requested:
 - When given a bug report, move directly into diagnosis and resolution
 - Point at logs, errors, failing tests, or concrete evidence, then resolve the issue
 - Minimize user context switching
-- Review `../.opencaw/.cache/DEBUG.md` for previous solutions before finding new ones
-- Write reusable bug resolutions to `../.opencaw/.cache/DEBUG.md`
+- Review `../.hephaera/.cache/DEBUG.md` for previous solutions before finding new ones
+- Write reusable bug resolutions to `../.hephaera/.cache/DEBUG.md`
 
 ## Task management
 0. Do not run task management while Brainstorm mode is active. Brainstorm elements can become plans only after explicit exit; a later delivery-mode request may then create task state.
-1. Plan first: update `../.opencaw/.cache/tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
-2. For each real task, create `../.opencaw/.cache/tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
-3. Create or link a matching GitHub issue for each real task and record only the issue URL in `../.opencaw/.cache/tasks/OPEN_ISSUES.md`
+1. Plan first: update `../.hephaera/.cache/tasks/TODO.md` as the active numbered checklist of pending and completed tasks in execution order
+2. For each real task, create `../.hephaera/.cache/tasks/<unique_task_name>/TASK.md` with the actual instructions, assumptions, notes, and review details
+3. Create or link a matching GitHub issue for each real task and record only the issue URL in `../.hephaera/.cache/tasks/OPEN_ISSUES.md`
 4. Verify plan: check in before starting implementation when the task is non-trivial or changes direction materially
-5. Track progress: mark `../.opencaw/.cache/tasks/TODO.md` items complete as you go
-6. Keep `../.opencaw/.cache/tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
-7. Store detailed implementation notes, task-specific instructions, and review results in the matching `../.opencaw/.cache/tasks/<unique_task_name>/TASK.md`
-8. Sync task issues when reading active tasks and remove URLs for closed issues from `.opencaw/.cache/tasks` tracking
+5. Track progress: mark `../.hephaera/.cache/tasks/TODO.md` items complete as you go
+6. Keep `../.hephaera/.cache/tasks/TODO.md` concise: it should be the ordered checklist, not the full work log
+7. Store detailed implementation notes, task-specific instructions, and review results in the matching `../.hephaera/.cache/tasks/<unique_task_name>/TASK.md`
+8. Sync task issues when reading active tasks and remove URLs for closed issues from `.hephaera/.cache/tasks` tracking
 9. Capture lessons proactively with `append-project-memory.sh --tags ... --entry ...` after corrections and durable discoveries
 10. Before final handoff for substantial work, run `clean-context` to compress completed context and refresh high-signal summaries
-11. A Gauntlet has one parent task file and issue. Its internal work units, progress and promotion-QA ledgers, PR-event evidence, and immutable critic rounds live under `.opencaw/.cache/gauntlets/<gauntlet_name>/`; do not create separate task issues for those units unless they become independently deliverable work
+11. A Gauntlet has one parent task file and issue. Its internal work units, progress and promotion-QA ledgers, PR-event evidence, and immutable critic rounds live under `.hephaera/.cache/gauntlets/<gauntlet_name>/`; do not create separate task issues for those units unless they become independently deliverable work
 
 ## Brainstorm flow
 
@@ -444,7 +448,7 @@ When multiple roles are requested:
 ## Goal flow
 - A goal is an explicitly requested automated multi-task delivery flow, not the generic `## Goal` field in a task file
 - Never start or create Goal flow while Brainstorm mode is active.
-- Goal files live under `../.opencaw/.cache/goals/<goal_name>/GOAL.md`; create them with `./commands/create-goal-file.sh "<goal_name>" ["Goal Title"]`
+- Goal files live under `../.hephaera/.cache/goals/<goal_name>/GOAL.md`; create them with `./commands/create-goal-file.sh "<goal_name>" ["Goal Title"]`
 - In normal task flow, tasks proceed one by one unless the project-manager role defines safe parallel sub-agent lanes
 - In goal flow, tasks still proceed through planning, implementation, validation, PR creation, and post-PR QA, but the PR readiness human confirmation prompt is skipped
 - After each completed goal task, automatically raise the PR, confirm it is available, run post-PR QA, post QA evidence to the PR, then move to the next goal task
@@ -457,7 +461,7 @@ When multiple roles are requested:
 
 - A Gauntlet is an explicitly requested adversarial quality loop, not a synonym for a task or goal queue
 - Never start or create Gauntlet flow while Brainstorm mode is active.
-- Gauntlet state lives under `../.opencaw/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md`; create it with `./commands/create-gauntlet-file.sh "<gauntlet_name>" ["Title"] --task "<task_name>"`
+- Gauntlet state lives under `../.hephaera/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md`; create it with `./commands/create-gauntlet-file.sh "<gauntlet_name>" ["Title"] --task "<task_name>"`
 - Before building, define an inspectable objective, artifact, constraints, concrete quality bar, delivery base branch plus exact base commit SHA, and `gauntlet/<gauntlet_name>` integration branch created exactly at that commit. Obtain human approval; the first accepted progress-PR event freezes the parent task, objective, constraints/permissions, base identity, static delivery policy, approved quality bar, and normalized unit manifest into separate execution-contract, quality, and unit-manifest fingerprints
 - Changing an approved bar requires new human approval and invalidates affected prior pass evidence; preserve prior rounds, record the revision in Unit History, reopen active units, clear integration evidence, reset the current fingerprint to `pending`, and reset PR eligibility to `no`
 - Let the lead agent decompose the deliverable into stable, independently judgeable units with a durable title and inspectable frozen scope. The normalized manifest contains sorted retained ID/title/scope definitions plus sorted supersession ID/scope/replacement edges, excluding transient checkbox/status state. Approve it with `- Unit manifest approval: <fingerprint> | units: <comma-sorted-ids> | approved by: <identity> | approved at: <canonical-UTC>`. Later additions, definition changes, or edge changes require `- Unit manifest revision: <revision-id> | from: <fingerprint> | to: <fingerprint> | prior-units: <comma-sorted-ids> | current-units: <comma-sorted-ids> | reason: <substantive reason> | approved by: <identity> | approved at: <canonical-UTC>`; a changed title or scope also requires a matching `- Unit scope-title revision: <item-id> | from: <scope-fingerprint> | to: <scope-fingerprint> | reason: <substantive reason> | approved by: <identity> | approved at: <canonical-UTC>`. Every per-unit checkpoint, PR event, and round must name a unit present in—and use the title/scope definition committed by—the manifest generation active at that evidence timestamp. Never delete or rename a retained definition
@@ -481,15 +485,15 @@ When multiple roles are requested:
 - If the user prompt includes an issue reference (for example `Work on #123`), import that issue into task tracking first with `./commands/import-task-from-issue.sh "#123"`.
 - Accept issue references as `#123`, `123`, or a full GitHub issue URL.
 - Reuse the existing task file when the issue is already linked.
-- Keep imported issue URLs in `../.opencaw/.cache/tasks/OPEN_ISSUES.md` only while the issue state is open.
+- Keep imported issue URLs in `../.hephaera/.cache/tasks/OPEN_ISSUES.md` only while the issue state is open.
 
 ## Task file rules
-- `../.opencaw/.cache/tasks/TODO.md` is the active ordered checklist only
+- `../.hephaera/.cache/tasks/TODO.md` is the active ordered checklist only
 - Items should be numbered and ordered by execution sequence
 - Checked items are complete; unchecked items are pending
 - Each TODO entry should reference its matching task folder when applicable
-- `../.opencaw/.cache/tasks/<unique_task_name>/TASK.md` contains the actual work instructions for that task
-- `../.opencaw/.cache/tasks/OPEN_ISSUES.md` stores only open GitHub issue URLs (one per line)
+- `../.hephaera/.cache/tasks/<unique_task_name>/TASK.md` contains the actual work instructions for that task
+- `../.hephaera/.cache/tasks/OPEN_ISSUES.md` stores only open GitHub issue URLs (one per line)
 - Each task should include a linked issue URL while open (for example in `## Issue`)
 - Prefer one task folder per substantial task
 - Keep task names stable, concise, and filesystem-safe
@@ -560,12 +564,12 @@ When multiple roles are requested:
 ## Memory v2 policy
 
 ### Precedence and scope
-- `.opencaw/.cache/SYSTEM_MEMORY.md` is flat, always loaded, and limited to protected safety constraints, verified non-sensitive machine capabilities, and repository-wide system-memory facts.
+- `.hephaera/.cache/SYSTEM_MEMORY.md` is flat, always loaded, and limited to protected safety constraints, verified non-sensitive machine capabilities, and repository-wide system-memory facts.
 - `MEMORY.md` is the canonical project-learning store and is loaded selectively by exact tags.
 - `REPO_MAP.md` is the canonical semantic project index and uses the same tag syntax.
 - `RULES.md` remains the project-specific instruction layer; `DEBUG.md` remains detailed debugging evidence.
 - Temporary notes remain in the matching task file.
-- Never store OpenCaw memory or context artifacts in a user-home, machine-global, or workspace-parent directory; keep them under the resolved repository's `.opencaw/.cache` directory.
+- Never store Hephaera memory or context artifacts in a user-home, machine-global, or workspace-parent directory; keep them under the resolved repository's `.hephaera/.cache` directory.
 
 ### Tagged entry schema
 Use one-line bullets such as:
@@ -594,7 +598,7 @@ When adding a new skill:
 2. Reuse an existing script in `commands/` if possible
 3. Add a new script only when necessary
 4. Keep the skill focused on a single repeatable job
-5. If the skill writes memory, it must write only to the host repo under `../.opencaw/.cache/`
+5. If the skill writes memory, it must write only to the host repo under `../.hephaera/.cache/`
 
 ## Role-based skill and command binding
 
@@ -614,9 +618,9 @@ After a role is activated, bias behavior using the mappings defined in:
 - Use the first role as the primary bias when there is overlap, unless the user sets a different priority
 - Use stricter or safer guidance when role-specific skill choices conflict
 
-## OpenCaw schema validation
+## Hephaera schema validation
 
-OpenCaw includes schema validation commands for roles, skills, and commands:
+Hephaera includes schema validation commands for roles, skills, and commands:
 
 - `./commands/validate-engines.sh`
 - `./commands/validate-engine-contract.sh`
@@ -625,15 +629,15 @@ OpenCaw includes schema validation commands for roles, skills, and commands:
 - `./commands/validate-commands.sh`
 - `./commands/validate-styles.sh`
 - `./commands/validate-media-templates.sh`
-- `./commands/validate-opencaw.sh`
+- `./commands/validate-hephaera.sh`
 
 Use these when:
 - adding or editing role files
 - adding or editing skills
 - adding or editing commands
-- reviewing changes to the OpenCaw baseline
+- reviewing changes to the Hephaera baseline
 
-Prefer running full validation before finalizing structural changes to OpenCaw.
+Prefer running full validation before finalizing structural changes to Hephaera.
 
 ## Host repository assumption
-An installed baseline must be `<project-root>/.opencaw/`; its direct parent is the host root. Reject other installation names and conflicting explicit root selections instead of searching workspace parents. A standalone maintainer source checkout is a development-only case and resolves to its own Git root; explicit `OPENCAW_PROJECT_ROOT` fixture hosts are allowed for development tests. Fail closed when the boundary is ambiguous. The resolver exposes `OPENCAW_INSTALL_DIR` and `OPENCAW_PROJECT_CACHE_DIR`; durable context always resides at `<project-root>/.opencaw/.cache/`.
+An installed baseline must be `<project-root>/.hephaera/`; its direct parent is the host root. Reject other installation names and conflicting explicit root selections instead of searching workspace parents. A standalone maintainer source checkout is a development-only case and resolves to its own Git root; explicit `HEPHAERA_PROJECT_ROOT` fixture hosts are allowed for development tests. Fail closed when the boundary is ambiguous. The resolver exposes `HEPHAERA_INSTALL_DIR` and `HEPHAERA_PROJECT_CACHE_DIR`; durable context always resides at `<project-root>/.hephaera/.cache/`.

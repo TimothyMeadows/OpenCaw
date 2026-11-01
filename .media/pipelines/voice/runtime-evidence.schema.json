@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/voice-runtime-evidence-v1.json",
+  "$id": "https://hephaera.dev/schemas/voice-runtime-evidence-v1.json",
   "title": "Actual selected-engine VOICE target evidence",
   "description": "Engine identity and complete output/source bindings are revalidated against current host state. Metadata is not actual playback review.",
   "type": "object",
@@ -18,7 +18,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "opencaw-voice-runtime-evidence/v1"
+      "const": "hephaera-voice-runtime-evidence/v1"
     },
     "task": {
       "type": "string",

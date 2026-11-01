@@ -80,7 +80,7 @@ echo "[5/8] exercising owned pure host-context, shared-budget and provenance fix
 
 echo "[6/8] inspecting readiness without loading models or mutating the host"
 mkdir -p "$runtime_dir/discovery"
-bash commands/inspect-local-media-host.sh --root "$runtime_dir/discovery" --workspace .opencaw/.cache/bubo-media --json > "$runtime_dir/discovery.json"
+bash commands/inspect-local-media-host.sh --root "$runtime_dir/discovery" --workspace .hephaera/.cache/bubo-media --json > "$runtime_dir/discovery.json"
 discovery_for_node="$runtime_dir/discovery.json"
 project_for_node="$runtime_dir/discovery"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
@@ -89,7 +89,7 @@ fi
 "$node_bin" - "$discovery_for_node" "$project_for_node" <<'NODE'
 const fs=require('fs'),assert=require('assert/strict');
 const doc=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
-assert.equal(doc.schemaVersion,'opencaw-local-media-host/v1');assert.equal(doc.pipeline,'LOCAL');
+assert.equal(doc.schemaVersion,'hephaera-local-media-host/v1');assert.equal(doc.pipeline,'LOCAL');
 for(const field of ['generation','modelLoading','installation','externalInstallationsInspected'])assert.equal(doc[field],false,field+' must not occur in discovery');
 for(const modality of ['image','sfx','music','voice']){
   assert.equal(doc.modalities[modality].ready,false,'advertisement/receipt presence cannot establish native readiness');
@@ -101,7 +101,7 @@ console.log('PASS: four-modality readiness remains separate from installed/nativ
 NODE
 for operation in setup inspect generate; do
   expect_failure "$runtime_dir/missing-$operation.log" bash commands/bubo-media.sh "$operation" --root "$runtime_dir/discovery" --task owned --manifest missing.json
-  [[ ! -e "$runtime_dir/discovery/.opencaw" ]] || fail 'rejected media dispatch created durable state'
+  [[ ! -e "$runtime_dir/discovery/.hephaera" ]] || fail 'rejected media dispatch created durable state'
 done
 
 echo "[7/8] validating image, music, SFX, and voice manifests"
@@ -133,7 +133,7 @@ fi
 "$node_bin" - "$native_project_for_node" "$template_for_node" <<'NODE'
 const fs=require('fs'),path=require('path');
 const root=process.argv[2],template=process.argv[3];
-const receipts=path.join(root,'.opencaw/.cache/tasks/native');
+const receipts=path.join(root,'.hephaera/.cache/tasks/native');
 const staged=path.join(root,'.art-staging/proofs');
 const outside=path.join(path.dirname(root),'project-relative-sibling');
 for(const directory of [receipts,staged,outside]) fs.mkdirSync(directory,{recursive:true});
@@ -156,7 +156,7 @@ fs.symlinkSync(root,path.join(path.dirname(root),'project-alias'),'junction');
 write('inside-link','inside-link/candidate.bin');
 write('outside-link','outside-link/candidate.bin');
 NODE
-native_receipts="$native_project/.opencaw/.cache/tasks/native"
+native_receipts="$native_project/.hephaera/.cache/tasks/native"
 bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$native_receipts/valid.json"
 expect_failure "$runtime_dir/project-legacy.log" bash commands/validate-media-generation-manifest.sh "$native_receipts/valid.json"
 for adverse in escape absolute missing changed-hash inside-link outside-link; do
@@ -164,7 +164,7 @@ for adverse in escape absolute missing changed-hash inside-link outside-link; do
 done
 expect_failure "$runtime_dir/project-manifest-escape.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$runtime_dir/project-relative-sibling/manifest.json"
 expect_failure "$runtime_dir/project-manifest-link.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" "$native_project/manifest-link/valid.json"
-expect_failure "$runtime_dir/project-root-link.log" bash commands/validate-media-generation-manifest.sh --project-root "$runtime_dir/project-alias" "$runtime_dir/project-alias/.opencaw/.cache/tasks/native/valid.json"
+expect_failure "$runtime_dir/project-root-link.log" bash commands/validate-media-generation-manifest.sh --project-root "$runtime_dir/project-alias" "$runtime_dir/project-alias/.hephaera/.cache/tasks/native/valid.json"
 expect_failure "$runtime_dir/project-duplicate.log" bash commands/validate-media-generation-manifest.sh --project-root "$native_project" --project-root "$native_project" "$native_receipts/valid.json"
 expect_failure "$runtime_dir/project-missing-option.log" bash commands/validate-media-generation-manifest.sh --project-root
 grep -Fq 'hash mismatch' "$runtime_dir/project-changed-hash.log" || fail 'changed project output did not fail its hash'
@@ -186,8 +186,8 @@ expect_failure "$runtime_dir/rights.log" bash commands/validate-media-generation
 echo "[8/8] validating pipeline structure and integrated hooks"
 bash commands/validate-media-templates.sh
 bash commands/validate-art-pipelines.sh
-grep -Fq './commands/validate-art-pipelines.sh' commands/validate-opencaw.sh || fail "integrated validation omits art pipelines"
-grep -Fq './commands/validate-media-templates.sh' commands/validate-opencaw.sh || fail "integrated validation omits media templates"
+grep -Fq './commands/validate-art-pipelines.sh' commands/validate-hephaera.sh || fail "integrated validation omits art pipelines"
+grep -Fq './commands/validate-media-templates.sh' commands/validate-hephaera.sh || fail "integrated validation omits media templates"
 git_check_bin="$(command -v git.exe 2>/dev/null || command -v git)"
 "$git_check_bin" diff --check
 echo "Generative media tests passed."

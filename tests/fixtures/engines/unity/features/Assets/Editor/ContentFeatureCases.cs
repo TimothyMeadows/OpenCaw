@@ -10,21 +10,21 @@ using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.U2D;
-#if OPENCAW_UNITY_SPRITE
+#if HEPHAERA_UNITY_SPRITE
 using UnityEditor.U2D.Sprites;
 #endif
-#if OPENCAW_UNITY_TILEMAP
+#if HEPHAERA_UNITY_TILEMAP
 using UnityEngine.Tilemaps;
 #endif
 
 // These are real Editor API probes, not a simulation of a Unity process.
 // Package-dependent branches stay blocked unless the isolated project's
 // declared prerequisites enabled their symbol. No source file installs packages.
-public static class OpenCawUnityContentCases
+public static class HephaeraUnityContentCases
 {
-    public static IEnumerator SpriteIdentity(OpenCawUnityFeatureContext context)
+    public static IEnumerator SpriteIdentity(HephaeraUnityFeatureContext context)
     {
-#if OPENCAW_UNITY_SPRITE
+#if HEPHAERA_UNITY_SPRITE
         string file = context.AssetDirectory + "/identity.png";
         var texture = new Texture2D(32, 16, TextureFormat.RGBA32, false);
         try
@@ -81,13 +81,13 @@ public static class OpenCawUnityContentCases
         context.Note("Native importer identities verified; real prefab/animation consumers require their own reload test.");
         yield return null;
 #else
-        context.Blocked("SpriteIdentity requires the explicitly selected 2D Sprite data-provider package and OPENCAW_UNITY_SPRITE.");
+        context.Blocked("SpriteIdentity requires the explicitly selected 2D Sprite data-provider package and HEPHAERA_UNITY_SPRITE.");
         yield break;
 #endif
     }
 
-#if OPENCAW_UNITY_SPRITE
-    private static Dictionary<string, string> SpriteIdentities(string file, OpenCawUnityFeatureContext context)
+#if HEPHAERA_UNITY_SPRITE
+    private static Dictionary<string, string> SpriteIdentities(string file, HephaeraUnityFeatureContext context)
     {
         var result = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var sprite in AssetDatabase.LoadAllAssetsAtPath(file).OfType<Sprite>())
@@ -100,15 +100,15 @@ public static class OpenCawUnityContentCases
     }
 #endif
 
-    public static IEnumerator RuleTileTopology(OpenCawUnityFeatureContext context)
+    public static IEnumerator RuleTileTopology(HephaeraUnityFeatureContext context)
     {
-#if OPENCAW_UNITY_TILEMAP
+#if HEPHAERA_UNITY_TILEMAP
         var rule = RequiredAsset<RuleTile>(context, "ContentRuleTile");
         var isolated = RequiredAsset<Sprite>(context, "ContentRuleIsolatedSprite");
         var neighbor = RequiredAsset<Sprite>(context, "ContentRuleNeighborSprite");
         context.Check(isolated != neighbor, "Declared isolated/east-neighbor outcomes differ");
-        var root = new GameObject("OpenCawRuleGrid", typeof(Grid));
-        var child = new GameObject("OpenCawRuleMap", typeof(Tilemap));
+        var root = new GameObject("HephaeraRuleGrid", typeof(Grid));
+        var child = new GameObject("HephaeraRuleMap", typeof(Tilemap));
         child.transform.SetParent(root.transform);
         try
         {
@@ -127,7 +127,7 @@ public static class OpenCawUnityContentCases
         }
         finally { UnityEngine.Object.DestroyImmediate(root); }
 #else
-        context.Blocked("RuleTileTopology requires explicitly selected Tilemap/Tilemap Extras packages and OPENCAW_UNITY_TILEMAP.");
+        context.Blocked("RuleTileTopology requires explicitly selected Tilemap/Tilemap Extras packages and HEPHAERA_UNITY_TILEMAP.");
         yield break;
 #endif
     }
@@ -140,7 +140,7 @@ public static class OpenCawUnityContentCases
         public int Delivered;
     }
 
-    public static IEnumerator AtlasLifecycle(OpenCawUnityFeatureContext context)
+    public static IEnumerator AtlasLifecycle(HephaeraUnityFeatureContext context)
     {
         context.RequireGraphics();
         string spriteFile = RequiredAssetFile(context, "ContentSpriteBundle");
@@ -179,7 +179,7 @@ public static class OpenCawUnityContentCases
             // Start both requests before awaiting either; no shared handle is overwritten.
             var sprites = spriteNames.Select(n => spriteBundle.LoadAssetAsync<Sprite>(n)).ToArray();
             while (sprites.Any(r => !r.isDone)) { CheckDeadline(context, deadline, "Loading two late-bound sprites"); yield return null; }
-            root = new GameObject("OpenCawAtlasFixture");
+            root = new GameObject("HephaeraAtlasFixture");
             var cameraObject = new GameObject("Camera", typeof(Camera));
             cameraObject.transform.SetParent(root.transform);
             var camera = cameraObject.GetComponent<Camera>();
@@ -249,9 +249,9 @@ public static class OpenCawUnityContentCases
         else request.completed += operation => { if (request.assetBundle != null) request.assetBundle.Unload(true); };
     }
 
-    public static IEnumerator Physics3D(OpenCawUnityFeatureContext context)
+    public static IEnumerator Physics3D(HephaeraUnityFeatureContext context)
     {
-        var scene = SceneManager.CreateScene("OpenCawPhysics3D_" + Guid.NewGuid().ToString("N"), new CreateSceneParameters(LocalPhysicsMode.Physics3D));
+        var scene = SceneManager.CreateScene("HephaeraPhysics3D_" + Guid.NewGuid().ToString("N"), new CreateSceneParameters(LocalPhysicsMode.Physics3D));
         try
         {
             var world = scene.GetPhysicsScene();
@@ -281,9 +281,9 @@ public static class OpenCawUnityContentCases
         finally { EditorSceneManager.CloseScene(scene, true); }
     }
 
-    public static IEnumerator Physics2D(OpenCawUnityFeatureContext context)
+    public static IEnumerator Physics2D(HephaeraUnityFeatureContext context)
     {
-        var scene = SceneManager.CreateScene("OpenCawPhysics2D_" + Guid.NewGuid().ToString("N"), new CreateSceneParameters(LocalPhysicsMode.Physics2D));
+        var scene = SceneManager.CreateScene("HephaeraPhysics2D_" + Guid.NewGuid().ToString("N"), new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         try
         {
             var world = scene.GetPhysicsScene2D();
@@ -317,7 +317,7 @@ public static class OpenCawUnityContentCases
         finally { EditorSceneManager.CloseScene(scene, true); }
     }
 
-    public static IEnumerator NavigationCancellation(OpenCawUnityFeatureContext context)
+    public static IEnumerator NavigationCancellation(HephaeraUnityFeatureContext context)
     {
         if (NavMesh.GetSettingsCount() == 0) context.Blocked("No native agent build settings are configured.");
         var settings = NavMesh.GetSettingsByIndex(0);
@@ -339,7 +339,7 @@ public static class OpenCawUnityContentCases
             var missing = new NavMeshPath();
             bool found = NavMesh.CalculatePath(start.position, origin + Vector3.right * 100, NavMesh.AllAreas, missing);
             context.Check(!found || missing.status != NavMeshPathStatus.PathComplete, "Unavailable destination never reports complete arrival");
-            actor = new GameObject("OpenCawNavAgent");
+            actor = new GameObject("HephaeraNavAgent");
             actor.transform.position = start.position;
             var agent = actor.AddComponent<NavMeshAgent>();
             agent.agentTypeID = settings.agentTypeID;
@@ -361,7 +361,7 @@ public static class OpenCawUnityContentCases
         }
     }
 
-    public static IEnumerator ShaderCompilation(OpenCawUnityFeatureContext context)
+    public static IEnumerator ShaderCompilation(HephaeraUnityFeatureContext context)
     {
         context.RequireGraphics();
         string asset = RequiredAssetFile(context, "ContentShader");
@@ -385,13 +385,13 @@ public static class OpenCawUnityContentCases
         finally { UnityEngine.Object.DestroyImmediate(material); }
     }
 
-    public static IEnumerator RenderingConfiguration(OpenCawUnityFeatureContext context)
+    public static IEnumerator RenderingConfiguration(HephaeraUnityFeatureContext context)
     {
         context.RequireGraphics();
         var asset = QualitySettings.renderPipeline != null ? QualitySettings.renderPipeline : GraphicsSettings.defaultRenderPipeline;
         string actual = asset == null ? "builtin" : asset.GetType().FullName;
         context.Check(context.Setting("ContentExpectedPipeline") == actual, "Effective Quality/Graphics pipeline matches declared fixture selection: " + actual);
-        var root = new GameObject("OpenCawRenderCamera", typeof(Camera));
+        var root = new GameObject("HephaeraRenderCamera", typeof(Camera));
         RenderTexture target = null;
         var previousActive = RenderTexture.active;
         try
@@ -430,7 +430,7 @@ public static class OpenCawUnityContentCases
         }
     }
 
-    private static void RenderCamera(OpenCawUnityFeatureContext context, Camera camera, RenderTexture target)
+    private static void RenderCamera(HephaeraUnityFeatureContext context, Camera camera, RenderTexture target)
     {
         var pipeline = QualitySettings.renderPipeline != null ? QualitySettings.renderPipeline : GraphicsSettings.defaultRenderPipeline;
         if (pipeline == null) { camera.Render(); return; }
@@ -457,14 +457,14 @@ public static class OpenCawUnityContentCases
         finally { RenderTexture.active = previous; UnityEngine.Object.DestroyImmediate(image); }
     }
 
-    private static T RequiredAsset<T>(OpenCawUnityFeatureContext context, string setting) where T : UnityEngine.Object
+    private static T RequiredAsset<T>(HephaeraUnityFeatureContext context, string setting) where T : UnityEngine.Object
     {
         var value = AssetDatabase.LoadAssetAtPath<T>(RequiredAssetFile(context, setting));
         if (value == null) context.Blocked("Required native asset is unavailable or has the wrong type: " + setting);
         return value;
     }
 
-    private static string RequiredAssetFile(OpenCawUnityFeatureContext context, string setting)
+    private static string RequiredAssetFile(HephaeraUnityFeatureContext context, string setting)
     {
         string asset = context.Setting(setting).Replace('\\', '/');
         string root = Path.GetFullPath("Assets");
@@ -483,14 +483,14 @@ public static class OpenCawUnityContentCases
         return asset;
     }
 
-    private static string[] TwoDistinct(string text, OpenCawUnityFeatureContext context)
+    private static string[] TwoDistinct(string text, HephaeraUnityFeatureContext context)
     {
         var values = text.Split(',').Select(s => s.Trim()).ToArray();
         context.Check(values.Length == 2 && values.All(s => s.Length > 0) && values.Distinct(StringComparer.Ordinal).Count() == 2, "Fixture declares two distinct names/tags");
         return values;
     }
 
-    private static void CheckDeadline(OpenCawUnityFeatureContext context, double deadline, string operation)
+    private static void CheckDeadline(HephaeraUnityFeatureContext context, double deadline, string operation)
     {
         context.Check(EditorApplication.timeSinceStartup < deadline, "Bounded native operation completed: " + operation);
     }

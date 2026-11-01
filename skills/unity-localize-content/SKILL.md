@@ -14,7 +14,7 @@ Localize an existing Unity game's text, fonts, images or audio, including changi
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unity-localize-content`; require effective `UNITY` compatibility before production edits or tool launches. Honor task override evidence and its output scope. A skill request does not select an engine.
 
-Inspect the actual Editor, Localization and Addressables versions, configured locales, table collections, UI stack, fallback policy and target platforms. Use installed package documentation; do not add packages, locales or remote providers implicitly. Record observations and evidence under the resolved `.opencaw/.cache/` task directory.
+Inspect the actual Editor, Localization and Addressables versions, configured locales, table collections, UI stack, fallback policy and target platforms. Use installed package documentation; do not add packages, locales or remote providers implicitly. Record observations and evidence under the resolved `.hephaera/.cache/` task directory.
 
 ## Workflow
 

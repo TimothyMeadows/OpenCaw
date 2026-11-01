@@ -105,8 +105,8 @@ function validate({ root: rootArgument, domain: domainArgument, contract: contra
   const { domain } = route({ domain: domainArgument }, data), definition = data.domains[domain];
   const file = runtime.projectPath(root, contractArgument || definition.contract), value = read(file);
   const { text } = value, lines = text.split('\n');
-  if (!lines.includes('# ' + domain + '.md') || lines.filter(line => line === '<!-- opencaw-media-pipeline:v1 domain=' + domain + ' -->').length !== 1
-      || [...text.matchAll(/<!-- opencaw-media-pipeline:v1 domain=([A-Z]+) -->/g)].length !== 1) fail('Pipeline contract identity does not match ' + domain + '.');
+  if (!lines.includes('# ' + domain + '.md') || lines.filter(line => line === '<!-- hephaera-media-pipeline:v1 domain=' + domain + ' -->').length !== 1
+      || [...text.matchAll(/<!-- hephaera-media-pipeline:v1 domain=([A-Z]+) -->/g)].length !== 1) fail('Pipeline contract identity does not match ' + domain + '.');
   if (canonical(sections(text, 'Pipeline Selection')) !== canonical(['- ' + domain])) fail('Pipeline contract must select only its own domain.');
   if (canonical(sections(text, 'Shared Media Authority')) !== canonical(['- MEDIA.md'])) fail('MEDIA.md must remain the shared media authority.');
   for (const heading of ['Provider And Execution Authority', 'Brief Requirements', 'State And Ancestry', 'Review And Promotion', 'Read Pipeline Instructions']) sections(text, heading);
@@ -117,7 +117,7 @@ function validate({ root: rootArgument, domain: domainArgument, contract: contra
       || !/shared approval-bound native media-state root/.test(sections(text, 'State And Ancestry').join('\n')))
     fail('Pipeline contract lacks provider, shared-allowance or separate promotion boundaries.');
   const declaration = read(shared(definition.declaration));
-  const inlineStart = '<!-- opencaw-media-inline:start -->\n', inlineEnd = '\n<!-- opencaw-media-inline:end -->';
+  const inlineStart = '<!-- hephaera-media-inline:start -->\n', inlineEnd = '\n<!-- hephaera-media-inline:end -->';
   const inline = text.includes(inlineStart) || text.includes(inlineEnd);
   const directives = [...text.matchAll(/^Read `([^`]+)` instructions\s*$/gm)];
   if (inline) {
@@ -137,10 +137,10 @@ function render({ root: rootArgument, domain: domainArgument, inline = false } =
   const { domain } = route({ domain: domainArgument }, data), definition = data.domains[domain];
   const template = read(shared(definition.template)).text;
   if (template.split('{{DEFINITION}}').length !== 2) fail('Domain contract template requires one definition placeholder.');
-  const mounted = runtime.samePath(root, BASE) ? '.' : './.opencaw';
+  const mounted = runtime.samePath(root, BASE) ? '.' : './.hephaera';
   const declaration = read(shared(definition.declaration)).text.trim();
   const instructions = '## Read Pipeline Instructions\n\n' + (inline
-    ? '<!-- opencaw-media-inline:start -->\n' + declaration + '\n<!-- opencaw-media-inline:end -->'
+    ? '<!-- hephaera-media-inline:start -->\n' + declaration + '\n<!-- hephaera-media-inline:end -->'
     : 'Read `' + mounted + '/.media/pipelines/' + definition.declaration + '` instructions');
   return { domain, content: template.replace('{{DEFINITION}}', instructions).trimEnd() + '\n' };
 }

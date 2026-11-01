@@ -1,11 +1,11 @@
 # Skills Catalog
 
-Curated reusable skills included in OpenCaw. Install the baseline at `<project-root>/.opencaw/`; durable project context belongs to its ignored `.cache/` child.
+Curated reusable skills included in Hephaera. Install the baseline at `<project-root>/.hephaera/`; durable project context belongs to its ignored `.cache/` child.
 
 ## Task And Governance
 
 - `brainstorm-flow` - Run explicit persistent pre-planning idea discovery with two independent researcher lanes, stable branches/elements, and a generated exit summary.
-- `create-host-ai-scaffold` - Initialize durable `.opencaw/.cache` context and the root bootstrap for the fixed `.opencaw` installation, with Windows Bash guidance when applicable.
+- `create-host-ai-scaffold` - Initialize durable `.hephaera/.cache` context and the root bootstrap for the fixed `.hephaera` installation, with Windows Bash guidance when applicable.
 - `create-task-file` - Create a detailed task folder and TASK.md, then create/link a matching GitHub issue and track it.
 - `gauntlet-flow` - Run explicit builder-versus-fresh-critic loops with a frozen manifest, immutable publication checkpoints, live Git/GitHub-bound progressive PR and QA evidence, one integration branch, and human-gated promotion.
 - `goal-flow` - Manage explicitly requested automated goals across task completion, automatic PR creation, post-PR QA, branch chaining, and final human approval reporting.
@@ -17,7 +17,7 @@ Curated reusable skills included in OpenCaw. Install the baseline at `<project-r
 - `post-pr-qa` - Run post-PR QA and post PR comments with pass/fail evidence and inline screenshot links.
 - `comment-issue-test-results` - Post QA/Playwright outcomes and artifacts to linked issue threads.
 - `audit-untrusted-agent-source` - Statically inspect agent-facing source for unsafe instructions, executables, credentials, path escapes, and hidden side effects.
-- `adapt-external-agent-skills` - Reimplement approved capability intent as an independently authored OpenCaw skill.
+- `adapt-external-agent-skills` - Reimplement approved capability intent as an independently authored Hephaera skill.
 - `verify-and-explain` - Produce evidence-backed conclusions with explicit scope, limitations, and reproduction steps.
 - `audit-reference-originality` - Compare local subject and reference material for mechanical similarity evidence without making legal conclusions.
 

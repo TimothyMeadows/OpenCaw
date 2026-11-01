@@ -1,6 +1,6 @@
 # Roles Index
 
-OpenCaw role catalog with categories and common aliases.
+Hephaera role catalog with categories and common aliases.
 
 Current role catalog location:
 
@@ -135,7 +135,7 @@ When multiple roles are requested, combine them in the order given unless the us
 
 ## Default skill and command bindings
 
-OpenCaw also defines default skill and command bindings for common engineering roles.
+Hephaera also defines default skill and command bindings for common engineering roles.
 See:
 
 - `./.roles/ROLE_SKILL_MAP.md`

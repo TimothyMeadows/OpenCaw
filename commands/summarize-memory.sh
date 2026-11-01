@@ -3,24 +3,24 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-opencaw_ensure_system_memory
-opencaw_ensure_project_files
+hephaera_resolve_paths
+hephaera_ensure_system_memory
+hephaera_ensure_project_files
 
-ai_dir="$OPENCAW_PROJECT_CACHE_DIR"
+ai_dir="$HEPHAERA_PROJECT_CACHE_DIR"
 archive_dir="$ai_dir/archive/context-snapshots"
 summary_file="$ai_dir/CONTEXT_SUMMARY.md"
 todo_file="$ai_dir/tasks/TODO.md"
-architecture_file="$OPENCAW_PROJECT_ROOT_RESOLVED/ARCHITECTURE.md"
+architecture_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/ARCHITECTURE.md"
 timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 fs_timestamp="$(date -u '+%Y%m%dT%H%M%SZ')"
 
 mkdir -p "$archive_dir"
-cp "$OPENCAW_SYSTEM_MEMORY_FILE" "$archive_dir/SYSTEM_MEMORY-$fs_timestamp.md"
-cp "$OPENCAW_PROJECT_MEMORY_FILE" "$archive_dir/MEMORY-$fs_timestamp.md"
-cp "$OPENCAW_REPO_MAP_FILE" "$archive_dir/REPO_MAP-$fs_timestamp.md"
-cp "$OPENCAW_RULES_FILE" "$archive_dir/RULES-$fs_timestamp.md"
-cp "$OPENCAW_DEBUG_FILE" "$archive_dir/DEBUG-$fs_timestamp.md"
+cp "$HEPHAERA_SYSTEM_MEMORY_FILE" "$archive_dir/SYSTEM_MEMORY-$fs_timestamp.md"
+cp "$HEPHAERA_PROJECT_MEMORY_FILE" "$archive_dir/MEMORY-$fs_timestamp.md"
+cp "$HEPHAERA_REPO_MAP_FILE" "$archive_dir/REPO_MAP-$fs_timestamp.md"
+cp "$HEPHAERA_RULES_FILE" "$archive_dir/RULES-$fs_timestamp.md"
+cp "$HEPHAERA_DEBUG_FILE" "$archive_dir/DEBUG-$fs_timestamp.md"
 
 dedupe_bullets_in_place() {
   local file="$1"
@@ -46,11 +46,11 @@ dedupe_bullets_in_place() {
   echo $((before - after))
 }
 
-system_merged="$(dedupe_bullets_in_place "$OPENCAW_SYSTEM_MEMORY_FILE")"
-memory_merged="$(dedupe_bullets_in_place "$OPENCAW_PROJECT_MEMORY_FILE")"
-map_merged="$(dedupe_bullets_in_place "$OPENCAW_REPO_MAP_FILE")"
-rules_merged="$(dedupe_bullets_in_place "$OPENCAW_RULES_FILE")"
-debug_merged="$(dedupe_bullets_in_place "$OPENCAW_DEBUG_FILE")"
+system_merged="$(dedupe_bullets_in_place "$HEPHAERA_SYSTEM_MEMORY_FILE")"
+memory_merged="$(dedupe_bullets_in_place "$HEPHAERA_PROJECT_MEMORY_FILE")"
+map_merged="$(dedupe_bullets_in_place "$HEPHAERA_REPO_MAP_FILE")"
+rules_merged="$(dedupe_bullets_in_place "$HEPHAERA_RULES_FILE")"
+debug_merged="$(dedupe_bullets_in_place "$HEPHAERA_DEBUG_FILE")"
 
 count_bullets() {
   grep -Ec '^[[:space:]]*-[[:space:]]+' "$1" || true
@@ -70,7 +70,7 @@ tag_catalog="$($script_dir/query-project-context.sh --list-tags | head -n 30 || 
 [[ -n "$tag_catalog" ]] || tag_catalog='none 0'
 
 map_status='UNAVAILABLE'
-if git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   map_status="$($script_dir/repo-map-status.sh | awk -F= '/^REPO_MAP_STATUS=/{print $2; exit}')"
 fi
 
@@ -88,9 +88,9 @@ $(list_pending_todo)
 
 ## Memory Inventory
 
-- System memory entries: $(count_bullets "$OPENCAW_SYSTEM_MEMORY_FILE")
-- Tagged project memory entries: $(count_bullets "$OPENCAW_PROJECT_MEMORY_FILE")
-- Semantic repository map entries: $(count_bullets "$OPENCAW_REPO_MAP_FILE")
+- System memory entries: $(count_bullets "$HEPHAERA_SYSTEM_MEMORY_FILE")
+- Tagged project memory entries: $(count_bullets "$HEPHAERA_PROJECT_MEMORY_FILE")
+- Semantic repository map entries: $(count_bullets "$HEPHAERA_REPO_MAP_FILE")
 - Repository map status: $map_status
 
 ## Tag Catalog

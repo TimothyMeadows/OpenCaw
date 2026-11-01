@@ -16,7 +16,7 @@ Use `FPrimaryAssetId` or an explicit project identity for durable references. An
 - Capture an owner weak pointer and request generation in completion work. On cancellation/world teardown, invalidate the generation and cancel only the owned pending handle. Validate owner, world and generation before assigning loaded objects; never resurrect a departed screen/actor or publish an obsolete request.
 - Treat a missing handle, invalid primary ID, failed cast and absent dependency as distinct failures. Do not assume a completion callback guarantees the requested type exists. Keep temporary fallback presentation separate from authoritative gameplay selection.
 
-Retain task-local observed context and receipts under `.opencaw/.cache`. `ENGINE.md` remains the engine authority; do not create another engine selector while recording discovered plugins and packages.
+Retain task-local observed context and receipts under `.hephaera/.cache`. `ENGINE.md` remains the engine authority; do not create another engine selector while recording discovered plugins and packages.
 
 ## Verification
 

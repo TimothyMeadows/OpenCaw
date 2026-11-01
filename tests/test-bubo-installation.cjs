@@ -12,16 +12,16 @@ const args = process.argv.slice(2);
 assert(args.length === 0 || (args.length === 1 && args[0] === '--real-runtime'), 'Usage: node tests/test-bubo-installation.cjs [--real-runtime]');
 const realMode = args.length === 1;
 const base = path.resolve(__dirname, '..');
-const cache = path.basename(base) === '.opencaw' ? path.join(base, '.cache') : path.join(base, '.opencaw/.cache');
-const evidence = path.join(cache, 'tasks/opencaw-retire-comfyui/evidence/installation');
+const cache = path.basename(base) === '.hephaera' ? path.join(base, '.cache') : path.join(base, '.hephaera/.cache');
+const evidence = path.join(cache, 'tasks/hephaera-retire-comfyui/evidence/installation');
 fs.mkdirSync(evidence, { recursive: true });
 const fixture = fs.mkdtempSync(path.join(evidence, realMode ? 'fixture-real-' : 'fixture-'));
 const environment = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: path.join(fixture, 'gitconfig'),
-  GIT_ALLOW_PROTOCOL: 'file', GIT_TERMINAL_PROMPT: '0', GIT_AUTHOR_NAME: 'OpenCaw installation fixture',
-  GIT_AUTHOR_EMAIL: 'fixture@example.invalid', GIT_COMMITTER_NAME: 'OpenCaw installation fixture',
+  GIT_ALLOW_PROTOCOL: 'file', GIT_TERMINAL_PROMPT: '0', GIT_AUTHOR_NAME: 'Hephaera installation fixture',
+  GIT_AUTHOR_EMAIL: 'fixture@example.invalid', GIT_COMMITTER_NAME: 'Hephaera installation fixture',
   GIT_COMMITTER_EMAIL: 'fixture@example.invalid' };
-for (const name of ['OPENCAW_PROJECT_ROOT', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE']) delete environment[name];
-fs.writeFileSync(environment.GIT_CONFIG_GLOBAL, '[core]\n autocrlf = false\n[commit]\n gpgsign = false\n');
+for (const name of ['HEPHAERA_PROJECT_ROOT', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE']) delete environment[name];
+fs.writeFileSync(environment.GIT_CONFIG_GLOBAL, '[core]\n autocrlf = false\n longpaths = true\n[commit]\n gpgsign = false\n');
 const observations = [];
 function check(value, message) { assert(value, message); observations.push(message); }
 function equal(actual, expected, message) { assert.deepEqual(actual, expected, message); observations.push(message); }
@@ -75,8 +75,8 @@ function realRuntime() {
   }
   inventory(bundle);
   check(files.length > 0, 'Real bundle inventory contains actual published files');
-  const source = path.join(fixture, 'real-opencaw-source'); init(source);
-  for (const name of ['commands/lib/bubo-runtime.cjs', 'runtime/bubo.lock.json', '.gitignore']) {
+  const source = path.join(fixture, 'real-hephaera-source'); init(source);
+  for (const name of ['commands/lib/bubo-runtime.cjs', 'commands/lib/state-transition.cjs', 'runtime/bubo.lock.json', '.gitignore']) {
     const target = path.join(source, name); fs.mkdirSync(path.dirname(target), { recursive: true }); fs.copyFileSync(path.join(base, name), target);
   }
   git(source, 'submodule', 'add', '-q', dependency, 'runtime/bubo');
@@ -85,11 +85,11 @@ function realRuntime() {
   const rejectionEvidence = [], forms = [];
   for (const form of ['clone', 'submodule']) {
     const host = path.join(fixture, `real-${form}-host`); init(host);
-    const baseline = path.join(host, '.opencaw');
+    const baseline = path.join(host, '.hephaera');
     if (form === 'clone') command('git', ['clone', '-q', '--no-hardlinks', '--recurse-submodules', source, baseline]);
     else {
-      git(host, 'submodule', 'add', '-q', source, '.opencaw');
-      git(host, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', '.opencaw');
+      git(host, 'submodule', 'add', '-q', source, '.hephaera');
+      git(host, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', '.hephaera');
     }
     const copiedDependency = path.join(baseline, 'runtime/bubo'), copiedBundle = path.join(copiedDependency, 'artifacts/bubo');
     equal(git(copiedDependency, 'rev-parse', 'HEAD'), revision, `${form}: actual dependency clone checks out the recorded Bubo revision`);
@@ -109,7 +109,7 @@ function realRuntime() {
     const identity = JSON.parse(admitted.stdout);
     equal(identity.revision, revision, `${form}: admitted CLI reports the recorded revision`);
     equal(identity.build, receipt.capabilities.build, `${form}: observed live capability build agrees with the original build receipt`);
-    const liveMedia = JSON.parse(command(path.join(copiedBundle, executable), ['capabilities', '--api-version', '1'], copiedBundle).stdout);
+    const liveMedia = JSON.parse(command(path.join(copiedBundle, executable), ['capabilities', '--api-version', '2'], copiedBundle).stdout);
     equal(liveMedia.mediaBackends.map(item => [item.id, item.modality]).sort(), [
       ['flux-schnell', 'image'], ['stable-audio-open', 'sfx'], ['ace-step-turbo', 'music'],
       ['qwen3-tts-customvoice', 'preset-speech'], ['qwen3-tts-base', 'consented-cloning']
@@ -151,7 +151,7 @@ function realRuntime() {
   equal(git(dependency, 'status', '--porcelain', '--untracked-files=no'), '', 'Actual pinned Bubo source remains unchanged after both isolated forms');
   fs.writeFileSync(path.join(evidence, 'real-runtime-latest.json'), JSON.stringify({ schemaVersion: 1, mode: 'real-runtime', status: 'pass',
     assertions: observations.length, platform: process.platform, revision, resourceCatalogSha256: lock.resourceCatalogSha256,
-    nativeBuilds: 0, executedCommands: ['prebuilt capabilities --api-version 1'], networkProtocolsAllowed: ['file'],
+    nativeBuilds: 0, executedCommands: ['prebuilt capabilities --api-version 2'], networkProtocolsAllowed: ['file'],
     forms, rejectionEvidence, observations }, null, 2) + '\n');
   console.log(`Real Bubo build admission tests passed (${observations.length} assertions; 26 isolated rejection cases; actual prebuilt capabilities; no builds/models).`);
 }
@@ -177,11 +177,11 @@ try {
   write(bubo, 'resources/catalog.json', JSON.stringify({ schemaVersion: 1, files: Object.fromEntries(
     [resourceKey, mediaResource, voiceResource].map(name => [name, digest(path.join(bubo, name))])) }, null, 2));
   const pinned = commit(bubo, 'Pinned offline dependency fixture');
-  const source = path.join(fixture, 'opencaw-source'); init(source);
+  const source = path.join(fixture, 'hephaera-source'); init(source);
   for (const file of ['commands/lib/bubo-runtime.cjs', 'commands/lib/bubo-host-adapter.cjs', 'commands/lib/style-contract.cjs',
     'commands/lib/engine-contract.cjs', 'commands/lib/memory-common.sh', 'commands/proof-to-model.sh',
     'commands/model-to-animation.sh', 'commands/model-to-action.sh',
-    'commands/lib/platform-common.sh', 'commands/initialize-bubo-runtime.sh', 'commands/resolve-opencaw-paths.sh',
+    'commands/lib/platform-common.sh', 'commands/initialize-bubo-runtime.sh', 'commands/resolve-hephaera-paths.sh',
     'commands/create-host-ai-scaffold.sh', '.gitignore']) {
     const destination = path.join(source, file); fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.copyFileSync(path.join(base, file), destination);
   }
@@ -193,7 +193,7 @@ try {
   write(source, 'AGENTS.md', '# Controlled installation fixture\n');
   git(source, 'submodule', 'add', '-q', bubo, 'runtime/bubo');
   const lock = { schemaVersion: 1, repository: 'https://github.com/TimothyMeadows/Bubo.git', path: 'runtime/bubo',
-    revision: pinned, apiVersion: 1, resourceCatalogSha256: digest(path.join(bubo, 'resources/catalog.json')), buildReceipt: 'artifacts/bubo/build-info.json' };
+    revision: pinned, apiVersion: 2, resourceCatalogSha256: digest(path.join(bubo, 'resources/catalog.json')), buildReceipt: 'artifacts/bubo/build-info.json' };
   write(source, 'runtime/bubo.lock.json', JSON.stringify(lock, null, 2));
   commit(source, 'Installation code with an actual nested gitlink');
   write(bubo, 'later-upstream.txt', 'This later upstream revision must not be selected.\n');
@@ -201,7 +201,7 @@ try {
   check(newer !== pinned, 'Fixture upstream has an actual newer commit than the recorded pin');
 
   // This is a maintainer root: unlike installed hosts, its baseline directory
-  // is not hidden beneath .opencaw and must exclude exactly its dependency.
+  // is not hidden beneath .hephaera and must exclude exactly its dependency.
   const maintainerEngine = require(path.join(source, 'commands/lib/engine-contract.cjs'));
   maintainerEngine.generate(source, 'UNITY');
   equal(maintainerEngine.resolve(source).existingEngines, [], 'Maintainer discovery excludes the exact baseline-owned dependency before reading its development package');
@@ -217,9 +217,9 @@ try {
   function installed(form) {
     const host = path.join(fixture, `${form}-host`); init(host);
     write(host, 'AGENTS.md', '# Host instructions\nKeep host-owned content.\n');
-    const baseline = path.join(host, '.opencaw');
+    const baseline = path.join(host, '.hephaera');
     if (form === 'clone') command('git', ['clone', '-q', source, baseline]);
-    else git(host, 'submodule', 'add', '-q', source, '.opencaw');
+    else git(host, 'submodule', 'add', '-q', source, '.hephaera');
     check(!fs.existsSync(path.join(baseline, 'runtime/bubo/.git')), `${form}: nonrecursive installation begins with an uninitialized Bubo dependency`);
     const missing = runtime(baseline, ['resource', 'proof-to-model/manifest.schema.json']);
     check(missing.status === 1 && /not initialized.*submodule update --init --recursive --checkout runtime\/bubo/.test(missing.stderr), `${form}: production resource lookup fails with recorded initialization instructions`);
@@ -255,7 +255,7 @@ try {
     engine.generate(host, 'UNITY');
     equal(engine.resolve(host).existingEngines, [], `${form}: selected engine resolves before dependency initialization`);
 
-    if (form === 'submodule') git(host, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', '.opencaw');
+    if (form === 'submodule') git(host, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', '.hephaera');
     else shell(baseline, 'initialize-bubo-runtime.sh');
     equal(git(path.join(baseline, 'runtime/bubo'), 'rev-parse', 'HEAD'), pinned, `${form}: recursive initialization selects the recorded gitlink rather than newer upstream HEAD`);
     const admitted = runtime(baseline, ['resource', 'proof-to-model/manifest.schema.json']);
@@ -294,26 +294,26 @@ try {
   }
   const forms = [installed('clone'), installed('submodule')];
   const recursiveHost = path.join(fixture, 'recursive-clone-host'); fs.mkdirSync(recursiveHost);
-  const recursiveBaseline = path.join(recursiveHost, '.opencaw');
+  const recursiveBaseline = path.join(recursiveHost, '.hephaera');
   command('git', ['clone', '-q', '--recurse-submodules', source, recursiveBaseline]);
   equal(git(path.join(recursiveBaseline, 'runtime/bubo'), 'rev-parse', 'HEAD'), pinned, 'Documented recursive clone checks out the recorded nested dependency despite newer upstream HEAD');
   equal(runtime(recursiveBaseline, ['resource', 'proof-to-model/manifest.schema.json']).status, 0, 'Documented recursive clone immediately admits pinned source resources without building');
   const installedUpdate = command('git', ['-C', recursiveBaseline, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', 'runtime/bubo']);
   equal(installedUpdate.status, 0, 'Documented direct-clone recursive update command operates on the recorded dependency');
-  // A parent-level second update would reset .opencaw to the old host gitlink.
-  // Exercise a real OpenCaw update and initialize Bubo from inside that updated
-  // baseline so the new OpenCaw revision survives until the host records it.
+  // A parent-level second update would reset .hephaera to the old host gitlink.
+  // Exercise a real Hephaera update and initialize Bubo from inside that updated
+  // baseline so the new Hephaera revision survives until the host records it.
   git(path.join(source, 'runtime/bubo'), 'fetch', '-q', 'origin');
   git(path.join(source, 'runtime/bubo'), 'checkout', '-q', '--detach', newer);
   write(source, 'runtime/bubo.lock.json', JSON.stringify({ ...lock, revision: newer }, null, 2));
   const updatedBaseline = commit(source, 'Reviewed baseline revision records its next dependency commit');
   for (const { form } of forms) {
-    const host = path.join(fixture, `${form}-host`), baseline = path.join(host, '.opencaw');
+    const host = path.join(fixture, `${form}-host`), baseline = path.join(host, '.hephaera');
     if (form === 'clone') git(baseline, 'pull', '--ff-only');
-    else git(host, 'submodule', 'update', '--remote', '--checkout', '--', '.opencaw');
+    else git(host, 'submodule', 'update', '--remote', '--checkout', '--', '.hephaera');
     git(baseline, 'submodule', 'update', '--init', '--recursive', '--checkout', '--', 'runtime/bubo');
-    equal(git(baseline, 'rev-parse', 'HEAD'), updatedBaseline, `${form}: documented update retains the newer OpenCaw revision until the host records it`);
-    equal(git(path.join(baseline, 'runtime/bubo'), 'rev-parse', 'HEAD'), newer, `${form}: documented update initializes the dependency recorded by the newer OpenCaw revision`);
+    equal(git(baseline, 'rev-parse', 'HEAD'), updatedBaseline, `${form}: documented update retains the newer Hephaera revision until the host records it`);
+    equal(git(path.join(baseline, 'runtime/bubo'), 'rev-parse', 'HEAD'), newer, `${form}: documented update initializes the dependency recorded by the newer Hephaera revision`);
     equal(runtime(baseline, ['resource', 'proof-to-model/manifest.schema.json']).status, 0, `${form}: updated lock, parent gitlink and resource remain consistent`);
     check(fs.existsSync(path.join(baseline, '.cache/MEMORY.md')), `${form}: updating the baseline preserves durable host memory`);
   }

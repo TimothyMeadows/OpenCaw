@@ -6,14 +6,14 @@ const crypto = require('node:crypto');
 const {pathToFileURL} = require('node:url');
 const ROOT = path.resolve(__dirname, '..');
 const ADAPTER = path.join(ROOT, 'runtime/bubo/resources/model-to-action/engines/threejs-action.mjs');
-const DEPENDENCIES = path.join(ROOT, '.opencaw/.cache/tasks/model-to-animation-design/dependency-audit/browser-fixture/node_modules');
+const DEPENDENCIES = path.join(ROOT, '.hephaera/.cache/tasks/model-to-animation-design/dependency-audit/browser-fixture/node_modules');
 const selection = {effectiveEngine: 'THREEJS', selectionSource: 'contract', contractSha256: 'a'.repeat(64), definitionSha256: 'b'.repeat(64), registrySha256: 'c'.repeat(64)};
 const hash = 'd'.repeat(64);
 const clone = value => JSON.parse(JSON.stringify(value));
 
 function packageData() {
   const steps = [{id: 'prepare', clip: 'source-prepare', occurrence: 0, start: 0, end: .5, sourceStart: 0, sourceEnd: .5, rate: 1, blendIn: 0, motionSha256: hash}, {id: 'cast', clip: 'source-cast', occurrence: 0, start: .5, end: 1, sourceStart: 0, sourceEnd: .5, rate: 1, blendIn: 0, motionSha256: hash}];
-  const base = {schemaVersion: 'opencaw-action-package/v1', asset: 'fixture', version: 'v1', profile: 'skinned', fps: 24,
+  const base = {schemaVersion: 'hephaera-action-package/v1', asset: 'fixture', version: 'v1', profile: 'skinned', fps: 24,
     engine: {...selection}, coordinateSystem: {runtimeUp: '+Y', runtimeForward: '+Z'}, model: {path: 'model.glb', sha256: hash},
     rig: {id: hash, rootBone: 'Root', rootNode: 'MotionRoot'}, sourceMotion: {rigId: hash, packageSha256: hash, modelSha256: hash, clips: [{id: 'source-prepare', motionSha256: hash}, {id: 'source-cast', motionSha256: hash}]},
     anchors: [{id: 'hand', node: 'anchor.hand'}], targets: [{id: 'fixed', mode: 'fixed-world-point', maxDistance: 30}],
@@ -239,8 +239,8 @@ async function browserFixture(values) {
     const page = await context.newPage(), errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(origin, {waitUntil: 'networkidle'});
-    await page.waitForFunction(() => window.__OPENCAW_ACTION_DONE, null, {timeout: 120000});
-    const result = await page.evaluate(() => window.__OPENCAW_ACTION_RESULT);
+    await page.waitForFunction(() => window.__HEPHAERA_ACTION_DONE, null, {timeout: 120000});
+    const result = await page.evaluate(() => window.__HEPHAERA_ACTION_RESULT);
     if (result.error) throw new Error(result.error);
     assert.equal(result.status, 'passed'); assert.equal(result.actualBrowser, true); assert.equal(result.actualWebGL, true); assert.ok(result.cases.length);
     const captures = [];
@@ -254,7 +254,7 @@ async function browserFixture(values) {
     assert.ok(captures.length); result.captures = captures;
     const capture = path.join(output, 'runtime-capture.png'); fs.copyFileSync(path.join(evidenceRoot, captures.find(frame => frame.phase === 'projectile')?.path || captures[0].path), capture);
     await page.screenshot({path: path.join(output, 'runtime-overview.png'), fullPage: true});
-    const denied = await page.evaluate(async () => { try { await fetch('https://opencaw-network-test.invalid/blocked'); return false; } catch { return true; } });
+    const denied = await page.evaluate(async () => { try { await fetch('https://hephaera-network-test.invalid/blocked'); return false; } catch { return true; } });
     assert.ok(denied && blocked.length); assert.deepEqual(errors, []);
     const report = {...result, engine: 'THREEJS', engineSelection: config.engineSelection, adapterSha256: crypto.createHash('sha256').update(fs.readFileSync(ADAPTER)).digest('hex'), fixturePackages: packages.map(entry => ({path: entry.file, sha256: crypto.createHash('sha256').update(fs.readFileSync(entry.file)).digest('hex'), modelSha256: entry.manifest.model.sha256})), requests: requested, blockedRequests: blocked, limits: 'Original engineering fixtures in software WebGL; loopback routing is not an OS network sandbox. No human or target-hardware acceptance.'};
     const test = path.join(output, 'runtime-test.json'), perf = path.join(output, 'performance-profile.json');
@@ -267,7 +267,7 @@ async function browserFixture(values) {
 }
 
 function browserPage() {
-  return '<!doctype html><meta charset="utf-8"><title>Controlled action fixture</title><style>body{margin:0;background:#141821;color:#ddd;font:13px sans-serif}canvas{display:block}pre{white-space:pre-wrap;padding:12px}</style><script type="importmap">{"imports":{"three":"/deps/three/build/three.module.js","three/addons/":"/deps/three/examples/jsm/"}}</script><body><div>Controlled MODEL_TO_ACTION fixture; no production acceptance</div><div id="viewport"></div><pre id="status"></pre><script type="module">import * as THREE from "three"; import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js"; import {clone} from "three/addons/utils/SkeletonUtils.js"; import {createActionPresentation} from "/adapter.mjs"; (' + browserProgram.toString() + ')(THREE,GLTFLoader,clone,createActionPresentation).catch(error=>{window.__OPENCAW_ACTION_RESULT={status:"failed",error:String(error.stack||error)};window.__OPENCAW_ACTION_DONE=true;document.getElementById("status").textContent=String(error.stack||error)});</script>';
+  return '<!doctype html><meta charset="utf-8"><title>Controlled action fixture</title><style>body{margin:0;background:#141821;color:#ddd;font:13px sans-serif}canvas{display:block}pre{white-space:pre-wrap;padding:12px}</style><script type="importmap">{"imports":{"three":"/deps/three/build/three.module.js","three/addons/":"/deps/three/examples/jsm/"}}</script><body><div>Controlled MODEL_TO_ACTION fixture; no production acceptance</div><div id="viewport"></div><pre id="status"></pre><script type="module">import * as THREE from "three"; import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js"; import {clone} from "three/addons/utils/SkeletonUtils.js"; import {createActionPresentation} from "/adapter.mjs"; (' + browserProgram.toString() + ')(THREE,GLTFLoader,clone,createActionPresentation).catch(error=>{window.__HEPHAERA_ACTION_RESULT={status:"failed",error:String(error.stack||error)};window.__HEPHAERA_ACTION_DONE=true;document.getElementById("status").textContent=String(error.stack||error)});</script>';
 }
 
 async function browserProgram(THREE, GLTFLoader, skeletonClone, createActionPresentation) {
@@ -378,7 +378,7 @@ async function browserProgram(THREE, GLTFLoader, skeletonClone, createActionPres
     result.cases.push({name: fixture.name, profile: pkg.profile, actions: actionResults, frames, frameCpuMs: metrics(timings), peakParticles: peak, resourcesCreated: presentation.stats().resourcesCreated, resourcesDisposed: presentation.stats().resourcesDisposed, rendererInfo: {calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, points: renderer.info.render.points, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures}});
     movement.removeFromParent(); document.getElementById('status').textContent = JSON.stringify({...result, captures: result.captures.map(({dataUrl, ...value}) => value)}, null, 2);
   }
-  window.__OPENCAW_ACTION_RESULT = result; window.__OPENCAW_ACTION_DONE = true;
+  window.__HEPHAERA_ACTION_RESULT = result; window.__HEPHAERA_ACTION_DONE = true;
 }
 if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1; });
 module.exports = {packageData, selection};

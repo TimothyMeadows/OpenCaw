@@ -36,12 +36,12 @@ function validate(styleArgument) {
   const text = bytes.toString('utf8').replace(/\r\n/g, '\n'), lines = text.split('\n'), errors = [];
   const requirePolicy = (valid, message) => { if (!valid) errors.push(message); };
   requirePolicy(lines.includes('# STYLE.md'), 'STYLE.md is missing the expected top-level heading.');
-  const styles = list(lines, 'Generated from OpenCaw style templates:', /^Primary OpenCaw art pipeline:/);
-  const primary = list(lines, 'Primary OpenCaw art pipeline:', /^Allowed OpenCaw art pipelines:/);
-  const allowed = list(lines, 'Allowed OpenCaw art pipelines:', /^---$/);
-  requirePolicy(styles.length > 0, 'STYLE.md does not list any generated OpenCaw style templates.');
-  requirePolicy(primary.length === 1, 'STYLE.md must list exactly one primary OpenCaw art pipeline.');
-  requirePolicy(allowed.length > 0, 'STYLE.md must list at least one allowed OpenCaw art pipeline.');
+  const styles = list(lines, 'Generated from Hephaera style templates:', /^Primary Hephaera art pipeline:/);
+  const primary = list(lines, 'Primary Hephaera art pipeline:', /^Allowed Hephaera art pipelines:/);
+  const allowed = list(lines, 'Allowed Hephaera art pipelines:', /^---$/);
+  requirePolicy(styles.length > 0, 'STYLE.md does not list any generated Hephaera style templates.');
+  requirePolicy(primary.length === 1, 'STYLE.md must list exactly one primary Hephaera art pipeline.');
+  requirePolicy(allowed.length > 0, 'STYLE.md must list at least one allowed Hephaera art pipeline.');
   const styleIndex = fs.readFileSync(path.join(BASE, '.styles/INDEX.md'), 'utf8');
   const pipelineIndex = fs.readFileSync(path.join(BASE, '.styles/.pipelines/INDEX.md'), 'utf8');
   const seen = new Set();
@@ -129,10 +129,10 @@ function main(args) {
   } else if (operation === 'resolve') {
     const selected = resolve(root, style.styleFile, options, style);
     if (options.evidence) {
-      const tasks = fs.realpathSync(path.join(root, '.opencaw/.cache/tasks'));
+      const tasks = fs.realpathSync(path.join(root, '.hephaera/.cache/tasks'));
       const output = engines.inside(root, path.resolve(native(options.evidence))).absolute;
       const relative = path.relative(tasks, output);
-      if (!relative || relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) fail('Evidence output must stay below .opencaw/.cache/tasks.');
+      if (!relative || relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) fail('Evidence output must stay below .hephaera/.cache/tasks.');
       fs.mkdirSync(path.dirname(output), { recursive: true }); engines.inside(root, output);
       fs.writeFileSync(output, JSON.stringify(selected, null, 2) + '\n');
     }

@@ -3,10 +3,10 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
-todo_file="$OPENCAW_PROJECT_CACHE_DIR/tasks/TODO.md"
-report_dir="$OPENCAW_PROJECT_CACHE_DIR/reports"
+todo_file="$HEPHAERA_PROJECT_CACHE_DIR/tasks/TODO.md"
+report_dir="$HEPHAERA_PROJECT_CACHE_DIR/reports"
 dry_run='false'
 
 usage() {
@@ -43,9 +43,9 @@ archived_task_names=''
 
 if [[ -f "$todo_file" ]]; then
   while IFS= read -r line; do
-    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`(\.\./)?\.opencaw/\.cache/tasks/([^/]+)/TASK\.md\` ]]; then
+    if [[ "$line" =~ ^[0-9]+\.[[:space:]]+\[x\][[:space:]].*\`(\.\./)?\.hephaera/\.cache/tasks/([^/]+)/TASK\.md\` ]]; then
       task_name="${BASH_REMATCH[2]}"
-      task_file="$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name/TASK.md"
+      task_file="$HEPHAERA_PROJECT_CACHE_DIR/tasks/$task_name/TASK.md"
 
       if [[ -f "$task_file" ]]; then
         if awk '{ sub(/\r$/, ""); if ($0 ~ /^Archived on [0-9]{8}T[0-9]{6}Z\.$/) found=1 } END { exit !found }' "$task_file"; then
@@ -57,7 +57,7 @@ if [[ -f "$todo_file" ]]; then
           archived_task_count=$((archived_task_count + 1))
           archived_task_names+="- $task_name\n"
         else
-          archive_output="$(OPENCAW_PROJECT_ROOT="$OPENCAW_PROJECT_ROOT_RESOLVED" "${script_dir}/archive-task-context.sh" "$task_name")"
+          archive_output="$(HEPHAERA_PROJECT_ROOT="$HEPHAERA_PROJECT_ROOT_RESOLVED" "${script_dir}/archive-task-context.sh" "$task_name")"
           if ! printf '%s\n' "$archive_output" | grep -q '^ALREADY_ARCHIVED=true$'; then
             archived_task_count=$((archived_task_count + 1))
             archived_task_names+="- $task_name\n"

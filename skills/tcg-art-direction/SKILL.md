@@ -31,4 +31,4 @@ Use when the task asks for trading card game, collectible card game, deck-builde
 - Treat Hearthstone, Magic: The Gathering Arena, Might & Magic Fates, and Gods Unchained as broad reference points only.
 - Translate references into original materials, shape language, mood, color hierarchy, readability goals, and interaction patterns.
 - Do not copy proprietary card frames, boards, logos, characters, factions, iconography, UI layouts, or exact compositions.
-- Keep OpenCaw outputs reusable; host-project-specific art decisions belong in the host repository.
+- Keep Hephaera outputs reusable; host-project-specific art decisions belong in the host repository.

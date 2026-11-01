@@ -15,16 +15,16 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then usage; exit 0; fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/art-pipeline-common.sh"
-opencaw_resolve_paths
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+hephaera_resolve_paths
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 media_file="${1:-$host_root/MEDIA.md}"
 [[ -f "$media_file" ]] || { echo "Missing MEDIA.md: $media_file" >&2; exit 1; }
 
 backend_template_path() {
   case "$1" in
-    CLOUD) printf '%s\n' "$opencaw_root/.styles/.pipelines/cloud/PIPELINE.md" ;;
-    LOCAL) printf '%s\n' "$opencaw_root/.styles/.pipelines/local/PIPELINE.md" ;;
+    CLOUD) printf '%s\n' "$hephaera_root/.styles/.pipelines/cloud/PIPELINE.md" ;;
+    LOCAL) printf '%s\n' "$hephaera_root/.styles/.pipelines/local/PIPELINE.md" ;;
     *) return 1 ;;
   esac
 }
@@ -36,7 +36,7 @@ done
 
 mapfile -t selected < <(awk '
   { sub(/\r$/, "") }
-  /^Generated from OpenCaw media pipeline templates:/ { list=1; next }
+  /^Generated from Hephaera media pipeline templates:/ { list=1; next }
   /^---$/ { list=0 }
   list && /^- / { sub(/^- /, ""); sub(/\r$/, ""); print }
 ' "$media_file")

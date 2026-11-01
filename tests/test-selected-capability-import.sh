@@ -125,7 +125,7 @@ valid_character="$temp_root/valid-character.json"
 
 cat > "$valid_character" <<EOF
 {
-  "schemaVersion": "opencaw-rigged-actor/v1",
+  "schemaVersion": "hephaera-rigged-actor/v1",
   "actor": {"id": "sentinel", "displayName": "Sentinel", "kind": "character", "deliveryStage": "shipped"},
   "files": {
     "source": {"path": "assets/source.fbx", "sha256": "$source_hash"},
@@ -192,7 +192,7 @@ write('valid-monster', value => {
   value.detachableParts = [{...value.equipment[0], id: 'horn'}];
   delete value.equipment;
 });
-write('wrong-schema', value => { value.schemaVersion = 'opencaw-rigged-actor/v2'; });
+write('wrong-schema', value => { value.schemaVersion = 'hephaera-rigged-actor/v2'; });
 write('invalid-kind', value => { value.actor.kind = 'vehicle'; });
 write('duplicate-clip', value => { value.clips.push(structuredClone(value.clips[0])); });
 write('duplicate-socket', value => { value.sockets.push(structuredClone(value.sockets[0])); });

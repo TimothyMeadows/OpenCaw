@@ -1,6 +1,6 @@
 # Game Production Capability Provenance
 
-All new guidance is independently authored. No third-party source code, prose, scripts, UI metadata or assets were copied. Existing Three.js CODE skills and browser engine guidance were renamed/moved within OpenCaw with historical evidence and artifact schemas preserved.
+All new guidance is independently authored. No third-party source code, prose, scripts, UI metadata or assets were copied. Existing Three.js CODE skills and browser engine guidance were renamed/moved within Hephaera with historical evidence and artifact schemas preserved.
 
 | Investigated source | License found during planning | Capability recreated or strengthened |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ Engine/API references are primary vendor documentation linked from definitions a
 
 ## Three.js particle integration
 
-The requested [three.quarks](https://github.com/Alchemist0823/three.quarks) particle/VFX library and `quarks.core` are MIT-licensed dependencies. Initial published acceptance uses version0.17.1 and the [upstream package manifest at its published source revision](https://github.com/Alchemist0823/three.quarks/blob/a432a153354ed568c5aa2c94777376c546b5425b/packages/three.quarks/package.json). The independent OpenCaw host helper uses their public APIs; no upstream editor/demo assets, hosted editor requirement, provider or copied implementation is added. Host dependency distributions must preserve applicable notices and lock exact resolved versions/integrities, including wildcard core transitive resolution. Source/CPU checks do not establish renderer/device quality or performance.
+The requested [three.quarks](https://github.com/Alchemist0823/three.quarks) particle/VFX library and `quarks.core` are MIT-licensed dependencies. Initial published acceptance uses version0.17.1 and the [upstream package manifest at its published source revision](https://github.com/Alchemist0823/three.quarks/blob/a432a153354ed568c5aa2c94777376c546b5425b/packages/three.quarks/package.json). The independent Hephaera host helper uses their public APIs; no upstream editor/demo assets, hosted editor requirement, provider or copied implementation is added. Host dependency distributions must preserve applicable notices and lock exact resolved versions/integrities, including wildcard core transitive resolution. Source/CPU checks do not establish renderer/device quality or performance.
 
 ## Three.js postprocessing integration
 

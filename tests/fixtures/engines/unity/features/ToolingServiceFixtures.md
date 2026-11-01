@@ -4,7 +4,7 @@ These are conditional native fixture families. The Editor case below uses real i
 
 ## PackageInventory: conditional native Editor case
 
-Entry point: `OpenCawUnityToolingCases.PackageInventory(context)`.
+Entry point: `HephaeraUnityToolingCases.PackageInventory(context)`.
 
 Prerequisites: matching installed Editor, resolved fixture `Packages/manifest.json` and `packages-lock.json`, and `RequiredPackages` containing an explicit comma-separated set of installed package IDs. Use an already prepared Editor/project with UPM available and explicit authorization for that environment; startup resolution is not authorized by this test. Do not remove `-noUpm` from ordinary batch verification to make the case run. No compiler symbols beyond the native Editor build are needed. Run on the isolated fixture copy through the fixture coroutine entry point; its harness owns Editor coroutine pumping, deadline and invocation-bound report checks.
 

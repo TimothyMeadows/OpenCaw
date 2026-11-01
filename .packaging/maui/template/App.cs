@@ -2,7 +2,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Storage;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 public sealed class App : Application
 {

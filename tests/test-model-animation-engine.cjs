@@ -7,7 +7,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const {pathToFileURL} = require('node:url');
 const ROOT = path.resolve(__dirname, '..');
-const TASK = path.join(ROOT, '.opencaw/.cache/tasks/model-to-animation-design');
+const TASK = path.join(ROOT, '.hephaera/.cache/tasks/model-to-animation-design');
 const ADAPTER = path.join(ROOT, 'runtime/bubo/resources/model-to-animation/engines/threejs-motion.mjs');
 
 function protocolThree() {
@@ -85,7 +85,7 @@ function protocolThree() {
 const selection = () => ({effectiveEngine: 'THREEJS', projectEngine: 'THREEJS', selectionSource: 'contract', contractSha256: 'a'.repeat(64), definitionSha256: 'b'.repeat(64), registrySha256: 'c'.repeat(64)});
 function packageData() {
   return {
-    schemaVersion: 'opencaw-motion-package/v1', profile: 'skinned', engine: selection(), coordinateSystem: {runtimeUp: '+Y'}, rig: {rootBone: 'Root'},
+    schemaVersion: 'hephaera-motion-package/v1', profile: 'skinned', engine: selection(), coordinateSystem: {runtimeUp: '+Y'}, rig: {rootBone: 'Root'},
     clips: ['idle', 'run', 'jump', 'death'].map(id => ({id, action: id, role: id, duration: 1, loop: ['idle', 'run'].includes(id), rootMotion: 'in-place', markers: [{time: 0.25, event: 'contact'}]})),
     anchors: [{id: 'exhaust', node: 'anchor.exhaust'}],
     parameters: [{id: 'speed', unit: 'metres-per-second', min: 0, max: 10, default: 0, bindings: [{node: 'wheel', property: 'rotation', axis: 'x', mode: 'angular-speed', scale: 2}]}],
@@ -310,7 +310,7 @@ async function main() {
   if (values.includes('--browser')) { await browserFixture(values); return; }
   const real = values.includes('--real');
   const option = (name, fallback) => { const i = values.indexOf(name); return i >= 0 ? values[i + 1] : fallback; };
-  const directory = path.resolve(option('--dependencies', process.env.OPENCAW_MOTION_DEPENDENCIES || path.join(TASK, 'dependency-audit/browser-fixture/node_modules')));
+  const directory = path.resolve(option('--dependencies', process.env.HEPHAERA_MOTION_DEPENDENCIES || path.join(TASK, 'dependency-audit/browser-fixture/node_modules')));
   let THREE;
   if (real) {
     const modulePath = path.join(directory, 'three/build/three.module.js');
@@ -401,8 +401,8 @@ async function browserFixture(values) {
     const page = await context.newPage();
     page.on('pageerror', error => consoleErrors.push(error.message));
     await page.goto(origin, {waitUntil: 'networkidle'});
-    await page.waitForFunction(() => window.__OPENCAW_MOTION_DONE, null, {timeout: 120000});
-    const result = await page.evaluate(() => window.__OPENCAW_MOTION_RESULT);
+    await page.waitForFunction(() => window.__HEPHAERA_MOTION_DONE, null, {timeout: 120000});
+    const result = await page.evaluate(() => window.__HEPHAERA_MOTION_RESULT);
     if (result.error) throw new Error(result.error);
     assert.equal(result.status, 'passed'); assert.equal(result.realRenderer, true); assert.ok(result.cases.length);
     const captureFrames = result.captureFrames || [];
@@ -424,8 +424,8 @@ async function browserFixture(values) {
     const representative = captures.find(item => item.clip === 'run') || captures.find(item => item.clip === 'warp-sustain-effects') || captures[0];
     fs.copyFileSync(path.join(evidenceRoot, representative.path), capture);
     await page.screenshot({path: path.join(output, 'runtime-overview.png'), fullPage: true});
-    const network = await page.evaluate(async () => { try { await fetch('https://opencaw-network-test.invalid/blocked'); return false; } catch { return true; } });
-    assert.ok(network && blocked.some(url => url.includes('opencaw-network-test.invalid')), 'external browser page request was blocked before transport');
+    const network = await page.evaluate(async () => { try { await fetch('https://hephaera-network-test.invalid/blocked'); return false; } catch { return true; } });
+    assert.ok(network && blocked.some(url => url.includes('hephaera-network-test.invalid')), 'external browser page request was blocked before transport');
     assert.deepEqual(consoleErrors, [], 'no uncaught browser errors');
     const report = {...result, engine: 'THREEJS', engineSelection: config.engineSelection, adapterSha256: crypto.createHash('sha256').update(fs.readFileSync(ADAPTER)).digest('hex'), nativeInference: false, browserExecutable: config.browserExecutable, fixturePackages: packages.map(entry => ({path: entry.file, sha256: crypto.createHash('sha256').update(fs.readFileSync(entry.file)).digest('hex'), modelSha256: entry.manifest.model.sha256})), requests, blockedRequests: blocked, limits: 'Controlled fixtures; browser request routing is not an OS network sandbox or production human acceptance.'};
     const testPath = path.join(output, 'runtime-test.json'); fs.writeFileSync(testPath, JSON.stringify(report, null, 2) + '\n');
@@ -440,7 +440,7 @@ async function browserFixture(values) {
 }
 
 function browserPage() {
-  return `<!doctype html><html><head><meta charset="utf-8"><title>OpenCaw motion acceptance fixture</title><link rel="icon" href="data:,"><style>body{margin:0;background:#151824;color:#e6ecff;font:15px sans-serif}header{padding:12px}canvas{display:block}pre{white-space:pre-wrap;padding:12px;font-size:12px}</style><script type="importmap">{"imports":{"three":"/deps/three/build/three.module.js","three/addons/":"/deps/three/examples/jsm/"}}</script></head><body><header>Controlled native model-to-animation fixture; no production acceptance</header><main></main><pre id="status">Loading actual staged GLB and host-local Three.js…</pre><script type="module">
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Hephaera motion acceptance fixture</title><link rel="icon" href="data:,"><style>body{margin:0;background:#151824;color:#e6ecff;font:15px sans-serif}header{padding:12px}canvas{display:block}pre{white-space:pre-wrap;padding:12px;font-size:12px}</style><script type="importmap">{"imports":{"three":"/deps/three/build/three.module.js","three/addons/":"/deps/three/examples/jsm/"}}</script></head><body><header>Controlled native model-to-animation fixture; no production acceptance</header><main></main><pre id="status">Loading actual staged GLB and host-local Three.js…</pre><script type="module">
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone as cloneSkeleton} from 'three/addons/utils/SkeletonUtils.js';
@@ -478,8 +478,8 @@ try{
   if(pkg.clips.some(c=>c.rootMotion==='extract'))check(extracted.some(e=>new THREE.Vector3().fromArray(e.translation).length()>1e-5),'Actual extracted clip produced no controller-owned displacement');
   const item={name:fixture.name,profile:pkg.profile,modelSha256:fixture.sha256,clips:pkg.clips.map(c=>c.id),anchors,skinnedMeshes:skins,actualSkinnedVertexChange:changedPose,extraction:{samples:extracted.length,total:extracted.reduce((sum,e)=>sum.add(new THREE.Vector3().fromArray(e.translation)),new THREE.Vector3()).toArray(),authority:'explicit host controller sink; local extracted root reset each frame'},frames,frameCpuMs:metrics(clock),peakParticles:peak,maxParticleCapacity:presentation.stats().particleCapacity,rendererInfo:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,points:renderer.info.render.points,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures},movementObserved:world.position.distanceTo(modelRootBefore)};result.cases.push(item);document.querySelector('#status').textContent=JSON.stringify({...result,captureFrames:result.captureFrames.map(({dataUrl,...metadata})=>metadata)},null,2);world.removeFromParent();
  }
- check(result.cases.length===config.fixtures.length,'Incomplete actual package results');result.status='passed';window.__OPENCAW_MOTION_RESULT=result;
-}catch(error){window.__OPENCAW_MOTION_RESULT={...result,status:'failed',error:error.stack}}finally{const {captureFrames,...summary}=window.__OPENCAW_MOTION_RESULT;document.querySelector('#status').textContent=JSON.stringify({...summary,captureFrames:captureFrames.map(({dataUrl,...metadata})=>metadata)},null,2);window.__OPENCAW_MOTION_DONE=true}
+ check(result.cases.length===config.fixtures.length,'Incomplete actual package results');result.status='passed';window.__HEPHAERA_MOTION_RESULT=result;
+}catch(error){window.__HEPHAERA_MOTION_RESULT={...result,status:'failed',error:error.stack}}finally{const {captureFrames,...summary}=window.__HEPHAERA_MOTION_RESULT;document.querySelector('#status').textContent=JSON.stringify({...summary,captureFrames:captureFrames.map(({dataUrl,...metadata})=>metadata)},null,2);window.__HEPHAERA_MOTION_DONE=true}
 </script></body></html>`;
 }
 if (require.main === module) main().catch(error => { console.error(error.stack); process.exitCode = 1; });

@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .opencaw/.cache/tasks/<task>/FILE.json]
+Usage: ./commands/copy-external-asset.sh LIBRARY_ID RELATIVE_ASSET_PATH [--style STYLE.md] [--evidence .hephaera/.cache/tasks/<task>/FILE.json]
 
 Copies a configured read-only external asset file or bundle into:
   <project-root>/assets/models/<library-id>/<relative-asset-path>
@@ -31,9 +31,9 @@ done
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/external-asset-library-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 external_asset_library_validate_id "$library_id"
-project_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+project_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 style_file="${style_file:-$project_root/STYLE.md}"
 [[ -f "$style_file" ]] || { echo "Missing STYLE.md: $style_file" >&2; exit 1; }
 [[ ! -L "$style_file" ]] || { echo 'STYLE.md must not be a symbolic link.' >&2; exit 1; }

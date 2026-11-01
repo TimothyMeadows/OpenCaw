@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-music-brief/v1",
+  "schemaVersion": "hephaera-music-brief/v1",
   "kind": "supplied-lyrics",
   "purpose": "Example only: import a separately authorized supplied-lyric song",
   "provider": "CLOUD",

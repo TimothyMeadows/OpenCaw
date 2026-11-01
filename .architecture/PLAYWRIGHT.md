@@ -47,7 +47,7 @@ playwright.config.ts
 ## Data Rules
 
 - Keep scenario data outside test logic in JSON, builders, fixtures, or explicit setup APIs.
-- Do not hardcode credentials in tests or shared OpenCaw assets.
+- Do not hardcode credentials in tests or shared Hephaera assets.
 - Use environment variables or host-owned secret stores for credentials and environment selection.
 - Preserve generated test artifacts outside source-controlled durable assets unless they are deliberate documentation evidence.
 
@@ -70,13 +70,13 @@ playwright.config.ts
 - Publish machine-readable test results and Playwright reports.
 - Make environment, browser project, grep/tag filters, and credentials explicit in CI.
 
-## OpenCaw Report Rules
+## Hephaera Report Rules
 
 - Assume interactive Playwright UI mode and report servers may not be available.
-- Prefer Markdown evidence reports generated under the host `.opencaw/.cache/reports/` directory.
+- Prefer Markdown evidence reports generated under the host `.hephaera/.cache/reports/` directory.
 - Use JSON, JUnit, screenshots, traces, videos, and discovery snapshots as source artifacts.
 - Use `playwright-report-summary.sh`, `playwright-artifact-index.sh`, `playwright-discovery-report.sh`, and `playwright-evidence-report.sh` as non-interactive substitutes for browsing the Playwright UI.
 
-## OpenCaw Usage
+## Hephaera Usage
 
-Use the generic Playwright skills for cross-repo browser testing. Keep product-specific workflows in host repositories or explicitly scoped extension packs, not in the generic OpenCaw Playwright layer.
+Use the generic Playwright skills for cross-repo browser testing. Keep product-specific workflows in host repositories or explicitly scoped extension packs, not in the generic Hephaera Playwright layer.

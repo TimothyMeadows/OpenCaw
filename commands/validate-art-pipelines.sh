@@ -103,7 +103,7 @@ closedObject(sourceTopology, ['method','receipt','receiptSha256'], ['method','re
 if (sourceTopology.properties.method.const !== 'reviewed-source-corners-v1' || Object.hasOwn(sourceTopology, 'default') || Object.values(sourceTopology.properties).some(p => Object.hasOwn(p, 'default'))) throw new Error('Source topology requires an explicit versioned receipt, never default selection.');
 if (!sameKeys(rigidInputs.dependentRequired?.sourceTopology, ['lods'])) throw new Error('Reviewed source topology requires explicitly selected constrained LODs.');
 const topologyPath = sourceTopology.properties.receipt;
-if (topologyPath.type !== 'string' || topologyPath.minLength !== 1 || topologyPath.maxLength !== 4096 || !new RegExp(topologyPath.pattern).test('.opencaw/.cache/tasks/task/owners.json') || new RegExp(topologyPath.pattern).test('outside.json')) throw new Error('Source topology requires a bounded task-local receipt path.');
+if (topologyPath.type !== 'string' || topologyPath.minLength !== 1 || topologyPath.maxLength !== 4096 || !new RegExp(topologyPath.pattern).test('.hephaera/.cache/tasks/task/owners.json') || new RegExp(topologyPath.pattern).test('outside.json')) throw new Error('Source topology requires a bounded task-local receipt path.');
 if (sourceTopology.properties.receiptSha256.type !== 'string' || sourceTopology.properties.receiptSha256.pattern !== '^[a-f0-9]{64}$') throw new Error('Source topology requires an exact receipt SHA256.');
 const topologyReceipt = readProof('rigid-source-topology.schema.json');
 closedObject(topologyReceipt, ['schemaVersion','kind','preparedGlbSha256','meshes'], ['schemaVersion','kind','preparedGlbSha256','meshes'], 'Source topology receipt');
@@ -174,11 +174,11 @@ for (const key of required) if (!code.required.includes(key)) throw new Error(`C
 const character = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-profile.schema.json', 'utf8'));
 const characterRequired = ['schemaVersion','characterId','codeModel','intent','silhouette','structure','motion','budgets','reviewPolicy','gates'];
 for (const key of characterRequired) if (!character.required.includes(key)) throw new Error(`Code character schema omits ${key}`);
-if (character.properties.schemaVersion.const !== 'opencaw-code-character/v1') throw new Error('Code character schema version is invalid.');
+if (character.properties.schemaVersion.const !== 'hephaera-code-character/v1') throw new Error('Code character schema version is invalid.');
 const observation = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-observation.schema.json', 'utf8'));
-if (observation.properties.schemaVersion.const !== 'opencaw-code-character-observation/v1') throw new Error('Code character observation schema version is invalid.');
+if (observation.properties.schemaVersion.const !== 'hephaera-code-character-observation/v1') throw new Error('Code character observation schema version is invalid.');
 const evidence = JSON.parse(fs.readFileSync('.styles/.pipelines/code/code-character-evidence-report.schema.json', 'utf8'));
-if (evidence.properties.schemaVersion.const !== 'opencaw-code-character-evidence/v1') throw new Error('Code character evidence schema version is invalid.');
+if (evidence.properties.schemaVersion.const !== 'hephaera-code-character-evidence/v1') throw new Error('Code character evidence schema version is invalid.');
 NODE
 
 bash commands/validate-media-templates.sh

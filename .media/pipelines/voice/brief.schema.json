@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/voice-brief-v1.json",
+  "$id": "https://hephaera.dev/schemas/voice-brief-v1.json",
   "title": "VOICE preset speech and local consented-cloning brief",
   "description": "The CLI additionally checks current evidence/source hashes, canonical case-insensitive distinct private identities, exact ordered reference/purpose/consent bindings, native approval scope and aggregate budgets. Examples/schema grant no authority.",
   "type": "object",
@@ -17,7 +17,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "opencaw-voice-brief/v1"
+      "const": "hephaera-voice-brief/v1"
     },
     "kind": {
       "enum": [

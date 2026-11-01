@@ -1,19 +1,22 @@
 
-# OpenCaw
+# Hephaera
 
-![](OpenCaw.png)
+![Hephaera robotic owl and wordmark](Hephaera.svg)
 
-**OpenCaw is a shared AI production baseline for video game development.** Describe the game, feature, or asset you want in ordinary language, refine the plan together, and work with your coding agent through design, implementation, playtesting, and review.
+**Hephaera is a shared AI production baseline for video game development.** Describe the game, feature, or asset you want in ordinary language, refine the plan together, and work with your coding agent through design, implementation, playtesting, and review.
 
 ```text
 Help me build a small playable vertical slice of this action RPG. Start with movement, one enemy, a readable combat HUD, and one reviewed environment prop. Inspect the project, agree on scope and performance targets, then plan the work before editing.
 ```
 
-OpenCaw brings game-design methods, engine-specific skills, art and audio workflows, QA, and delivery controls into **Codex, Claude, Cursor**, and other compatible agents. You can begin with a conversation; roles, skills, and commands are optional ways to make a request more precise.
+Hephaera brings game-design methods, engine-specific skills, art and audio workflows, QA, and delivery controls into **Codex, Claude, Cursor**, and other compatible agents. You can begin with a conversation; roles, skills, and commands are optional ways to make a request more precise.
+
+Hephaera's wordmark pairs Bubo's robotic owl with matching [charcoal, slate and gold branding](docs/BRANDING.md).
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#202A32","primaryTextColor":"#FFF4D6","primaryBorderColor":"#C69A52","lineColor":"#C69A52","secondaryColor":"#46535E","tertiaryColor":"#202A32","edgeLabelBackground":"#FFF4D6"}}}%%
 flowchart TB
-    accTitle: OpenCaw video game production
+    accTitle: Hephaera video game production
     accDescr: Describe a game idea or production task, define player experience and budgets, resolve project contracts, and iterate on design, engine implementation, and staged assets. Playtests and technical checks lead to review or further revision. A validated local result goes through separate authorization for publication and runtime asset promotion.
 
     Request["Describe a game idea, feature, or asset"] --> Brief["Plan player experience, scope, and budgets"]
@@ -28,7 +31,7 @@ flowchart TB
     Local --> Delivery["Follow the selected delivery mode<br/>Apply publication gates and separate human asset acceptance"]
 ```
 
-Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task tracking, and verification evidence live in `.opencaw/.cache/`, so future sessions can continue from recorded decisions.
+Each game project installs Hephaera in `.hephaera/`. Durable project memory, task tracking, and verification evidence live in `.hephaera/.cache/`, so future sessions can continue from recorded decisions.
 
 ---
 
@@ -41,12 +44,13 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
   - [Brainstorm Before Planning](#brainstorm-before-planning)
   - [Planning Is a Conversation](#planning-is-a-conversation)
   - [A Realistic Planning Flow](#a-realistic-planning-flow)
-  - [What OpenCaw Does Behind the Scenes](#what-opencaw-does-behind-the-scenes)
+  - [What Hephaera Does Behind the Scenes](#what-hephaera-does-behind-the-scenes)
   - [Natural-Language Examples](#natural-language-examples)
   - [When Explicit Controls Help](#when-explicit-controls-help)
 - [Install](#install)
-  - [Fork OpenCaw First](#fork-opencaw-first)
+  - [Fork Hephaera First](#fork-hephaera-first)
   - [Fixed Installation Layout](#fixed-installation-layout)
+  - [Existing installation state](#existing-installation-state)
   - [Windows Bash Prerequisite](#windows-bash-prerequisite)
   - [Option 1 — Git Submodule](#option-1--git-submodule)
   - [Option 2 — Clone](#option-2--clone)
@@ -79,9 +83,9 @@ Each game project installs OpenCaw in `.opencaw/`. Durable project memory, task 
 
 # Game Production
 
-Use OpenCaw to take a game concept toward a playable, reviewed result, or to improve one part of an existing game.
+Use Hephaera to take a game concept toward a playable, reviewed result, or to improve one part of an existing game.
 
-| Production area | Work OpenCaw helps with | Evidence to collect |
+| Production area | Work Hephaera helps with | Evidence to collect |
 | --- | --- | --- |
 | Game design | Player decisions, core loops, progression, economies, difficulty, and balance hypotheses | Design briefs and observed playtest results |
 | Gameplay and worlds | Movement, combat, physics, actors, level systems, persistence, and engine integration | Tests and representative playable scenarios |
@@ -102,13 +106,13 @@ Engine-specific workflows cover **Three.js, Babylon.js, Phaser, Unity, Unreal, a
 
 **AUDIO, MUSIC, and VOICE are independent production pipelines.** Load them together and alongside the visual workflow without changing its selection. Each provides planning, immutable asset versions, validation, human review, and separate runtime promotion. See [Audio, Music, and Voice Pipelines](#audio-music-and-voice-pipelines) for routing and setup.
 
-OpenCaw supplies guidance and executable workflows. Actual production needs the selected engine, packages, platform SDKs, art tools, and any chosen media capabilities. Dependencies, model licenses, generation budgets, and runtime asset acceptance remain explicit decisions. A structural validation pass does not establish gameplay quality or production readiness.
+Hephaera supplies guidance and executable workflows. Actual production needs the selected engine, packages, platform SDKs, art tools, and any chosen media capabilities. Dependencies, model licenses, generation budgets, and runtime asset acceptance remain explicit decisions. A structural validation pass does not establish gameplay quality or production readiness.
 
 ---
 
 # Start with a Normal Request
 
-Start with what the player should experience, what the game needs, and how you will judge the result. OpenCaw uses the repository and its production contracts to turn that conversation into scoped work.
+Start with what the player should experience, what the game needs, and how you will judge the result. Hephaera uses the repository and its production contracts to turn that conversation into scoped work.
 
 Start with the outcome:
 
@@ -128,28 +132,28 @@ You can correct direction naturally too:
 That plan is too broad. Keep the combat rules unchanged and separate the HUD fix from the save-system work.
 ```
 
-OpenCaw uses the baseline instructions, project contracts, repository structure, task state, and relevant memory to turn that conversation into governed work. You can stay at this level for the whole task.
+Hephaera uses the baseline instructions, project contracts, repository structure, task state, and relevant memory to turn that conversation into governed work. You can stay at this level for the whole task.
 
 ## No Magic Words
 
 Role and skill names are **optional controls**, not required incantations.
 
-| You can simply say | OpenCaw can interpret it as |
+| You can simply say | Hephaera can interpret it as |
 | --- | --- |
 | “Before coding, help me work out the safest approach.” | Inspect context, identify decisions, and produce a plan. |
 | “Find the root cause and prove the fix.” | Diagnose, implement a focused correction, and run verification. |
 | “Review this like a security-minded senior engineer.” | Apply a security review lens without requiring a role name. |
 | “This is large; split only the parts that can safely run in parallel.” | Plan bounded sub-agent lanes when parallelism is useful and available. |
 | “Take this from idea through a reviewed PR, but ask before publishing.” | Track the task, implement, validate, then stop at the PR readiness gate. |
-| “Remember this repository rule for next time.” | Validate and store durable project knowledge under `.opencaw/.cache/`. |
+| “Remember this repository rule for next time.” | Validate and store durable project knowledge under `.hephaera/.cache/`. |
 
 These prompts are examples, not fixed syntax. Equivalent natural wording works.
 
-You may still say `use role gameplay-engineer`, invoke a named skill, or request a command when you know exactly which control you want. OpenCaw does not require that level of specificity to plan or complete ordinary work.
+You may still say `use role gameplay-engineer`, invoke a named skill, or request a command when you know exactly which control you want. Hephaera does not require that level of specificity to plan or complete ordinary work.
 
 ## Choose a Work Mode
 
-OpenCaw has three work modes. A normal specific assignment uses task mode; goal and Gauntlet modes begin only when you explicitly request them.
+Hephaera has three work modes. A normal specific assignment uses task mode; goal and Gauntlet modes begin only when you explicitly request them.
 
 Before those work modes, you may explicitly enter the optional Brainstorm discovery stage. The hierarchy is `Brainstorm → Plan → Task | Goal | Gauntlet`; Brainstorm never creates delivery work itself.
 
@@ -187,7 +191,7 @@ Use Brainstorm mode when an idea needs structured clarification and substantial 
 Enter Brainstorm mode. I want to explore a cooperative city-building game where players recover after disasters. Research the audience, comparable systems, technical risks, and a concrete definition of complete.
 ```
 
-Brainstorm is deliberately explicit and sticky. Once entered, repository-root `BRAINSTORM.md` remains active across conversations until you explicitly turn it off. While active, OpenCaw does not create tasks, issues, goals, Gauntlets, implementation changes, commits, or PRs.
+Brainstorm is deliberately explicit and sticky. Once entered, repository-root `BRAINSTORM.md` remains active across conversations until you explicitly turn it off. While active, Hephaera does not create tasks, issues, goals, Gauntlets, implementation changes, commits, or PRs.
 
 The Brainstorm team always has three participants: the main project-manager and two persistent read-only researcher subagents. One researcher focuses on the problem, audience, and precedent; the other focuses on feasibility, constraints, risks, start conditions, and measurable completeness. If both researcher slots are unavailable, idea processing stops rather than falling back to a smaller team.
 
@@ -199,9 +203,9 @@ Each materially distinct idea receives a stable `IDEA-NNN` identifier and belong
 - concrete start conditions and definition of complete
 - lifecycle status and plan readiness
 
-Ask to see the Brainstorm and OpenCaw returns a Mermaid mindmap. Ask to see it “in Markdown” and it returns the complete `BRAINSTORM.md` instead.
+Ask to see the Brainstorm and Hephaera returns a Mermaid mindmap. Ask to see it “in Markdown” and it returns the complete `BRAINSTORM.md` instead.
 
-Explicit exit preserves every complete or incomplete element and generates repository-root `BRAINSTORM_SUMMARY.md`, grouped by branch and bound to the final source hash. OpenCaw then waits; it plans only after you explicitly select an element.
+Explicit exit preserves every complete or incomplete element and generates repository-root `BRAINSTORM_SUMMARY.md`, grouped by branch and bound to the final source hash. Hephaera then waits; it plans only after you explicitly select an element.
 
 Lifecycle commands:
 
@@ -224,7 +228,7 @@ You can begin with uncertainty:
 The combat feels hard to read, but I am not sure whether the problem is timing, animation, camera, or UI. Inspect the current systems and help me define a playtestable improvement plan. Do not implement anything yet.
 ```
 
-OpenCaw can then:
+Hephaera can then:
 
 1. Resolve the repository boundary and load the relevant project context.
 2. Inspect the current architecture, active tasks, tests, and likely change surface.
@@ -256,7 +260,7 @@ Assume we must support existing saves and both controller and keyboard input. Wh
 We learned this scene also ships on mobile. Stop and re-plan around touch input, memory use, and the mobile frame-time budget.
 ```
 
-You are not locked into the first plan. OpenCaw treats corrections, new evidence, and changed constraints as reasons to update the plan rather than push through stale assumptions.
+You are not locked into the first plan. Hephaera treats corrections, new evidence, and changed constraints as reasons to update the plan rather than push through stale assumptions.
 
 ## A Realistic Planning Flow
 
@@ -266,29 +270,29 @@ Here is a complete interaction without role or skill syntax:
 You:
 Our combat state is spread across animation callbacks, the player controller, and the HUD. I want clearer ownership without changing attack timing or existing saves. First inspect the repository and give me a phased plan. Do not edit yet.
 
-OpenCaw:
+Hephaera:
 Inspects the selected engine, combat state, animation events, UI lifecycle, tests, and relevant repository memory. Returns a plan with ownership boundaries, compatibility risks, phases, and playable verification scenarios.
 
 You:
 Keep attack timings and save formats unchanged in phase one. Separate presentation cleanup from authoritative combat rules, and make the first task small enough for one reviewer.
 
-OpenCaw:
+Hephaera:
 Updates the plan, narrows phase one, and makes the dependency order explicit.
 
 You:
 Implement phase one. Add focused tests, run the broader validation, and tell me when it is ready for a PR.
 
-OpenCaw:
+Hephaera:
 Creates or updates task tracking, implements the agreed slice, verifies it, records reusable findings, and stops at the PR readiness gate.
 ```
 
 The named machinery is still there—roles, skills, commands, task files, memory, and validation—but it supports the conversation instead of replacing it.
 
-## What OpenCaw Does Behind the Scenes
+## What Hephaera Does Behind the Scenes
 
 For a substantial request, the normal flow is:
 
-1. **Resolve the project safely** — find the actual host repository and mounted OpenCaw directory without guessing across workspace boundaries.
+1. **Resolve the project safely** — find the actual host repository and mounted Hephaera directory without guessing across workspace boundaries.
 2. **Load high-signal context** — read protected repository memory, project rules, engine/architecture/style contracts, active tasks, and relevant tagged knowledge.
 3. **Restore or choose discovery** — resume an active Brainstorm before planning, or enter it only after an explicit request.
 4. **Understand the request** — distinguish the desired outcome, constraints, assumptions, authorization boundaries, and definition of done; Brainstorm may use two researcher lanes to deepen that understanding.
@@ -300,7 +304,7 @@ For a substantial request, the normal flow is:
 10. **Preserve durable learning** — record verified, reusable repository facts and keep the semantic map current.
 11. **Deliver by mode** — task work pauses before publication; goal flow may publish validated task PRs; an approved Gauntlet contract may publish unit progress PRs to its integration branch; every path keeps merges human-controlled, and Gauntlet promotion still requires a final human gate.
 
-OpenCaw can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
+Hephaera can do this even if your prompt never mentions a role, skill, command, task file, memory tag, or validation script.
 
 ## Natural-Language Examples
 
@@ -360,13 +364,13 @@ We keep rediscovering the same Windows path issue. Verify the pattern, fix the w
 
 ## When Explicit Controls Help
 
-Natural language is the default. Explicit controls are useful when you want to constrain *how* OpenCaw approaches the work.
+Natural language is the default. Explicit controls are useful when you want to constrain *how* Hephaera approaches the work.
 
 | Control | Use it when | Example |
 | --- | --- | --- |
 | Role | You want a named specialist perspective or composition order. | `Use roles game-designer + gameplay-engineer.` |
 | Skill | You want one exact reusable workflow. | `Use the dependency audit skill before changing packages.` |
-| Command | You want a deterministic repository script. | `Run the full OpenCaw validation command.` |
+| Command | You want a deterministic repository script. | `Run the full Hephaera validation command.` |
 | Agent count | You are authorizing parallel agent work and want a capacity ceiling. | `Use up to 3 agents, but only for independent lanes.` |
 | Issue reference | Existing GitHub issue content is the source task. | `Work on #123.` |
 | Brainstorm mode | An idea needs persistent, research-heavy discovery before planning. | `Enter Brainstorm mode and research this game idea.` |
@@ -408,107 +412,112 @@ Brainstorm is explicit because it creates persistent pre-planning state and susp
 
 # Install
 
-Install OpenCaw directly at `<project-root>/.opencaw/` in an existing project. Both automated setup and manual installation require this exact directory.
+Install Hephaera directly at `<project-root>/.hephaera/` in an existing project. Both automated setup and manual installation require this exact directory.
 
 The installation contains reusable baseline files plus an ignored `.cache/` child for durable project memory, tasks, rules, and evidence. Project contracts such as `ENGINE.md`, `ARCHITECTURE.md`, and `STYLE.md` stay at the project root. This is a fresh-install layout; earlier install locations are not supported or migrated.
 
-## Fork OpenCaw First
+## Fork Hephaera First
 
 Fork the repository before installing it into production or team projects. A fork gives your team control over updates, custom roles and skills, security policy, and the exact version each repository consumes.
 
 Upstream repository:
 
-https://github.com/TimothyMeadows/OpenCaw
+https://github.com/TimothyMeadows/Hephaera
 
 Example fork:
 
 ```text
-https://github.com/<your-org>/OpenCaw
+https://github.com/<your-org>/Hephaera
 ```
 
 Use your fork URL in the installation commands below.
 
 ## Fixed Installation Layout
 
-Use `.opencaw` for Codex, Cursor, Claude, and every other supported agent. Do not rename the installation or select a tool-specific directory. The scaffold maintains a block in the host root `AGENTS.md` that reads only `./.opencaw/AGENTS.md`, while preserving other host instructions.
+Use `.hephaera` for Codex, Cursor, Claude, and every other supported agent. Do not rename the installation or select a tool-specific directory. The scaffold maintains a block in the host root `AGENTS.md` that reads only `./.hephaera/AGENTS.md`, while preserving other host instructions.
 
-Commands shown in this install section run from the project root. Technical-reference examples using `./commands/` run from inside `.opencaw/`; the equivalent project-root prefix is `./.opencaw/commands/`.
+Commands shown in this install section run from the project root. Technical-reference examples using `./commands/` run from inside `.hephaera/`; the equivalent project-root prefix is `./.hephaera/commands/`.
+
+## Existing installation state
+
+New installations use `.hephaera/`. Before carrying forward an existing installation, use `bash .hephaera/commands/state-transition.sh inspect`; follow the [state-transition guide](docs/STATE_TRANSITION.md). Explicit preparation preserves historical receipts, consent, journals and attempt accounting and records a persistent production fence. It does not relabel approvals or make relocated tools executable. Fresh projects without legacy state use the normal setup path.
+
 
 ## Windows Bash Prerequisite
 
-OpenCaw commands use Bash. Linux and macOS normally already provide the expected runtime.
+Hephaera commands use Bash. Linux and macOS normally already provide the expected runtime.
 
-On Windows, Git Bash is recommended for native Windows filesystem performance. After OpenCaw is mounted, inspect available providers from PowerShell:
+On Windows, Git Bash is recommended for native Windows filesystem performance. After Hephaera is mounted, inspect available providers from PowerShell:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.hephaera\commands\install-windows-bash.ps1"
 ```
 
 Install Git Bash explicitly when needed:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider GitBash -Install
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.hephaera\commands\install-windows-bash.ps1" -Provider GitBash -Install
 ```
 
 Or explicitly install WSL when Linux tooling compatibility is preferred:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider WSL -Install
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.hephaera\commands\install-windows-bash.ps1" -Provider WSL -Install
 ```
 
-OpenCaw never installs Bash implicitly. Use `-WhatIf` to preview installation or scaffold execution.
+Hephaera never installs Bash implicitly. Use `-WhatIf` to preview installation or scaffold execution.
 
 Run the canonical scaffold through the selected provider:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ".\.opencaw\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\.hephaera\commands\install-windows-bash.ps1" -Provider GitBash -RunScaffold -ProjectRoot .
 ```
 
 ## Option 1 — Git Submodule
 
-Recommended for teams that want centralized OpenCaw updates while pinning each host repository to a reviewed revision:
+Recommended for teams that want centralized Hephaera updates while pinning each host repository to a reviewed revision:
 
 ```bash
-git submodule add https://github.com/<your-org>/OpenCaw .opencaw
-git submodule update --init --recursive --checkout -- .opencaw
+git submodule add https://github.com/<your-org>/Hephaera .hephaera
+git submodule update --init --recursive --checkout -- .hephaera
 ```
 
-Update the OpenCaw submodule when your team is ready, then initialize its recorded nested dependencies:
+Update the Hephaera submodule when your team is ready, then initialize its recorded nested dependencies:
 
 ```bash
-git submodule update --remote --checkout -- .opencaw
-git -C .opencaw submodule update --init --recursive --checkout -- runtime/bubo
+git submodule update --remote --checkout -- .hephaera
+git -C .hephaera submodule update --init --recursive --checkout -- runtime/bubo
 ```
 
-Review and commit the resulting `.opencaw` gitlink in the host repository. The first command deliberately updates only OpenCaw; the second checks out Bubo at the commit recorded by that OpenCaw revision. Do not run `--remote` against `runtime/bubo` or recursively against nested dependencies.
+Review and commit the resulting `.hephaera` gitlink in the host repository. The first command deliberately updates only Hephaera; the second checks out Bubo at the commit recorded by that Hephaera revision. Do not run `--remote` against `runtime/bubo` or recursively against nested dependencies.
 
 ## Option 2 — Clone
 
 Use a direct clone when the host repository needs an independent, customized copy:
 
 ```bash
-git clone --recurse-submodules https://github.com/<your-org>/OpenCaw .opencaw
+git clone --recurse-submodules https://github.com/<your-org>/Hephaera .hephaera
 ```
 
-For an existing clone, update OpenCaw first and then initialize the nested dependencies at their recorded commits:
+For an existing clone, update Hephaera first and then initialize the nested dependencies at their recorded commits:
 
 ```bash
-git -C .opencaw pull --ff-only
-git -C .opencaw submodule update --init --recursive --checkout -- runtime/bubo
+git -C .hephaera pull --ff-only
+git -C .hephaera submodule update --init --recursive --checkout -- runtime/bubo
 ```
 
 ### Native runtime prerequisites
 
-Both installation forms pin the standalone Bubo runtime at `.opencaw/runtime/bubo`. Its revision, execution API and resource catalog are recorded in `runtime/bubo.lock.json`. Session startup, memory, engine selection and scaffold creation work before this submodule is initialized or built.
+Both installation forms pin the standalone Bubo runtime at `.hephaera/runtime/bubo`. Its revision, execution API and resource catalog are recorded in `runtime/bubo.lock.json`. Session startup, memory, engine selection and scaffold creation work before this submodule is initialized or built.
 
 Before using proof-to-model, model-to-animation, model-to-action or read-only Blender scene inspection, initialize and explicitly build the recorded runtime with an existing .NET 10 SDK:
 
 ```bash
-bash ./.opencaw/commands/initialize-bubo-runtime.sh
-bash ./.opencaw/commands/build-bubo-runtime.sh
+bash ./.hephaera/commands/initialize-bubo-runtime.sh
+bash ./.hephaera/commands/build-bubo-runtime.sh
 ```
 
-Rebuild after an OpenCaw update changes the Bubo pin. Production commands verify the recorded revision, build identity, API and audited resources before launching the prebuilt CLI. A missing dependency or build gives initialization/build instructions. These commands do not install the SDK, Blender, Python environments, models or packages, accept licenses, generate assets or grant promotion approval; applicable production prerequisites remain separate.
+Rebuild after a Hephaera update changes the Bubo pin. Production commands verify the recorded revision, build identity, API and audited resources before launching the prebuilt CLI. A missing dependency or build gives initialization/build instructions. These commands do not install the SDK, Blender, Python environments, models or packages, accept licenses, generate assets or grant promotion approval; applicable production prerequisites remain separate.
 
 Pre-extraction manifests and review receipts remain historical evidence. Start a new asset version bound to the current runtime and refresh approvals affected by changed execution inputs; preserve the original manifests and receipts.
 
@@ -517,13 +526,13 @@ Pre-extraction manifests and review receipts remain historical evidence. Start a
 Initialize the durable context files and managed root `AGENTS.md` bootstrap before the first session:
 
 ```bash
-bash ./.opencaw/commands/create-host-ai-scaffold.sh
+bash ./.hephaera/commands/create-host-ai-scaffold.sh
 ```
 
 Use the PowerShell `-RunScaffold` command above when Bash is not yet available to the current shell. Compatible agents read the host bootstrap to load the baseline. If discovery has not happened yet, use a natural request:
 
 ```text
-Read ./.opencaw/AGENTS.md, initialize the repository-local .opencaw/.cache scaffold, and explain what project context is available before we start.
+Read ./.hephaera/AGENTS.md, initialize the repository-local .hephaera/.cache scaffold, and explain what project context is available before we start.
 ```
 
 After initialization, begin with the work itself:
@@ -552,30 +561,30 @@ The rest of this README describes the machinery behind the conversational experi
 | Memory and repository map | Durable facts and semantic repository structure | Queried selectively before broad searches |
 | Verification evidence | Tests, logs, browser artifacts, and PR QA comments | Required before completion |
 
-Roles, skills, and commands deepen control, but baseline OpenCaw behavior works without explicitly naming any of them.
+Roles, skills, and commands deepen control, but baseline Hephaera behavior works without explicitly naming any of them.
 
 ## Session Startup and Context Resolution
 
-At session start, OpenCaw follows a memory-first sequence:
+At session start, Hephaera follows a memory-first sequence:
 
-1. Resolve the actual project root and mounted baseline with `commands/resolve-opencaw-paths.sh`.
-2. Create the repository-local `.opencaw/.cache` scaffold when required.
-3. Load all of `.opencaw/.cache/SYSTEM_MEMORY.md`.
+1. Resolve the actual project root and mounted baseline with `commands/resolve-hephaera-paths.sh`.
+2. Create the repository-local `.hephaera/.cache` scaffold when required.
+3. Load all of `.hephaera/.cache/SYSTEM_MEMORY.md`.
 4. Review project rules, `ENGINE.md`, `ARCHITECTURE.md`, `STYLE.md`, active task tracking, and open issues when present.
 5. Infer relevant memory tags and query ranked context before broad raw searches.
 6. Check the semantic repository-map fingerprint and refresh stale structure when necessary.
 7. Plan and execute the current request using the narrowest safe scope.
 
-For installed commands, the resolver uses the direct parent of `.opencaw/` as the project root and fails closed on an invalid layout or conflicting root selection. It never searches a broad workspace parent or discovers alternate installation names. Maintainer source checkouts may use explicit `OPENCAW_PROJECT_ROOT` fixture roots for development and testing; they are not another host installation option.
+For installed commands, the resolver uses the direct parent of `.hephaera/` as the project root and fails closed on an invalid layout or conflicting root selection. It never searches a broad workspace parent or discovers alternate installation names. Maintainer source checkouts may use explicit `HEPHAERA_PROJECT_ROOT` fixture roots for development and testing; they are not another host installation option.
 
 ## Repository Layering
 
-OpenCaw separates reusable baseline behavior from host-project state.
+Hephaera separates reusable baseline behavior from host-project state.
 
 ### Shared mounted baseline
 
 ```text
-<project-root>/.opencaw/
+<project-root>/.hephaera/
 ├── AGENTS.md
 ├── .architecture/
 ├── .engine/
@@ -603,7 +612,7 @@ OpenCaw separates reusable baseline behavior from host-project state.
 ├── VOICE.md                 # optional speech/cloning workflow
 ├── BRAINSTORM.md            # optional discovery state
 ├── BRAINSTORM_SUMMARY.md    # optional exit index
-└── .opencaw/
+└── .hephaera/
     └── .cache/
         ├── SYSTEM_MEMORY.md
         ├── MEMORY.md
@@ -621,11 +630,11 @@ OpenCaw separates reusable baseline behavior from host-project state.
         └── reports/
 ```
 
-Project-specific learned state belongs under `.opencaw/.cache/`. Although this directory sits inside the installation, it is local durable state and excluded from the shared baseline's Git history. Preserve and back it up with the project's other durable state; do not treat it as a disposable tool-download cache. Shared configuration changes belong outside `.cache/` and require an explicit baseline-change request.
+Project-specific learned state belongs under `.hephaera/.cache/`. Although this directory sits inside the installation, it is local durable state and excluded from the shared baseline's Git history. Preserve and back it up with the project's other durable state; do not treat it as a disposable tool-download cache. Shared configuration changes belong outside `.cache/` and require an explicit baseline-change request.
 
 ## Engine, Architecture, Style, and Media Contracts
 
-OpenCaw uses concise host-level contracts so agents do not have to rediscover foundational decisions during every task.
+Hephaera uses concise host-level contracts so agents do not have to rediscover foundational decisions during every task.
 
 | Contract | Host file | Template source | Purpose |
 | --- | --- | --- | --- |
@@ -638,7 +647,7 @@ OpenCaw uses concise host-level contracts so agents do not have to rediscover fo
 | Instrumental and supplied-lyric music | Optional `MUSIC.md` | `.media/pipelines/music/` | Track intent, exact lyrics/rights, full-track review, and target handoff |
 | Preset speech and consented cloning | Optional `VOICE.md` | `.media/pipelines/voice/` | Spoken content, local reference/consent, disclosure, and target handoff |
 
-When a required architecture or style contract is missing, OpenCaw asks which templates apply and supports composing more than one. Default generation uses concise read directives rather than copying entire templates into the host file. Inline generation is opt-in.
+When a required architecture or style contract is missing, Hephaera asks which templates apply and supports composing more than one. Default generation uses concise read directives rather than copying entire templates into the host file. Inline generation is opt-in.
 
 The three media-domain contracts are optional and independent; configure only the workflows the project needs. They use shared `MEDIA.md` execution policy without selecting a visual style. Generation planning does not require an engine; selected-engine handoff requires current target evidence.
 
@@ -696,11 +705,11 @@ Each project selects one engine in `ENGINE.md`; unconfigured projects default to
 
 Generation uses concise read directives; `--inline` embeds the definition. Regeneration preserves project content outside the managed block. Invalid contracts and conflicting existing-engine evidence require explicit migration. Browser engine architecture templates remain compatibility redirects.
 
-Every skill declares `engines: [AGNOSTIC]` or one canonical engine. Engine-specific feature skills use prefixes such as `unity-` or `threejs-`. The registry defines engine features across all six engines; Unity has 19 focused skills and Unreal has 22, and role capability resolution filters their effective selection and reports exclusions. A requested skill never changes engines. Legacy Three.js skill names resolve through OpenCaw aliases, while command names and artifact schemas remain compatible.
+Every skill declares `engines: [AGNOSTIC]` or one canonical engine. Engine-specific feature skills use prefixes such as `unity-` or `threejs-`. The registry defines engine features across all six engines; Unity has 19 focused skills and Unreal has 22, and role capability resolution filters their effective selection and reports exclusions. A requested skill never changes engines. Legacy Three.js skill names resolve through Hephaera aliases, while command names and artifact schemas remain compatible.
 
 Unreal workflows cover C++/Blueprint ownership, assets, controls, physics, animation, materials, UI, audio and multiplayer, with dedicated specialists for async work, GAS, movement, modular features, AI/StateTree, Mass, cameras, Niagara, cinematics, world streaming, procedural content and saves. All follow the project's actual version and explicit plugin choices. Engine guidance requires no additional model or hosted service; real API/runtime acceptance needs matching native tools, SDKs and assets. Optional native feature fixtures distinguish source/structure checks from actual execution and do not certify network correction, rendering, sound or physical feedback through headless success.
 
-Task overrides require recorded, hash-bound evidence and an isolated prototype scope. For example, `resolve-engine.sh --override GODOT --task demo --scope prototypes/godot-demo --record-override` records selection; consumers pass `--evidence .opencaw/.cache/tasks/demo/engine-override.json --output prototypes/godot-demo/file`. The task must already exist. CODE commands consume the same receipt through `--engine-evidence FILE` and an explicit prototype source path; manifests and reports remain under that task. Overrides cannot edit incompatible code in an existing game and do not rewrite ENGINE.md. This is cooperative validation, not an OS sandbox.
+Task overrides require recorded, hash-bound evidence and an isolated prototype scope. For example, `resolve-engine.sh --override GODOT --task demo --scope prototypes/godot-demo --record-override` records selection; consumers pass `--evidence .hephaera/.cache/tasks/demo/engine-override.json --output prototypes/godot-demo/file`. The task must already exist. CODE commands consume the same receipt through `--engine-evidence FILE` and an explicit prototype source path; manifests and reports remain under that task. Overrides cannot edit incompatible code in an existing game and do not rewrite ENGINE.md. This is cooperative validation, not an OS sandbox.
 
 Unity production adds dedicated 2D content, localization, rendering, native Editor tools and web optimization, plus explicitly selected live services, sessions, voice, purchases and advertising. Native batch tooling remains available; Unity CLI/Pipeline is optional and requires configured project/instance identity. Feature use never installs packages or activates accounts. Match the project Editor and package versions; native, service, visual/audio and device acceptance require their actual prerequisites.
 
@@ -723,12 +732,12 @@ Three.js, Babylon.js and Phaser automatically select the **MAUI** packaging prof
 Build the game's static distribution with its existing locked toolchain before running `sync`. From an installed host project root:
 
 ```bash
-bash .opencaw/commands/web-game-package.sh doctor --target WINDOWS
-bash .opencaw/commands/web-game-package.sh init \
+bash .hephaera/commands/web-game-package.sh doctor --target WINDOWS
+bash .hephaera/commands/web-game-package.sh init \
   --app-id com.example.mygame --title "My Game" --web-root dist
-bash .opencaw/commands/web-game-package.sh sync
-bash .opencaw/commands/web-game-package.sh plan --target WINDOWS --format folder
-bash .opencaw/commands/web-game-package.sh package --target WINDOWS --format folder
+bash .hephaera/commands/web-game-package.sh sync
+bash .hephaera/commands/web-game-package.sh plan --target WINDOWS --format folder
+bash .hephaera/commands/web-game-package.sh package --target WINDOWS --format folder
 ```
 
 Use `build` for compilation and `package` for distribution artifacts. Configure identity/version and static entry in `web-game-package.json`; keep native source under `platforms/maui`. Sync records exact web/native/configuration identities, rejects unsafe or foreign paths and retains prior assets/receipts in durable project cache. Changed inputs require explicit resync. Interrupted initialization/staging uses an owned journal and explicit `recover`. Native execution is bounded, and unavailable prerequisites remain explicit.
@@ -743,8 +752,8 @@ Use `package-web-games` and the [complete packaging/release workflow](docs/WEB_G
 From an installed host root:
 
 ```bash
-bash .opencaw/commands/threejs-particles.sh inspect --renderer WebGLRenderer
-bash .opencaw/commands/threejs-particles.sh scaffold --output src/engine/particles --renderer WebGLRenderer
+bash .hephaera/commands/threejs-particles.sh inspect --renderer WebGLRenderer
+bash .hephaera/commands/threejs-particles.sh scaffold --output src/engine/particles --renderer WebGLRenderer
 ```
 
 The workflow provides read-only npm dependency discovery and a reusable bounded scene/clock/resource owner with pause, reset, cancellation and disposal. The initial CPU-tested set is Three0.182.0 with `three.quarks`0.17.1 and `quarks.core`0.17.1. Selection never installs or upgrades packages; incompatible host locks and unsupported renderers require direction. Core WebGL integration does not imply WebGPU or actual MAUI/device rendering acceptance.
@@ -756,8 +765,8 @@ Use the [particle integration guide](docs/THREEJS_PARTICLES.md) for exact depend
 **Three.js automatically selects pmndrs `postprocessing` for screen effects.** Use `threejs-build-postprocessing` and the [postprocessing guide](docs/THREEJS_POSTPROCESSING.md) for read-only dependency inspection, explicit source scaffolding and a bounded WebGL2 composer shared with the existing Quarks renderer/clock.
 
 ```bash
-bash .opencaw/commands/threejs-postprocessing.sh inspect --renderer WebGLRenderer
-bash .opencaw/commands/threejs-postprocessing.sh scaffold --output src/engine/postprocessing --renderer WebGLRenderer
+bash .hephaera/commands/threejs-postprocessing.sh inspect --renderer WebGLRenderer
+bash .hephaera/commands/threejs-postprocessing.sh scaffold --output src/engine/postprocessing --renderer WebGLRenderer
 ```
 
 The tested stack uses Three0.182.0/postprocessing6.39.5. The starter uses LDR byte targets and FXAA with explicit size, lifecycle and resource ownership. Selection installs nothing. HDR/heavier effects require reviewed host integration and target checks. MAUI WebViews can support WebGL2, but actual packaged GPU/color/performance acceptance remains device-specific and unverified by source/CPU tests. Ray tracing and path tracing are deferred to prioritize device coverage.
@@ -765,7 +774,7 @@ The tested stack uses Three0.182.0/postprocessing6.39.5. The starter uses LDR by
 
 ## Roles
 
-Roles are optional named perspectives. Use one when you want a specific specialist lens, not because OpenCaw requires a role to work.
+Roles are optional named perspectives. Use one when you want a specific specialist lens, not because Hephaera requires a role to work.
 
 Role definitions live at:
 
@@ -791,7 +800,7 @@ Use role game-designer and review the core loop, progression, and balance hypoth
 Use roles art-director + technical-3d-artist to review silhouette, material consistency, runtime budgets, and handoff evidence.
 ```
 
-If an unqualified name or alias is ambiguous across domains, OpenCaw asks for the domain-qualified role. Exact role-name matches take precedence over aliases.
+If an unqualified name or alias is ambiguous across domains, Hephaera asks for the domain-qualified role. Exact role-name matches take precedence over aliases.
 
 ### Multi-role composition
 
@@ -811,7 +820,7 @@ Deterministic resolution:
 
 ## Role, Skill, and Command Bindings
 
-Role casting can influence more than tone. OpenCaw maintains default bindings between roles, reusable skills, and preferred commands:
+Role casting can influence more than tone. Hephaera maintains default bindings between roles, reusable skills, and preferred commands:
 
 ```text
 .roles/ROLE_SKILL_MAP.json
@@ -900,20 +909,21 @@ commands/*.ps1
 You can ask naturally:
 
 ```text
-Run the full OpenCaw validation and summarize any failures.
+Run the full Hephaera validation and summarize any failures.
 ```
 
 Or run the command directly:
 
 ```bash
-./commands/validate-opencaw.sh
+./commands/validate-hephaera.sh
 ```
 
 ### Common command groups
 
 | Group | Commands |
 | --- | --- |
-| Project resolution and scaffold | `resolve-opencaw-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Project resolution and scaffold | `resolve-hephaera-paths.sh`, `create-host-ai-scaffold.sh`, `install-windows-bash.ps1` |
+| Historical state transition | `state-transition.sh` |
 | Three.js particles | `threejs-particles.sh` |
 | Three.js postprocessing | `threejs-postprocessing.sh` |
 | Native web-game packaging | `web-game-package.sh` |
@@ -942,13 +952,13 @@ Or run the command directly:
 | Code-first Three.js models | `create-code-model-manifest.sh`, `validate-code-model-manifest.sh`, `next-code-model-pass.sh`, `record-code-model-review.sh` |
 | Code-first Three.js characters | `create-code-character-profile.sh`, `validate-code-character-profile.sh`, `measure-code-character-evidence.sh`, `record-code-character-calibration.sh`, `record-code-character-gate.sh` |
 | Blender production | `print-blender-production-brief.sh`, `inspect-blender-scene.sh`, `validate-blender-scene-report.sh`, `validate-blender-python.sh` |
-| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-blender-scene-report.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-opencaw.sh` |
+| Validation | `validate-readme.sh`, `validate-roles.sh`, `validate-skills.sh`, `validate-commands.sh`, `validate-role-skill-map.sh`, `validate-rigged-actor-manifest.sh`, `validate-blender-scene-report.sh`, `validate-media-templates.sh`, `validate-memory.sh`, `validate-hephaera.sh` |
 
 Commands should remain deterministic, reviewable, platform-safe, and non-self-installing unless an installation action is explicitly authorized.
 
 ## Sub-Agent Orchestration
 
-OpenCaw supports parallel work when the user requests multiple agents or when the applicable project policy explicitly permits safe parallel lanes.
+Hephaera supports parallel work when the user requests multiple agents or when the applicable project policy explicitly permits safe parallel lanes.
 
 Natural request:
 
@@ -965,13 +975,13 @@ Use up to 4 agents. Do not invent work just to fill every slot, and reserve fina
 For substantial task-backed work, the durable lane plan lives at:
 
 ```text
-.opencaw/.cache/tasks/<task-name>/SUBAGENTS.md
+.hephaera/.cache/tasks/<task-name>/SUBAGENTS.md
 ```
 
 It records:
 
 - requested and effective capacity
-- lane IDs and resolved OpenCaw roles
+- lane IDs and resolved Hephaera roles
 - explorer, worker, or default agent type
 - scope and non-overlapping write sets
 - dependencies and integration order
@@ -999,15 +1009,16 @@ Brainstorm precedes planning; Task, Goal, and Gauntlet remain sibling delivery m
 | Stage or mode | Activation | Durable state | Loop | Publication |
 | --- | --- | --- | --- | --- |
 | Brainstorm | Explicit `start` or `enter Brainstorm mode`, or active repository state restored at startup | `BRAINSTORM.md`; hash-bound `BRAINSTORM_SUMMARY.md` on exit | Clarify, branch, research with two independent researchers, and synthesize ideas | None; delivery creation is blocked while active |
-| Task | Default for a specific assignment; may also be named explicitly | `.opencaw/.cache/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
-| Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.opencaw/.cache/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
-| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.opencaw/.cache/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
+| Task | Default for a specific assignment; may also be named explicitly | `.hephaera/.cache/tasks/<task-name>/TASK.md` | Plan, implement, and verify one assignment | Human approval before its PR |
+| Goal | Explicit `goal` or `goal flow`, or `Goal Flow: enabled` / `Flow: goal` in a planning artifact | `.hephaera/.cache/goals/<goal-name>/GOAL.md` plus its task artifacts | Complete each ordered task and its post-PR QA | Each task PR may open automatically; merging remains human-controlled |
+| Gauntlet | Explicit `gauntlet`, `gauntlet mode`, or `gauntlet flow`, or `Gauntlet Mode: enabled` / `Flow: gauntlet` in an artifact | `.hephaera/.cache/gauntlets/<gauntlet-name>/GAUNTLET.md`, immutable rounds, and an ordered PR/QA ledger | Build and criticize units on progress PRs, human-merge them into `gauntlet/<name>`, then test and promote the integrated artifact | Approved contract permits automatic progress and remediation PRs; every merge and final promotion publication remain human-controlled |
 
-Task, Goal, and Gauntlet are sibling delivery modes. Brainstorm may feed planning for any one of them, but never nests with or creates them. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request selects conflicting stages or delivery modes, OpenCaw asks which governs before changing project state.
+Task, Goal, and Gauntlet are sibling delivery modes. Brainstorm may feed planning for any one of them, but never nests with or creates them. A generic `## Goal` section in `TASK.md` describes task intent and does not activate goal flow. Gauntlet work units are not separate goal tasks. Their progress-PR authorization comes only from the explicitly approved Gauntlet contract, not from goal mode. If a request selects conflicting stages or delivery modes, Hephaera asks which governs before changing project state.
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#202A32","primaryTextColor":"#FFF4D6","primaryBorderColor":"#C69A52","lineColor":"#C69A52","secondaryColor":"#46535E","tertiaryColor":"#202A32","edgeLabelBackground":"#FFF4D6"}}}%%
 flowchart TB
-    accTitle: OpenCaw game development planning and delivery
+    accTitle: Hephaera game development planning and delivery
     accDescr: A game-development request may enter explicit Brainstorm discovery; exit then requires selecting an idea and explicitly requesting a plan, then uses task mode by default, explicit goal mode for ordered task pull requests, or explicit Gauntlet mode for reviewed work-unit pull requests and final promotion.
 
     Request["Natural-language request"] --> Discovery{"Explicit Brainstorm mode?"}
@@ -1072,7 +1083,7 @@ Creation commands for tasks, task issues/imports, Goals, and Gauntlets fail clos
 
 ### Task lifecycle
 
-Task mode is the normal path for one assignment. OpenCaw creates or imports its task and issue, implements within the agreed scope, proves the result, and stops at the human PR readiness gate. After approval, it opens one linked PR and runs post-PR QA.
+Task mode is the normal path for one assignment. Hephaera creates or imports its task and issue, implements within the agreed scope, proves the result, and stops at the human PR readiness gate. After approval, it opens one linked PR and runs post-PR QA.
 
 ### Goal lifecycle
 
@@ -1107,13 +1118,13 @@ Supersession requires exactly one canonical `- Unit supersession: <item-id> | sc
 
 `GAUNTLET.md` is the live contract and index. It records flow and status, the parent task, objective, approved quality bar, constraints and permissions, retained work-unit definitions and active scopes, execution/quality/unit-manifest fingerprints, frozen base commit, round/progress-PR/completion/promotion ledgers, merge topology, integration review, delivery state, and review notes. Append-only publication checkpoints live beside it and are consumed by opened entries in the hashed progress-PR ledger.
 
-Do not fabricate progressive PR events for a Gauntlet started under the earlier single-final-PR contract. Preserve that run and report under `.opencaw/.cache/archive/gauntlets/`, then create a new progressive Gauntlet or explicitly supersede its old units and rebuild them through real work-unit PRs. Historical evidence without an observed PR head, QA result, and human merge cannot satisfy the new completion gate.
+Do not fabricate progressive PR events for a Gauntlet started under the earlier single-final-PR contract. Preserve that run and report under `.hephaera/.cache/archive/gauntlets/`, then create a new progressive Gauntlet or explicitly supersede its old units and rebuild them through real work-unit PRs. Historical evidence without an observed PR head, QA result, and human merge cannot satisfy the new completion gate.
 
 #### Work units and progress PRs
 
 The lead derives the smallest work units that can be improved and judged independently. Each unit line freezes a stable ID, title, and inspectable scope/acceptance boundary. Each active unit gets one progress PR targeting `gauntlet/<name>` from `gauntlet-work/<name>/<item-id>`; later remediation or replacement cycles use `-remediation-N`. Builder/critic iterations normally update that open unit PR, so its comments show every failure and pass without creating throwaway PRs. A completed, closed, or causally superseded cycle gets a new PR. The separate `gauntlet-work/` namespace is required because Git cannot store `gauntlet/<name>` and a descendant branch beneath the same ref. Disjoint units may use separate branches and PRs in parallel. Coupled or dependent work waits until its prerequisite PR is human-merged, then starts from the resulting integration-branch state.
 
-The approved contract authorizes progress-PR publication; it does not authorize merging. Before publication, readiness fetches the recorded origin, proves every effective push URL belongs to the issue repository, compares local and remote integration/work refs, proves the work head descends from the exact integration-chain tip, and writes an immutable `publication-checkpoints/<item-id>/checkpoint-NNN.md`. Gauntlet evidence permits only authenticated SSH or HTTPS `github.com` remotes—never plaintext HTTP—and explicitly pins live API queries to `github.com` instead of trusting an ambient `GH_HOST`. Its quality fingerprint plus exact `Quality bar approved at` value, manifest fingerprint plus exact `Unit manifest approved at` value, and every supersession edge used for inherited remediation must already be approved and active at that checkpoint's issuance time. The PR body must begin with case-sensitive `Refs #<issue-number>` and include exactly one emitted `<!-- opencaw-gauntlet-publication:v1 checkpoint=<path> checkpoint-sha256=<sha> -->` marker; every GitHub closing-keyword alias is reserved for the human-gated promotion PR. The opened-event recorder queries the live same-repository PR body, base/head branches and OIDs, state, draft flag, and creation time; it verifies that the checkpoint still matches the contract, fingerprints, refs, and remediation root, then consumes it exactly once. Every later round and event re-observes the mutable body, and each later head on that open PR must fast-forward from its prior recorded head. An unused checkpoint may document an aborted publication attempt, but it cannot authorize a later changed PR; issuing a newer checkpoint supersedes every older unused checkpoint for that unit.
+The approved contract authorizes progress-PR publication; it does not authorize merging. Before publication, readiness fetches the recorded origin, proves every effective push URL belongs to the issue repository, compares local and remote integration/work refs, proves the work head descends from the exact integration-chain tip, and writes an immutable `publication-checkpoints/<item-id>/checkpoint-NNN.md`. Gauntlet evidence permits only authenticated SSH or HTTPS `github.com` remotes—never plaintext HTTP—and explicitly pins live API queries to `github.com` instead of trusting an ambient `GH_HOST`. Its quality fingerprint plus exact `Quality bar approved at` value, manifest fingerprint plus exact `Unit manifest approved at` value, and every supersession edge used for inherited remediation must already be approved and active at that checkpoint's issuance time. The PR body must begin with case-sensitive `Refs #<issue-number>` and include exactly one emitted `<!-- hephaera-gauntlet-publication:v1 checkpoint=<path> checkpoint-sha256=<sha> -->` marker; every GitHub closing-keyword alias is reserved for the human-gated promotion PR. The opened-event recorder queries the live same-repository PR body, base/head branches and OIDs, state, draft flag, and creation time; it verifies that the checkpoint still matches the contract, fingerprints, refs, and remediation root, then consumes it exactly once. Every later round and event re-observes the mutable body, and each later head on that open PR must fast-forward from its prior recorded head. An unused checkpoint may document an aborted publication attempt, but it cannot authorize a later changed PR; issuing a newer checkpoint supersedes every older unused checkpoint for that unit.
 
 A unit counts as integrated only when all three conditions are recorded for the current unit scope, unit-manifest, quality, and execution-contract fingerprints:
 
@@ -1132,23 +1143,23 @@ For every critic round:
 3. The critic uses blind comparison where feasible; otherwise it directly compares the artifact with the reference and checks objective tests and guardrails.
 4. The report identifies the exact head SHA and real project-relative artifacts inspected. A passing verdict advances the unit toward PR QA. A failing verdict records the largest remaining gap and critic recommendation; after its QA failure is recorded, the builder must use a different actual strategy for the next attempt on the same unit PR.
 
-Builder and critic identity sets must remain globally disjoint across the Gauntlet, with case-normalized comparison, and every round requires a new critic invocation using a native fresh-context subagent or a fresh isolated session. If OpenCaw cannot obtain an isolated critic, it blocks the Gauntlet instead of accepting self-review. Critics inspect the running product, rendered output, test evidence, finished document, or other real artifact—not a builder-written summary.
+Builder and critic identity sets must remain globally disjoint across the Gauntlet, with case-normalized comparison, and every round requires a new critic invocation using a native fresh-context subagent or a fresh isolated session. If Hephaera cannot obtain an isolated critic, it blocks the Gauntlet instead of accepting self-review. Critics inspect the running product, rendered output, test evidence, finished document, or other real artifact—not a builder-written summary.
 
 Every critic report uses the exact contract documented by the `gauntlet-flow` skill: ordered `Artifact Inspected`, `Bar Comparison`, `Guardrail Results`, `Verdict`, `Largest Remaining Gap`, and `Next Strategy` sections; at least one `- Artifact: <project-relative-file>` entry that is a regular file in the reviewed commit tree; one `- Head SHA: <full-sha>` matching the live PR or integration head; and exactly one `- Verdict: pass|fail|blocked`. Evidence is append-only under:
 
 ```text
-.opencaw/.cache/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
+.hephaera/.cache/gauntlets/<gauntlet-name>/rounds/<item-id>/round-NNN.md
 ```
 
-PR events are durable under `.opencaw/.cache/gauntlets/<gauntlet-name>/pr-events/<item-id>/event-NNN.md`. Recording `opened`, `qa-pass`, `qa-fail`, `merged`, or `closed` performs a fresh live-GitHub query and persists same-repository identity, PR-body checkpoint, state, draft flag, created/closed/merged times, head/base SHAs, all current fingerprints, target, merge actor and bot flag, and merge commit. Record human merges promptly in integration order so every `baseRefOid` connects the prior chain tip to the new `mergeCommit`; direct integration commits are forbidden. Any retained GitHub timeline event that enabled auto-merge, auto-rebase, auto-squash, or entry into a merge queue invalidates a progress or promotion PR, even if the automation was later disabled. Completion and readiness re-query every terminal PR used for topology or remediation causality rather than trusting mutable local text. For PR events recorded in the same UTC second, append order in the hashed Progress PR Ledger supplies causal order; equal-time records in different ledgers must be joined by an explicit evidence edge rather than lexical path or evidence-type ordering.
+PR events are durable under `.hephaera/.cache/gauntlets/<gauntlet-name>/pr-events/<item-id>/event-NNN.md`. Recording `opened`, `qa-pass`, `qa-fail`, `merged`, or `closed` performs a fresh live-GitHub query and persists same-repository identity, PR-body checkpoint, state, draft flag, created/closed/merged times, head/base SHAs, all current fingerprints, target, merge actor and bot flag, and merge commit. Record human merges promptly in integration order so every `baseRefOid` connects the prior chain tip to the new `mergeCommit`; direct integration commits are forbidden. Any retained GitHub timeline event that enabled auto-merge, auto-rebase, auto-squash, or entry into a merge queue invalidates a progress or promotion PR, even if the automation was later disabled. Completion and readiness re-query every terminal PR used for topology or remediation causality rather than trusting mutable local text. For PR events recorded in the same UTC second, append order in the hashed Progress PR Ledger supplies causal order; equal-time records in different ledgers must be joined by an explicit evidence edge rather than lexical path or evidence-type ordering.
 
-Each QA verdict requires a new exact same-PR comment containing `<!-- opencaw-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`. The recorder verifies its source hash, reviewed head, verdict, affected set, trusted human collaborator, creation/update timestamps, PR ownership, and uniqueness. Each unit round also binds the opened event and resolved remediation root by path and hash, making the external comment an anchor that cannot be locally reassigned to a different failure. Canonical ledger lines bind one-to-one to file hashes, and mutation commands use an atomic per-Gauntlet lock, compare-and-swap, and no-clobber installation.
+Each QA verdict requires a new exact same-PR comment containing `<!-- hephaera-gauntlet-qa:v1 verdict=<pass|fail> head-sha=<sha> source=<canonical-evidence-path> source-sha256=<sha> affected-units=<none|comma-sorted-ids> -->`. The recorder verifies its source hash, reviewed head, verdict, affected set, trusted human collaborator, creation/update timestamps, PR ownership, and uniqueness. Each unit round also binds the opened event and resolved remediation root by path and hash, making the external comment an anchor that cannot be locally reassigned to a different failure. Canonical ledger lines bind one-to-one to file hashes, and mutation commands use an atomic per-Gauntlet lock, compare-and-swap, and no-clobber installation.
 
-Each autonomous Gauntlet execution window lasts at most 45 minutes or two failed full-validation epochs, whichever occurs first. One epoch means evaluating one frozen candidate against the approved verification suite; targeted diagnosis does not reset or enlarge the window. When the budget is exhausted, OpenCaw records the elapsed time and failed-epoch count, persists resumable state, generates a stopped report, sets the Gauntlet to `stopped`, and asks for explicit user reauthorization before starting another build, audit, or validation epoch. Reauthorization starts a new window. Safety, permission, platform policy, and unrecoverable blockers still stop immediately, and this does not authorize unapproved paid services or external actions.
+Each autonomous Gauntlet execution window lasts at most 45 minutes or two failed full-validation epochs, whichever occurs first. One epoch means evaluating one frozen candidate against the approved verification suite; targeted diagnosis does not reset or enlarge the window. When the budget is exhausted, Hephaera records the elapsed time and failed-epoch count, persists resumable state, generates a stopped report, sets the Gauntlet to `stopped`, and asks for explicit user reauthorization before starting another build, audit, or validation epoch. Reauthorization starts a new window. Safety, permission, platform policy, and unrecoverable blockers still stop immediately, and this does not authorize unapproved paid services or external actions.
 
 #### Integration and promotion
 
-After every active unit is integrated, OpenCaw proves the fetch and every push identity still match the issue repository and the exact local and remote `gauntlet/<name>` heads are the unique gapless merge-chain tip descended from the frozen base. A rewind, force-push, fork, divergence, chain gap, or unrecorded direct commit fails. A new integration critic then reviews that SHA and aggregate scope. Unit critic/QA failures, integration fail/block evidence, and promotion failures each remain exact externally anchored causal roots until a later merged PR consumes them. Supersession transfers every outstanding ancestor root to every active descendant leaf. The replacement cycle's checkpoint, opened event, round, QA marker, and merge remain hash-linked to that root; old passing merges cannot be reused by manually flipping status.
+After every active unit is integrated, Hephaera proves the fetch and every push identity still match the issue repository and the exact local and remote `gauntlet/<name>` heads are the unique gapless merge-chain tip descended from the frozen base. A rewind, force-push, fork, divergence, chain gap, or unrecorded direct commit fails. A new integration critic then reviews that SHA and aggregate scope. Unit critic/QA failures, integration fail/block evidence, and promotion failures each remain exact externally anchored causal roots until a later merged PR consumes them. Supersession transfers every outstanding ancestor root to every active descendant leaf. The replacement cycle's checkpoint, opened event, round, QA marker, and merge remain hash-linked to that root; old passing merges cannot be reused by manually flipping status.
 
 An integration pass can generate `GAUNTLET_REPORT.md` and an immutable `completion-events/event-NNN.md` entry in the Completion Ledger. The event binds a canonical projection hash of the entire report except the self-referential Immutable Completion Evidence section. Every older completion must be consumed exactly once by a later promotion failure; at most the newest can remain active. An active completion forces passed, PR-eligible, report-present, and unchanged source state even if mutable fields are edited. Readiness rechecks remote identity, all fingerprints, base ancestry, merge topology, live terminal PRs, report projection, source SHA, and that the frozen delivery base is still GitHub's default branch. The promotion PR targets that verified default branch, begins with exact case-sensitive `Closes #<parent-issue>`, and links the ordered unit, remediation, critic, completion, and QA ledgers.
 
@@ -1184,16 +1195,16 @@ The final validation summary is optional, but `--gauntlet` still requires human 
 
 ### Method sources
 
-OpenCaw's Gauntlet mode adapts Matt Shumer's [Gauntlet Loop method](https://somethingbig.ai/gauntlet-loop), with the public [Claude of Duty repository and process evidence](https://github.com/mshumer/Claude-of-Duty) as a concrete case study. The user-supplied [Prompt Index guide](https://www.thepromptindex.com/ai-loop-engineering-gauntlet-loop-guide.html) provided supplementary framing. OpenCaw adds its own durable state, approval, issue, validation, and PR/QA policies; it does not embed or reproduce the external prompt.
+Hephaera's Gauntlet mode adapts Matt Shumer's [Gauntlet Loop method](https://somethingbig.ai/gauntlet-loop), with the public [Claude of Duty repository and process evidence](https://github.com/mshumer/Claude-of-Duty) as a concrete case study. The user-supplied [Prompt Index guide](https://www.thepromptindex.com/ai-loop-engineering-gauntlet-loop-guide.html) provided supplementary framing. Hephaera adds its own durable state, approval, issue, validation, and PR/QA policies; it does not embed or reproduce the external prompt.
 
 ## Task, Issue, and PR Delivery
 
 Real work is tracked under:
 
 ```text
-.opencaw/.cache/tasks/TODO.md
-.opencaw/.cache/tasks/<task-name>/TASK.md
-.opencaw/.cache/tasks/OPEN_ISSUES.md
+.hephaera/.cache/tasks/TODO.md
+.hephaera/.cache/tasks/<task-name>/TASK.md
+.hephaera/.cache/tasks/OPEN_ISSUES.md
 ```
 
 Rules:
@@ -1219,7 +1230,7 @@ Import directly with:
 
 ### Normal PR readiness gate
 
-Completing implementation does not automatically authorize publication. Before a normal push or PR, OpenCaw:
+Completing implementation does not automatically authorize publication. Before a normal push or PR, Hephaera:
 
 1. summarizes the completed scope
 2. reports validation evidence and remaining risk
@@ -1232,15 +1243,15 @@ PRs for task-backed work include issue linkage such as `Closes #123`. QA results
 
 ## Memory v2
 
-OpenCaw keeps all memory and context in the resolved host repository's durable `.opencaw/.cache/` directory, ignored by the shared baseline's Git repository:
+Hephaera keeps all memory and context in the resolved host repository's durable `.hephaera/.cache/` directory, ignored by the shared baseline's Git repository:
 
 ```text
-.opencaw/.cache/SYSTEM_MEMORY.md
-.opencaw/.cache/MEMORY.md
-.opencaw/.cache/REPO_MAP.md
-.opencaw/.cache/RULES.md
-.opencaw/.cache/DEBUG.md
-.opencaw/.cache/CONTEXT_SUMMARY.md
+.hephaera/.cache/SYSTEM_MEMORY.md
+.hephaera/.cache/MEMORY.md
+.hephaera/.cache/REPO_MAP.md
+.hephaera/.cache/RULES.md
+.hephaera/.cache/DEBUG.md
+.hephaera/.cache/CONTEXT_SUMMARY.md
 ```
 
 ### Memory layers
@@ -1272,7 +1283,7 @@ Useful commands:
 ./commands/clean-context.sh --dry-run
 ```
 
-OpenCaw proactively records only verified, stable, reusable facts. It does not store secrets, identities, personal paths, guesses, raw logs, or transient task chatter. Replacement and purge workflows archive prior knowledge before removing it.
+Hephaera proactively records only verified, stable, reusable facts. It does not store secrets, identities, personal paths, guesses, raw logs, or transient task chatter. Replacement and purge workflows archive prior knowledge before removing it.
 
 ## Audio, Music, and Voice Pipelines
 
@@ -1289,17 +1300,17 @@ All three can load together with CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER 
 For a host project that needs all three workflows, run from its project root:
 
 ```bash
-bash .opencaw/commands/generate-media-pipeline-contract.sh AUDIO
-bash .opencaw/commands/generate-media-pipeline-contract.sh MUSIC
-bash .opencaw/commands/generate-media-pipeline-contract.sh VOICE
-bash .opencaw/commands/resolve-media-pipeline.sh --all --visual
+bash .hephaera/commands/generate-media-pipeline-contract.sh AUDIO
+bash .hephaera/commands/generate-media-pipeline-contract.sh MUSIC
+bash .hephaera/commands/generate-media-pipeline-contract.sh VOICE
+bash .hephaera/commands/resolve-media-pipeline.sh --all --visual
 ```
 
 Omit contract-generation commands for unused domains. Contract generation defaults to concise read directives; `--inline` embeds the declaration. `validate-media-pipeline-contract.sh DOMAIN` checks a configured contract. Resolution reports missing optional domains without creating files, installing tools, or loading models. Its `nativeReadiness` remains `unverified`: a valid contract, advertised capability, or receipt does not verify installed content. `MEDIA.md` separately controls provider availability, budgets, rights, staging, and promotion; configuring a domain does not select CLOUD or LOCAL.
 
 Each pipeline command supports `brief`, `init`, `revise`, `status`, `doctor`, `setup-plan`, `generate`, `import`, `validate`, `review`, `handoff`, `promote`, and `recover`. Use its `--help` for current arguments. The shared lifecycle provides:
 
-- **Immutable versions and provenance:** exact inputs, settings, native run/build/catalogue ancestry, output hashes, retained failures, and task/domain/asset/version state under `.opencaw/.cache/tasks/<task>/media/`. Changed inputs, rights, consent, or policy invalidate affected evidence; LOCAL admission rechecks bound evidence after waiting for GPU ownership. A revision preserves its parent and never resets an exhausted allowance.
+- **Immutable versions and provenance:** exact inputs, settings, native run/build/catalogue ancestry, output hashes, retained failures, and task/domain/asset/version state under `.hephaera/.cache/tasks/<task>/media/`. Changed inputs, rights, consent, or policy invalidate affected evidence; LOCAL admission rechecks bound evidence after waiting for GPU ownership. A revision preserves its parent and never resets an exhausted allowance.
 - **Explicit execution:** setup planning is dry-run; generation requires current authorization, installation/license evidence, finite budgets, and a matching provider. LOCAL uses the verified Bubo runtime. CLOUD outputs require actual session provenance import; these commands do not run unattended CLOUD generation or silently fall back. Unavailable technical analysis keeps imported outputs staged and blocks handoff.
 - **Complete content review:** SFX/ambience needs whole-output listening and any claimed loop seam; music needs full-track review and every supplied line when applicable; voice needs full spoken-text, pronunciation, artifact, and preset/reference-match review. Technical measurements do not establish those judgments.
 - **Private voice and lyrics:** exact supplied lyrics retain their rights evidence. Cloning requires local reference audio, matching transcript, rights, reference-bound consent, and purpose-bound local-use evidence. Local or QA consent grants no public disclosure or runtime distribution; cloned outputs need separate disclosure evidence. Private inputs and generated QA speech stay local.
@@ -1311,7 +1322,7 @@ Read the [media pipeline guide](docs/MEDIA_PIPELINES.md) for same-task command e
 
 ## Art Pipelines and Generative Media
 
-OpenCaw separates visual direction from production method. Asset-production tasks combine an art style with one resolved art pipeline:
+Hephaera separates visual direction from production method. Asset-production tasks combine an art style with one resolved art pipeline:
 
 1. Choose one or more art styles for composition, color, shape, lighting, motion, and review guidance.
 2. Choose one primary art pipeline. New `STYLE.md` contracts default to `PROOF_TO_MODEL`.
@@ -1363,7 +1374,7 @@ An explicit prompt such as “use imagegen for this illustration,” “use dire
 
 ```bash
 ./commands/resolve-art-pipeline.sh --override imagegen \
-  --evidence .opencaw/.cache/tasks/current-task/pipeline-selection.json
+  --evidence .hephaera/.cache/tasks/current-task/pipeline-selection.json
 ```
 
 For cloud/local execution, generate the optional media contract with canonical names or aliases:
@@ -1386,7 +1397,7 @@ Cloud/local media guardrails include:
 - hashed outputs and workflow receipts
 - explicit acceptance, rejection, and promotion state
 
-Direct LOCAL execution uses the exact pinned, explicitly built Bubo runtime. OpenCaw supplies actual MEDIA policy, typed rights/license/consent references, project-confined roots and finite budgets; Bubo owns the model/tool catalog, dependency verification, workers and shared GPU lease. Exact model versions and supported settings live in [Bubo's media API](runtime/bubo/docs/MEDIA.md), without another OpenCaw model catalog.
+Direct LOCAL execution uses the exact pinned, explicitly built Bubo runtime. Hephaera supplies actual MEDIA policy, typed rights/license/consent references, project-confined roots and finite budgets; Bubo owns the model/tool catalog, dependency verification, workers and shared GPU lease. Exact model versions and supported settings live in [Bubo's media API](runtime/bubo/docs/MEDIA.md), without another Hephaera model catalog.
 
 | Capability | Bubo backend | Request distinction |
 | --- | --- | --- |
@@ -1398,18 +1409,18 @@ Direct LOCAL execution uses the exact pinned, explicitly built Bubo runtime. Ope
 
 Discovery is read-only and works when the runtime is missing or unbuilt. An advertised capability, a receipt on disk and fully verified installed content are distinct states. Discovery never loads models or provisions software. Windows CUDA native acceptance and Linux fixture/dependency support must be reported separately; neither a lockfile nor a synthetic fixture proves native media quality.
 
-For sound production, use the independent domain workflows above. These lower-level LOCAL setup/execution examples are relative to the OpenCaw installation; replace the project path and reviewed manifests:
+For sound production, use the independent domain workflows above. These lower-level LOCAL setup/execution examples are relative to the Hephaera installation; replace the project path and reviewed manifests:
 
 ```bash
 ./commands/inspect-local-media-host.sh --root /absolute/project --json
 ./commands/install-bubo-media.sh --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/setup.json
+  --manifest .hephaera/.cache/tasks/media-task/setup.json
 ./commands/bubo-media.sh inspect --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/request.json \
-  --media-state .opencaw/.cache/shared-media
+  --manifest .hephaera/.cache/tasks/media-task/request.json \
+  --media-state .hephaera/.cache/shared-media
 ./commands/bubo-media.sh generate --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/request.json \
-  --media-state .opencaw/.cache/shared-media
+  --manifest .hephaera/.cache/tasks/media-task/request.json \
+  --media-state .hephaera/.cache/shared-media
 ./commands/validate-media-generation-manifest.sh --help
 ```
 
@@ -1417,51 +1428,51 @@ For sound production, use the independent domain workflows above. These lower-le
 
 Acceptance-bearing requests require their retained explicit `--media-state` for both inspection and generation. An image task overriding a different STYLE primary also supplies current task-bound LOCAL evidence with `--selection`; audio rejects this visual option.
 
-The default workspace is `.opencaw/.cache/bubo-media`; custom workspace and shared-state roots must remain project-cache children. Native execution state stays under `.opencaw/.cache/tasks/<task>/bubo-media`, separately from domain workflow state under `.opencaw/.cache/tasks/<task>/media/`. Bind each acceptance approval to one retained shared media-state root across tasks and workspace changes. Preserve existing started claims and candidate/revision allowances, including one-candidate-plus-one-revision limits; registration or migration never resets them.
+The default workspace is `.hephaera/.cache/bubo-media`; custom workspace and shared-state roots must remain project-cache children. Native execution state stays under `.hephaera/.cache/tasks/<task>/bubo-media`, separately from domain workflow state under `.hephaera/.cache/tasks/<task>/media/`. Bind each acceptance approval to one retained shared media-state root across tasks and workspace changes. Preserve existing started claims and candidate/revision allowances, including one-candidate-plus-one-revision limits; registration or migration never resets them.
 
 Generated outputs remain staged with pending human review. Preserve native dispatch/results/settings/build ancestry and separate provider-neutral manifests per output. Listen to complete audio for content and declared preset/reference match; cloning consent for local QA does not authorize public reference/clone disclosure. `bubo-media.sh` has no promotion operation; the independent media workflows provide separate guarded `handoff`, `promote`, and `recover` commands. CLOUD behavior, historical receipts/approvals, accepted/rejected outputs and external installations remain preserved; do not probe or uninstall external tools during migration.
 
-The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; OpenCaw neither installs it nor stores it as a dependency.
+The `CODE` pipeline uses six ordered passes: blockout, structure, form, materials, interaction, and optimization. Manifests record the host Three.js version, deterministic seed, semantic parts, pivots/anchors, budgets, cleanup ownership, review decisions, and hashed views. Non-planar models require front and two orbit renders. Three.js must already belong to the host; Hephaera neither installs it nor stores it as a dependency.
 
-Characters, creatures, and embodied runtime actors add a linked `opencaw-code-character/v1` profile without changing generic model callers. The profile freezes presentation sizes and views, semantic body structure, static/articulated/skinned motion, contextual tolerances and budgets, active builder identities, and exactly six character gates paired with the generic passes. Blockout, form, and materials/style remain independent-review decisions. Structure, interaction/runtime, and optimization/budget use descriptive machine observations with both passing and focused failing calibration.
+Characters, creatures, and embodied runtime actors add a linked `hephaera-code-character/v1` profile without changing generic model callers. The profile freezes presentation sizes and views, semantic body structure, static/articulated/skinned motion, contextual tolerances and budgets, active builder identities, and exactly six character gates paired with the generic passes. Blockout, form, and materials/style remain independent-review decisions. Structure, interaction/runtime, and optimization/budget use descriptive machine observations with both passing and focused failing calibration.
 
 Create and validate the linked contract before authoring or collecting gate evidence:
 
 ```bash
 ./commands/create-code-character-profile.sh actor-id \
-  --manifest .opencaw/.cache/tasks/current-task/code-model.json \
+  --manifest .hephaera/.cache/tasks/current-task/code-model.json \
   --brief "Readable source-native runtime actor" \
   --intended-use "representative gameplay"
 ./commands/validate-code-character-profile.sh --strict \
-  .opencaw/.cache/tasks/current-task/code-character.json
+  .hephaera/.cache/tasks/current-task/code-character.json
 ```
 
 The deterministic evidence command has two explicit modes. `analyze` evaluates repository-contained calibration observations and marks the report untrusted. Freeze each machine gate's passing and focused failing reports transactionally before recording a passing gate result. `capture` uses a task-local ESM adapter and only host-installed Three.js, Playwright, and Chromium to collect trusted machine evidence:
 
 ```bash
 ./commands/measure-code-character-evidence.sh analyze \
-  .opencaw/.cache/tasks/current-task/code-character.json \
-  --measurements .opencaw/.cache/tasks/current-task/evidence/structure-pass.json \
-  --output .opencaw/.cache/tasks/current-task/evidence/structure-pass-report.json
+  .hephaera/.cache/tasks/current-task/code-character.json \
+  --measurements .hephaera/.cache/tasks/current-task/evidence/structure-pass.json \
+  --output .hephaera/.cache/tasks/current-task/evidence/structure-pass-report.json
 ./commands/measure-code-character-evidence.sh analyze \
-  .opencaw/.cache/tasks/current-task/code-character.json \
-  --measurements .opencaw/.cache/tasks/current-task/evidence/structure-fail.json \
-  --output .opencaw/.cache/tasks/current-task/evidence/structure-fail-report.json
+  .hephaera/.cache/tasks/current-task/code-character.json \
+  --measurements .hephaera/.cache/tasks/current-task/evidence/structure-fail.json \
+  --output .hephaera/.cache/tasks/current-task/evidence/structure-fail-report.json
 ./commands/record-code-character-calibration.sh \
-  .opencaw/.cache/tasks/current-task/code-character.json \
+  .hephaera/.cache/tasks/current-task/code-character.json \
   --gate structure-integrity \
-  --passing .opencaw/.cache/tasks/current-task/evidence/structure-pass-report.json \
-  --failing .opencaw/.cache/tasks/current-task/evidence/structure-fail-report.json
+  --passing .hephaera/.cache/tasks/current-task/evidence/structure-pass-report.json \
+  --failing .hephaera/.cache/tasks/current-task/evidence/structure-fail-report.json
 ./commands/measure-code-character-evidence.sh capture \
-  .opencaw/.cache/tasks/current-task/code-character.json \
-  --adapter .opencaw/.cache/tasks/current-task/evidence/adapter.mjs \
-  --output-dir .opencaw/.cache/tasks/current-task/evidence/browser-capture
+  .hephaera/.cache/tasks/current-task/code-character.json \
+  --adapter .hephaera/.cache/tasks/current-task/evidence/adapter.mjs \
+  --output-dir .hephaera/.cache/tasks/current-task/evidence/browser-capture
 ./commands/record-code-character-gate.sh \
-  .opencaw/.cache/tasks/current-task/code-character.json \
+  .hephaera/.cache/tasks/current-task/code-character.json \
   --gate structure-integrity --decision pass \
   --summary "Declared structure satisfies its contextual checks" \
   --strategy "Measure the frozen semantic graph and normalized tolerances" \
-  --evidence machine-report=.opencaw/.cache/tasks/current-task/evidence/browser-capture/report.json
+  --evidence machine-report=.hephaera/.cache/tasks/current-task/evidence/browser-capture/report.json
 ```
 
 Capture uses `127.0.0.1` with an OS-assigned port, keeps the Chromium sandbox enabled, blocks service workers and external requests, confines served modules and new outputs to the project, and serializes one output directory. It captures required views and intended sizes, semantic masks, isolated signature parts, and runtime evidence. Missing Three.js, Playwright, or Chromium stops clearly without installation or pipeline fallback. Machine results never approve identity, silhouette, form, materials, style, or appeal.
@@ -1478,9 +1489,9 @@ Use `build-proof-to-model-assets` and `./commands/proof-to-model.sh` for `init`,
 
 Approve front, subject-right, back, subject-left, top and bottom together with the originals and proposed hidden structure visible. Preprocessing preserves shared framing, actual alpha, masks and camera intrinsics. Reconstruction submits six separate frames and camera matrices to pinned Pixal3D MV inference; a contact sheet or single image is insufficient. Review renders use the same cameras and an explicit engine-export coordinate transform. Arbitrary source camera assumptions are labeled nominal rather than measured.
 
-Run a subcommand with `--help` for its required inputs; [Bubo command arguments](commands/BUBO_ARGUMENTS.md) documents all supported options and receipt rules. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. OpenCaw passes host policy and evidence to the pinned Bubo runtime; its audited resources live in `runtime/bubo/resources/proof-to-model/`. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. Initialize and build Bubo as described under Install; no sibling checkout or source-run fallback is used.
+Run a subcommand with `--help` for its required inputs; [Bubo command arguments](commands/BUBO_ARGUMENTS.md) documents all supported options and receipt rules. Setup defaults to a dry run; execution requires audited hashes and applicable model-license evidence. The Q8 MV set adds four flow files totaling about 5.45 GiB beyond the five shared models; the complete nine-model set is about 7.54 GiB. Shared bytes may be reused after hash verification. No new mandatory research model, hosted service or MCP bridge is required. Ordinary production never downloads tools or invokes proof generators implicitly. Hephaera passes host policy and evidence to the pinned Bubo runtime; its audited resources live in `runtime/bubo/resources/proof-to-model/`. Pixal3D runs directly; Blender 4.5 LTS runs fixed audited finishing/review scripts. Native processes have argument arrays, timeouts, cancellation and logs; workspace guards are not an OS sandbox. Initialize and build Bubo as described under Install; no sibling checkout or source-run fallback is used.
 
-State and reviews live below `.opencaw/.cache/tasks/<task>/`; immutable originals, classification, proof candidates, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof-set selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
+State and reviews live below `.hephaera/.cache/tasks/<task>/`; immutable originals, classification, proof candidates, attempts, working files and review exports below `.art-staging/proof-to-model/<asset>/<version>/`; dependencies below ignored `.local/tools/proof-to-model/`. Human proof-set selection, independent review, and separate human runtime acceptance are durable hash-bound receipts. Changed inputs invalidate dependent evidence. Promote only reviewed packages into `<project-root>/assets/models/`. Required outputs include retopology, UV and high-to-low baking, measured LODs and semantic convex colliders, editable `.blend`, and independently re-imported GLB. Recipes declare budgets explicitly. Rigging and animation remain subject-specific work, with evidence required when applicable.
 
 Finishing defaults to QuadriFlow. Rigid/articulated assets may explicitly select
 [reviewed per-part HIGH/LOW finishing](runtime/bubo/resources/proof-to-model/RIGID_PARTS.md),
@@ -1493,6 +1504,7 @@ Fresh assets use manifest v2. Historical v1 requires explicit `--mode single-vie
 The default 3D asset path keeps production and acceptance separate:
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#202A32","primaryTextColor":"#FFF4D6","primaryBorderColor":"#C69A52","lineColor":"#C69A52","secondaryColor":"#46535E","tertiaryColor":"#202A32","edgeLabelBackground":"#FFF4D6"}}}%%
 flowchart TB
     accTitle: Native proof-to-model game asset production
     accDescr: Classify only original sources, research hidden anatomy or structure, generate missing canonical views under authorized media budgets, and approve all six. Prepare six images and cameras for native multi-view reconstruction and Blender finishing. Matching six-camera review and independent review precede separate human runtime acceptance and explicit promotion. Revisions invalidate whole-set approval and dependent evidence.
@@ -1513,7 +1525,7 @@ Rejected or changed inputs return to the affected stage and invalidate dependent
 
 ### Model to animation
 
-`MODEL_TO_ANIMATION` continues from a reviewed model into motion production and selected-engine integration. It composes after PROOF_TO_MODEL, Blender, copied libraries or an explicitly compatible CODE handoff; it does not replace the primary art pipeline or select another engine. Use `build-model-animations` and `model-to-animation.sh` with `--help`. OpenCaw retains its policy contract in `.styles/.workflows/model-to-animation/WORKFLOW.md`; schemas, recipes, audited Blender scripts and engine adapters live in `runtime/bubo/resources/model-to-animation/`.
+`MODEL_TO_ANIMATION` continues from a reviewed model into motion production and selected-engine integration. It composes after PROOF_TO_MODEL, Blender, copied libraries or an explicitly compatible CODE handoff; it does not replace the primary art pipeline or select another engine. Use `build-model-animations` and `model-to-animation.sh` with `--help`. Hephaera retains its policy contract in `.styles/.workflows/model-to-animation/WORKFLOW.md`; schemas, recipes, audited Blender scripts and engine adapters live in `runtime/bubo/resources/model-to-animation/`.
 
 Start by checking animation readiness. A display mesh may have fused limbs, attached equipment or missing independent wheels and may need modeling repair. Choose a skinned character, articulated mechanism or rigid-object profile. The existing combat-focused rigged-actor/v1 manifest remains available for valid consumers; vehicles and noncombatants do not need fake bones, attacks or combat colliders.
 
@@ -1523,9 +1535,10 @@ Humanoids can declare run, jump takeoff/air/landing, swimming and death motions.
 
 Motion packages keep clips, hierarchy, parameters and effect anchors alongside selected-engine bindings. A GLB does not instantiate a portable particle system or state machine. Compatible animation/VFX/material/camera/audio owners implement bounded effects and cleanup in the selected engine. Three.js selects the host-locked three.quarks particle backend through `threejs-build-particles`; see the particle guide for explicit legacy sample integration and dependency checks. Other native engines require their actual import/tooling evidence; Phaser's 2D path needs an explicit sprite/pre-rendered handoff. CODE remains Three.js source authoring.
 
-No Adobe products, services or authoring integrations are supported by this workflow. Native authoring and reviewed non-Adobe clip imports are the baseline. Optional rig aids, AI models, hosted services and paid motion libraries remain separate dependency and rights decisions; ordinary production installs and downloads nothing. Source, rig, clip, mapping, recipe, tool or engine changes invalidate dependent evidence. State stays in `.opencaw/.cache/tasks/<task>/`; originals, working copies and motion proofs stay in `.art-staging/model-to-animation/`; explicit promotion targets reviewed runtime assets under `<project-root>/assets/models/`.
+No Adobe products, services or authoring integrations are supported by this workflow. Native authoring and reviewed non-Adobe clip imports are the baseline. Optional rig aids, AI models, hosted services and paid motion libraries remain separate dependency and rights decisions; ordinary production installs and downloads nothing. Source, rig, clip, mapping, recipe, tool or engine changes invalidate dependent evidence. State stays in `.hephaera/.cache/tasks/<task>/`; originals, working copies and motion proofs stay in `.art-staging/model-to-animation/`; explicit promotion targets reviewed runtime assets under `<project-root>/assets/models/`.
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#202A32","primaryTextColor":"#FFF4D6","primaryBorderColor":"#C69A52","lineColor":"#C69A52","secondaryColor":"#46535E","tertiaryColor":"#202A32","edgeLabelBackground":"#FFF4D6"}}}%%
 flowchart TB
     accTitle: Native model-to-animation game production
     accDescr: Inspect a reviewed model for animation readiness, prepare an actual skeleton or articulated or rigid hierarchy, author or retarget motion, bake and independently re-import exports, review complete clips and transitions, and verify compatible engine playback and effects before human runtime acceptance and promotion.
@@ -1551,6 +1564,7 @@ The Three.js presentation adapter plays actual exported actions and owns attache
 Use the policy contract under `.styles/.workflows/model-to-action/WORKFLOW.md` with an existing reviewed motion package, explicit source review and budgets. Runtime schemas, recipes, audited scripts and engine adapters live in `runtime/bubo/resources/model-to-action/`. Initial shared composition uses in-place clips; root-motion actions require an explicitly compatible movement implementation. The primary `STYLE.md` pipeline and `ENGINE.md` selection remain authoritative. Adobe integrations, hidden downloads and automatic acceptance are excluded. Action selection, independent review and human runtime acceptance remain separate from explicit promotion.
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#202A32","primaryTextColor":"#FFF4D6","primaryBorderColor":"#C69A52","lineColor":"#C69A52","secondaryColor":"#46535E","tertiaryColor":"#202A32","edgeLabelBackground":"#FFF4D6"}}}%%
 flowchart LR
     Clips["Reviewed individual clips"] --> Sequence["Ordered steps, trims and blends"]
     Sequence --> Cues["Anchored effects and fixed-target cues"]
@@ -1561,7 +1575,7 @@ flowchart LR
 
 ### Optional external 3D asset libraries
 
-Projects may point `STYLE.md` at an existing filesystem library of models, rigs, animations, and asset bundles. This is optional: OpenCaw does not ask for a library during startup or installation, and a project without one behaves exactly as before.
+Projects may point `STYLE.md` at an existing filesystem library of models, rigs, animations, and asset bundles. This is optional: Hephaera does not ask for a library during startup or installation, and a project without one behaves exactly as before.
 
 Configure one or more named absolute roots when generating the style contract:
 
@@ -1582,25 +1596,25 @@ Configured read-only library roots:
 
 Existing library entries survive later style regeneration. Supplying `--asset-library` replaces the configured set; `--clear-asset-libraries` removes it explicitly. Paths may be unavailable on another contributor's machine, so style validation checks their syntax and safety policy without probing the filesystem.
 
-When libraries are configured, OpenCaw searches them before creating, generating, or downloading another 3D asset. The source library is always read-only and is never loaded directly. A selected file or complete bundle must first be copied into the repository:
+When libraries are configured, Hephaera searches them before creating, generating, or downloading another 3D asset. The source library is always read-only and is never loaded directly. A selected file or complete bundle must first be copied into the repository:
 
 ```bash
 ./commands/list-external-asset-libraries.sh
 ./commands/inspect-external-asset-library.sh studio
 ./commands/copy-external-asset.sh studio characters/hero \
-  --evidence .opencaw/.cache/tasks/current-task/external-asset-copy.json
+  --evidence .hephaera/.cache/tasks/current-task/external-asset-copy.json
 ```
 
 The deterministic destination is `assets/models/<library-id>/<source-relative-path>`. Commands reject symbolic links, traversal, overlapping source/project roots, destination escapes, and overwrites. Only the repository-local copy may be loaded, imported, edited, or used. Asset-level provenance, licenses, selected pipeline, formats, and runtime budgets still apply: the library does not relax `PROOF_TO_MODEL` or `CODE` boundaries.
 
 ## Validation
 
-OpenCaw includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and visual/AUDIO/MUSIC/VOICE workflows.
+Hephaera includes integrated validators for roles, skills, commands, styles, role bindings, language/tool alignment, memory, Gauntlet lifecycles, Windows bootstrap behavior, and visual/AUDIO/MUSIC/VOICE workflows.
 
 Run the complete suite:
 
 ```bash
-./commands/validate-opencaw.sh
+./commands/validate-hephaera.sh
 ```
 
 Common focused validators:
@@ -1652,7 +1666,7 @@ Verification for host-project work remains proportional to the task: targeted te
 Installed projects use this baseline layout. Root project contracts and the host bootstrap sit one directory above it, as shown under Repository Layering.
 
 ```text
-.opencaw/
+.hephaera/
 ├── AGENTS.md                         # shared behavior contract
 ├── README.md
 ├── .architecture/                    # reusable architecture templates
@@ -1674,7 +1688,7 @@ Installed projects use this baseline layout. Root project contracts and the host
 │   ├── bubo.lock.json               # recorded Bubo revision/API/resource identity
 │   └── bubo/                       # Bubo Git submodule; execution and resources
 ├── assets/                           # reusable test/report assets
-├── tests/                            # OpenCaw validation suites and fixtures
+├── tests/                            # Hephaera validation suites and fixtures
 └── .cache/                           # durable project context; ignored by baseline Git
 ```
 
@@ -1686,14 +1700,14 @@ Bundled Playwright assets include configuration, package-script, report, and CLI
 
 Contributions are welcome.
 
-A standalone `OpenCaw/` checkout is for maintaining the baseline itself, not for installing it into another project. Its own project contracts remain at that checkout's root and its development context uses `.opencaw/.cache/`. Development commands can target explicit fixture host roots; ordinary host installations must still live directly at `<project-root>/.opencaw/`.
+A standalone `Hephaera/` checkout is for maintaining the baseline itself, not for installing it into another project. Its own project contracts remain at that checkout's root and its development context uses `.hephaera/.cache/`. Development commands can target explicit fixture host roots; ordinary host installations must still live directly at `<project-root>/.hephaera/`.
 
 Typical flow:
 
 1. Fork the repository.
 2. Create a focused branch.
 3. Implement the improvement.
-4. Run the relevant focused checks and `./commands/validate-opencaw.sh`.
+4. Run the relevant focused checks and `./commands/validate-hephaera.sh`.
 5. Review the diff and readiness evidence.
 6. Push and open a linked pull request after the required human confirmation.
 7. Run post-PR QA and attach the evidence to the PR.
@@ -1701,8 +1715,8 @@ Typical flow:
 Example:
 
 ```bash
-git clone --recurse-submodules https://github.com/<your-org>/OpenCaw
-cd OpenCaw
+git clone --recurse-submodules https://github.com/<your-org>/Hephaera
+cd Hephaera
 git checkout -b feature/improve-gameplay-review
 ```
 
@@ -1711,7 +1725,7 @@ After updating a maintainer checkout, run `bash ./commands/initialize-bubo-runti
 After making changes:
 
 ```bash
-./commands/validate-opencaw.sh
+./commands/validate-hephaera.sh
 git add <intended-files>
 git commit -m "feat(architecture): add framework"
 ```
@@ -1719,7 +1733,7 @@ git commit -m "feat(architecture): add framework"
 When contributing:
 
 - keep changes small enough to review
-- preserve the layering boundary between shared baseline files and durable host-project `.opencaw/.cache` state
+- preserve the layering boundary between shared baseline files and durable host-project `.hephaera/.cache` state
 - keep architecture, role, skill, style, and command schemas valid
 - add regression coverage for workflow fixes
 - avoid hidden dependency installation or external mutations
@@ -1729,4 +1743,4 @@ When contributing:
 
 # License
 
-OpenCaw is released under the MIT License. See `LICENSE` for the full terms.
+Hephaera is released under the MIT License. See `LICENSE` for the full terms.

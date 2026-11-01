@@ -3,7 +3,7 @@ using Foundation;
 using Microsoft.Maui.Controls;
 using WebKit;
 
-namespace OpenCaw.GameHost.Services;
+namespace Hephaera.GameHost.Services;
 
 public static class GameWebViewPolicy
 {

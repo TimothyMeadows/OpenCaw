@@ -2,7 +2,7 @@
 
 This file is the canonical architecture contract for this repository.
 
-Generated from OpenCaw architecture templates:
+Generated from Hephaera architecture templates:
 - MARKDOWN
 - DOTNET
 
@@ -22,11 +22,11 @@ Add repository-specific architecture instructions below these read directives.
 
 The standalone .NET 10 execution runtime is the exact Git submodule at `runtime/bubo`, pinned by its parent gitlink and `runtime/bubo.lock.json`. Read Bubo's own `ARCHITECTURE.md` for its inward domain/application/infrastructure layering. Bubo owns execution algorithms, fixed audited scripts, resources and native process ownership. Native subprocesses are bounded, cancellable and logged; cooperative file guards are not an OS sandbox.
 
-OpenCaw owns host policy, engine/style/media selection, source rights and consent, task/publication controls and separate asset acceptance. Thin Node adapters in `commands/lib/bubo-*.cjs` supply explicit hash-bound host context to an explicitly built Bubo CLI. Verify the dependency revision, API, build receipt and audited resources on each invocation. Production never runs source, substitutes a sibling checkout, builds or installs dependencies implicitly. Scaffold/memory/policy startup remains usable without the runtime initialized.
+Hephaera owns host policy, engine/style/media selection, source rights and consent, task/publication controls and separate asset acceptance. Thin Node adapters in `commands/lib/bubo-*.cjs` supply explicit hash-bound host context to an explicitly built Bubo CLI. Verify the dependency revision, API, build receipt and audited resources on each invocation. Production never runs source, substitutes a sibling checkout, builds or installs dependencies implicitly. Scaffold/memory/policy startup remains usable without the runtime initialized.
 
 Proof reconstruction, animation and action composition use this single execution boundary. Read-only Blender inspection uses an explicit inspection policy receipt without selecting an engine or art style. Motion data, authoring and selected-engine presentation remain separate; action sequencing and effects never own authoritative combat, targeting, movement or projectile outcomes. Historical manifests/approvals retain their bytes; a changed execution or host-policy identity needs a new asset version with retained ancestry and refreshed affected reviews.
 
-LOCAL generated media uses `commands/lib/bubo-media-adapter.cjs` through the same verified runtime and bounded asynchronous execution boundary. The adapter supplies explicit MEDIA policy, typed rights/license/consent references, project-confined roots, finite budgets and immutable dispatch receipts. Image work additionally supplies actual STYLE/selection evidence; audio requires no fabricated visual style or engine. Bubo owns image, SFX, music, preset-speech and consented-cloning algorithms, dependency catalogs, setup/registration verification, GPU serialization and claim accounting. OpenCaw maintains no parallel model pins or inference implementation.
+LOCAL generated media uses `commands/lib/bubo-media-adapter.cjs` through the same verified runtime and bounded asynchronous execution boundary. The adapter supplies explicit MEDIA policy, typed rights/license/consent references, project-confined roots, finite budgets and immutable dispatch receipts. Image work additionally supplies actual STYLE/selection evidence; audio requires no fabricated visual style or engine. Bubo owns image, SFX, music, preset-speech and consented-cloning algorithms, dependency catalogs, setup/registration verification, GPU serialization and claim accounting. Hephaera maintains no parallel model pins or inference implementation.
 
 Read-only discovery remains available without an initialized or built runtime and distinguishes advertised capability from installation verification. Setup is dry-run unless explicitly authorized; generation never provisions. Each approval identity remains bound to one shared project-local media-state root across tasks and workspace changes. Provider-neutral manifests retain native output/settings/build ancestry with pending human review. CLOUD contracts and historical evidence remain compatible; runtime promotion and private-media disclosure require separate authorization.
 
@@ -46,7 +46,7 @@ The separate `media-pipeline-promotion.cjs` executor requires current domain val
 
 Engine metadata derives MAUI packaging for web runtimes independently of game code, software architecture, art and media selection. `commands/lib/web-game-package.cjs` coordinates explicit initialization, owned immutable static web staging, prerequisite discovery and bounded native dotnet build/publish; `.packaging/maui/template` contains a thin .NET10 HybridWebView host. Read `.architecture/MAUI.md` and `docs/WEB_GAME_PACKAGING.md` for generated native host changes. No Bubo execution or model dependency is introduced.
 
-Project-local configuration and generated native source remain in the host repository; durable version/run receipts and previous staged assets stay under `.opencaw/.cache/packaging/`. Native platform implementation stays behind host service boundaries; gameplay remains in the selected web engine. Real build artifacts, signing, target behavior and store submission are distinct evidence/authorization stages. Four official targets only; no automatic installations or publication.
+Project-local configuration and generated native source remain in the host repository; durable version/run receipts and previous staged assets stay under `.hephaera/.cache/packaging/`. Native platform implementation stays behind host service boundaries; gameplay remains in the selected web engine. Real build artifacts, signing, target behavior and store submission are distinct evidence/authorization stages. Four official targets only; no automatic installations or publication.
 
 ## Three.js particle ownership
 
@@ -55,3 +55,7 @@ The effective THREEJS registry entry derives the three.quarks particle capabilit
 ## Three.js postprocessing ownership
 
 EffectiveTHREEJS selects pmndrs postprocessing independently of Quarks, MAUI and art/media routing. Metadata-only commands/lib/threejs-postprocessing.cjs inspects explicit host locks and scaffolds fresh reviewed source. .engine/threejs/postprocessing owns the bounded LDR/FXAA composer lifecycle on the caller presentation clock; host renderer/scene/Quarks/assets remain borrowed. Runtime WebGL2/framebuffer validation and device acceptance are separate from selection. Ray tracing and path tracing are deferred; this capability uses the existing raster renderer.
+
+## Name-transition boundary
+
+The canonical installation is `.hephaera`. Shared Node/Python/Bash transition guards distinguish a fresh project from retained legacy context before state creation or production/external writes. Explicit inspection/preparation preserves original bytes and identities; it is not adoption or approval renewal. Historical installation records stay separate until reviewed reconciliation. See `docs/STATE_TRANSITION.md`.

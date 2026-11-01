@@ -43,7 +43,7 @@ async function main(args) {
     if (runtime.within(info.root, file)) fail('Inspection output cannot replace the read-only Bubo dependency.');
     if (runtime.samePath(file, scene) || runtime.samePath(file, blender)) fail('Inspection output cannot replace a registered input or native tool.');
     for (const scope of ['requests', 'bubo-host', 'bubo-executions']) {
-      const ledger = path.join(root, '.opencaw/.cache/tasks/blender-inspection', scope);
+      const ledger = path.join(root, '.hephaera/.cache/tasks/blender-inspection', scope);
       if (runtime.within(ledger, file)) fail('Inspection execution receipts and input references are read-only.');
     }
   }
@@ -56,7 +56,7 @@ async function main(args) {
   if (values.get('--dry-run')) {
     console.log(`Blender: ${blender}\nVersion: ${version}\nScene: ${path.relative(root, scene)}\nProfile: ${profile}\nOutput: ${destination || 'stdout'}\nFlags: --background --factory-startup --disable-autoexec --offline-mode --python-exit-code 1`); return;
   }
-  const task = 'blender-inspection', stateRoot = '.opencaw/.cache/tasks/' + task;
+  const task = 'blender-inspection', stateRoot = '.hephaera/.cache/tasks/' + task;
   const relative = full => path.relative(root, full).split(path.sep).join('/');
   const id = crypto.randomUUID();
   const folder = runtime.projectPath(root, stateRoot + '/requests/' + id);
@@ -80,7 +80,7 @@ async function main(args) {
   if (destination) {
     admitDestination(destination);
     if (fs.existsSync(destination) && !values.get('--replace')) fail('Output appeared during inspection.');
-    const temporary = path.join(path.dirname(destination), '.opencaw-inspection-' + id + '.tmp');
+    const temporary = path.join(path.dirname(destination), '.hephaera-inspection-' + id + '.tmp');
     fs.copyFileSync(reportFile, temporary, fs.constants.COPYFILE_EXCL);
     try {
       admitDestination(destination);

@@ -12,33 +12,34 @@ trap 'rm -rf -- "$temp_root"' EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
 echo '[1/4] classifying Windows and non-Windows hosts'
-WSL_INTEROP='' opencaw_is_windows_host 'MINGW64_NT-10.0' '' || fail 'Git Bash host was not detected as Windows'
-WSL_INTEROP='' opencaw_is_windows_host 'MSYS_NT-10.0' '' || fail 'MSYS host was not detected as Windows'
-WSL_INTEROP='' opencaw_is_windows_host 'CYGWIN_NT-10.0' '' || fail 'Cygwin host was not detected as Windows'
-WSL_INTEROP='' opencaw_is_windows_host 'Linux' 'Linux version with Microsoft WSL2' || fail 'WSL host was not detected as Windows'
-if WSL_INTEROP='' opencaw_is_windows_host 'Linux' 'generic Linux kernel'; then fail 'generic Linux was classified as Windows'; fi
-if WSL_INTEROP='' opencaw_is_windows_host 'Darwin' 'Darwin kernel'; then fail 'macOS was classified as Windows'; fi
+WSL_INTEROP='' hephaera_is_windows_host 'MINGW64_NT-10.0' '' || fail 'Git Bash host was not detected as Windows'
+WSL_INTEROP='' hephaera_is_windows_host 'MSYS_NT-10.0' '' || fail 'MSYS host was not detected as Windows'
+WSL_INTEROP='' hephaera_is_windows_host 'CYGWIN_NT-10.0' '' || fail 'Cygwin host was not detected as Windows'
+WSL_INTEROP='' hephaera_is_windows_host 'Linux' 'Linux version with Microsoft WSL2' || fail 'WSL host was not detected as Windows'
+if WSL_INTEROP='' hephaera_is_windows_host 'Linux' 'generic Linux kernel'; then fail 'generic Linux was classified as Windows'; fi
+if WSL_INTEROP='' hephaera_is_windows_host 'Darwin' 'Darwin kernel'; then fail 'macOS was classified as Windows'; fi
 
 echo '[2/4] generating Windows-only scaffold guidance'
 fixture="$temp_root/project"
-mkdir -p "$fixture/.opencaw/commands/lib"
-cp commands/create-host-ai-scaffold.sh "$fixture/.opencaw/commands/create-host-ai-scaffold.sh"
-cp commands/install-windows-bash.ps1 "$fixture/.opencaw/commands/install-windows-bash.ps1"
-cp commands/lib/memory-common.sh "$fixture/.opencaw/commands/lib/memory-common.sh"
-cp commands/lib/platform-common.sh "$fixture/.opencaw/commands/lib/platform-common.sh"
-chmod +x "$fixture/.opencaw/commands/create-host-ai-scaffold.sh"
+mkdir -p "$fixture/.hephaera/commands/lib"
+cp commands/create-host-ai-scaffold.sh "$fixture/.hephaera/commands/create-host-ai-scaffold.sh"
+cp commands/install-windows-bash.ps1 "$fixture/.hephaera/commands/install-windows-bash.ps1"
+cp commands/lib/memory-common.sh "$fixture/.hephaera/commands/lib/memory-common.sh"
+cp commands/lib/state-transition-common.sh "$fixture/.hephaera/commands/lib/state-transition-common.sh"
+cp commands/lib/platform-common.sh "$fixture/.hephaera/commands/lib/platform-common.sh"
+chmod +x "$fixture/.hephaera/commands/create-host-ai-scaffold.sh"
 
-WSL_INTEROP='fixture' bash "$fixture/.opencaw/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-first.log"
-guidance="$fixture/.opencaw/.cache/WINDOWS_BASH.md"
+WSL_INTEROP='fixture' bash "$fixture/.hephaera/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-first.log"
+guidance="$fixture/.hephaera/.cache/WINDOWS_BASH.md"
 [[ -f "$guidance" ]] || fail 'Windows scaffold guidance was not created'
-grep -Fq './.opencaw/commands/install-windows-bash.ps1' "$guidance" || fail 'mounted installer path is incorrect'
+grep -Fq './.hephaera/commands/install-windows-bash.ps1' "$guidance" || fail 'mounted installer path is incorrect'
 grep -Fq -- '-Provider GitBash -Install' "$guidance" || fail 'native Git Bash install guidance is missing'
 grep -Fq -- '-Provider WSL -Install' "$guidance" || fail 'WSL install guidance is missing'
 grep -Fq 'never installs software automatically' "$guidance" || fail 'explicit-install safety guidance is missing'
 
 echo '[3/4] preserving scaffold idempotence'
 guidance_fingerprint="$(sha256sum "$guidance" | awk '{print $1}')"
-WSL_INTEROP='fixture' bash "$fixture/.opencaw/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-second.log"
+WSL_INTEROP='fixture' bash "$fixture/.hephaera/commands/create-host-ai-scaffold.sh" > "$temp_root/scaffold-second.log"
 [[ "$(sha256sum "$guidance" | awk '{print $1}')" == "$guidance_fingerprint" ]] || fail 'Windows guidance changed on an idempotent scaffold run'
 [[ "$(grep -c '^# Windows Bash Setup$' "$guidance")" -eq 1 ]] || fail 'Windows guidance was duplicated'
 

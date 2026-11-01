@@ -1,4 +1,4 @@
 interface:
   display_name: "Create Host AI Scaffold"
-  short_description: "Initialize fixed .opencaw bootstrap and project cache"
-  default_prompt: "Use $create-host-ai-scaffold to initialize durable .opencaw/.cache context and the host AGENTS bootstrap for the fixed .opencaw installation, preserving project content."
+  short_description: "Initialize fixed .hephaera bootstrap and project cache"
+  default_prompt: "Use $create-host-ai-scaffold to initialize durable .hephaera/.cache context and the host AGENTS bootstrap for the fixed .hephaera installation, preserving project content."

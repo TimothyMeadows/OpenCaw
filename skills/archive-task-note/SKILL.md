@@ -1,6 +1,6 @@
 ---
 name: archive-task-note
-description: Archive a host repository task note into `.opencaw/.cache/archive/tasks` for traceability.
+description: Archive a host repository task note into `.hephaera/.cache/archive/tasks` for traceability.
 engines: [AGNOSTIC]
 ---
 

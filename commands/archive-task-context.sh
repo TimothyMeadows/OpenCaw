@@ -4,16 +4,16 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/workflow-path-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
 task_ref="${1:-}"
 
 if [[ -z "$task_ref" ]]; then
-  echo 'Usage: ./commands/archive-task-context.sh "<task-name|.opencaw/.cache/tasks/<task-name>/TASK.md>"' >&2
+  echo 'Usage: ./commands/archive-task-context.sh "<task-name|.hephaera/.cache/tasks/<task-name>/TASK.md>"' >&2
   exit 1
 fi
 
-task_file="$(opencaw_workflow_file "$task_ref" tasks TASK.md)"
+task_file="$(hephaera_workflow_file "$task_ref" tasks TASK.md)"
 
 task_name="$(basename "$(dirname "$task_file")")"
 
@@ -24,8 +24,8 @@ if grep -Eq '^Archived on [0-9]{8}T[0-9]{6}Z\.$' "$task_file"; then
   exit 0
 fi
 
-archive_dir="$OPENCAW_PROJECT_CACHE_DIR/archive/tasks"
-for path in "$OPENCAW_PROJECT_CACHE_DIR/archive" "$archive_dir"; do
+archive_dir="$HEPHAERA_PROJECT_CACHE_DIR/archive/tasks"
+for path in "$HEPHAERA_PROJECT_CACHE_DIR/archive" "$archive_dir"; do
   [[ ! -L "$path" ]] || { echo "Archive path must not be a symbolic link: $path" >&2; exit 1; }
 done
 mkdir -p "$archive_dir"

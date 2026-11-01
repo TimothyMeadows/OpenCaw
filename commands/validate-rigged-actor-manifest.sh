@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/validate-rigged-actor-manifest.sh <manifest> [--root <repo>] [--require-verified]
 
-Validates an opencaw-rigged-actor/v1 JSON manifest. --root verifies every
+Validates a hephaera-rigged-actor/v1 JSON manifest. --root verifies every
 declared file is a regular repository-confined file with the declared SHA-256.
 --require-verified requires complete production-readiness evidence.
 EOF
@@ -136,8 +136,8 @@ required(document, [
   'clips', 'colliders', 'budgets', 'provenance', 'verification'
 ], 'manifest');
 only(document, topLevel, 'manifest');
-if (document.schemaVersion !== 'opencaw-rigged-actor/v1') {
-  errors.push('schemaVersion must be opencaw-rigged-actor/v1');
+if (document.schemaVersion !== 'hephaera-rigged-actor/v1') {
+  errors.push('schemaVersion must be hephaera-rigged-actor/v1');
 }
 
 required(document.actor, ['id', 'displayName', 'kind', 'deliveryStage'], 'actor');

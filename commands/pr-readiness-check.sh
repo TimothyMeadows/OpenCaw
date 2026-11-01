@@ -66,9 +66,9 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/gauntlet-common.sh"
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-output_dir="${OPENCAW_REPORT_DIR:-$OPENCAW_PROJECT_CACHE_DIR/reports}"
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+output_dir="${HEPHAERA_REPORT_DIR:-$HEPHAERA_PROJECT_CACHE_DIR/reports}"
 gauntlet_execution_fingerprint='none'
 gauntlet_base_commit_sha='none'
 gauntlet_manifest_fingerprint='none'
@@ -229,7 +229,7 @@ if [[ $gauntlet_progress_flow -eq 1 ]]; then
   if [[ "$remediation_root" == 'none' ]]; then
     remediation_root_hash='none'
   else
-    remediation_root_hash="$(gauntlet_hash_file "$OPENCAW_PROJECT_ROOT_RESOLVED/$remediation_root")"
+    remediation_root_hash="$(gauntlet_hash_file "$HEPHAERA_PROJECT_ROOT_RESOLVED/$remediation_root")"
   fi
 
   checkpoint_dir="$gauntlet_dir/publication-checkpoints/$gauntlet_progress_item"
@@ -251,8 +251,8 @@ if [[ $gauntlet_progress_flow -eq 1 ]]; then
   fi
   next_checkpoint=$((max_checkpoint + 1))
   printf -v checkpoint_label '%03d' "$next_checkpoint"
-  gauntlet_publication_checkpoint_relative=".opencaw/.cache/gauntlets/$gauntlet_name/publication-checkpoints/$gauntlet_progress_item/checkpoint-$checkpoint_label.md"
-  gauntlet_publication_checkpoint="$OPENCAW_PROJECT_ROOT_RESOLVED/$gauntlet_publication_checkpoint_relative"
+  gauntlet_publication_checkpoint_relative=".hephaera/.cache/gauntlets/$gauntlet_name/publication-checkpoints/$gauntlet_progress_item/checkpoint-$checkpoint_label.md"
+  gauntlet_publication_checkpoint="$HEPHAERA_PROJECT_ROOT_RESOLVED/$gauntlet_publication_checkpoint_relative"
   checkpoint_stage="$(mktemp "$gauntlet_dir/.publication-checkpoint-stage.XXXXXX")"
   checkpoint_root_created=0
   checkpoint_dir_created=0
@@ -307,7 +307,7 @@ EOF
     echo 'GAUNTLET.md changed during publication preflight; checkpoint creation was rolled back.' >&2
     exit 1
   fi
-  gauntlet_publication_marker="<!-- opencaw-gauntlet-publication:v1 checkpoint=$gauntlet_publication_checkpoint_relative checkpoint-sha256=$gauntlet_publication_checkpoint_hash -->"
+  gauntlet_publication_marker="<!-- hephaera-gauntlet-publication:v1 checkpoint=$gauntlet_publication_checkpoint_relative checkpoint-sha256=$gauntlet_publication_checkpoint_hash -->"
   task_ref="${args[0]}/$gauntlet_progress_item"
 fi
 
@@ -323,8 +323,8 @@ detect_repo_root() {
     return
   fi
 
-  if git -C "$opencaw_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    printf '%s\n' "$opencaw_root"
+  if git -C "$hephaera_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf '%s\n' "$hephaera_root"
     return
   fi
 
@@ -370,7 +370,7 @@ report_file="$output_dir/pr-readiness-$stamp.md"
 
 if [[ $goal_flow -eq 1 ]]; then
   checkpoint_heading="## Goal Flow Automation Checkpoint"
-  checkpoint_body="Goal flow is active for this task. This is the only OpenCaw exception to the human PR readiness approval prompt.
+  checkpoint_body="Goal flow is active for this task. This is the only Hephaera exception to the human PR readiness approval prompt.
 
 Because the user explicitly selected goal flow, the agent may automatically push/open a PR for this completed task after local validation is complete. Goal flow must not merge PRs, approve PRs, or enable auto-merge.
 

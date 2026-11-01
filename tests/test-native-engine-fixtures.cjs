@@ -162,13 +162,13 @@ const hash = file => crypto.createHash('sha256').update(fs.readFileSync(file)).d
 const verdict = (id, phase, status, reason, details = {}) => ({ engine: id, phase, status, reason, ...details });
 
 async function unity(context) {
-  const editor = executable(process.env.OPENCAW_UNITY_EDITOR, ['Unity', 'Unity.exe']);
-  if (!editor) return [verdict('UNITY', 'native-smoke', 'blocked', 'Matching Unity Editor is unavailable on PATH or OPENCAW_UNITY_EDITOR')];
-  const version = process.env.OPENCAW_UNITY_VERSION;
-  if (!/^\d+\.\d+\.\d+[A-Za-z0-9._-]*$/.test(version || '')) return [verdict('UNITY', 'native-smoke', 'blocked', 'Set exact OPENCAW_UNITY_VERSION to the installed licensed Editor version')];
-  const target = process.env.OPENCAW_UNITY_BUILD_TARGET || '';
+  const editor = executable(process.env.HEPHAERA_UNITY_EDITOR, ['Unity', 'Unity.exe']);
+  if (!editor) return [verdict('UNITY', 'native-smoke', 'blocked', 'Matching Unity Editor is unavailable on PATH or HEPHAERA_UNITY_EDITOR')];
+  const version = process.env.HEPHAERA_UNITY_VERSION;
+  if (!/^\d+\.\d+\.\d+[A-Za-z0-9._-]*$/.test(version || '')) return [verdict('UNITY', 'native-smoke', 'blocked', 'Set exact HEPHAERA_UNITY_VERSION to the installed licensed Editor version')];
+  const target = process.env.HEPHAERA_UNITY_BUILD_TARGET || '';
   const targets = { StandaloneWindows64: ['win32', 'fixture.exe'], StandaloneLinux64: ['linux', 'fixture.x86_64'], StandaloneOSX: ['darwin', 'fixture.app'] };
-  if (target && !targets[target]) throw new Error('Unsupported OPENCAW_UNITY_BUILD_TARGET');
+  if (target && !targets[target]) throw new Error('Unsupported HEPHAERA_UNITY_BUILD_TARGET');
   const directory = path.join(context.temp, 'unity');
   copyFixture(path.join(FIXTURES, 'unity'), directory);
   fs.mkdirSync(path.join(directory, 'ProjectSettings'));
@@ -178,9 +178,9 @@ async function unity(context) {
   const report = path.join(directory, 'editor-report.json');
   const buildOutput = target ? path.join(directory, 'build', targets[target][1]) : '';
   if (target) fs.mkdirSync(path.dirname(buildOutput));
-  const result = await context.run(editor, ['-batchmode', '-nographics', '-noUpm', '-projectPath', directory, '-executeMethod', 'OpenCawFixture.Run', '-logFile', path.join(directory, 'editor.log')], {
+  const result = await context.run(editor, ['-batchmode', '-nographics', '-noUpm', '-projectPath', directory, '-executeMethod', 'HephaeraFixture.Run', '-logFile', path.join(directory, 'editor.log')], {
     cwd: directory, log: path.join(directory, 'editor-process.log'),
-    env: { OPENCAW_FIXTURE_REPORT: report, OPENCAW_FIXTURE_BUILD_TARGET: target, OPENCAW_FIXTURE_BUILD_OUTPUT: buildOutput }
+    env: { HEPHAERA_FIXTURE_REPORT: report, HEPHAERA_FIXTURE_BUILD_TARGET: target, HEPHAERA_FIXTURE_BUILD_OUTPUT: buildOutput }
   });
   const error = nativeFailure(result);
   if (error) {
@@ -188,9 +188,9 @@ async function unity(context) {
     const licensing = /no valid (?:Unity Editor )?licen[cs]e|licen[cs](?:e|ing)[^\n]{0,90}(?:unavailable|not found|not active|failed)/i.test(result.text + nativeLog);
     return [verdict('UNITY', 'native-smoke', licensing ? 'blocked' : 'fail', licensing ? 'Installed Editor license is unavailable; no terms were accepted' : error)];
   }
-  const checked = readReport(report, 'opencaw-native-unity', 5, version);
+  const checked = readReport(report, 'hephaera-native-unity', 5, version);
   const results = [verdict('UNITY', 'native-smoke', 'pass', 'Actual Editor lifecycle/serialization checks passed', { checks: checked.checks, engineVersion: checked.engineVersion, reportSha256: hash(report) })];
-  if (!target) { results.push(verdict('UNITY', 'build', 'not-run', 'No OPENCAW_UNITY_BUILD_TARGET selected')); return results; }
+  if (!target) { results.push(verdict('UNITY', 'build', 'not-run', 'No HEPHAERA_UNITY_BUILD_TARGET selected')); return results; }
   if (checked.buildStatus === 'blocked') { results.push(verdict('UNITY', 'build', 'blocked', checked.buildReason)); return results; }
   if (checked.buildStatus !== 'pass' || !fs.existsSync(buildOutput)) return [...results, verdict('UNITY', 'build', 'fail', 'Unity build output or successful BuildReport is missing')];
   results.push(verdict('UNITY', 'build', 'pass', 'Actual BuildReport succeeded', { target }));
@@ -198,18 +198,18 @@ async function unity(context) {
   let player = buildOutput;
   if (target === 'StandaloneOSX') player = path.join(buildOutput, 'Contents/MacOS', fs.readdirSync(path.join(buildOutput, 'Contents/MacOS'))[0]);
   const playerReport = path.join(directory, 'player-report.json');
-  const played = await context.run(player, ['-batchmode', '-nographics', '-logFile', path.join(directory, 'player.log')], { cwd: directory, log: path.join(directory, 'player-process.log'), env: { OPENCAW_FIXTURE_REPORT: playerReport } });
+  const played = await context.run(player, ['-batchmode', '-nographics', '-logFile', path.join(directory, 'player.log')], { cwd: directory, log: path.join(directory, 'player-process.log'), env: { HEPHAERA_FIXTURE_REPORT: playerReport } });
   if (nativeFailure(played)) return [...results, verdict('UNITY', 'player', 'fail', nativeFailure(played))];
   let playerChecked;
-  try { playerChecked = readReport(playerReport, 'opencaw-native-unity-player', 5, version); }
+  try { playerChecked = readReport(playerReport, 'hephaera-native-unity-player', 5, version); }
   catch (error) { return [...results, verdict('UNITY', 'player', 'fail', error.message)]; }
   results.push(verdict('UNITY', 'player', 'pass', 'Built player completed component lifecycle checks', { checks: playerChecked.checks, reportSha256: hash(playerReport), playerSha256: hash(player) }));
   return results;
 }
 
 async function godot(context) {
-  const editor = executable(process.env.OPENCAW_GODOT_EDITOR, ['godot', 'godot4', 'Godot', 'godot.exe']);
-  if (!editor) return [verdict('GODOT', 'native-smoke', 'blocked', 'Godot 4 Editor is unavailable on PATH or OPENCAW_GODOT_EDITOR')];
+  const editor = executable(process.env.HEPHAERA_GODOT_EDITOR, ['godot', 'godot4', 'Godot', 'godot.exe']);
+  if (!editor) return [verdict('GODOT', 'native-smoke', 'blocked', 'Godot 4 Editor is unavailable on PATH or HEPHAERA_GODOT_EDITOR')];
   const directory = path.join(context.temp, 'godot');
   copyFixture(path.join(FIXTURES, 'godot'), directory);
   engine.generate(directory, 'GODOT');
@@ -220,17 +220,17 @@ async function godot(context) {
   const imported = await context.run(editor, ['--headless', '--path', directory, '--editor', '--import'], { cwd: directory, log: path.join(directory, 'import.log') });
   if (nativeFailure(imported)) throw new Error(nativeFailure(imported));
   const report = path.join(directory, 'runtime-report.json');
-  const result = await context.run(editor, ['--headless', '--path', directory, '--script', 'res://harness.gd'], { cwd: directory, log: path.join(directory, 'runtime.log'), env: { OPENCAW_FIXTURE_REPORT: report, OPENCAW_FIXTURE_FORCE_FAILURE: '0' } });
+  const result = await context.run(editor, ['--headless', '--path', directory, '--script', 'res://harness.gd'], { cwd: directory, log: path.join(directory, 'runtime.log'), env: { HEPHAERA_FIXTURE_REPORT: report, HEPHAERA_FIXTURE_FORCE_FAILURE: '0' } });
   if (nativeFailure(result)) throw new Error(nativeFailure(result));
-  const checked = readReport(report, 'opencaw-native-godot', 5);
+  const checked = readReport(report, 'hephaera-native-godot', 5);
   const failureReport = path.join(directory, 'intentional-failure-report.json');
-  const failed = await context.run(editor, ['--headless', '--path', directory, '--script', 'res://harness.gd'], { cwd: directory, log: path.join(directory, 'intentional-failure.log'), env: { OPENCAW_FIXTURE_REPORT: failureReport, OPENCAW_FIXTURE_FORCE_FAILURE: '1' } });
+  const failed = await context.run(editor, ['--headless', '--path', directory, '--script', 'res://harness.gd'], { cwd: directory, log: path.join(directory, 'intentional-failure.log'), env: { HEPHAERA_FIXTURE_REPORT: failureReport, HEPHAERA_FIXTURE_FORCE_FAILURE: '1' } });
   if (failed.code === 0 || failed.timedOut || failed.spawnError || !fs.existsSync(failureReport) || JSON.parse(fs.readFileSync(failureReport, 'utf8')).status !== 'fail') throw new Error('Godot intentional failure did not produce a failing report and exit');
   const results = [verdict('GODOT', 'native-smoke', 'pass', 'Actual node lifecycle/state checks and intentional failure exit passed', { checks: checked.checks, engineVersion: checked.engineVersion, reportSha256: hash(report) })];
-  const preset = process.env.OPENCAW_GODOT_EXPORT_PRESET;
-  if (!preset) { results.push(verdict('GODOT', 'export', 'not-run', 'No OPENCAW_GODOT_EXPORT_PRESET selected')); return results; }
+  const preset = process.env.HEPHAERA_GODOT_EXPORT_PRESET;
+  if (!preset) { results.push(verdict('GODOT', 'export', 'not-run', 'No HEPHAERA_GODOT_EXPORT_PRESET selected')); return results; }
   const presets = { Linux: ['linux', 'fixture.x86_64'], Windows: ['win32', 'fixture.exe'], macOS: ['darwin', 'fixture.app'] };
-  if (!presets[preset]) throw new Error('Unsupported OPENCAW_GODOT_EXPORT_PRESET');
+  if (!presets[preset]) throw new Error('Unsupported HEPHAERA_GODOT_EXPORT_PRESET');
   const output = path.join(directory, 'export', presets[preset][1]);
   fs.mkdirSync(path.dirname(output));
   const exported = await context.run(editor, ['--headless', '--path', directory, '--export-debug', preset, output], { cwd: directory, log: path.join(directory, 'export.log') });
@@ -246,25 +246,25 @@ async function godot(context) {
   let player = output;
   if (preset === 'macOS') player = path.join(output, 'Contents/MacOS', fs.readdirSync(path.join(output, 'Contents/MacOS'))[0]);
   const playerReport = path.join(directory, 'export-player-report.json');
-  const played = await context.run(player, ['--headless'], { cwd: directory, log: path.join(directory, 'export-player.log'), env: { OPENCAW_FIXTURE_REPORT: playerReport, OPENCAW_FIXTURE_FORCE_FAILURE: '0' } });
+  const played = await context.run(player, ['--headless'], { cwd: directory, log: path.join(directory, 'export-player.log'), env: { HEPHAERA_FIXTURE_REPORT: playerReport, HEPHAERA_FIXTURE_FORCE_FAILURE: '0' } });
   if (nativeFailure(played)) return [...results, verdict('GODOT', 'player', 'fail', nativeFailure(played))];
   let playerChecked;
-  try { playerChecked = readReport(playerReport, 'opencaw-native-godot', 5); }
+  try { playerChecked = readReport(playerReport, 'hephaera-native-godot', 5); }
   catch (error) { return [...results, verdict('GODOT', 'player', 'fail', error.message)]; }
   results.push(verdict('GODOT', 'player', 'pass', 'Exported player independently completed lifecycle/state checks', { checks: playerChecked.checks, reportSha256: hash(playerReport), playerSha256: hash(player) }));
   return results;
 }
 
 async function unreal(context) {
-  const selected = process.env.OPENCAW_UNREAL_PROJECT;
+  const selected = process.env.HEPHAERA_UNREAL_PROJECT;
   const sourceProject = selected ? safeLocalFile(selected, path.join(FIXTURES, 'unreal')) : null;
   if (sourceProject && path.extname(sourceProject) !== '.uproject') throw new Error('Unreal fixture selection must be a .uproject');
-  const editor = executable(process.env.OPENCAW_UNREAL_EDITOR, ['UnrealEditor-Cmd', 'UnrealEditor', 'UnrealEditor.exe']);
-  if (!editor) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Matching Unreal Editor is unavailable on PATH or OPENCAW_UNREAL_EDITOR')];
-  if (!sourceProject) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Explicit repository-local OPENCAW_UNREAL_PROJECT fixture selection is required')];
-  const version = process.env.OPENCAW_UNREAL_VERSION;
-  if (!/^5\.\d+(?:\.\d+)?$/.test(version || '')) return [verdict('UNREAL', 'native-smoke', 'blocked', 'OPENCAW_UNREAL_VERSION must identify the matching Unreal 5 installation')];
-  const ubt = executable(process.env.OPENCAW_UNREAL_UBT, ['UnrealBuildTool', 'UnrealBuildTool.exe'], true);
+  const editor = executable(process.env.HEPHAERA_UNREAL_EDITOR, ['UnrealEditor-Cmd', 'UnrealEditor', 'UnrealEditor.exe']);
+  if (!editor) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Matching Unreal Editor is unavailable on PATH or HEPHAERA_UNREAL_EDITOR')];
+  if (!sourceProject) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Explicit repository-local HEPHAERA_UNREAL_PROJECT fixture selection is required')];
+  const version = process.env.HEPHAERA_UNREAL_VERSION;
+  if (!/^5\.\d+(?:\.\d+)?$/.test(version || '')) return [verdict('UNREAL', 'native-smoke', 'blocked', 'HEPHAERA_UNREAL_VERSION must identify the matching Unreal 5 installation')];
+  const ubt = executable(process.env.HEPHAERA_UNREAL_UBT, ['UnrealBuildTool', 'UnrealBuildTool.exe'], true);
   if (!ubt) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Matching installed Unreal Build Tool is unavailable')];
   const dotnet = /\.dll$/i.test(ubt) ? executable(null, ['dotnet']) : null;
   if (/\.dll$/i.test(ubt) && !dotnet) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Installed dotnet is required to invoke the selected UBT DLL')];
@@ -279,19 +279,19 @@ async function unreal(context) {
   engine.requireEngine(directory, 'UNREAL');
   const platform = { win32: 'Win64', linux: 'Linux', darwin: 'Mac' }[process.platform];
   if (!platform) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Unsupported fixture build host')];
-  const buildArgs = ['OpenCawNativeFixtureEditor', platform, 'Development', '-Project=' + project, '-WaitMutex', '-NoHotReloadFromIDE'];
+  const buildArgs = ['HephaeraNativeFixtureEditor', platform, 'Development', '-Project=' + project, '-WaitMutex', '-NoHotReloadFromIDE'];
   const built = await context.run(dotnet || ubt, dotnet ? [ubt, ...buildArgs] : buildArgs, { cwd: directory, log: path.join(directory, 'build.log') });
   if (nativeFailure(built)) {
     if (/SDK[^\n]{0,100}(?:not installed|not found|missing)|(?:Visual Studio|compiler|toolchain)[^\n]{0,100}(?:not found|missing|must be installed)/i.test(built.text)) return [verdict('UNREAL', 'native-smoke', 'blocked', 'Required native compiler or platform SDK is unavailable')];
     throw new Error(nativeFailure(built));
   }
   const reportDirectory = path.join(directory, 'automation-report');
-  const executed = await context.run(editor, [project, '-unattended', '-nop4', '-nosplash', '-NullRHI', '-stdout', '-FullStdOutLogOutput', '-ExecCmds=Automation RunTests OpenCaw.Fixtures.LifecycleState', '-TestExit=Automation Test Queue Empty', '-ReportExportPath=' + reportDirectory], { cwd: directory, log: path.join(directory, 'automation.log') });
+  const executed = await context.run(editor, [project, '-unattended', '-nop4', '-nosplash', '-NullRHI', '-stdout', '-FullStdOutLogOutput', '-ExecCmds=Automation RunTests Hephaera.Fixtures.LifecycleState', '-TestExit=Automation Test Queue Empty', '-ReportExportPath=' + reportDirectory], { cwd: directory, log: path.join(directory, 'automation.log') });
   if (nativeFailure(executed)) throw new Error(nativeFailure(executed));
   const actualVersion = executed.text.match(/Engine Version:\s*(5\.\d+\.\d+)/);
   if (!actualVersion || (version.split('.').length === 2 ? !actualVersion[1].startsWith(version + '.') : actualVersion[1] !== version)) throw new Error('Unreal startup did not identify the configured matching engine version');
   const report = path.join(reportDirectory, 'index.json');
-  const checked = inspectUnrealReport(report, 'OpenCaw.Fixtures.LifecycleState');
+  const checked = inspectUnrealReport(report, 'Hephaera.Fixtures.LifecycleState');
   return [verdict('UNREAL', 'native-smoke', 'pass', 'Actual UBT build and selected Automation lifecycle/state fixture passed', { ...checked, engineVersion: actualVersion[1], reportSha256: hash(report) }), verdict('UNREAL', 'package', 'not-run', 'This source-only transient-world fixture does not cook a binary map or certify packaged content')];
 }
 
@@ -299,8 +299,8 @@ async function runnerChecks(temp) {
   let checks = 0;
   for (const name of ['unity', 'godot', 'unreal']) { fixtureMetadata(name); checks++; }
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(FIXTURES, 'unity/Packages/manifest.json'), 'utf8')).dependencies, {}); checks++;
-  const ordinary = JSON.parse(fs.readFileSync(path.join(FIXTURES, 'unreal/OpenCawNativeFixture.uproject'), 'utf8'));
-  assert.equal(ordinary.Modules[0].Name, 'OpenCawNativeFixture'); checks++;
+  const ordinary = JSON.parse(fs.readFileSync(path.join(FIXTURES, 'unreal/HephaeraNativeFixture.uproject'), 'utf8'));
+  assert.equal(ordinary.Modules[0].Name, 'HephaeraNativeFixture'); checks++;
   const features = unrealFeatures.manifest();
   for (const file of features.files) safeLocalFile(path.join(unrealFeatures.DIRECTORY, file), unrealFeatures.DIRECTORY);
   checks++;
@@ -374,11 +374,11 @@ async function runnerChecks(temp) {
   assert.equal(alive, false, 'Owned descendant survived timeout process-tree cleanup'); checks++;
   // Simulate failed native invocations through the complete feature runner.
   // Exit status must defeat any implied report success; these are not engines.
-  const priorSelection = process.env.OPENCAW_UNREAL_FEATURE_PROJECT;
-  const priorVersion = process.env.OPENCAW_UNREAL_VERSION;
+  const priorSelection = process.env.HEPHAERA_UNREAL_FEATURE_PROJECT;
+  const priorVersion = process.env.HEPHAERA_UNREAL_VERSION;
   try {
-    process.env.OPENCAW_UNREAL_FEATURE_PROJECT = path.join(unrealFeatures.DIRECTORY, 'OpenCawFeatureFixture.uproject');
-    process.env.OPENCAW_UNREAL_VERSION = '5.8';
+    process.env.HEPHAERA_UNREAL_FEATURE_PROJECT = path.join(unrealFeatures.DIRECTORY, 'HephaeraFeatureFixture.uproject');
+    process.env.HEPHAERA_UNREAL_VERSION = '5.8';
     const api = { safeLocalFile, executable: () => process.execPath, copyFixture, nativeFailure, inspectUnrealReport };
     const failureTemp = path.join(temp, 'simulated-feature-build'); fs.mkdirSync(failureTemp);
     const failures = await unrealFeatures.run({ temp: failureTemp, run: async () => ({ code: 7, text: '' }) }, api);
@@ -389,8 +389,8 @@ async function runnerChecks(temp) {
     const executed = processes.filter(result => !features.cases.find(test => test.name === result.test).requires || Object.keys(features.cases.find(test => test.name === result.test).requires).length === 0);
     assert.ok(executed.length > 0); assert.ok(executed.every(result => result.status === 'fail' && /exited 9/.test(result.reason))); checks++;
   } finally {
-    if (priorSelection === undefined) delete process.env.OPENCAW_UNREAL_FEATURE_PROJECT; else process.env.OPENCAW_UNREAL_FEATURE_PROJECT = priorSelection;
-    if (priorVersion === undefined) delete process.env.OPENCAW_UNREAL_VERSION; else process.env.OPENCAW_UNREAL_VERSION = priorVersion;
+    if (priorSelection === undefined) delete process.env.HEPHAERA_UNREAL_FEATURE_PROJECT; else process.env.HEPHAERA_UNREAL_FEATURE_PROJECT = priorSelection;
+    if (priorVersion === undefined) delete process.env.HEPHAERA_UNREAL_VERSION; else process.env.HEPHAERA_UNREAL_VERSION = priorVersion;
   }
   return checks;
 }
@@ -404,7 +404,7 @@ function cleanup(temp) {
 
 async function main(args = process.argv.slice(2)) {
   for (const arg of args) if (!['--structure-only', '--require-native'].includes(arg)) throw new Error('Unknown native fixture option: ' + arg);
-  const seconds = Number(process.env.OPENCAW_NATIVE_TIMEOUT_SECONDS || 180);
+  const seconds = Number(process.env.HEPHAERA_NATIVE_TIMEOUT_SECONDS || 180);
   if (!Number.isFinite(seconds) || seconds < 1 || seconds > 600) throw new Error('Native timeout must be between 1 and 600 seconds');
   const temp = fs.mkdtempSync(path.join(__dirname, '.native-engine-fixtures-'));
   const abort = new AbortController();

@@ -84,7 +84,7 @@ def run_regressions(topology, rigid, api, work):
     work = Path(work)
     work.mkdir(parents=True, exist_ok=True)
     # A private fixture project satisfies the same confined task-path rule.
-    task = work / '.opencaw/.cache/tasks/source-topology-controls'
+    task = work / '.hephaera/.cache/tasks/source-topology-controls'
     task.mkdir(parents=True, exist_ok=False)
     prepared = work / 'source-topology.glb'
     receipt_path = task / 'source-topology.json'

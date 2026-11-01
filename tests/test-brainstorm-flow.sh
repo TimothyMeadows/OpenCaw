@@ -29,7 +29,7 @@ new_project() {
 run_for() {
   local project="$1"
   shift
-  OPENCAW_PROJECT_ROOT="$project" "$@"
+  HEPHAERA_PROJECT_ROOT="$project" "$@"
 }
 
 write_sample_brainstorm() {
@@ -164,7 +164,7 @@ expect_failure "$temp_root/state.log" run_for "$invalid_project" bash commands/b
 grep -q '^BRAINSTORM_STATUS=malformed$' "$temp_root/state.log" || fail 'malformed mode state did not fail closed'
 expect_failure "$temp_root/malformed-guard.log" run_for "$invalid_project" bash commands/create-task-file.sh malformed-task 'Malformed task' --no-issue
 grep -q 'malformed mode state' "$temp_root/malformed-guard.log" || fail 'delivery creation did not fail closed on malformed Brainstorm state'
-[[ ! -e "$invalid_project/.opencaw/.cache/tasks/malformed-task" ]] || fail 'malformed Brainstorm guard wrote task state'
+[[ ! -e "$invalid_project/.hephaera/.cache/tasks/malformed-task" ]] || fail 'malformed Brainstorm guard wrote task state'
 write_sample_brainstorm "$invalid_project"
 printf '\n### IDEA-001\n' >> "$invalid_project/BRAINSTORM.md"
 expect_failure "$temp_root/duplicate.log" run_for "$invalid_project" bash commands/validate-brainstorm.sh --phase active
@@ -224,9 +224,9 @@ expect_failure "$temp_root/gauntlet-guard.log" run_for "$guard_project" bash com
 for log in task-guard issue-guard import-guard goal-guard gauntlet-guard; do
   grep -q 'blocked while Brainstorm mode is active' "$temp_root/$log.log" || fail "$log did not report the active Brainstorm guard"
 done
-[[ ! -e "$guard_project/.opencaw/.cache/tasks/blocked-task" && ! -e "$guard_project/.opencaw/.cache/goals/blocked-goal" && ! -e "$guard_project/.opencaw/.cache/gauntlets/blocked-gauntlet" ]] || fail 'a guarded creation command wrote delivery state'
+[[ ! -e "$guard_project/.hephaera/.cache/tasks/blocked-task" && ! -e "$guard_project/.hephaera/.cache/goals/blocked-goal" && ! -e "$guard_project/.hephaera/.cache/gauntlets/blocked-gauntlet" ]] || fail 'a guarded creation command wrote delivery state'
 run_for "$guard_project" bash commands/create-goal-file.sh preview-goal 'Preview goal' --dry-run >/dev/null
-[[ ! -e "$guard_project/.opencaw/.cache/goals/preview-goal" ]] || fail 'Goal dry-run wrote state'
+[[ ! -e "$guard_project/.hephaera/.cache/goals/preview-goal" ]] || fail 'Goal dry-run wrote state'
 run_for "$guard_project" bash commands/brainstorm-mode.sh stop >/dev/null
 printf '\n' >> "$guard_project/BRAINSTORM.md"
 expect_failure "$temp_root/stale-summary-guard.log" run_for "$guard_project" bash commands/create-task-file.sh stale-summary-task 'Stale summary task' --no-issue
@@ -234,7 +234,7 @@ grep -q 'lacks a current exit summary' "$temp_root/stale-summary-guard.log" || f
 run_for "$guard_project" bash commands/brainstorm-mode.sh stop >/dev/null
 run_for "$guard_project" bash commands/create-task-file.sh allowed-task 'Allowed task' --no-issue >/dev/null
 run_for "$guard_project" bash commands/create-goal-file.sh allowed-goal 'Allowed goal' >/dev/null
-[[ -f "$guard_project/.opencaw/.cache/tasks/allowed-task/TASK.md" && -f "$guard_project/.opencaw/.cache/goals/allowed-goal/GOAL.md" ]] || fail 'inactive Brainstorm changed existing creation behavior'
+[[ -f "$guard_project/.hephaera/.cache/tasks/allowed-task/TASK.md" && -f "$guard_project/.hephaera/.cache/goals/allowed-goal/GOAL.md" ]] || fail 'inactive Brainstorm changed existing creation behavior'
 
 echo '[8/8] checking role, skill, command, and integrated validation hooks'
 grep -q '^description:.*Use ' skills/brainstorm-flow/SKILL.md || fail 'brainstorm skill metadata has no trigger'

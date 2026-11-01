@@ -77,11 +77,11 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/art-pipeline-common.sh"
 source "$script_dir/lib/external-asset-library-common.sh"
-opencaw_resolve_paths
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-mount_dir_name="$(basename "$opencaw_root")"
-if [[ "$opencaw_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
+hephaera_resolve_paths
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+mount_dir_name="$(basename "$hephaera_root")"
+if [[ "$hephaera_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
 style_target="$host_root/STYLE.md"
 
 if [[ $clear_external_libraries -eq 1 && ${#external_library_specs[@]} -gt 0 ]]; then
@@ -126,7 +126,7 @@ for name in "${styles[@]}"; do
   normalized_name="${name//-/_}"
   normalized_name="${normalized_name// /_}"
   upper_name="${normalized_name^^}"
-  template_path="$opencaw_root/.styles/${upper_name}.md"
+  template_path="$hephaera_root/.styles/${upper_name}.md"
   if [[ ! -f "$template_path" ]]; then
     echo "Missing style template: $template_path" >&2
     exit 1
@@ -156,7 +156,7 @@ done
 
 for pipeline in "${allowed_pipelines[@]}"; do
   relative="$(art_pipeline_contract_relative_path "$pipeline")"
-  [[ -f "$opencaw_root/$relative" ]] || { echo "Missing art pipeline contract: $opencaw_root/$relative" >&2; exit 1; }
+  [[ -f "$hephaera_root/$relative" ]] || { echo "Missing art pipeline contract: $hephaera_root/$relative" >&2; exit 1; }
 done
 
 {
@@ -164,15 +164,15 @@ done
   echo
   echo "This file is the canonical art style contract for this repository."
   echo
-  echo "Generated from OpenCaw style templates:"
+  echo "Generated from Hephaera style templates:"
   for name in "${selected[@]}"; do
     echo "- $name"
   done
   echo
-  echo "Primary OpenCaw art pipeline:"
+  echo "Primary Hephaera art pipeline:"
   echo "- $primary_pipeline"
   echo
-  echo "Allowed OpenCaw art pipelines:"
+  echo "Allowed Hephaera art pipelines:"
   for pipeline in "${allowed_pipelines[@]}"; do
     echo "- $pipeline"
   done
@@ -225,7 +225,7 @@ done
     echo "## Inlined Style Templates"
     echo
     for name in "${selected[@]}"; do
-      template_path="$opencaw_root/.styles/${name}.md"
+      template_path="$hephaera_root/.styles/${name}.md"
       echo "<!-- BEGIN TEMPLATE: ${name} -->"
       echo
       cat "$template_path"
@@ -241,7 +241,7 @@ done
       relative="$(art_pipeline_contract_relative_path "$pipeline")"
       echo "<!-- BEGIN ART PIPELINE: ${pipeline} -->"
       echo
-      cat "$opencaw_root/$relative"
+      cat "$hephaera_root/$relative"
       echo
       echo "<!-- END ART PIPELINE: ${pipeline} -->"
       echo

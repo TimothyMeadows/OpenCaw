@@ -10,30 +10,30 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-#if OPENCAW_UNITY_UGUI
+#if HEPHAERA_UNITY_UGUI
 using UnityEngine.EventSystems;
 #endif
-#if OPENCAW_UNITY_TMP
+#if HEPHAERA_UNITY_TMP
 using TMPro;
 #endif
-#if OPENCAW_UNITY_LOCALIZATION
+#if HEPHAERA_UNITY_LOCALIZATION
 using UnityEngine.AddressableAssets;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 
-public sealed class OpenCawUnityFixtureFocusWindow : EditorWindow { }
+public sealed class HephaeraUnityFixtureFocusWindow : EditorWindow { }
 
-public static class OpenCawUnityPresentationCases
+public static class HephaeraUnityPresentationCases
 {
-    public static IEnumerator UIFocus(OpenCawUnityFeatureContext context)
+    public static IEnumerator UIFocus(HephaeraUnityFeatureContext context)
     {
         context.RequireGraphics();
-        var window = ScriptableObject.CreateInstance<OpenCawUnityFixtureFocusWindow>();
+        var window = ScriptableObject.CreateInstance<HephaeraUnityFixtureFocusWindow>();
         try
         {
-            window.titleContent = new GUIContent("OpenCaw focus fixture");
+            window.titleContent = new GUIContent("Hephaera focus fixture");
             window.ShowUtility();
             var content = new VisualElement();
             var prior = new UnityEngine.UIElements.Button { text = "Prior focus" };
@@ -74,13 +74,13 @@ public static class OpenCawUnityPresentationCases
         }
     }
 
-    public static IEnumerator UGUIFocus(OpenCawUnityFeatureContext context)
+    public static IEnumerator UGUIFocus(HephaeraUnityFeatureContext context)
     {
-#if OPENCAW_UNITY_UGUI
+#if HEPHAERA_UNITY_UGUI
         if (!EditorApplication.isPlaying) context.Blocked("uGUI selection fixture requires Play Mode.");
         var savedSystem = EventSystem.current;
-        var root = new GameObject("OpenCaw uGUI fixture");
-        var eventObject = new GameObject("OpenCaw EventSystem", typeof(EventSystem));
+        var root = new GameObject("Hephaera uGUI fixture");
+        var eventObject = new GameObject("Hephaera EventSystem", typeof(EventSystem));
         var system = eventObject.GetComponent<EventSystem>();
         UnityEngine.UI.Button prior = null;
         try
@@ -132,9 +132,9 @@ public static class OpenCawUnityPresentationCases
 #endif
     }
 
-    public static IEnumerator UIFontCoverage(OpenCawUnityFeatureContext context)
+    public static IEnumerator UIFontCoverage(HephaeraUnityFeatureContext context)
     {
-#if OPENCAW_UNITY_TMP
+#if HEPHAERA_UNITY_TMP
         string path = context.Setting("tmpFontAsset");
         string required = context.Setting("tmpRequiredCharacters");
         var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(path);
@@ -161,9 +161,9 @@ public static class OpenCawUnityPresentationCases
 #endif
     }
 
-    public static IEnumerator LocalizationLifecycle(OpenCawUnityFeatureContext context)
+    public static IEnumerator LocalizationLifecycle(HephaeraUnityFeatureContext context)
     {
-#if OPENCAW_UNITY_LOCALIZATION
+#if HEPHAERA_UNITY_LOCALIZATION
         if (!EditorApplication.isPlaying) context.Blocked("Localization SDK lifecycle fixture requires Play Mode.");
         string localeACode = context.Setting("localizationLocaleA");
         string localeBCode = context.Setting("localizationLocaleB");
@@ -243,7 +243,7 @@ public static class OpenCawUnityPresentationCases
 #endif
     }
 
-    public static IEnumerator AudioLifecycle(OpenCawUnityFeatureContext context)
+    public static IEnumerator AudioLifecycle(HephaeraUnityFeatureContext context)
     {
         if (!EditorApplication.isPlaying) context.Blocked("Audio playback fixture requires Play Mode.");
         string mixerPath = context.Setting("audioMixerAsset");
@@ -252,8 +252,8 @@ public static class OpenCawUnityPresentationCases
         if (mixer == null) context.Blocked("A real native AudioMixer asset is required.");
         var groups = mixer.FindMatchingGroups(groupName).Where(group => group.name == groupName).ToArray();
         if (groups.Length != 1) context.Blocked("Select exactly one native mixer group by name.");
-        var owner = new GameObject("OpenCaw audio owner", typeof(AudioSource));
-        var listenerObject = new GameObject("OpenCaw audio listener", typeof(AudioListener));
+        var owner = new GameObject("Hephaera audio owner", typeof(AudioSource));
+        var listenerObject = new GameObject("Hephaera audio listener", typeof(AudioListener));
         var source = owner.GetComponent<AudioSource>();
         AudioClip clip = null;
         try
@@ -264,7 +264,7 @@ public static class OpenCawUnityPresentationCases
             double deadline = EditorApplication.timeSinceStartup + 3.0;
             while (AudioSettings.dspTime <= initialDsp && EditorApplication.timeSinceStartup < deadline) yield return null;
             if (AudioSettings.dspTime <= initialDsp) context.Blocked("Audio DSP clock is unavailable or suspended.");
-            clip = AudioClip.Create("OpenCaw owned PCM", rate / 2, 1, rate, false);
+            clip = AudioClip.Create("Hephaera owned PCM", rate / 2, 1, rate, false);
             var samples = new float[rate / 2];
             for (int index = 0; index < samples.Length; index++) samples[index] = 0.01f * Mathf.Sin(2 * Mathf.PI * 220 * index / rate);
             context.Check(clip.SetData(samples, 0), "Known PCM is written to an actual native AudioClip.");
@@ -307,21 +307,21 @@ public static class OpenCawUnityPresentationCases
         }
     }
 
-    public static IEnumerator EditorTransactions(OpenCawUnityFeatureContext context)
+    public static IEnumerator EditorTransactions(HephaeraUnityFeatureContext context)
     {
         string scenePath = context.AssetDirectory.TrimEnd('/') + "/PresentationTransaction.unity";
         if (AssetDatabase.LoadMainAssetAtPath(scenePath) != null) throw new InvalidOperationException("Owned fixture output already exists.");
         var previous = SceneManager.GetActiveScene();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
-        OpenCawUnityPresentationProbe probe = null;
+        HephaeraUnityPresentationProbe probe = null;
         GameObject owner = null;
         try
         {
-            owner = new GameObject("OpenCaw transaction owner");
+            owner = new GameObject("Hephaera transaction owner");
             SceneManager.MoveGameObjectToScene(owner, scene);
-            probe = owner.AddComponent<OpenCawUnityPresentationProbe>();
+            probe = owner.AddComponent<HephaeraUnityPresentationProbe>();
             Undo.IncrementCurrentGroup();
-            Undo.RecordObject(probe, "OpenCaw fixture owned value");
+            Undo.RecordObject(probe, "Hephaera fixture owned value");
             probe.OwnedValue = 42;
             Undo.FlushUndoRecordObjects();
             Undo.PerformUndo();
@@ -333,7 +333,7 @@ public static class OpenCawUnityPresentationCases
             Undo.ClearUndo(probe);
             EditorSceneManager.CloseScene(scene, true);
             scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
-            probe = scene.GetRootGameObjects().Select(value => value.GetComponent<OpenCawUnityPresentationProbe>())
+            probe = scene.GetRootGameObjects().Select(value => value.GetComponent<HephaeraUnityPresentationProbe>())
                 .Single(value => value != null);
             context.Check(probe.OwnedValue == 42, "Unloaded and reopened scene preserves the real serialized component value.");
             context.Note("Owned component value transaction only; prefab/multi-object inspector and Graph Toolkit checks are separate conditional native procedures.");
@@ -348,7 +348,7 @@ public static class OpenCawUnityPresentationCases
         }
     }
 
-    public static IEnumerator WebBuild(OpenCawUnityFeatureContext context)
+    public static IEnumerator WebBuild(HephaeraUnityFeatureContext context)
     {
         string scene = context.Setting("webBuildScene");
         if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scene) == null) context.Blocked("webBuildScene must identify a native authored fixture scene.");

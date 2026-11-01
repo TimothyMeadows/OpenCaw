@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/code-character-evidence-report-v1.json",
-  "title": "OpenCaw Code Character Evidence Report",
+  "$id": "https://hephaera.dev/schemas/code-character-evidence-report-v1.json",
+  "title": "Hephaera Code Character Evidence Report",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "characterId", "captureMode", "trustedMachineEvidence", "trustReason", "contracts", "observationSha256", "overallDecision", "gateResults", "comparison", "reviewerBoundary"],
   "properties": {
-    "schemaVersion": { "const": "opencaw-code-character-evidence/v1" },
+    "schemaVersion": { "const": "hephaera-code-character-evidence/v1" },
     "characterId": { "type": "string" },
     "captureMode": { "enum": ["browser", "fixture"] },
     "trustedMachineEvidence": { "type": "boolean" },

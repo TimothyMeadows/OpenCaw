@@ -99,8 +99,8 @@ is_image_ref() {
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/gauntlet-common.sh"
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 summary_text="$(cat "$summary_file")"
 gauntlet_marker=''
 if [[ -n "$gauntlet_verdict" || -n "$gauntlet_head_sha" || -n "$gauntlet_source" \
@@ -111,7 +111,7 @@ if [[ -n "$gauntlet_verdict" || -n "$gauntlet_head_sha" || -n "$gauntlet_source"
   }
   gauntlet_validate_head_sha "$gauntlet_head_sha" 'Gauntlet QA head SHA'
   gauntlet_head_sha="${gauntlet_head_sha,,}"
-  [[ "$gauntlet_source" =~ ^\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
+  [[ "$gauntlet_source" =~ ^\.hephaera/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
     echo 'Gauntlet QA source must be a project-relative immutable round or completion event.' >&2
     exit 1
   }
@@ -130,13 +130,13 @@ if [[ -n "$gauntlet_verdict" || -n "$gauntlet_head_sha" || -n "$gauntlet_source"
       exit 1
     }
   fi
-  gauntlet_marker="<!-- opencaw-gauntlet-qa:v1 verdict=$gauntlet_verdict head-sha=$gauntlet_head_sha source=$gauntlet_source source-sha256=$gauntlet_source_hash affected-units=$gauntlet_affected_units -->"
+  gauntlet_marker="<!-- hephaera-gauntlet-qa:v1 verdict=$gauntlet_verdict head-sha=$gauntlet_head_sha source=$gauntlet_source source-sha256=$gauntlet_source_hash affected-units=$gauntlet_affected_units -->"
 fi
 
 repo_root="$host_root"
 if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if git -C "$opencaw_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    repo_root="$opencaw_root"
+  if git -C "$hephaera_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    repo_root="$hephaera_root"
   else
     echo "Unable to detect a git repository root for PR QA comments." >&2
     exit 1
@@ -171,10 +171,10 @@ else
   done
 fi
 
-if [[ ${#local_screenshot_errors[@]} -gt 0 && "${OPENCAW_ALLOW_LOCAL_SCREENSHOT_REFERENCES:-}" != "1" ]]; then
+if [[ ${#local_screenshot_errors[@]} -gt 0 && "${HEPHAERA_ALLOW_LOCAL_SCREENSHOT_REFERENCES:-}" != "1" ]]; then
   {
     echo "Local screenshot paths cannot render inline in GitHub PR comments."
-    echo "Provide HTTP(S) screenshot URLs, or set OPENCAW_ALLOW_LOCAL_SCREENSHOT_REFERENCES=1 to post local paths as a temporary exception."
+    echo "Provide HTTP(S) screenshot URLs, or set HEPHAERA_ALLOW_LOCAL_SCREENSHOT_REFERENCES=1 to post local paths as a temporary exception."
     printf 'Local screenshot: %s\n' "${local_screenshot_errors[@]}"
   } >&2
   exit 1

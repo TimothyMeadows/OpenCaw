@@ -4,13 +4,13 @@
 const assert = require('assert/strict'), fs = require('fs'), path = require('path');
 const runtime = require('../commands/lib/bubo-runtime.cjs');
 const host = require('../commands/lib/bubo-host-adapter.cjs');
-const cache = path.basename(runtime.BASE) === '.opencaw' ? path.join(runtime.BASE, '.cache') : path.join(runtime.BASE, '.opencaw/.cache');
-const folder = path.join(cache, 'tasks/opencaw-integrate-bubo-runtime/evidence/context'); fs.mkdirSync(folder, { recursive: true });
+const cache = path.basename(runtime.BASE) === '.hephaera' ? path.join(runtime.BASE, '.cache') : path.join(runtime.BASE, '.hephaera/.cache');
+const folder = path.join(cache, 'tasks/hephaera-integrate-bubo-runtime/evidence/context'); fs.mkdirSync(folder, { recursive: true });
 const root = fs.mkdtempSync(path.join(folder, 'p-'));
 let checks = 0;
 const check = (value, reason) => { assert(value, reason); checks++; };
 function write(name, value) { const file = path.join(root, name); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, typeof value === 'string' ? value : JSON.stringify(value)); return name; }
-const task = 'fixture', manifest = '.opencaw/.cache/tasks/fixture/proof-to-model/owned/v2/manifest.json';
+const task = 'fixture', manifest = '.hephaera/.cache/tasks/fixture/proof-to-model/owned/v2/manifest.json';
 write('STYLE.md', fs.readFileSync(path.join(runtime.BASE, 'STYLE.md'), 'utf8').replace(/\r\n/g, '\n'));
 write('outside/source.bin', 'Original fixture bytes');
 write('outside/stage-input.json', { stagedPath: 'outside/candidate.bin', rights: 'License: original owned fixture', model: 'unavailable:not-disclosed' });
@@ -27,14 +27,14 @@ write('metadata.json', { model: 'unavailable:not-provided', copyEvidence: 'outsi
 const state = { task, hostPolicySha256: 'a'.repeat(64), runtimeBuildSha256: 'b'.repeat(64), rights: 'rights.json', recipe: 'recipe.json', toolchain: 'toolchain.json', proofMetadata: 'metadata.json',
   sourceInputs: { 'outside/source.bin': runtime.hash(path.join(root, 'outside/source.bin')) }, stages: { classify: { inputs: { 'outside/stage-input.json': runtime.hash(path.join(root, 'outside/stage-input.json')) } } } };
 write(manifest, state);
-const info = { folder: path.join(root, '.opencaw/runtime/bubo/artifacts/bubo') };
+const info = { folder: path.join(root, '.hephaera/runtime/bubo/artifacts/bubo') };
 const options = () => host.parse(['--root', root, '--manifest', manifest]);
 let context = host.contextFor('proof-to-model', 'status', options(), info).context;
 const names = new Set(context.references.map(item => item.path));
 for (const name of ['outside/source.bin', 'outside/stage-input.json', 'outside/candidate.bin', 'outside/copy.json', 'outside/handoff.json', 'outside/prepared.glb', 'outside/authored.json']) check(names.has(name), 'Exact source/stage/nested reference: ' + name);
 check(!context.permissions.provisioning && !context.permissions.promotion, 'Status grants neither provisioning nor promotion');
 check(context.budgets.timeoutSeconds === 2400 && context.budgets.maxLogBytes === 134217728, 'Configured bounded process ceilings are retained');
-check(context.roots.inputs.includes('models') && context.roots.inputs.includes('.opencaw/runtime/bubo/artifacts/bubo'), 'Selected model directory and verified publication have read-only admission');
+check(context.roots.inputs.includes('models') && context.roots.inputs.includes('.hephaera/runtime/bubo/artifacts/bubo'), 'Selected model directory and verified publication have read-only admission');
 check(context.tools.some(item => runtime.samePath(item.path, process.execPath)), 'Existing selected native tool is exact hash-bound');
 assert.throws(() => host.parse(['--host-context', 'injected.json']), /protected/); checks++;
 assert.throws(() => host.parse(['--execute', 'false']), /only true/); checks++;
@@ -48,7 +48,7 @@ assert.throws(() => host.contextFor('proof-to-model', 'status', options(), info)
 check(fs.readFileSync(path.join(root, manifest)).equals(oldBytes), 'Historical manifest bytes remain untouched');
 state.hostPolicySha256 = 'a'.repeat(64); write(manifest, state);
 let style = fs.readFileSync(path.join(root, 'STYLE.md'), 'utf8');
-style = style.replace('Primary OpenCaw art pipeline:\n- PROOF_TO_MODEL', 'Primary OpenCaw art pipeline:\n- BLENDER').replace('- Use PROOF_TO_MODEL unless', '- Use BLENDER unless');
+style = style.replace('Primary Hephaera art pipeline:\n- PROOF_TO_MODEL', 'Primary Hephaera art pipeline:\n- BLENDER').replace('- Use PROOF_TO_MODEL unless', '- Use BLENDER unless');
 write('STYLE.md', style);
 const selection = host.policyCommand('resolve-art-pipeline.sh', ['--style', path.join(root, 'STYLE.md'), '--override', 'PROOF_TO_MODEL', '--json'], root);
 write(path.posix.join(path.posix.dirname(manifest), 'pipeline-selection.json'), selection);

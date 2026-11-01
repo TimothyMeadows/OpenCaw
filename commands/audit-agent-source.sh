@@ -173,7 +173,7 @@ findings.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity] ||
 const counts = { critical: 0, high: 0, medium: 0, low: 0 };
 for (const finding of findings) counts[finding.severity] += 1;
 const report = {
-  schema: 'opencaw-agent-source-audit/v1',
+  schema: 'hephaera-agent-source-audit/v1',
   source: sourceRoot,
   inspection: 'static-only',
   summary: { directories: directoryCount, files: fileCount, skippedBinaryFiles: skippedBinaryCount, findings: findings.length, bySeverity: counts },

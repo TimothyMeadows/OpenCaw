@@ -316,9 +316,9 @@ function create(root, values) {
   const modelId = options._[0];
   if (!MODEL_ID_PATTERN.test(modelId)) fail('Model id must use lowercase kebab-case.');
   requireString(options.brief, '--brief');
-  const outputValue = options.output ?? `.opencaw/.cache/tasks/${modelId}/code-model.json`;
+  const outputValue = options.output ?? `.hephaera/.cache/tasks/${modelId}/code-model.json`;
   const output = relativeInside(root, outputValue, 'Manifest output');
-  if (!output.relative.startsWith('.opencaw/.cache/tasks/')) fail('Manifest output must stay below .opencaw/.cache/tasks.');
+  if (!output.relative.startsWith('.hephaera/.cache/tasks/')) fail('Manifest output must stay below .hephaera/.cache/tasks.');
   const sourceValue = options.source ?? `src/models/${modelId}.ts`;
   const source = relativeInside(root, sourceValue, 'Target source path');
   if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(source.relative)) fail('Target source path must be a TypeScript or JavaScript file.');

@@ -50,16 +50,16 @@ done
 [[ "$match" =~ ^(ranked|any|all)$ ]] || { echo "Invalid match mode: $match" >&2; exit 1; }
 [[ "$limit" =~ ^[1-9][0-9]*$ ]] || { echo 'Limit must be a positive integer.' >&2; exit 1; }
 
-opencaw_resolve_paths
+hephaera_resolve_paths
 
 files=()
 labels=()
-if [[ -f "$OPENCAW_PROJECT_MEMORY_FILE" ]]; then
-  files+=("$OPENCAW_PROJECT_MEMORY_FILE")
+if [[ -f "$HEPHAERA_PROJECT_MEMORY_FILE" ]]; then
+  files+=("$HEPHAERA_PROJECT_MEMORY_FILE")
   labels+=('memory')
 fi
-if [[ -f "$OPENCAW_REPO_MAP_FILE" ]]; then
-  files+=("$OPENCAW_REPO_MAP_FILE")
+if [[ -f "$HEPHAERA_REPO_MAP_FILE" ]]; then
+  files+=("$HEPHAERA_REPO_MAP_FILE")
   labels+=('repo-map')
 fi
 

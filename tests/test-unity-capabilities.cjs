@@ -97,11 +97,11 @@ async function main() {
     equal(meta.cases.find(test => test.id === 'LocalizationLifecycle').playMode, true);
     equal(meta.cases.find(test => test.id === 'WebBuild').buildTarget, 'WebGL');
     equal(meta.cases.find(test => test.id === 'UIFontCoverage').minimumChecks, 2);
-    equal(meta.files.includes('Assets/OpenCawUnityPresentationProbe.cs'), true);
+    equal(meta.files.includes('Assets/HephaeraUnityPresentationProbe.cs'), true);
     for (const file of meta.files) equal(fs.existsSync(native.safeLocalFile(path.join(features.DIRECTORY, file), features.DIRECTORY)), true);
     const source = ['Content', 'Presentation', 'ToolingService'].map(name => fs.readFileSync(path.join(features.DIRECTORY, 'Assets/Editor', name + 'FeatureCases.cs'), 'utf8')).join('\n');
     for (const test of meta.cases) {
-      equal(source.includes(`IEnumerator ${test.id}(OpenCawUnityFeatureContext context)`), true);
+      equal(source.includes(`IEnumerator ${test.id}(HephaeraUnityFeatureContext context)`), true);
       equal(typeof test.limit === 'string' && test.limit.length > 0, true);
       equal(typeof test.graphics, 'boolean'); equal(typeof test.playMode, 'boolean');
     }
@@ -192,7 +192,7 @@ async function main() {
     const test = meta.cases.find(item => item.id === 'Physics3D');
     const reportFile = path.join(temporary, 'synthetic-report.json');
     const runId = crypto.randomUUID(); const inputSha256 = 'a'.repeat(64); const engineVersion = '6000.3.0f1';
-    const good = { schemaVersion: 1, fixture: 'opencaw-unity-feature', caseName: test.id, runId, inputSha256, engineVersion, status: 'pass', checks: test.minimumChecks, observations: Array.from({ length: test.minimumChecks }, (_, index) => 'CHECK SIMULATION ' + index), reason: 'SIMULATION ONLY', startedUtc: new Date().toISOString(), fixturePlayMode: false, fixtureDomainReloadDisabled: false };
+    const good = { schemaVersion: 1, fixture: 'hephaera-unity-feature', caseName: test.id, runId, inputSha256, engineVersion, status: 'pass', checks: test.minimumChecks, observations: Array.from({ length: test.minimumChecks }, (_, index) => 'CHECK SIMULATION ' + index), reason: 'SIMULATION ONLY', startedUtc: new Date().toISOString(), fixturePlayMode: false, fixtureDomainReloadDisabled: false };
     const inspect = () => features.inspectReport(reportFile, test, runId, inputSha256, Date.now(), engineVersion);
     json(reportFile, good); equal(inspect().status, 'pass'); equal(inspect().reportSha256.length, 64);
     for (const change of [
@@ -220,28 +220,28 @@ async function main() {
     equal(features.unavailable('error CS0117: invalid fixture API'), null);
 
     // Simulated processes cannot gain native status from a report beside failure.
-    const previous = { config: process.env.OPENCAW_UNITY_FEATURE_CONFIG, version: process.env.OPENCAW_UNITY_VERSION };
+    const previous = { config: process.env.HEPHAERA_UNITY_FEATURE_CONFIG, version: process.env.HEPHAERA_UNITY_VERSION };
     try {
-      delete process.env.OPENCAW_UNITY_FEATURE_CONFIG;
+      delete process.env.HEPHAERA_UNITY_FEATURE_CONFIG;
       const api = { safeLocalFile: native.safeLocalFile, executable: () => process.execPath, copyFixture: native.copyFixture, nativeFailure: native.nativeFailure };
       const disabled = await features.run({ run: () => { throw new Error('Unexpected launch'); } }, api);
       equal(disabled.length, 26); equal(disabled.every(result => result.status !== 'pass'), true);
-      process.env.OPENCAW_UNITY_FEATURE_CONFIG = path.join(features.DIRECTORY, 'fixture-config.example.json');
-      process.env.OPENCAW_UNITY_VERSION = engineVersion;
+      process.env.HEPHAERA_UNITY_FEATURE_CONFIG = path.join(features.DIRECTORY, 'fixture-config.example.json');
+      process.env.HEPHAERA_UNITY_VERSION = engineVersion;
       for (const result of [{ code: 7, text: '' }, { code: 0, timedOut: true, text: '' }, { code: 0, cancelled: true, text: '' }, { code: null, spawnError: 'SIMULATION unavailable executable', text: '' }]) {
         const simulationDirectory = fs.mkdtempSync(path.join(temporary, 'process-'));
         let launches = 0;
         const results = await features.run({ temp: simulationDirectory, run: async (command, args, options) => {
           launches++; equal(args.includes('-noUpm'), true);
-          const selectedCase = meta.cases.find(item => item.id === options.env.OPENCAW_UNITY_FEATURE_CASE);
-          json(options.env.OPENCAW_UNITY_FEATURE_REPORT, { ...good, caseName: selectedCase.id, runId: options.env.OPENCAW_UNITY_FEATURE_RUN, inputSha256: options.env.OPENCAW_UNITY_FEATURE_INPUT_SHA256, startedUtc: new Date().toISOString(), fixturePlayMode: selectedCase.playMode, fixtureDomainReloadDisabled: selectedCase.playMode });
+          const selectedCase = meta.cases.find(item => item.id === options.env.HEPHAERA_UNITY_FEATURE_CASE);
+          json(options.env.HEPHAERA_UNITY_FEATURE_REPORT, { ...good, caseName: selectedCase.id, runId: options.env.HEPHAERA_UNITY_FEATURE_RUN, inputSha256: options.env.HEPHAERA_UNITY_FEATURE_INPUT_SHA256, startedUtc: new Date().toISOString(), fixturePlayMode: selectedCase.playMode, fixtureDomainReloadDisabled: selectedCase.playMode });
           return result;
         } }, api);
         equal(launches > 0, true); equal(results.filter(item => item.status === 'fail').length, launches); equal(results.some(item => item.status === 'pass'), false);
       }
     } finally {
-      if (previous.config === undefined) delete process.env.OPENCAW_UNITY_FEATURE_CONFIG; else process.env.OPENCAW_UNITY_FEATURE_CONFIG = previous.config;
-      if (previous.version === undefined) delete process.env.OPENCAW_UNITY_VERSION; else process.env.OPENCAW_UNITY_VERSION = previous.version;
+      if (previous.config === undefined) delete process.env.HEPHAERA_UNITY_FEATURE_CONFIG; else process.env.HEPHAERA_UNITY_FEATURE_CONFIG = previous.config;
+      if (previous.version === undefined) delete process.env.HEPHAERA_UNITY_VERSION; else process.env.HEPHAERA_UNITY_VERSION = previous.version;
     }
     console.log(`Unity capability checks passed (${checks} assertions; structural contracts and SIMULATION report/process checks do not establish native acceptance).`);
   } finally {

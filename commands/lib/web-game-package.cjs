@@ -9,8 +9,8 @@ const engines = require('./engine-contract.cjs');
 const BASE = path.resolve(__dirname, '../..');
 const TEMPLATE = path.join(BASE, '.packaging/maui/template');
 const CONFIG = 'web-game-package.json';
-const OWNER = '.opencaw-maui-host.json';
-const SNAPSHOT = '.opencaw-web-snapshot.json';
+const OWNER = '.hephaera-maui-host.json';
+const SNAPSHOT = '.hephaera-web-snapshot.json';
 const PENDING = 'pending-transaction.json';
 const TARGETS = Object.freeze({
   WINDOWS: { framework: 'net10.0-windows10.0.19041.0', hosts: ['win32'], workloads: ['maui', 'maui-windows'], rids: ['win-x64', 'win-arm64', 'win-x86'], formats: ['folder', 'msix'] },
@@ -30,7 +30,7 @@ function relative(value, label) {
   if (typeof value !== 'string' || !value || value.includes('\\') || /[:\x00-\x1f<>"|?*;$%@]/.test(value) || path.posix.isAbsolute(value)) fail(`${label} must be a portable project-relative path without MSBuild metacharacters.`);
   const parts = value.split('/');
   if (parts.some(p => !p || p === '.' || p === '..' || /[. ]$/.test(p) || /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(p))) fail(`${label} contains unsafe path components.`);
-  if (parts.some(p => ['.git', '.opencaw', 'node_modules'].includes(p.toLowerCase()))) fail(`${label} cannot target Git, OpenCaw or dependencies.`);
+  if (parts.some(p => ['.git', '.hephaera', 'node_modules'].includes(p.toLowerCase()))) fail(`${label} cannot target Git, Hephaera or dependencies.`);
   return value;
 }
 function confined(root, value, label) {
@@ -119,7 +119,7 @@ function nativeBuildRoots(root, host) {
   }
 }
 function stateDirectory(root, configRelative) {
-  return engines.inside(root, `.opencaw/.cache/packaging/${digest(configRelative).slice(0, 16)}`, 'Packaging state').absolute;
+  return engines.inside(root, `.hephaera/.cache/packaging/${digest(configRelative).slice(0, 16)}`, 'Packaging state').absolute;
 }
 function assertNoPending(c) {
   const file = statePath(c, PENDING);
@@ -145,7 +145,7 @@ function context(root, opt = {}) {
     const owner = path.join(host, OWNER);
     regular(owner, 'Native host ownership');
     const receipt = json(owner);
-    if (receipt.schemaVersion !== 1 || receipt.producer !== 'OpenCaw/MAUI' || receipt.config !== configRelative || receipt.appId !== config.appId) fail('Native host belongs to another configuration/application.');
+    if (receipt.schemaVersion !== 1 || receipt.producer !== 'Hephaera/MAUI' || receipt.config !== configRelative || receipt.appId !== config.appId) fail('Native host belongs to another configuration/application.');
   }
   const state = stateDirectory(root, configRelative);
   const result = { root, selected, configRelative, configPath, config, host, web, state };
@@ -164,7 +164,7 @@ function nativeFiles(host) {
 function currentIdentity(c, properties) {
   const entries = nativeFiles(c.host);
   if (properties !== undefined) {
-    const entry = entries.find(e => e.path === 'OpenCawGame.props');
+    const entry = entries.find(e => e.path === 'HephaeraGame.props');
     if (!entry) fail('Generated application properties are missing.');
     entry.size = Buffer.byteLength(properties); entry.sha256 = digest(properties);
   }
@@ -205,7 +205,7 @@ function statePath(c, suffix) {
 }
 const xml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 function props(c) {
-  return `<Project>\n  <PropertyGroup>\n    <MauiVersion>10.0.20</MauiVersion>\n    <ApplicationTitle>${xml(c.title)}</ApplicationTitle>\n    <ApplicationId>${xml(c.appId)}</ApplicationId>\n    <ApplicationDisplayVersion>${c.displayVersion}</ApplicationDisplayVersion>\n    <ApplicationVersion>${c.buildNumber}</ApplicationVersion>\n    <OpenCawDefaultFile>${xml(c.entry)}</OpenCawDefaultFile>\n  </PropertyGroup>\n</Project>\n`;
+  return `<Project>\n  <PropertyGroup>\n    <MauiVersion>10.0.20</MauiVersion>\n    <ApplicationTitle>${xml(c.title)}</ApplicationTitle>\n    <ApplicationId>${xml(c.appId)}</ApplicationId>\n    <ApplicationDisplayVersion>${c.displayVersion}</ApplicationDisplayVersion>\n    <ApplicationVersion>${c.buildNumber}</ApplicationVersion>\n    <HephaeraDefaultFile>${xml(c.entry)}</HephaeraDefaultFile>\n  </PropertyGroup>\n</Project>\n`;
 }
 function describe(file) {
   if (!fs.existsSync(file)) return null;
@@ -324,8 +324,8 @@ function init(root, opt) {
       const target = path.join(staged, file.path); fs.mkdirSync(path.dirname(target), { recursive: true });
       writeNew(target, fs.readFileSync(path.join(TEMPLATE, file.path)));
     }
-    writeNew(path.join(staged, 'OpenCawGame.props'), props(config));
-    writeNew(path.join(staged, OWNER), encode({ schemaVersion: 1, producer: 'OpenCaw/MAUI', config: configRelative, appId: config.appId, templateSha256: fingerprint(files) }));
+    writeNew(path.join(staged, 'HephaeraGame.props'), props(config));
+    writeNew(path.join(staged, OWNER), encode({ schemaVersion: 1, producer: 'Hephaera/MAUI', config: configRelative, appId: config.appId, templateSha256: fingerprint(files) }));
     const configStage = path.join(version, 'config.json'); writeNew(configStage, encode(config));
     if (fingerprint(tree(TEMPLATE)) !== fingerprint(files)) fail('Native template changed during initialization.');
     transact(c, version, 'init', [[host, staged, 'host'], [configPath, configStage, 'config']], () => {
@@ -349,7 +349,7 @@ async function sync(root, opt) {
         if (!same(existing, json(snapshotFile).identity?.webFiles)) fail('Existing staged assets were changed or have foreign files; nothing was replaced.');
       }
     }
-    const propFile = pathTypes(c.root, `${c.config.hostDirectory}/OpenCawGame.props`, 'file', 'Generated application properties');
+    const propFile = pathTypes(c.root, `${c.config.hostDirectory}/HephaeraGame.props`, 'file', 'Generated application properties');
     regular(propFile, 'Generated application properties');
     const before = currentIdentity(c), propertyBytes = props(c.config), identity = currentIdentity(c, propertyBytes);
     if (!identity.webFiles.length) fail('No web build assets were found.');
@@ -362,7 +362,7 @@ async function sync(root, opt) {
     }
     if (!same(tree(stage), identity.webFiles) || !same(currentIdentity(c), before)) fail('Web/native inputs changed during sync; retry after inspecting the source.');
     const snapshot = { schemaVersion: 1, id, identity };
-    const stagedProps = path.join(version, 'OpenCawGame.props'), stagedSnapshot = path.join(version, 'snapshot-to-publish.json');
+    const stagedProps = path.join(version, 'HephaeraGame.props'), stagedSnapshot = path.join(version, 'snapshot-to-publish.json');
     writeNew(stagedProps, propertyBytes); writeNew(stagedSnapshot, encode(snapshot));
     writeNew(path.join(version, 'snapshot.json'), encode(snapshot));
     transact(c, version, 'sync', [[propFile, stagedProps, 'props'], [destination, stage, 'wwwroot'], [snapshotFile, stagedSnapshot, 'snapshot']], () => verifySnapshot(c));
@@ -422,7 +422,7 @@ function plan(root, opt = {}) {
   let signing = null;
   if (opt.signingProperties) { signing = confined(c.root, opt.signingProperties, 'Signing properties'); regular(signing, 'Signing properties'); }
   const args = [operation === 'package' ? 'publish' : 'build', path.join(c.host, 'GameHost.csproj'), '-f', def.framework, '-c', 'Release', '-r', rid, `-p:TargetFrameworks=${def.framework}`, '-p:PublishAot=false', '-p:TrimMode=partial'];
-  if (signing) args.push(`-p:OpenCawSigningProps=${signing}`);
+  if (signing) args.push(`-p:HephaeraSigningProps=${signing}`);
   if (target === 'WINDOWS') args.push(`-p:WindowsPackageType=${format === 'msix' ? 'MSIX' : 'None'}`, '-p:WindowsAppSDKSelfContained=true', '-p:SelfContained=true');
   if (target === 'ANDROID') args.push(`-p:AndroidPackageFormats=${format}`);
   if (target === 'IOS' && operation === 'package') args.push('-p:ArchiveOnBuild=true', '-p:BuildIpa=true');

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/code-model-manifest-v1.json",
-  "title": "OpenCaw Code Model Manifest",
+  "$id": "https://hephaera.dev/schemas/code-model-manifest-v1.json",
+  "title": "Hephaera Code Model Manifest",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "modelId", "title", "intent", "pipelineSelection", "inputs", "target", "renderer", "runtime", "budgets", "reviewPolicy", "passes"],

@@ -1,6 +1,6 @@
 # Architecture Templates
 
-Available templates in this OpenCaw baseline:
+Available templates in this Hephaera baseline:
 
 - AZURE_STORAGE_TABLES
 - BABYLONJS

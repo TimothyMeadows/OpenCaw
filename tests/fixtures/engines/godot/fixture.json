@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "engine": "GODOT",
-  "fixture": "opencaw-native-godot",
+  "fixture": "hephaera-native-godot",
   "minimumChecks": 5,
   "files": ["project.godot", "main.tscn", "main.gd", "actor.tscn", "actor.gd", "suite.gd", "harness.gd", "export_presets.cfg"]
 }

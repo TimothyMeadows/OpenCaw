@@ -29,17 +29,17 @@ done
 
 [[ -n "$entry" ]] || { usage >&2; exit 1; }
 
-opencaw_validate_single_line "$entry" 'System memory entry'
-opencaw_reject_sensitive_text "$entry" system
-opencaw_resolve_paths
-opencaw_ensure_system_memory
+hephaera_validate_single_line "$entry" 'System memory entry'
+hephaera_reject_sensitive_text "$entry" system
+hephaera_resolve_paths
+hephaera_ensure_system_memory
 
 line="- $entry"
-if grep -Fxiq -- "$line" "$OPENCAW_SYSTEM_MEMORY_FILE"; then
+if grep -Fxiq -- "$line" "$HEPHAERA_SYSTEM_MEMORY_FILE"; then
   echo 'ALREADY_PRESENT=true'
 else
-  printf '%s\n' "$line" >> "$OPENCAW_SYSTEM_MEMORY_FILE"
+  printf '%s\n' "$line" >> "$HEPHAERA_SYSTEM_MEMORY_FILE"
   echo 'ALREADY_PRESENT=false'
 fi
 
-echo "SYSTEM_MEMORY_FILE=$OPENCAW_SYSTEM_MEMORY_FILE"
+echo "SYSTEM_MEMORY_FILE=$HEPHAERA_SYSTEM_MEMORY_FILE"

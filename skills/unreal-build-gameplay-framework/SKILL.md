@@ -12,7 +12,7 @@ Build Unreal reflected gameplay classes, Blueprint interfaces and actor lifetime
 
 ## Activation and prerequisites
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-gameplay-framework` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-gameplay-framework` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
 
 Read the .uproject engine association, module and plugin list, target configurations, gameplay design and replication model. Bind APIs to the matching Unreal release and compiler toolchain. Distinguish gameplay C++/Blueprints from C# .Build.cs and .Target.cs build rules.
 

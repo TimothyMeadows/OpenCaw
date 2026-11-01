@@ -189,7 +189,7 @@ completion_event_file="$(gauntlet_latest_completion_event_file "$gauntlet_dir/co
   echo 'Promotion QA requires an active immutable completion event.' >&2
   exit 1
 }
-completion_event_relative="${completion_event_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+completion_event_relative="${completion_event_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
 completion_recorded_at="$(gauntlet_section_field "$completion_event_file" 'Completion Event Metadata' 'Recorded at')"
 gauntlet_assert_live_pr_comment \
   "$evidence_url" "$promotion_pr_url" "$issue_repo" "$verdict" "$head_sha" \
@@ -272,15 +272,15 @@ if [[ -d "$promotion_dir" ]]; then
 fi
 next_event=$((max_event + 1))
 printf -v event_label '%03d' "$next_event"
-event_relative=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/event-$event_label.md"
-event_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$event_relative"
+event_relative=".hephaera/.cache/gauntlets/$gauntlet_name/promotion-events/event-$event_label.md"
+event_target="$HEPHAERA_PROJECT_ROOT_RESOLVED/$event_relative"
 archive_relative='none'
 archive_target=''
 archive_hash='none'
 archive_stage=''
 if [[ "$verdict" == 'fail' ]]; then
-  archive_relative=".opencaw/.cache/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$event_label.md"
-  archive_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$archive_relative"
+  archive_relative=".hephaera/.cache/gauntlets/$gauntlet_name/promotion-events/GAUNTLET_REPORT-before-event-$event_label.md"
+  archive_target="$HEPHAERA_PROJECT_ROOT_RESOLVED/$archive_relative"
   [[ ! -e "$archive_target" && ! -L "$archive_target" ]] || {
     echo "Archived completion report evidence already exists: $archive_relative" >&2
     exit 1

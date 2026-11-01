@@ -1,7 +1,7 @@
 using Android.App;
 using Android.Runtime;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 [Application]
 public sealed class MainApplication(IntPtr handle, JniHandleOwnership ownership) : Microsoft.Maui.MauiApplication(handle, ownership)

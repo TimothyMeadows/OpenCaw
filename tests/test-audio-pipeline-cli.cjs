@@ -7,9 +7,9 @@ const assert=require('assert/strict'),fs=require('fs'),path=require('path'),cp=r
 const runtime=require('../commands/lib/bubo-runtime.cjs'),contracts=require('../commands/lib/media-pipeline-contract.cjs');
 const lifecycle=require('../commands/lib/media-pipeline-state.cjs'),engines=require('../commands/lib/engine-contract.cjs');
 const coordinator=require('../commands/lib/media-pipeline-command.cjs'),spec=require('../commands/lib/audio-pipeline.cjs');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-audio-pipeline/evidence/cli-fixtures');fs.mkdirSync(evidence,{recursive:true});
-const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-audio-cli',workspace='.opencaw/.cache/owned-media',mediaState='.opencaw/.cache/shared-media-allowance';
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-audio-pipeline/evidence/cli-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-audio-cli',workspace='.hephaera/.cache/owned-media',mediaState='.hephaera/.cache/shared-media-allowance';
 const observations=[],unavailable={unavailable:true,reason:'Owned synthetic fixture; not a real provider/model/acoustic observation.'};
 function check(value,message){assert(value,message);observations.push(message);}
 function write(name,value){const full=path.join(root,name);fs.mkdirSync(path.dirname(full),{recursive:true});fs.writeFileSync(full,typeof value==='string'||Buffer.isBuffer(value)?value:JSON.stringify(value,null,2)+'\n');return name;}
@@ -22,13 +22,13 @@ function cli(operation,args=[],expected=0){
 }
 function reject(operation,args,pattern){const message=cli(operation,args,1);check(pattern.test(message),'Rejected '+operation+' for the stated boundary: '+message);}
 function snapshot(folder=root){const rows=[];function visit(dir){for(const name of fs.readdirSync(dir).sort()){const full=path.join(dir,name),stat=fs.lstatSync(full);rows.push([path.relative(folder,full),stat.isDirectory()?'dir':stat.isSymbolicLink()?'link':runtime.hash(full)]);if(stat.isDirectory()&&!stat.isSymbolicLink())visit(full);}}visit(folder);return JSON.stringify(rows);}
-const media='# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')+'Image, music, sound-effect SFX and voice are independent. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
-write('MEDIA.md',media);write(`.opencaw/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task\n');contracts.generate({root,domain:'AUDIO',inline:true});
+const media='# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')+'Image, music, sound-effect SFX and voice are independent. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
+write('MEDIA.md',media);write(`.hephaera/.cache/tasks/${task}/TASK.md`,'# Owned synthetic task\n');contracts.generate({root,domain:'AUDIO',inline:true});
 write('inputs/rights.json',{schemaVersion:'bubo-media-rights/v1',task,owner:'Owned synthetic assertion only',promptRightsConfirmed:true,generationAllowed:true});
 write('inputs/license-source.json',{fixture:'Not an actual license acceptance'});
 write('inputs/license.json',{schemaVersion:'bubo-media-license-evidence/v1',accepted:true,backends:['stable-audio-open'],licenseIds:['owned-fixture-only'],sourceEvidence:ref('inputs/license-source.json')});
 write('inputs/installation.json',{schemaVersion:'bubo-media-installation/v1',backend:'stable-audio-open',licenses:[ref('inputs/license.json')]});
-const brief={schemaVersion:'opencaw-audio-brief/v1',kind:'sfx',purpose:'Owned test fixture, no real media requested',provider:'LOCAL',spatialization:'2d',loopIntent:false,
+const brief={schemaVersion:'hephaera-audio-brief/v1',kind:'sfx',purpose:'Owned test fixture, no real media requested',provider:'LOCAL',spatialization:'2d',loopIntent:false,
   request:{rights:ref('inputs/rights.json'),installation:ref('inputs/installation.json'),settings:{device:'cuda:0',precision:'float16',offload:'none'},
     budget:{maximumOutputs:1,maximumBytesPerOutput:1048576,maximumTotalBytes:1048576,maximumPixels:4096,maximumAudioSeconds:2},
     items:[{id:'owned',prompt:'Owned harmless metadata fixture',negativePrompt:'',seed:17,steps:20,guidance:7,seconds:1,loopCandidate:false}]},
@@ -47,7 +47,7 @@ function provenance(stateFile){
   const native={schemaVersion:'bubo-media-manifest/v1',status:'generated-staged',backend:'stable-audio-open',promotion:false,humanReview:'pending',
     outputs:[measured],hostContextSha256:ref(host).sha256,mediaPolicySha256:ref('MEDIA.md').sha256,runtimeBuild:build,requestPath:source,requestSha256:ref(source).sha256,
     requestedSettings:brief.request.settings,actualSettings:brief.request.settings,resourceCatalogSha256:build.resourceCatalogSha256,workerSourceSha256,unloaded:true,modelLoads:1,cleanup:null};
-  const nativeFile=write('inputs/native-manifest.json',native),result=write('inputs/native-result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:1,status:'succeeded',workflow:'media',operation:'generate',hostContextSha256:ref(host).sha256,runtime:build,data:native});
+  const nativeFile=write('inputs/native-manifest.json',native),result=write('inputs/native-result.json',{schemaVersion:'bubo-execution-result/v1',apiVersion:2,status:'succeeded',workflow:'media',operation:'generate',hostContextSha256:ref(host).sha256,runtime:build,data:native});
   const manifest={schemaVersion:1,runId:sourceRequest.requestId+'-0',createdAt:new Date().toISOString(),backend:{kind:'local',provider:'Owned fixture',capability:'stable-audio-open',toolVersion:sourceRevision},
     modality:'sfx',model:{name:unavailable,revision:unavailable,digest:unavailable,license:unavailable},workflow:{name:'Owned synthetic fixture',revision:sourceRevision,digest:workerSourceSha256},
     generation:{prompt:brief.request.items[0].prompt,negativePrompt:unavailable,seed:17,parameters:{nativeManifest:ref(nativeFile),nativeResult:ref(result),hostContext:ref(host),sourceRequest:ref(source),runtime:{build,revision:sourceRevision,resourceCatalogSha256:build.resourceCatalogSha256,sourceRevisionEvidence},requested:measured.requested,actual:measured.actual,execution:brief.request.settings}},
@@ -58,7 +58,7 @@ function provenance(stateFile){
 async function main(){
   const help=cp.spawnSync(process.execPath,[path.join(runtime.BASE,'commands/lib/media-pipeline-command.cjs'),'AUDIO','--help'],{cwd:root,encoding:'utf8'});
   check(help.status===0&&/setup-plan/.test(help.stdout)&&/recover/.test(help.stdout),'Actual help works without initializing or resolving a host');
-  const shell=process.env.OPENCAW_BASH||(process.platform==='win32'?'C:/Program Files/Git/bin/bash.exe':'bash');
+  const shell=process.env.HEPHAERA_BASH||(process.platform==='win32'?'C:/Program Files/Git/bin/bash.exe':'bash');
   const wrapper=cp.spawnSync(shell,[path.join(runtime.BASE,'commands/audio-pipeline.sh').replace(/\\/g,'/'),'--help'],{cwd:root,encoding:'utf8'});
   check(wrapper.status===0&&/audio-pipeline/.test(wrapper.stdout),'Real Bash AUDIO wrapper help works outside initialized host');
   const beforeBrief=snapshot();check(cli('brief',['--brief','inputs/brief.json']).valid===true,'Supported explicit native brief validates without execution');
@@ -88,20 +88,20 @@ async function main(){
   check(technicalReport.generationIdentities[0].sourceRevision==='1'.repeat(40)&&technicalReport.generationIdentities[0].resourceCatalogSha256==='2'.repeat(64),'Actual CLI technical report preserves disclosed source-build and resource identities');
   reject('handoff',['--state',stateFile],/content/);
   const fingerprint=current(stateFile).assetSha256,reviewSource=ref(write('inputs/human-source.json',{fixture:'Synthetic review source; no human listened'}));
-  const content={schemaVersion:'opencaw-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'content',verdict:'accepted',reviewer:'Owned synthetic fixture only',reason:'Test explicit evidence binding, not acoustic quality',sourceEvidence:reviewSource,
+  const content={schemaVersion:'hephaera-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'content',verdict:'accepted',reviewer:'Owned synthetic fixture only',reason:'Test explicit evidence binding, not acoustic quality',sourceEvidence:reviewSource,
     criteria:{listenedEntireOutput:true,matchesBrief:true,unwantedSpeechMusicAbsent:true,artifactsAcceptable:true,headTailAccepted:true}};
   const missing=write('inputs/incomplete-review.json',{...content,criteria:{}});reject('review',['--state',stateFile,'--review',missing],/criteria/);
   cli('review',['--state',stateFile,'--review',write('inputs/content-review.json',content)]);
   reject('handoff',['--state',stateFile],/runtime/);
   engines.generate(root,'THREEJS',{inline:true});const engine=lifecycle.engineIdentity(root);
   const target={directory:'assets/audio/owned-fixture',codecs:['wav'],sampleRates:[44100],channels:[2],maxOutputBytes:1048576,maxAudioSeconds:2,spatialization:'2d',loopIntent:false};
-  const distribution=ref(write('inputs/distribution.json',{schemaVersion:'opencaw-audio-distribution/v1',task,purpose:brief.purpose,rightsConfirmed:true,sourceEvidence:reviewSource}));
-  const targetEvidence=ref(write('inputs/target-evidence.json',{schemaVersion:'opencaw-audio-runtime-evidence/v1',task,engine,outputs:source.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:reviewSource}));
-  const runtimeReview={schemaVersion:'opencaw-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'runtime',verdict:'accepted',reviewer:content.reviewer,reason:content.reason,sourceEvidence:reviewSource,
+  const distribution=ref(write('inputs/distribution.json',{schemaVersion:'hephaera-audio-distribution/v1',task,purpose:brief.purpose,rightsConfirmed:true,sourceEvidence:reviewSource}));
+  const targetEvidence=ref(write('inputs/target-evidence.json',{schemaVersion:'hephaera-audio-runtime-evidence/v1',task,engine,outputs:source.outputs,spatialization:'2d',loopIntent:false,playbackReviewed:true,loadDisposeReviewed:true,loopSeamReviewed:false,sourceEvidence:reviewSource}));
+  const runtimeReview={schemaVersion:'hephaera-media-review/v1',assetSha256:fingerprint,outputs:source.outputs,kind:'runtime',verdict:'accepted',reviewer:content.reviewer,reason:content.reason,sourceEvidence:reviewSource,
     criteria:{targetPlaybackReviewed:true,loadDisposeReviewed:true,spatializationReviewed:true},engine,target,rightsEvidence:distribution,targetEvidence};
   cli('review',['--state',stateFile,'--review',write('inputs/runtime-review.json',runtimeReview)]);
   const handoff=cli('handoff',['--state',stateFile]);check(handoff.promotion===false&&!fs.existsSync(path.join(root,target.directory)),'Actual handoff does not copy files');
-  const authorization=write('inputs/promotion.json',{schemaVersion:'opencaw-media-promotion/v1',authorized:true,assetSha256:fingerprint,target,outputs:source.outputs,authorizedBy:'Owned synthetic fixture; not a real permission',reason:'Exercise copying of harmless bytes inside owned fixture',sourceEvidence:ref(write('inputs/promotion-source.json',{fixture:'No real asset promotion authorization'}))});
+  const authorization=write('inputs/promotion.json',{schemaVersion:'hephaera-media-promotion/v1',authorized:true,assetSha256:fingerprint,target,outputs:source.outputs,authorizedBy:'Owned synthetic fixture; not a real permission',reason:'Exercise copying of harmless bytes inside owned fixture',sourceEvidence:ref(write('inputs/promotion-source.json',{fixture:'No real asset promotion authorization'}))});
   const promoted=cli('promote',['--state',stateFile,'--authorization',authorization]);
   check(promoted.promotion===true&&fs.readFileSync(path.join(root,target.directory+'/000.wav'),'utf8').startsWith('OWNED nonaudio'),'Explicit CLI promotion copies only owned fixture bytes after all gates');
   const recovered=cli('recover',['--state',stateFile,'--authorization',authorization]);check(recovered.alreadyPromoted===true,'Explicit recovery recognizes exactly owned completed fixture without re-copying');

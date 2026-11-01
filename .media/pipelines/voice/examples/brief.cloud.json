@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-voice-brief/v1",
+  "schemaVersion": "hephaera-voice-brief/v1",
   "kind": "preset-speech",
   "purpose": "Example only: owned fictional sample; requires current scoped permission",
   "provider": "CLOUD",

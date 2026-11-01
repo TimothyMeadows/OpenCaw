@@ -12,7 +12,7 @@ Author or change Unreal world partitioning, runtime streaming, data layers, leve
 
 ## Activation and inputs
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-worlds`; require effective `UNREAL` and `compatible: true` before edits or tool launches. Honor validated task-only override evidence and its output scope. `ENGINE.md` remains authoritative; observations and receipts belong under `.opencaw/.cache`.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-worlds`; require effective `UNREAL` and `compatible: true` before edits or tool launches. Honor validated task-only override evidence and its output scope. `ENGINE.md` remains authoritative; observations and receipts belong under `.hephaera/.cache`.
 
 Inspect the project's Unreal version, existing map/streaming format, target platforms, persistence identities, multiplayer authority, traversal speeds and CPU/memory/loading budgets. A map-format conversion or HLOD rebuild can change many binary/external-actor packages: preview its exact scope before writing through native tools.
 

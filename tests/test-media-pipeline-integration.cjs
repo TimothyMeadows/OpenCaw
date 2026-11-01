@@ -4,19 +4,19 @@
 // reviews and media bytes below are synthetic. No Bubo process/model runs.
 const assert = require('assert/strict'), fs = require('fs'), path = require('path'), cp = require('child_process');
 const source = path.resolve(__dirname, '..');
-const cache = path.basename(source) === '.opencaw' ? path.join(source, '.cache') : path.join(source, '.opencaw/.cache');
-const evidence = path.join(cache, 'tasks/opencaw-parallel-media-pipeline-qa/evidence/integration-fixtures');
+const cache = path.basename(source) === '.hephaera' ? path.join(source, '.cache') : path.join(source, '.hephaera/.cache');
+const evidence = path.join(cache, 'tasks/hephaera-parallel-media-pipeline-qa/evidence/integration-fixtures');
 fs.mkdirSync(evidence, {recursive:true});
 const fixture = fs.mkdtempSync(path.join(evidence, 'owned-')), observations = [], hosts = [];
 const environment = {...process.env, GIT_CONFIG_NOSYSTEM:'1', GIT_CONFIG_GLOBAL:path.join(fixture,'gitconfig'),
-  GIT_ALLOW_PROTOCOL:'file', GIT_TERMINAL_PROMPT:'0', GIT_AUTHOR_NAME:'OpenCaw owned fixture', GIT_AUTHOR_EMAIL:'fixture@example.invalid',
-  GIT_COMMITTER_NAME:'OpenCaw owned fixture', GIT_COMMITTER_EMAIL:'fixture@example.invalid'};
-for (const key of Object.keys(environment)) if (['OPENCAW_PROJECT_ROOT','GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE'].includes(key) || /^GIT_CONFIG_(COUNT|KEY_|VALUE_)/.test(key)) delete environment[key];
+  GIT_ALLOW_PROTOCOL:'file', GIT_TERMINAL_PROMPT:'0', GIT_AUTHOR_NAME:'Hephaera owned fixture', GIT_AUTHOR_EMAIL:'fixture@example.invalid',
+  GIT_COMMITTER_NAME:'Hephaera owned fixture', GIT_COMMITTER_EMAIL:'fixture@example.invalid'};
+for (const key of Object.keys(environment)) if (['HEPHAERA_PROJECT_ROOT','GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE'].includes(key) || /^GIT_CONFIG_(COUNT|KEY_|VALUE_)/.test(key)) delete environment[key];
 fs.writeFileSync(environment.GIT_CONFIG_GLOBAL, '[core]\n autocrlf = false\n[commit]\n gpgsign = false\n');
-const task = 'owned-mixed-media', workspace = '.opencaw/.cache/owned-media', mediaState = '.opencaw/.cache/shared-media-allowance';
+const task = 'owned-mixed-media', workspace = '.hephaera/.cache/owned-media', mediaState = '.hephaera/.cache/shared-media-allowance';
 const domains = ['AUDIO','MUSIC','VOICE'], kinds = {AUDIO:'sfx',MUSIC:'instrumental',VOICE:'preset-speech'};
 const visual = ['CLOUD','LOCAL','PROOF_TO_MODEL','CODE','BLENDER'];
-const mediaText = '# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'
+const mediaText = '# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'
   + ['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(x=>'## '+x+'\n').join('\n')
   + 'Image, music, sound-effect SFX and voice are independent. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
 const unavailable = {unavailable:true,reason:'Owned synthetic metadata; no provider/model/acoustic observation.'};
@@ -31,7 +31,7 @@ function execute(executable,args,cwd=fixture,expected=0) {
 }
 const git = (root,...args) => execute('git',['-C',root,...args]).stdout.trim();
 const revision = git(source,'rev-parse','HEAD');
-const bash = process.env.OPENCAW_BASH || (process.platform==='win32' ? path.join(process.env.ProgramFiles || 'C:/Program Files','Git/bin/bash.exe') : 'bash');
+const bash = process.env.HEPHAERA_BASH || (process.platform==='win32' ? path.join(process.env.ProgramFiles || 'C:/Program Files','Git/bin/bash.exe') : 'bash');
 function write(root,name,value) {
   const file=path.join(root,name); fs.mkdirSync(path.dirname(file),{recursive:true});
   fs.writeFileSync(file,typeof value==='string'||Buffer.isBuffer(value)?value:JSON.stringify(value,null,2)+'\n'); return name;
@@ -50,8 +50,8 @@ function snapshot(root) {
   walk(root);return JSON.stringify(rows);
 }
 function style(primary) {
-  return '# STYLE.md\nGenerated from OpenCaw style templates:\n- CEL_SHADED_COMIC\nPrimary OpenCaw art pipeline:\n- '+primary
-    +'\nAllowed OpenCaw art pipelines:\n'+visual.map(x=>'- '+x+'\n').join('')+'---\n'
+  return '# STYLE.md\nGenerated from Hephaera style templates:\n- CEL_SHADED_COMIC\nPrimary Hephaera art pipeline:\n- '+primary
+    +'\nAllowed Hephaera art pipelines:\n'+visual.map(x=>'- '+x+'\n').join('')+'---\n'
     +'A prompt override applies only to this task and does not rewrite STYLE.md. Never switch or fall back silently.\n';
 }
 function install(form) {
@@ -59,11 +59,11 @@ function install(form) {
   execute('git',['init','-q','--initial-branch=main',root]);
   write(root,'host-owned.txt','Owned host content must remain unchanged.\n');
   git(root,'add','host-owned.txt');git(root,'commit','-qm','Owned host fixture');
-  const baseline=path.join(root,'.opencaw');
+  const baseline=path.join(root,'.hephaera');
   if(form==='clone')execute('git',['clone','-q','--shared','--no-checkout',source,baseline]);
-  else git(root,'-c','protocol.file.allow=always','submodule','add','-q',source,'.opencaw');
+  else git(root,'-c','protocol.file.allow=always','submodule','add','-q',source,'.hephaera');
   git(baseline,'checkout','-q','--detach',revision);
-  if(form==='submodule')git(root,'add','.opencaw');
+  if(form==='submodule')git(root,'add','.hephaera');
   check(git(baseline,'rev-parse','HEAD')===revision,form+': actual baseline checks out explicit source commit');
   check(form==='clone'?fs.statSync(path.join(baseline,'.git')).isDirectory():fs.statSync(path.join(baseline,'.git')).isFile(),form+': actual Git installation form is retained');
   const local = name => require(path.join(baseline,'commands/lib',name+'.cjs'));
@@ -99,12 +99,12 @@ function metadataCandidate(host,asset,{label=asset.domain,count=1}={}) {
   const options={root,stateFile:asset.stateFile};
   state.recordCandidate({...options,provider:'LOCAL',manifest,origin:'external-import'});
   const assetSha256=state.status(options).assetSha256;
-  const technical=write(root,'inputs/'+label+'-technical.json',{schemaVersion:'opencaw-media-technical/v1',assetSha256,outputs,status:'passed',
+  const technical=write(root,'inputs/'+label+'-technical.json',{schemaVersion:'hephaera-media-technical/v1',assetSha256,outputs,status:'passed',
     checks:[{id:'owned-metadata-only',status:'passed',reason:'Exercise shared lifecycle isolation; no actual acoustic measurement'}],
     measurements:outputs.map(value=>({...value,bytes:fs.statSync(path.join(root,value.path)).size,durationSeconds:1,sampleRate:24000,channels:1}))});
   state.recordTechnical({...options,report:technical});
   const human=ref(write(root,'inputs/'+label+'-human-source.json',{fixture:'Synthetic review source; not human acceptance'}));
-  const review=write(root,'inputs/'+label+'-content-review.json',{schemaVersion:'opencaw-media-review/v1',assetSha256,outputs,kind:'content',verdict:'accepted',
+  const review=write(root,'inputs/'+label+'-content-review.json',{schemaVersion:'hephaera-media-review/v1',assetSha256,outputs,kind:'content',verdict:'accepted',
     reviewer:'Owned synthetic fixture',reason:'Exercise common state only; no listening claim',sourceEvidence:human});
   state.recordReview({...options,review});return {options,outputs,human};
 }
@@ -124,7 +124,7 @@ function handoffMatrix(host) {
   const valid={directory:'assets/audio/owned-common-handoff',sampleRates:[24000],channels:[1],codecs:['wav'],maxOutputBytes:bytes*2,maxAudioSeconds:2};
   let sequence=0;
   function runtimeReview(target,engine=state.engineIdentity(root)) {
-    const review=write(root,'inputs/common-runtime-'+(++sequence)+'.json',{schemaVersion:'opencaw-media-review/v1',assetSha256:state.status(selected.options).assetSha256,
+    const review=write(root,'inputs/common-runtime-'+(++sequence)+'.json',{schemaVersion:'hephaera-media-review/v1',assetSha256:state.status(selected.options).assetSha256,
       outputs:selected.outputs,kind:'runtime',verdict:'accepted',reviewer:'Synthetic common-admission fixture',reason:'No actual target playback or user acceptance',
       sourceEvidence:state.identity(root,write(root,'inputs/common-runtime-source-'+sequence+'.json',{fixture:'Synthetic target source, no player executed'})),engine,target});
     state.recordReview({...selected.options,review});
@@ -161,7 +161,7 @@ function bindingMatrix(host,prepared) {
     ['instrumental','ace-step-turbo',copy(prepared.MUSIC.request)],['song','ace-step-turbo',copy(prepared.MUSIC.request)],
     ['preset','qwen3-tts-customvoice',copy(prepared.VOICE.request)],['cloning','qwen3-tts-base',copy(prepared.VOICE.request)]];
   let bindingFile,bindingBytes;const outputRoots=[];
-  const selection=write(root,'.opencaw/.cache/tasks/'+task+'/owned-local-selection.json',{schemaVersion:1,pipeline:'LOCAL',selectionSource:'prompt',styleContract:'STYLE.md',styleSha256:host.runtime.hash(path.join(root,'STYLE.md'))});
+  const selection=write(root,'.hephaera/.cache/tasks/'+task+'/owned-local-selection.json',{schemaVersion:1,pipeline:'LOCAL',selectionSource:'prompt',styleContract:'STYLE.md',styleSha256:host.runtime.hash(path.join(root,'STYLE.md'))});
   for(const [profile,backend,request] of profiles) {
     request.backend=backend;request.requestId='owned-'+profile;request.outputDirectory=workspace+'/staging/'+profile;request.acceptance={approval};
     if(profile==='song')request.items[0].music={...request.items[0].music,mode:'supplied-lyrics',lyrics:'Owned fictional line for a metadata fixture.'};
@@ -169,18 +169,18 @@ function bindingMatrix(host,prepared) {
     request.installation=ref(write(root,'inputs/'+profile+'-context-installation.json',{schemaVersion:'bubo-media-installation/v1',backend,modelDirectory,python,licenses:[ref('inputs/license.json')]}));
     const manifest=write(root,'inputs/'+profile+'-context-request.json',request);
     const args=['--root',root,'--task',task,'--manifest',manifest,'--workspace',workspace,'--media-state',mediaState,...(profile==='image'?['--selection',selection]:[])];
-    const before=snapshot(path.join(root,mediaState)),bindingBefore=snapshot(path.join(root,'.opencaw/.cache/local-media/acceptance-roots'));
+    const before=snapshot(path.join(root,mediaState)),bindingBefore=snapshot(path.join(root,'.hephaera/.cache/local-media/acceptance-roots'));
     const context=adapter.contextFor('generate',adapter.parse(args),infos);
     check(context.mediaState===mediaState&&context.context.roots.mediaState===mediaState,host.form+': '+profile+' context uses the same physical approval ledger');
     check(snapshot(path.join(root,mediaState))===before,host.form+': '+profile+' context does not create, reserve or reset claim files');
-    check(snapshot(path.join(root,'.opencaw/.cache/local-media/acceptance-roots'))===bindingBefore,host.form+': '+profile+' context alone creates no approval binding');
+    check(snapshot(path.join(root,'.hephaera/.cache/local-media/acceptance-roots'))===bindingBefore,host.form+': '+profile+' context alone creates no approval binding');
     check(!context.context.permissions.provisioning&&!context.context.permissions.promotion,host.form+': '+profile+' binding context grants neither provisioning nor promotion');
     const file=adapter.bindSharedState(context);
     if(!bindingFile){bindingFile=file;bindingBytes=fs.readFileSync(file);}
     check(file===bindingFile&&fs.readFileSync(file).equals(bindingBytes),host.form+': '+profile+' reuses one immutable approval binding');
     check(snapshot(path.join(root,mediaState))===before,host.form+': '+profile+' explicit binding writes no native claim');
     for(const operation of ['inspect','generate']) {
-      const wrong=[...args];wrong[wrong.indexOf('--media-state')+1]='.opencaw/.cache/another-ledger';
+      const wrong=[...args];wrong[wrong.indexOf('--media-state')+1]='.hephaera/.cache/another-ledger';
       rejects(()=>adapter.contextFor(operation,adapter.parse(wrong),infos),operation==='inspect'?/already bound/:/Approval root differs/,host.form+': '+profile+' '+operation+' cannot reroot approval');
     }
     outputRoots.push(request.outputDirectory);
@@ -199,7 +199,7 @@ async function exercise(host) {
     contracts.generate({root,domain});
   }
   engines.generate(root,'THREEJS');write(root,'MEDIA.md',mediaText);
-  write(root,'.opencaw/.cache/tasks/'+task+'/TASK.md','# Owned synthetic mixed-domain task\n');
+  write(root,'.hephaera/.cache/tasks/'+task+'/TASK.md','# Owned synthetic mixed-domain task\n');
   write(root,'inputs/rights.json',{schemaVersion:'bubo-media-rights/v1',task,owner:'Owned synthetic assertion only',promptRightsConfirmed:true,generationAllowed:true});
   write(root,'inputs/license-source.json',{fixture:'No external terms accepted'});
   write(root,'inputs/license.json',{schemaVersion:'bubo-media-license-evidence/v1',accepted:true,backends:['stable-audio-open','ace-step-turbo','qwen3-tts-customvoice'],licenseIds:['owned-fixture-only'],sourceEvidence:state.identity(root,'inputs/license-source.json')});

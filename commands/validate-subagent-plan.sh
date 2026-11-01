@@ -18,9 +18,9 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
 source "$script_dir/lib/workflow-path-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
-plan_path="$(opencaw_workflow_file "$input" tasks SUBAGENTS.md)"
+plan_path="$(hephaera_workflow_file "$input" tasks SUBAGENTS.md)"
 
 trim() {
   local value="$1"

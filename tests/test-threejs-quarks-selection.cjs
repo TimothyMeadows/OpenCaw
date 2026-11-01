@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const engine = require('../commands/lib/engine-contract.cjs');
-const parent = path.join(engine.BASE, '.opencaw/.cache/tasks/opencaw-threejs-quarks');
+const parent = path.join(engine.BASE, '.hephaera/.cache/tasks/hephaera-threejs-quarks');
 fs.mkdirSync(parent, {recursive:true});
 const root = fs.mkdtempSync(path.join(parent, 'engine-fixtures-'));
 const registry = JSON.parse(fs.readFileSync(path.join(engine.BASE, '.engine/registry.json'), 'utf8'));
@@ -66,7 +66,7 @@ try {
     ['three-to-babylon','THREEJS','BABYLONJS'], ['phaser-to-three','PHASERJS','THREEJS']
   ]) {
     const dir=host(name), task='particles-demo';
-    engine.generate(dir,project); write(dir,`.opencaw/.cache/tasks/${task}/TASK.md`,'# Isolated particle routing fixture\n');
+    engine.generate(dir,project); write(dir,`.hephaera/.cache/tasks/${task}/TASK.md`,'# Isolated particle routing fixture\n');
     const receipt=engine.resolve(dir,{recordOverride:true,override:effective,task,scope:'prototypes/quarks-demo'});
     selected(receipt,effective);
     const file=path.join(dir,receipt.evidence), stored=JSON.parse(fs.readFileSync(file,'utf8'));
@@ -80,7 +80,7 @@ try {
 
   // Installed baseline paths and malformed metadata are isolated from the
   // shared registry so this suite can run beside other candidate checks.
-  const installed=host('installed'), baseline=path.join(installed,'.opencaw');
+  const installed=host('installed'), baseline=path.join(installed,'.hephaera');
   fs.mkdirSync(path.join(baseline,'commands/lib'),{recursive:true});
   fs.copyFileSync(path.join(engine.BASE,'commands/lib/engine-contract.cjs'),path.join(baseline,'commands/lib/engine-contract.cjs'));
   for(const definition of Object.values(registry.engines)) write(baseline,`.engine/${definition.definition}`,fs.readFileSync(path.join(engine.BASE,'.engine',definition.definition)));
@@ -88,7 +88,7 @@ try {
   const local=require(path.join(baseline,'commands/lib/engine-contract.cjs'));
   selected(local.generate(installed,'three.js'),'THREEJS');
   selected(local.resolve(installed),'THREEJS');
-  eq(fs.readFileSync(path.join(installed,'ENGINE.md'),'utf8').includes('Read `./.opencaw/.engine/THREEJS.md` instructions'),true);
+  eq(fs.readFileSync(path.join(installed,'ENGINE.md'),'utf8').includes('Read `./.hephaera/.engine/THREEJS.md` instructions'),true);
   const file=path.join(baseline,'.engine/registry.json');
   for(const [id,value] of [['THREEJS',undefined],['THREEJS',null],['THREEJS','OTHER'],['BABYLONJS','THREE_QUARKS'],['GODOT','THREE_QUARKS']]) {
     const changed=structuredClone(registry);

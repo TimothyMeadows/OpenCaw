@@ -16,8 +16,8 @@ for ((index=0; index<${#arguments[@]}; index++)); do
     root_arg="${arguments[$((index+1))]}"
   fi
 done
-if [[ -n "$root_arg" ]]; then export OPENCAW_PROJECT_ROOT="$root_arg"; fi
+if [[ -n "$root_arg" ]]; then export HEPHAERA_PROJECT_ROOT="$root_arg"; fi
 source "$command_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-if [[ -z "$root_arg" ]]; then set -- "$@" --root "$OPENCAW_PROJECT_ROOT_RESOLVED"; fi
+hephaera_resolve_paths
+if [[ -z "$root_arg" ]]; then set -- "$@" --root "$HEPHAERA_PROJECT_ROOT_RESOLVED"; fi
 exec "$node_bin" "$node_script" "$@"

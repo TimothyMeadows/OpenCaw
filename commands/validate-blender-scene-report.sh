@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/validate-blender-scene-report.sh <report> [--root <repo>] [--require-clean]
 
-Validates an opencaw-blender-scene/v1 JSON scene report. --root verifies
+Validates a hephaera-blender-scene/v1 JSON scene report. --root verifies
 repository-confined files and hashes. --require-clean applies delivery gates.
 EOF
 }
@@ -87,7 +87,7 @@ const simulations = arr(doc.simulations, 'simulations'); ids.simulations = uniqu
 const dependencies = arr(doc.dependencies, 'dependencies'); ids.dependencies = unique(dependencies, 'dependencies');
 const findings = arr(doc.findings, 'findings');
 
-if (doc.schemaVersion !== 'opencaw-blender-scene/v1') errors.push('unsupported schemaVersion');
+if (doc.schemaVersion !== 'hephaera-blender-scene/v1') errors.push('unsupported schemaVersion');
 const profiles = new Set(['static-asset','rigged-actor','procedural-scene','render-scene','simulation']);
 if (!profiles.has(doc.profile)) errors.push('unsupported profile');
 if (typeof doc.blenderVersion !== 'string' || !/^4\.5\.\d+$/.test(doc.blenderVersion)) errors.push('blenderVersion must be Blender 4.5.x');

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/audio-brief-v1.json",
+  "$id": "https://hephaera.dev/schemas/audio-brief-v1.json",
   "title": "AUDIO SFX and ambience brief",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "kind", "purpose", "provider", "spatialization", "loopIntent", "request", "technical"],
   "properties": {
-    "schemaVersion": {"const": "opencaw-audio-brief/v1"},
+    "schemaVersion": {"const": "hephaera-audio-brief/v1"},
     "kind": {"enum": ["sfx", "ambience"]},
     "purpose": {"type": "string", "minLength": 1, "maxLength": 1024},
     "provider": {"enum": ["LOCAL", "CLOUD"]},

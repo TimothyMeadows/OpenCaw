@@ -44,18 +44,18 @@ Exact versions, dependencies, supported settings and native formats belong to `r
 
 ## Commands
 
-Examples are relative to the OpenCaw installation. Replace paths and manifests with the host's reviewed inputs:
+Examples are relative to the Hephaera installation. Replace paths and manifests with the host's reviewed inputs:
 
 ```bash
 ./commands/inspect-local-media-host.sh --root /absolute/project --json
 ./commands/install-bubo-media.sh --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/setup.json
+  --manifest .hephaera/.cache/tasks/media-task/setup.json
 ./commands/bubo-media.sh inspect --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/request.json \
-  --media-state .opencaw/.cache/shared-media
+  --manifest .hephaera/.cache/tasks/media-task/request.json \
+  --media-state .hephaera/.cache/shared-media
 ./commands/bubo-media.sh generate --root /absolute/project --task media-task \
-  --manifest .opencaw/.cache/tasks/media-task/request.json \
-  --media-state .opencaw/.cache/shared-media
+  --manifest .hephaera/.cache/tasks/media-task/request.json \
+  --media-state .hephaera/.cache/shared-media
 ```
 
 `setup` defaults to dry-run. `--execute` applies only to that explicit setup. `--load true` applies only to a selected zero-sample inspection. A retained acceptance approval must always use its already-bound shared media-state path.

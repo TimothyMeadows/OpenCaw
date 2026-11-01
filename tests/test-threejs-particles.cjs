@@ -9,7 +9,7 @@ const crypto = require('node:crypto');
 const engine = require('../commands/lib/engine-contract.cjs');
 const particles = require('../commands/lib/threejs-particles.cjs');
 const ROOT = path.resolve(__dirname, '..');
-const parent = path.join(ROOT, '.opencaw/.cache/tasks/opencaw-threejs-quarks');
+const parent = path.join(ROOT, '.hephaera/.cache/tasks/hephaera-threejs-quarks');
 fs.mkdirSync(parent, { recursive: true });
 const fixtures = fs.mkdtempSync(path.join(parent, 'cli-fixtures-'));
 const cliFile = path.join(ROOT, 'commands/lib/threejs-particles.cjs');
@@ -68,7 +68,7 @@ try {
   const absent = inspect(missing);
   equal(absent.backend, 'THREE_QUARKS'); equal(absent.metadataReadyForIntegration, false);
   equal(absent.installedContent, 'unverified'); equal(absent.executionReadiness, 'unverified');
-  equal(snapshot(missing), before); equal(fs.existsSync(path.join(missing, '.opencaw')), false);
+  equal(snapshot(missing), before); equal(fs.existsSync(path.join(missing, '.hephaera')), false);
 
   const root = ready('metadata'); const baseline = snapshot(root); const result = inspect(root);
   equal(result.testedPair, true); equal(result.metadataReadyForIntegration, true);
@@ -83,7 +83,7 @@ try {
   rejects(() => inspect(root, { renderer: 'UnknownRenderer' }), /renderer/i);
 
   const native = host('native', 'UNITY'); rejects(() => inspect(native), /THREEJS/);
-  equal(fs.existsSync(path.join(native, '.opencaw')), false);
+  equal(fs.existsSync(path.join(native, '.hephaera')), false);
   const stale = ready('stale-manifest'); const manifest = json(path.join(stale, 'package.json'));
   manifest.dependencies['three.quarks'] = '0.16.0'; write(stale, 'package.json', manifest);
   equal(inspect(stale).metadataReadyForIntegration, false);
@@ -112,14 +112,14 @@ try {
 
   const gpu = ready('gpu'); const gpuBefore = snapshot(gpu); rejects(() => particles.scaffold(gpu, { renderer: 'WebGPURenderer' }), /WebGPU|WebGL/i); equal(snapshot(gpu), gpuBefore);
   const unsafe = ready('unsafe-output');
-  for (const output of ['../outside', '/outside', 'src/../outside', 'src\\fx', '.opencaw/fx', '.git/fx', 'node_modules/fx', 'commands/fx', 'runtime/fx', 'src/fx:stream', 'src/fx.', 'src/NUL']) rejects(() => particles.scaffold(unsafe, { output }), /path|Output|traversal|scope|root/i);
+  for (const output of ['../outside', '/outside', 'src/../outside', 'src\\fx', '.hephaera/fx', '.git/fx', 'node_modules/fx', 'commands/fx', 'runtime/fx', 'src/fx:stream', 'src/fx.', 'src/NUL']) rejects(() => particles.scaffold(unsafe, { output }), /path|Output|traversal|scope|root/i);
   write(unsafe, 'occupied/sentinel.txt', 'foreign'); rejects(() => particles.scaffold(unsafe, { output: 'occupied' }), /exists/i); equal(fs.readFileSync(path.join(unsafe, 'occupied/sentinel.txt'), 'utf8'), 'foreign');
   write(unsafe, 'bad-parent', 'file'); rejects(() => particles.scaffold(unsafe, { output: 'bad-parent/particles' }), /directory|ENOTDIR/i);
 
   ok(fs.existsSync(path.join(template, 'three-quarks-runtime.mjs')));
   const fresh = ready('scaffold'); const filesBefore = snapshot(fresh); const created = particles.scaffold(fresh, { renderer: 'WebGLRenderer' });
   equal(created.backend, 'THREE_QUARKS'); equal(created.installationPerformed, false); equal(created.executionReadiness, 'unverified');
-  const output = path.join(fresh, created.output), receipt = json(path.join(output, 'opencaw-particles.json'));
+  const output = path.join(fresh, created.output), receipt = json(path.join(output, 'hephaera-particles.json'));
   for (const source of receipt.source) equal(hash(path.join(output, source.name)), hash(path.join(template, source.name)));
   equal(receipt.dependencies.metadataReadyForIntegration, true); equal(receipt.runtimeAcceptance, 'unverified');
   for (const [name, sha] of filesBefore.filter(([, value]) => value !== 'directory')) equal(hash(path.join(fresh, name)), sha);
@@ -127,14 +127,14 @@ try {
   rejects(() => particles.scaffold(fresh, { output: `${created.output}/nested` }), /nest|owned/i);
   const symlinkOutput = ready('linked-output'); const outside = host('outside');
   if (link(outside, path.join(symlinkOutput, 'src'))) rejects(() => particles.scaffold(symlinkOutput), /link|symbolic/i);
-  const locked = ready('locked'); fs.mkdirSync(path.join(locked, '.opencaw/.cache/threejs-particles/scaffolds/operation.lock'), { recursive: true }); rejects(() => particles.scaffold(locked), /lock/i); ok(fs.existsSync(path.join(locked, '.opencaw/.cache/threejs-particles/scaffolds/operation.lock')));
+  const locked = ready('locked'); fs.mkdirSync(path.join(locked, '.hephaera/.cache/threejs-particles/scaffolds/operation.lock'), { recursive: true }); rejects(() => particles.scaffold(locked), /lock/i); ok(fs.existsSync(path.join(locked, '.hephaera/.cache/threejs-particles/scaffolds/operation.lock')));
 
-  const override = host('override', 'UNITY'); write(override, '.opencaw/.cache/tasks/quarks/TASK.md', '# isolated particle test\n');
+  const override = host('override', 'UNITY'); write(override, '.hephaera/.cache/tasks/quarks/TASK.md', '# isolated particle test\n');
   const selected = engine.resolve(override, { override: 'THREEJS', task: 'quarks', scope: 'prototypes/quarks', recordOverride: true });
   rejects(() => particles.scaffold(override, { engineEvidence: selected.evidence }), /scope|outside|prototype/i);
   const isolated = particles.scaffold(override, { engineEvidence: selected.evidence, output: 'prototypes/quarks/particles' }); equal(isolated.output, 'prototypes/quarks/particles'); equal(isolated.dependencies.executionReadiness, 'unverified');
 
-  const installed = host('installed'); const baselineDir = path.join(installed, '.opencaw');
+  const installed = host('installed'); const baselineDir = path.join(installed, '.hephaera');
   for (const file of ['commands/lib/engine-contract.cjs', 'commands/lib/threejs-particles.cjs', '.engine/registry.json', ...Object.keys(JSON.parse(fs.readFileSync(path.join(ROOT, '.engine/registry.json'))).engines).map(id => `.engine/${id}.md`)]) { const target = path.join(baselineDir, file); fs.mkdirSync(path.dirname(target), { recursive: true }); fs.copyFileSync(path.join(ROOT, file), target); }
   fs.cpSync(template, path.join(baselineDir, '.engine/threejs/particles'), { recursive: true });
   require(path.join(baselineDir, 'commands/lib/engine-contract.cjs')).generate(installed, 'THREEJS'); dependencies(installed);

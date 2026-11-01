@@ -15,7 +15,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
-TASK = ROOT / '.opencaw/.cache/tasks/model-to-action'
+TASK = ROOT / '.hephaera/.cache/tasks/model-to-action'
 BLENDER = Path(os.environ.get('BLENDER_EXE') or shutil.which('blender') or 'C:/Program Files/Blender Foundation/Blender 4.5/blender.exe')
 ADAPTER = ROOT / 'commands/lib/bubo-host-adapter.cjs'
 
@@ -62,15 +62,15 @@ def main():
     source = json.loads(source_path.read_text(encoding='utf-8'))
     source['engine'] = context
     source_path.write_text(json.dumps(source, indent=2) + '\n', encoding='utf-8')
-    fixture_task = project / '.opencaw/.cache/tasks/fixture/TASK.md'
+    fixture_task = project / '.hephaera/.cache/tasks/fixture/TASK.md'
     fixture_task.parent.mkdir(parents=True, exist_ok=True)
     fixture_task.write_text('# Controlled action fixture\n\nOriginal engineering assets only. All human receipts are synthetic test assertions.\n', encoding='utf-8')
     review = {'schemaVersion': 1, 'kind': 'source-motion', 'decision': 'approved', 'human': True,
               'reviewer': 'fixture-source-reviewer', 'reason': 'SYNTHETIC TEST ONLY; actual Blender-authored original source, no production human approval',
-              'rights': {'authorized': True, 'license': 'Original controlled OpenCaw engineering model and motion clips'},
+              'rights': {'authorized': True, 'license': 'Original controlled Hephaera engineering model and motion clips'},
               'motionPackageSha256': sha(source_path), 'modelSha256': source['model']['sha256'], 'rigId': source['rig']['id'],
               'clips': [{'id': clip['id'], 'motionSha256': clip['motionSha256']} for clip in source['clips']]}
-    source_review = write('.opencaw/.cache/tasks/fixture/source-review.json', review)
+    source_review = write('.hephaera/.cache/tasks/fixture/source-review.json', review)
     executable = ['node', ADAPTER, 'model-to-action']
 
     def command(operation, manifest=None, *extra, expected=True):
@@ -83,7 +83,7 @@ def main():
         command('init', None, '--task', 'fixture', '--asset', asset, '--version', 'v1', '--actor', 'fixture-builder',
                 '--motion-package', 'source/motion-package.json', '--recipe', recipe, '--source-review', receipt,
                 '--blender', BLENDER, expected=expected)
-        return '.opencaw/.cache/tasks/fixture/model-to-action/' + asset + '/v1/manifest.json'
+        return '.hephaera/.cache/tasks/fixture/model-to-action/' + asset + '/v1/manifest.json'
 
     def state(manifest):
         return json.loads((project / manifest).read_text(encoding='utf-8'))
@@ -99,12 +99,12 @@ def main():
                    'fingerprint': current['approvalFingerprints'][kind]}
         if runtime:
             receipt['runtime'] = runtime
-        path = write('.opencaw/.cache/tasks/fixture/' + kind + '-review.json', receipt)
+        path = write('.hephaera/.cache/tasks/fixture/' + kind + '-review.json', receipt)
         command('record', manifest, '--kind', kind, '--reviewer', reviewer, '--evidence', path)
 
     denied = copy.deepcopy(review)
     denied['rights']['authorized'] = False
-    denied_review = write('.opencaw/.cache/tasks/fixture/denied-review.json', denied)
+    denied_review = write('.hephaera/.cache/tasks/fixture/denied-review.json', denied)
     initialize('denied', receipt=denied_review, expected=False)
     check(not (project / '.art-staging/model-to-action/denied').exists(), 'unauthorized source rights cause no production staging')
     missing = json.loads((project / 'action-recipe.json').read_text())
@@ -123,7 +123,7 @@ def main():
     command('validate', manifest)
     package_path = project / artifact(manifest, 'export', 'package')
     package = json.loads(package_path.read_text(encoding='utf-8'))
-    check(package['schemaVersion'] == 'opencaw-action-package/v1', 'actual export produces profiled action package')
+    check(package['schemaVersion'] == 'hephaera-action-package/v1', 'actual export produces profiled action package')
     check({action['id'] for action in package['actions']} == {'dance-pattern', 'chained-combo', 'charge-cast'}, 'all three requested action families have actual composite clips')
     check(all(len(action['steps']) > 1 and action['motionSha256'] for action in package['actions']), 'compound actions preserve ordered steps and actual sampled output hashes')
     check(package['engine']['effectiveEngine'] == 'THREEJS', 'action package consumes canonical selected engine')
@@ -153,13 +153,13 @@ def main():
     command('validate', manifest)
     check(len(state(manifest)['history']) == history, 'changed engine is rejected before another native producer attempt')
 
-    output = project / '.opencaw/.cache/tasks/fixture/action-browser'
+    output = project / '.hephaera/.cache/tasks/fixture/action-browser'
     args = [sys.executable, ROOT / 'tests/test-model-action-engine.py', '--project-root', project, '--package', package_path, '--output', output]
     browser = subprocess.run([str(value) for value in args], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
     (work / 'browser.log').write_bytes(browser.stdout)
     assert browser.returncode in (0, 77), browser.stdout.decode(errors='replace')[-6000:]
     actual_browser = browser.returncode == 0
-    if not actual_browser and os.environ.get('OPENCAW_REQUIRE_ACTION_BROWSER') == '1':
+    if not actual_browser and os.environ.get('HEPHAERA_REQUIRE_ACTION_BROWSER') == '1':
         raise AssertionError('Actual action browser acceptance required; prerequisites unavailable')
     if actual_browser:
         observed = json.loads((output / 'engine-evidence.json').read_text(encoding='utf-8'))

@@ -207,8 +207,8 @@ gauntlet_assert_progress_issue_link "$GAUNTLET_GH_BODY" "$issue_url"
 gauntlet_parse_publication_checkpoint_marker "$GAUNTLET_GH_BODY"
 publication_checkpoint="$GAUNTLET_PUBLICATION_CHECKPOINT"
 publication_checkpoint_hash="$GAUNTLET_PUBLICATION_CHECKPOINT_SHA256"
-publication_checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$publication_checkpoint"
-[[ "$publication_checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ \
+publication_checkpoint_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$publication_checkpoint"
+[[ "$publication_checkpoint" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ \
   && -f "$publication_checkpoint_file" && ! -L "$publication_checkpoint_file" \
   && "$publication_checkpoint_hash" == "$(gauntlet_hash_file "$publication_checkpoint_file")" ]] || {
   echo 'Progress PR publication marker does not bind canonical immutable checkpoint evidence.' >&2
@@ -344,7 +344,7 @@ if [[ "$event" == 'opened' ]]; then
   checkpoint_item_dir="$gauntlet_dir/publication-checkpoints/$item_id"
   while IFS=$'\t' read -r _checkpoint_number issued_checkpoint_file; do
     [[ -n "$issued_checkpoint_file" ]] || continue
-    issued_checkpoint_relative="${issued_checkpoint_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    issued_checkpoint_relative="${issued_checkpoint_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     issued_checkpoint_consumed=0
     if [[ -d "$event_root" ]]; then
       while IFS= read -r prior_checkpoint_event; do
@@ -391,7 +391,7 @@ if [[ "$event" == 'opened' ]]; then
   if [[ "$expected_root" == 'none' ]]; then
     expected_root_hash='none'
   else
-    expected_root_hash="$(gauntlet_hash_file "$OPENCAW_PROJECT_ROOT_RESOLVED/$expected_root")"
+    expected_root_hash="$(gauntlet_hash_file "$HEPHAERA_PROJECT_ROOT_RESOLVED/$expected_root")"
   fi
   checkpoint_remote_integration_state="$(gauntlet_section_field "$publication_checkpoint_file" 'Publication Checkpoint Metadata' 'Remote integration state')"
   checkpoint_remote_integration_sha="$(gauntlet_section_field "$publication_checkpoint_file" 'Publication Checkpoint Metadata' 'Remote integration SHA' | tr '[:upper:]' '[:lower:]')"
@@ -464,7 +464,7 @@ fi
 case "$event" in
   qa-pass|qa-fail)
     [[ -n "$latest_round" ]] || { echo "$event requires a recorded critic round." >&2; exit 1; }
-    latest_round_relative="${latest_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    latest_round_relative="${latest_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     critic_round="$latest_round_relative"
     critic_verdict="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Verdict')"
     round_pr="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Progress PR')"
@@ -507,7 +507,7 @@ case "$event" in
   merged)
     [[ "$previous_event" == 'qa-pass' ]] || { echo 'merged requires the latest event to be qa-pass.' >&2; exit 1; }
     [[ -n "$latest_round" ]] || { echo 'merged requires a latest passing critic round.' >&2; exit 1; }
-    latest_round_relative="${latest_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    latest_round_relative="${latest_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     critic_round="$latest_round_relative"
     critic_verdict="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Verdict')"
     round_head_sha="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Head SHA')"
@@ -530,7 +530,7 @@ case "$event" in
       round_pr="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Progress PR')"
       round_pr="${round_pr%/}"
       if [[ "$round_pr" == "$pr_url" ]]; then
-        critic_round="${latest_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+        critic_round="${latest_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
         critic_verdict="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Verdict')"
         [[ ( "$previous_event" == 'qa-pass' || "$previous_event" == 'qa-fail' ) \
           && "$previous_round" == "$critic_round" \
@@ -555,8 +555,8 @@ if [[ -d "$event_dir" ]]; then
 fi
 next_event=$((max_event + 1))
 printf -v event_label '%03d' "$next_event"
-event_relative=".opencaw/.cache/gauntlets/$gauntlet_name/pr-events/$item_id/event-$event_label.md"
-event_target="$OPENCAW_PROJECT_ROOT_RESOLVED/$event_relative"
+event_relative=".hephaera/.cache/gauntlets/$gauntlet_name/pr-events/$item_id/event-$event_label.md"
+event_target="$HEPHAERA_PROJECT_ROOT_RESOLVED/$event_relative"
 [[ ! -e "$event_target" && ! -L "$event_target" ]] || { echo "PR event evidence already exists: $event_relative" >&2; exit 1; }
 
 recorded_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"

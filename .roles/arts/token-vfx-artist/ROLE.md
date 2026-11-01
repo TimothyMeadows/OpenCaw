@@ -40,7 +40,7 @@ Design original TCG token, minion, counter, status, and VFX language that commun
 - Do not create VFX that hides targeting, damage, health, card counts, or active prompts.
 - Do not rely solely on color to distinguish status or ownership.
 - Do not accept generated assets with malformed anatomy, unsafe content, or illegible text artifacts.
-- Do not store project-specific token lore or sprites in OpenCaw baseline.
+- Do not store project-specific token lore or sprites in Hephaera baseline.
 
 # Collaboration
 

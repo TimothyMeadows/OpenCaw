@@ -35,7 +35,7 @@ def main():
         raise SystemExit("BLOCKED: real Blender 4.5 unavailable; set BLENDER_EXE")
     if not CLI.is_file():
         raise SystemExit("BLOCKED: build the native PROOF_TO_MODEL CLI first")
-    evidence = ROOT / ".opencaw/.cache/tasks/proof-multiview-classification/evidence"
+    evidence = ROOT / ".hephaera/.cache/tasks/proof-multiview-classification/evidence"
     evidence.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="native-integration-", dir=evidence))
     project = work / "project"
@@ -215,7 +215,7 @@ File.WriteAllText(Path.ChangeExtension(output, ".consumed.json"), new JsonObject
         {"id": "source-" + view, "path": "source-" + view + ".png"} for view in VIEWS]}))
     check(len({digest(project / ("source-" + view + ".png")) for view in VIEWS}) == 6,
           "The six independent fixture cameras must produce six distinct real PNGs")
-    manifest = ".opencaw/.cache/tasks/test/proof-to-model/fixture/v1/manifest.json"
+    manifest = ".hephaera/.cache/tasks/test/proof-to-model/fixture/v1/manifest.json"
 
     def cli(stage, *args, success=True):
         return command(["node", CLI, "proof-to-model", stage, "--root", project, "--manifest", manifest,
@@ -269,7 +269,7 @@ File.WriteAllText(Path.ChangeExtension(output, ".consumed.json"), new JsonObject
         key = "proofSet" if kind == "proof-set" else kind
         fingerprint = status.get("approvalFingerprints", {}).get(key)
         check(bool(fingerprint), "status must expose the current approval fingerprint: " + key)
-        receipt = f".opencaw/.cache/tasks/test/reviews/{kind}.json"
+        receipt = f".hephaera/.cache/tasks/test/reviews/{kind}.json"
         (project / receipt).parent.mkdir(parents=True, exist_ok=True)
         (project / receipt).write_text(json.dumps({"kind": kind, "reviewer": reviewer,
             "decision": "approved", "fingerprint": fingerprint, "human": human,
@@ -329,7 +329,7 @@ File.WriteAllText(Path.ChangeExtension(output, ".consumed.json"), new JsonObject
     current = state()
     reviewed = json.loads((project / current["stages"]["review"]["artifacts"]["result"]).read_text())
     check(reviewed["mode"] == "multi-view" and reviewed["measurements"]["views"] == 6, "Actual Blender review must render six production cameras")
-    check(reviewed["alignment"]["inputFrame"] == "opencaw-proof-z-up", "Finished review must not apply raw correction twice")
+    check(reviewed["alignment"]["inputFrame"] == "hephaera-proof-z-up", "Finished review must not apply raw correction twice")
     check(reviewed["alignment"]["engineExportToProofFrame"] == [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
           "Already corrected finished geometry must use identity frame mapping")
     check(len([name for name in reviewed["artifacts"] if name.startswith("original-")]) == 6, "Review must show all six original source fixtures")

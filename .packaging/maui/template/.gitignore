@@ -5,4 +5,4 @@ obj/
 *.p12
 *.mobileprovision
 *.signing.props
-OpenCawSigning.props
+HephaeraSigning.props

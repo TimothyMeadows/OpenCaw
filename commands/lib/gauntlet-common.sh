@@ -9,9 +9,9 @@
 
 gauntlet_lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$gauntlet_lib_dir/memory-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 
-OPENCAW_GAUNTLETS_DIR="$OPENCAW_PROJECT_CACHE_DIR/gauntlets"
+HEPHAERA_GAUNTLETS_DIR="$HEPHAERA_PROJECT_CACHE_DIR/gauntlets"
 
 gauntlet_fail() {
   echo "$*" >&2
@@ -32,7 +32,7 @@ gauntlet_validate_identifier() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   if [[ ! "$value" =~ ^/?[A-Za-z0-9][A-Za-z0-9._:@/-]*$ ]] \
     || [[ "$value" == *'..'* || "$value" == *'//'* || "$value" == */ ]]; then
     gauntlet_fail "$label contains unsupported characters: $value"
@@ -44,7 +44,7 @@ gauntlet_validate_head_sha() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   if [[ ! "$value" =~ ^[0-9a-fA-F]{40}([0-9a-fA-F]{24})?$ ]]; then
     gauntlet_fail "$label must be a full 40- or 64-character hexadecimal commit SHA: $value"
     return 1
@@ -54,9 +54,9 @@ gauntlet_validate_head_sha() {
 gauntlet_assert_git_repository() {
   local discovered_root expected_root
 
-  expected_root="$(cd "$OPENCAW_PROJECT_ROOT_RESOLVED" && pwd -P)"
+  expected_root="$(cd "$HEPHAERA_PROJECT_ROOT_RESOLVED" && pwd -P)"
   discovered_root="$(git -C "$expected_root" rev-parse --show-toplevel 2>/dev/null)" || {
-    gauntlet_fail "The resolved OpenCaw project root is not a Git repository: $expected_root"
+    gauntlet_fail "The resolved Hephaera project root is not a Git repository: $expected_root"
     return 1
   }
   discovered_root="$(cd "$discovered_root" && pwd -P)"
@@ -71,7 +71,7 @@ gauntlet_assert_github_repository_identity() {
   local origin_url observed_repo='' push_url push_repo push_count=0
 
   gauntlet_assert_git_repository || return 1
-  origin_url="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" remote get-url origin 2>/dev/null)" || {
+  origin_url="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" remote get-url origin 2>/dev/null)" || {
     gauntlet_fail 'The local Git repository requires an origin remote for GitHub identity verification.'
     return 1
   }
@@ -114,7 +114,7 @@ gauntlet_assert_github_repository_identity() {
       gauntlet_fail "Git origin push URL does not match the parent task GitHub repository: expected $expected_repo, observed $push_url"
       return 1
     }
-  done < <(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" remote get-url --push --all origin 2>/dev/null) || {
+  done < <(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" remote get-url --push --all origin 2>/dev/null) || {
     gauntlet_fail 'Unable to resolve Git origin push URLs for Gauntlet publication identity verification.'
     return 1
   }
@@ -148,7 +148,7 @@ gauntlet_assert_github_default_branch() {
 
 gauntlet_fetch_origin() {
   gauntlet_assert_git_repository || return 1
-  git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" fetch --no-tags origin >/dev/null 2>&1 || {
+  git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" fetch --no-tags origin >/dev/null 2>&1 || {
     gauntlet_fail 'Unable to fetch origin before Gauntlet publication preflight.'
     return 1
   }
@@ -161,7 +161,7 @@ gauntlet_observe_remote_branch() {
 
   gauntlet_validate_branch "$branch" "$label" || return 1
   expected_ref="refs/heads/$branch"
-  observation="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" ls-remote --heads origin "$expected_ref" 2>/dev/null)" || {
+  observation="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" ls-remote --heads origin "$expected_ref" 2>/dev/null)" || {
     gauntlet_fail "Unable to query live origin ref for $label: $expected_ref"
     return 1
   }
@@ -277,7 +277,7 @@ gauntlet_assert_commit_object() {
 
   gauntlet_validate_head_sha "$sha" "$label" || return 1
   gauntlet_assert_git_repository || return 1
-  object_type="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" cat-file -t "$sha" 2>/dev/null)" || {
+  object_type="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" cat-file -t "$sha" 2>/dev/null)" || {
     gauntlet_fail "$label does not exist in the local Git object database: $sha"
     return 1
   }
@@ -285,7 +285,7 @@ gauntlet_assert_commit_object() {
     gauntlet_fail "$label is not a Git commit object: $sha"
     return 1
   }
-  resolved="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" rev-parse --verify "$sha^{commit}" 2>/dev/null)" || return 1
+  resolved="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" rev-parse --verify "$sha^{commit}" 2>/dev/null)" || return 1
   [[ "${resolved,,}" == "${sha,,}" ]] || {
     gauntlet_fail "$label does not resolve exactly to the supplied full SHA: $sha"
     return 1
@@ -300,7 +300,7 @@ gauntlet_local_branch_sha() {
   gauntlet_validate_branch "$branch" "$label" || return 1
   gauntlet_assert_git_repository || return 1
   ref="refs/heads/$branch"
-  git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" show-ref --verify --hash "$ref" 2>/dev/null || {
+  git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" show-ref --verify --hash "$ref" 2>/dev/null || {
     gauntlet_fail "$label does not exist as an exact local branch ref: $branch"
     return 1
   }
@@ -327,7 +327,7 @@ gauntlet_assert_commit_ancestor() {
 
   gauntlet_assert_commit_object "$ancestor" "$label ancestor" || return 1
   gauntlet_assert_commit_object "$descendant" "$label descendant" || return 1
-  git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" merge-base --is-ancestor "$ancestor" "$descendant" || {
+  git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" merge-base --is-ancestor "$ancestor" "$descendant" || {
     gauntlet_fail "$label is not represented by the required local Git ancestry: $ancestor -> $descendant"
     return 1
   }
@@ -339,7 +339,7 @@ gauntlet_assert_artifact_at_commit() {
   local object_type tree_mode
 
   gauntlet_assert_commit_object "$sha" 'Reviewed commit' || return 1
-  object_type="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" cat-file -t "$sha:$artifact" 2>/dev/null)" || {
+  object_type="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" cat-file -t "$sha:$artifact" 2>/dev/null)" || {
     gauntlet_fail "Inspected artifact is absent from reviewed commit $sha: $artifact"
     return 1
   }
@@ -347,7 +347,7 @@ gauntlet_assert_artifact_at_commit() {
     gauntlet_fail "Inspected artifact is not a file blob in reviewed commit $sha: $artifact"
     return 1
   }
-  tree_mode="$(git -C "$OPENCAW_PROJECT_ROOT_RESOLVED" ls-tree "$sha" -- "$artifact" | awk 'NR == 1 { print $1 }')"
+  tree_mode="$(git -C "$HEPHAERA_PROJECT_ROOT_RESOLVED" ls-tree "$sha" -- "$artifact" | awk 'NR == 1 { print $1 }')"
   [[ "$tree_mode" == 100* ]] || {
     gauntlet_fail "Inspected artifact is not a regular file in reviewed commit $sha: $artifact"
     return 1
@@ -522,7 +522,7 @@ gauntlet_assert_live_pr() {
 
 gauntlet_acquire_lock() {
   local gauntlet_dir="$1"
-  local lock_dir="$gauntlet_dir/.opencaw-gauntlet.lock"
+  local lock_dir="$gauntlet_dir/.hephaera-gauntlet.lock"
 
   gauntlet_assert_safe_ai_path "$gauntlet_dir" 'Gauntlet directory' || return 1
   if ! mkdir "$lock_dir" 2>/dev/null; then
@@ -586,7 +586,7 @@ gauntlet_validate_substantive_single_line() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   [[ "$value" != *'|'* ]] || {
     gauntlet_fail "$label must not contain a pipe character."
     return 1
@@ -718,7 +718,7 @@ gauntlet_validate_branch() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   if [[ -z "$value" || "$value" == -* || "$value" == /* || "$value" == */ \
     || "$value" == *'..'* || "$value" == *'//'* || "$value" == *'@{'* \
     || "$value" == *'\'* || "$value" == *' '* || "$value" == *'~'* \
@@ -734,7 +734,7 @@ gauntlet_validate_github_pr_url() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   if [[ ! "$value" =~ ^https://github\.com/[^/[:space:]]+/[^/[:space:]]+/pull/[0-9]+/?$ ]]; then
     gauntlet_fail "$label must be a GitHub pull-request URL: $value"
     return 1
@@ -745,7 +745,7 @@ gauntlet_validate_evidence_url() {
   local value="$1"
   local label="$2"
 
-  opencaw_validate_single_line "$value" "$label" || return 1
+  hephaera_validate_single_line "$value" "$label" || return 1
   if [[ "$value" != 'none' && ! "$value" =~ ^https://[^[:space:]]+$ ]]; then
     gauntlet_fail "$label must be 'none' or an HTTPS URL: $value"
     return 1
@@ -759,7 +759,7 @@ gauntlet_validate_pr_evidence_url() {
   local comment_pr comment_id
 
   gauntlet_validate_github_pr_url "$pr_url" 'Evidence PR URL' || return 1
-  opencaw_validate_single_line "$value" 'PR evidence URL' || return 1
+  hephaera_validate_single_line "$value" 'PR evidence URL' || return 1
   if [[ "$allow_pr_url" == 'yes' && "${value%/}" == "$pr_url" ]]; then
     return 0
   fi
@@ -842,11 +842,11 @@ gauntlet_assert_live_pr_comment() {
     }
   fi
   gauntlet_validate_head_sha "$expected_head_sha" 'QA comment reviewed Head SHA' || return 1
-  [[ "$expected_source" =~ ^\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
+  [[ "$expected_source" =~ ^\.hephaera/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/(rounds/[a-z0-9-]+/round-[0-9]{3,}|completion-events/event-[0-9]{3,})\.md$ ]] || {
     gauntlet_fail "QA comment source is not canonical immutable Gauntlet evidence: $expected_source"
     return 1
   }
-  expected_source_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$expected_source"
+  expected_source_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$expected_source"
   gauntlet_assert_safe_ai_path "$expected_source_file" \
     'QA comment source evidence' || return 1
   [[ -f "$expected_source_file" && ! -L "$expected_source_file" ]] || {
@@ -854,7 +854,7 @@ gauntlet_assert_live_pr_comment() {
     return 1
   }
   expected_source_hash="$(gauntlet_hash_file "$expected_source_file")" || return 1
-  expected_marker="<!-- opencaw-gauntlet-qa:v1 verdict=$expected_verdict head-sha=$expected_head_sha source=$expected_source source-sha256=$expected_source_hash affected-units=$expected_affected_units -->"
+  expected_marker="<!-- hephaera-gauntlet-qa:v1 verdict=$expected_verdict head-sha=$expected_head_sha source=$expected_source source-sha256=$expected_source_hash affected-units=$expected_affected_units -->"
   endpoint="repos/$expected_repo/issues/comments/$comment_id"
   observation="$(gh api --hostname github.com "$endpoint" \
     --jq '[.html_url, .issue_url, (.id | tostring), (.body // "" | @base64), (.user.login // "none"), (.user.type // "none"), (.author_association // "none"), (.created_at // "none"), (.updated_at // "none")] | @tsv' 2>/dev/null)" || {
@@ -873,7 +873,7 @@ gauntlet_assert_live_pr_comment() {
   observed_body="$(gauntlet_decode_base64 "$observed_body_base64")" || return 1
   marker_count="$(printf '%s\n' "$observed_body" | grep -Fxc -- "$expected_marker" || true)"
   [[ "$marker_count" -eq 1 \
-    && "$(printf '%s\n' "$observed_body" | grep -Fc -- '<!-- opencaw-gauntlet-qa:' || true)" -eq 1 ]] || {
+    && "$(printf '%s\n' "$observed_body" | grep -Fc -- '<!-- hephaera-gauntlet-qa:' || true)" -eq 1 ]] || {
     gauntlet_fail "Live GitHub QA comment lacks exactly one matching Gauntlet verdict/source marker: $evidence_url"
     return 1
   }
@@ -1087,7 +1087,7 @@ gauntlet_hash_text() {
   local value="$1"
   local temporary digest
 
-  temporary="$(mktemp "${TMPDIR:-/tmp}/opencaw-gauntlet-hash.XXXXXX")"
+  temporary="$(mktemp "${TMPDIR:-/tmp}/hephaera-gauntlet-hash.XXXXXX")"
   printf '%s\n' "$value" > "$temporary"
   if ! digest="$(gauntlet_hash_file "$temporary")"; then
     rm -f "$temporary"
@@ -1539,13 +1539,13 @@ gauntlet_assert_safe_ai_path() {
   local label="$2"
   local project_root parent_canonical
 
-  project_root="$(cd "$OPENCAW_PROJECT_ROOT_RESOLVED" && pwd -P)"
-  [[ ! -L "$OPENCAW_PROJECT_CACHE_DIR" ]] || {
-    gauntlet_fail "The project .opencaw/.cache directory must not be a symbolic link."
+  project_root="$(cd "$HEPHAERA_PROJECT_ROOT_RESOLVED" && pwd -P)"
+  [[ ! -L "$HEPHAERA_PROJECT_CACHE_DIR" ]] || {
+    gauntlet_fail "The project .hephaera/.cache directory must not be a symbolic link."
     return 1
   }
-  [[ "$path" == "$OPENCAW_PROJECT_CACHE_DIR" || "$path" == "$OPENCAW_PROJECT_CACHE_DIR"/* ]] || {
-    gauntlet_fail "$label is outside the resolved project .opencaw/.cache directory: $path"
+  [[ "$path" == "$HEPHAERA_PROJECT_CACHE_DIR" || "$path" == "$HEPHAERA_PROJECT_CACHE_DIR"/* ]] || {
+    gauntlet_fail "$label is outside the resolved project .hephaera/.cache directory: $path"
     return 1
   }
   if [[ -L "$path" ]]; then
@@ -1553,8 +1553,8 @@ gauntlet_assert_safe_ai_path() {
     return 1
   fi
   parent_canonical="$(cd "$(dirname "$path")" && pwd -P)"
-  if [[ "$parent_canonical" != "$project_root/.opencaw/.cache" && "$parent_canonical" != "$project_root/.opencaw/.cache"/* ]]; then
-    gauntlet_fail "$label resolves outside the project .opencaw/.cache directory: $path"
+  if [[ "$parent_canonical" != "$project_root/.hephaera/.cache" && "$parent_canonical" != "$project_root/.hephaera/.cache"/* ]]; then
+    gauntlet_fail "$label resolves outside the project .hephaera/.cache directory: $path"
     return 1
   fi
 }
@@ -1563,14 +1563,14 @@ gauntlet_resolve_file() {
   local ref="$1"
   local candidate gauntlets_root candidate_dir candidate_canonical project_root unit_dir_name
 
-  [[ -d "$OPENCAW_GAUNTLETS_DIR" ]] || {
-    gauntlet_fail "Gauntlet directory does not exist: $OPENCAW_GAUNTLETS_DIR"
+  [[ -d "$HEPHAERA_GAUNTLETS_DIR" ]] || {
+    gauntlet_fail "Gauntlet directory does not exist: $HEPHAERA_GAUNTLETS_DIR"
     return 1
   }
 
-  gauntlet_assert_safe_ai_path "$OPENCAW_GAUNTLETS_DIR" 'Gauntlet root' || return 1
+  gauntlet_assert_safe_ai_path "$HEPHAERA_GAUNTLETS_DIR" 'Gauntlet root' || return 1
   if [[ "$ref" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
-    candidate="$OPENCAW_GAUNTLETS_DIR/$ref/GAUNTLET.md"
+    candidate="$HEPHAERA_GAUNTLETS_DIR/$ref/GAUNTLET.md"
   elif [[ -d "$ref" ]]; then
     candidate="$ref/GAUNTLET.md"
   else
@@ -1591,10 +1591,10 @@ gauntlet_resolve_file() {
     return 1
   }
 
-  project_root="$(cd "$OPENCAW_PROJECT_ROOT_RESOLVED" && pwd -P)"
-  gauntlets_root="$(cd "$OPENCAW_GAUNTLETS_DIR" && pwd -P)"
-  [[ "$gauntlets_root" == "$project_root/.opencaw/.cache/gauntlets" ]] || {
-    gauntlet_fail "Gauntlet root resolves outside the canonical project path: $OPENCAW_GAUNTLETS_DIR"
+  project_root="$(cd "$HEPHAERA_PROJECT_ROOT_RESOLVED" && pwd -P)"
+  gauntlets_root="$(cd "$HEPHAERA_GAUNTLETS_DIR" && pwd -P)"
+  [[ "$gauntlets_root" == "$project_root/.hephaera/.cache/gauntlets" ]] || {
+    gauntlet_fail "Gauntlet root resolves outside the canonical project path: $HEPHAERA_GAUNTLETS_DIR"
     return 1
   }
   candidate_dir="$(cd "$(dirname "$candidate")" && pwd -P)"
@@ -1604,7 +1604,7 @@ gauntlet_resolve_file() {
   if [[ "$(dirname "$candidate_dir")" != "$gauntlets_root" ]] \
     || ! gauntlet_validate_name "$unit_dir_name" 'Gauntlet directory name' \
     || [[ "$candidate_canonical" != "$candidate_dir/GAUNTLET.md" ]]; then
-    gauntlet_fail "Gauntlet references must resolve under $OPENCAW_GAUNTLETS_DIR: $ref"
+    gauntlet_fail "Gauntlet references must resolve under $HEPHAERA_GAUNTLETS_DIR: $ref"
     return 1
   fi
 
@@ -1616,7 +1616,7 @@ gauntlet_project_relative_artifact() {
 
   value="${value#\`}"
   value="${value%\`}"
-  opencaw_validate_single_line "$value" 'Artifact path' || return 1
+  hephaera_validate_single_line "$value" 'Artifact path' || return 1
   if [[ -z "$value" || "$value" == /* || "$value" == . || "$value" == ./* \
     || "$value" == */. || "$value" == *'//'* || "$value" == .. \
     || "$value" == ../* || "$value" == */../* || "$value" == */.. ]]; then
@@ -2074,30 +2074,30 @@ gauntlet_equal_time_failure_precedes() {
   local earlier_file later_file later_round earlier_round later_root
 
   [[ "$earlier_path" != "$later_path" ]] || return 1
-  earlier_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$earlier_path"
-  later_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$later_path"
+  earlier_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$earlier_path"
+  later_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$later_path"
 
-  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
-    && "$later_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
+  if [[ "$earlier_path" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$later_path" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
     gauntlet_progress_pr_event_precedes "$gauntlet_file" "$earlier_path" "$later_path"
     return
   fi
-  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md \
-    && "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$earlier_path" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md \
+    && "$later_path" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     gauntlet_round_event_precedes "$gauntlet_file" "$earlier_path" "$later_path"
     return
   fi
 
-  if [[ "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$later_path" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     later_root="$(gauntlet_section_field "$later_file" 'Round Metadata' 'Remediation root')"
     [[ "$later_root" == "$earlier_path" ]]
     return
   fi
-  if [[ "$later_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
-    && "$earlier_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$later_path" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$earlier_path" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     later_round="$(gauntlet_section_field "$later_file" 'PR Event Metadata' 'Critic round')"
     [[ "$later_round" == "$earlier_path" ]] && return 0
-    if [[ "$later_round" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+    if [[ "$later_round" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
       gauntlet_round_event_precedes "$gauntlet_file" "$earlier_path" "$later_round"
       return
     fi
@@ -2105,8 +2105,8 @@ gauntlet_equal_time_failure_precedes() {
 
   # A QA failure explicitly consumes its critic round. This reverse lookup is
   # useful when the failure candidates happen to be visited in the other order.
-  if [[ "$earlier_path" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md \
-    && "$later_path" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+  if [[ "$earlier_path" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md \
+    && "$later_path" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     earlier_round="$(gauntlet_section_field "$earlier_file" 'PR Event Metadata' 'Critic round')"
     [[ "$earlier_round" == "$later_path" ]] && return 1
   fi
@@ -2138,11 +2138,11 @@ gauntlet_parse_publication_checkpoint_marker() {
   local body="$1"
   local marker marker_count publication_count
 
-  marker="$(printf '%s\n' "$body" | grep -Eo '<!-- opencaw-gauntlet-publication:v1 checkpoint=\.opencaw/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md checkpoint-sha256=[0-9a-f]{64} -->' || true)"
+  marker="$(printf '%s\n' "$body" | grep -Eo '<!-- hephaera-gauntlet-publication:v1 checkpoint=\.hephaera/\.cache/gauntlets/[a-z0-9]+(-[a-z0-9]+)*/publication-checkpoints/[a-z0-9]+(-[a-z0-9]+)*/checkpoint-[0-9]{3,}\.md checkpoint-sha256=[0-9a-f]{64} -->' || true)"
   marker_count="$(printf '%s\n' "$marker" | sed '/^$/d' | wc -l | tr -d '[:space:]')"
-  publication_count="$(printf '%s\n' "$body" | grep -Fo '<!-- opencaw-gauntlet-publication:' | wc -l | tr -d '[:space:]')"
+  publication_count="$(printf '%s\n' "$body" | grep -Fo '<!-- hephaera-gauntlet-publication:' | wc -l | tr -d '[:space:]')"
   [[ "$marker_count" -eq 1 && "$publication_count" -eq 1 ]] || {
-    gauntlet_fail 'Progress PR body requires exactly one canonical OpenCaw Gauntlet publication checkpoint marker.'
+    gauntlet_fail 'Progress PR body requires exactly one canonical Hephaera Gauntlet publication checkpoint marker.'
     return 1
   }
   GAUNTLET_PUBLICATION_CHECKPOINT="$(printf '%s\n' "$marker" | sed -E 's/^.* checkpoint=([^ ]+) checkpoint-sha256=.*$/\1/')"
@@ -2181,7 +2181,7 @@ gauntlet_assert_progress_publication_body() {
     return 1
   }
 
-  checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$expected_checkpoint"
+  checkpoint_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$expected_checkpoint"
   gauntlet_assert_safe_ai_path "$checkpoint_file" \
     'Progress PR publication checkpoint' || return 1
   [[ -f "$checkpoint_file" && ! -L "$checkpoint_file" \
@@ -2202,13 +2202,13 @@ gauntlet_resolve_remediation_trigger_file() {
   }
   gauntlet_name="$(basename "$gauntlet_dir")"
   [[ "$gauntlet_name" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ \
-    && ( "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
-      || "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ \
-      || "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ) ]] || {
+    && ( "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/[a-z0-9]+(-[a-z0-9]+)*/round-[0-9]{3,}\.md$ \
+      || "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ \
+      || "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/[a-z0-9]+(-[a-z0-9]+)*/event-[0-9]{3,}\.md$ ) ]] || {
     gauntlet_fail "Remediation trigger is not canonical immutable evidence for $gauntlet_name: $trigger"
     return 1
   }
-  trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$trigger"
+  trigger_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$trigger"
   gauntlet_assert_safe_ai_path "$trigger_file" 'Remediation trigger evidence' || return 1
   [[ -f "$trigger_file" && ! -L "$trigger_file" ]] || {
     gauntlet_fail "Remediation trigger evidence is missing or unsafe: $trigger"
@@ -2319,7 +2319,7 @@ gauntlet_remediation_root_for_trigger() {
   esac
   trigger_file="$(gauntlet_resolve_remediation_trigger_file \
     "$gauntlet_file" "$trigger")" || return 1
-  if [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
+  if [[ "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/([a-z0-9]+(-[a-z0-9]+)*)/round-[0-9]{3,}\.md$ ]]; then
     trigger_item="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Item')"
     trigger_event="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Verdict')"
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Round Metadata' 'Recorded at')"
@@ -2350,7 +2350,7 @@ gauntlet_remediation_root_for_trigger() {
     printf '%s\n' "$trigger"
     return 0
   fi
-  if [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
+  if [[ "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/promotion-events/event-[0-9]{3,}\.md$ ]]; then
     affected="$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Affected units')"
     trigger_time="$(gauntlet_section_field "$trigger_file" 'Promotion QA Event Metadata' 'Recorded at')"
     if [[ -n "$consumer_cutoff" \
@@ -2379,7 +2379,7 @@ gauntlet_remediation_root_for_trigger() {
     printf '%s\n' "$trigger"
     return 0
   fi
-  [[ "$trigger" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]] || {
+  [[ "$trigger" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/([a-z0-9]+(-[a-z0-9]+)*)/event-[0-9]{3,}\.md$ ]] || {
     gauntlet_fail "Remediation trigger cannot resolve a canonical root: $trigger"
     return 1
   }
@@ -2426,15 +2426,15 @@ gauntlet_resolve_remediation_root() {
   gauntlet_name="$(basename "$gauntlet_dir")"
   trigger="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Remediation trigger')"
   checkpoint="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Publication checkpoint')"
-  checkpoint_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$checkpoint"
-  [[ "$checkpoint" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ ]] || {
-    gauntlet_fail "Opened remediation evidence lacks a safe publication checkpoint cutoff: ${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+  checkpoint_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$checkpoint"
+  [[ "$checkpoint" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/publication-checkpoints/${item_id}/checkpoint-[0-9]{3,}\.md$ ]] || {
+    gauntlet_fail "Opened remediation evidence lacks a safe publication checkpoint cutoff: ${opened_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     return 1
   }
   gauntlet_assert_safe_ai_path "$checkpoint_file" \
     'Opened remediation publication checkpoint' || return 1
   [[ -f "$checkpoint_file" && ! -L "$checkpoint_file" ]] || {
-    gauntlet_fail "Opened remediation evidence lacks a safe publication checkpoint cutoff: ${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    gauntlet_fail "Opened remediation evidence lacks a safe publication checkpoint cutoff: ${opened_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     return 1
   }
   [[ "$(gauntlet_section_field_count \
@@ -2501,7 +2501,7 @@ gauntlet_applicable_failures() {
       else
         gauntlet_failure_applies_to_unit "$gauntlet_file" "$candidate_item" "$item_id" || continue
       fi
-      relative="${candidate#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      relative="${candidate#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
       printf '%s\t%s\n' "$recorded_at" "$relative"
     done < <(find "$gauntlet_dir/rounds" -mindepth 2 -maxdepth 2 -type f -name 'round-*.md' -print | LC_ALL=C sort)
   fi
@@ -2522,7 +2522,7 @@ gauntlet_applicable_failures() {
       else
         gauntlet_failure_applies_to_unit "$gauntlet_file" "$affected" "$item_id" || continue
       fi
-      relative="${candidate#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      relative="${candidate#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
       printf '%s\t%s\n' "$recorded_at" "$relative"
     done < <(find "$gauntlet_dir/rounds/integration" -maxdepth 1 -type f -name 'round-*.md' -print | LC_ALL=C sort)
   fi
@@ -2542,7 +2542,7 @@ gauntlet_applicable_failures() {
       else
         gauntlet_failure_applies_to_unit "$gauntlet_file" "$affected" "$item_id" || continue
       fi
-      relative="${candidate#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      relative="${candidate#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
       printf '%s\t%s\n' "$recorded_at" "$relative"
     done < <(find "$gauntlet_dir/promotion-events" -maxdepth 1 -type f -name 'event-*.md' -print | LC_ALL=C sort)
   fi
@@ -2563,7 +2563,7 @@ gauntlet_applicable_failures() {
       else
         gauntlet_failure_applies_to_unit "$gauntlet_file" "$candidate_item" "$item_id" || continue
       fi
-      relative="${candidate#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      relative="${candidate#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
       printf '%s\t%s\n' "$recorded_at" "$relative"
     done < <(find "$gauntlet_dir/pr-events" -mindepth 2 -maxdepth 2 -type f -name 'event-*.md' -print | LC_ALL=C sort)
   fi
@@ -2580,8 +2580,8 @@ gauntlet_closed_cycle_contains_failure() {
 
   gauntlet_dir="$(cd "$(dirname "$gauntlet_file")" && pwd -P)"
   gauntlet_name="$(basename "$gauntlet_dir")"
-  [[ "$closed_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]] || return 1
-  closed_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$closed_relative"
+  [[ "$closed_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]] || return 1
+  closed_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$closed_relative"
   [[ -f "$closed_file" && ! -L "$closed_file" \
     && "$(gauntlet_section_field "$closed_file" 'PR Event Metadata' 'Event')" == 'closed' \
     && "$(gauntlet_section_field "$closed_file" 'PR Event Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2590,8 +2590,8 @@ gauntlet_closed_cycle_contains_failure() {
   [[ -n "$closed_pr" ]] || return 1
 
   opened_file="$(gauntlet_opened_event_for_pr "$gauntlet_dir" "$item_id" "$closed_pr")" || return 1
-  opened_relative="${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
-  [[ "$opened_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+  opened_relative="${opened_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
+  [[ "$opened_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
     && -f "$opened_file" && ! -L "$opened_file" \
     && "$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Event')" == 'opened' \
     && "$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2601,12 +2601,12 @@ gauntlet_closed_cycle_contains_failure() {
   gauntlet_progress_pr_event_precedes \
     "$gauntlet_file" "$opened_relative" "$closed_relative" || return 1
 
-  if [[ "$failure_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]]; then
+  if [[ "$failure_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]]; then
     round_failure=1
     round_relative="$failure_relative"
-  elif [[ "$failure_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]]; then
+  elif [[ "$failure_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ ]]; then
     qa_relative="$failure_relative"
-    qa_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$qa_relative"
+    qa_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$qa_relative"
   else
     return 1
   fi
@@ -2621,12 +2621,12 @@ gauntlet_closed_cycle_contains_failure() {
       [[ "$candidate_pr" == "$closed_pr" ]] || continue
       qa_count=$((qa_count + 1))
       qa_file="$candidate"
-      qa_relative="${candidate#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      qa_relative="${candidate#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     done < <(find "$gauntlet_dir/pr-events/$item_id" -maxdepth 1 -type f -name 'event-*.md' -print | LC_ALL=C sort)
     [[ "$qa_count" -eq 1 ]] || return 1
   fi
 
-  [[ "$qa_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+  [[ "$qa_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
     && -f "$qa_file" && ! -L "$qa_file" \
     && "$(gauntlet_section_field "$qa_file" 'PR Event Metadata' 'Event')" == 'qa-fail' \
     && "$(gauntlet_section_field "$qa_file" 'PR Event Metadata' 'Item')" == "$item_id" ]] || return 1
@@ -2640,8 +2640,8 @@ gauntlet_closed_cycle_contains_failure() {
     round_relative="$qa_round"
   fi
 
-  [[ "$round_relative" =~ ^\.opencaw/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]] || return 1
-  round_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$round_relative"
+  [[ "$round_relative" =~ ^\.hephaera/\.cache/gauntlets/${gauntlet_name}/rounds/${item_id}/round-[0-9]{3,}\.md$ ]] || return 1
+  round_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$round_relative"
   [[ -f "$round_file" && ! -L "$round_file" \
     && "$(gauntlet_section_field "$round_file" 'Round Metadata' 'Item')" == "$item_id" ]] || return 1
   round_pr="$(gauntlet_section_field "$round_file" 'Round Metadata' 'Progress PR')"
@@ -2681,13 +2681,13 @@ gauntlet_trace_remediation_trigger() {
     [[ "$resolved_root" != "$expected_failure" ]] || return 0
     trigger="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Remediation trigger')"
     trace_record="$resolved_root"
-    [[ "$trace_record" =~ ^\.opencaw/\.cache/gauntlets/[^/]+/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
+    [[ "$trace_record" =~ ^\.hephaera/\.cache/gauntlets/[^/]+/pr-events/${item_id}/event-[0-9]{3,}\.md$ \
       && "$seen" != *"|$trace_record|"* ]] || {
       gauntlet_fail "Remediation trigger chain does not reach the latest applicable failure for $item_id: $trigger (resolved root: $trace_record)"
       return 1
     }
     seen+="$trace_record|"
-    trigger_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$trace_record"
+    trigger_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$trace_record"
     [[ -f "$trigger_file" && ! -L "$trigger_file" ]] || {
       gauntlet_fail "Remediation trigger chain references missing evidence: $trace_record"
       return 1
@@ -2708,7 +2708,7 @@ gauntlet_trace_remediation_trigger() {
         gauntlet_fail "Closed remediation cycle does not resolve exactly one opened event: $trace_record"
         return 1
       }
-    prior_opened_relative="${prior_opened#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    prior_opened_relative="${prior_opened#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     gauntlet_progress_pr_event_precedes \
       "$gauntlet_file" "$prior_opened_relative" "$trace_record" || {
       gauntlet_fail "Closed remediation cycle does not follow its opened event in the immutable PR ledger: $trace_record"
@@ -2729,12 +2729,12 @@ gauntlet_failure_has_merged_remediation() {
   local failure_critic_round failure_precedes_round failure_precedes_opened
 
   gauntlet_dir="$(cd "$(dirname "$gauntlet_file")" && pwd -P)"
-  failure_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$failure_relative"
-  if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+  failure_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$failure_relative"
+  if [[ "$failure_relative" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
     failure_heading='Round Metadata'
     failure_item="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Item')"
     [[ "$failure_item" == 'integration' ]] || failure_pr="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Progress PR')"
-  elif [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
+  elif [[ "$failure_relative" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
     failure_heading='PR Event Metadata'
     failure_item="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Item')"
     failure_event="$(gauntlet_section_field "$failure_file" "$failure_heading" 'Event')"
@@ -2744,7 +2744,7 @@ gauntlet_failure_has_merged_remediation() {
   [[ -d "$gauntlet_dir/pr-events/$item_id" ]] || return 1
   while IFS= read -r merged_file; do
     [[ "$(gauntlet_section_field "$merged_file" 'PR Event Metadata' 'Event')" == 'merged' ]] || continue
-    merge_relative="${merged_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    merge_relative="${merged_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     merge_time="$(gauntlet_section_field "$merged_file" 'PR Event Metadata' 'Recorded at')"
     latest_pr="$(gauntlet_section_field "$merged_file" 'PR Event Metadata' 'PR URL')"
     opened_file=''
@@ -2755,7 +2755,7 @@ gauntlet_failure_has_merged_remediation() {
       fi
     done < <(find "$gauntlet_dir/pr-events/$item_id" -maxdepth 1 -type f -name 'event-*.md' -print | LC_ALL=C sort)
     [[ -n "$opened_file" ]] || continue
-    opened_relative="${opened_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    opened_relative="${opened_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     same_pr_failure=0
     if [[ "$failure_pr" != 'none' && "$failure_item" == "$item_id" \
       && "${latest_pr%/}" == "$failure_pr" ]]; then
@@ -2771,7 +2771,7 @@ gauntlet_failure_has_merged_remediation() {
     fi
     opened_time="$(gauntlet_section_field "$opened_file" 'PR Event Metadata' 'Recorded at')"
     critic_round="$(gauntlet_section_field "$merged_file" 'PR Event Metadata' 'Critic round')"
-    round_file="$OPENCAW_PROJECT_ROOT_RESOLVED/$critic_round"
+    round_file="$HEPHAERA_PROJECT_ROOT_RESOLVED/$critic_round"
     [[ -f "$round_file" && ! -L "$round_file" ]] || continue
     round_time="$(gauntlet_section_field "$round_file" 'Round Metadata' 'Recorded at')"
     qa_file=''
@@ -2783,7 +2783,7 @@ gauntlet_failure_has_merged_remediation() {
       fi
     done < <(find "$gauntlet_dir/pr-events/$item_id" -maxdepth 1 -type f -name 'event-*.md' -print | LC_ALL=C sort)
     [[ -n "$qa_file" ]] || continue
-    qa_relative="${qa_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    qa_relative="${qa_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     qa_time="$(gauntlet_section_field "$qa_file" 'PR Event Metadata' 'Recorded at')"
 
     [[ ( "$opened_time" < "$round_time" || "$opened_time" == "$round_time" ) \
@@ -2799,13 +2799,13 @@ gauntlet_failure_has_merged_remediation() {
       if [[ "$failure_time" < "$round_time" ]]; then
         failure_precedes_round=1
       elif [[ "$failure_time" == "$round_time" ]]; then
-        if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
+        if [[ "$failure_relative" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]]; then
           gauntlet_round_event_precedes \
             "$gauntlet_file" "$failure_relative" "$critic_round" \
             && failure_precedes_round=1
-        elif [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
+        elif [[ "$failure_relative" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
           failure_critic_round="$(gauntlet_section_field "$failure_file" 'PR Event Metadata' 'Critic round')"
-          if [[ "$failure_critic_round" == .opencaw/.cache/gauntlets/*/rounds/*/round-*.md ]] \
+          if [[ "$failure_critic_round" == .hephaera/.cache/gauntlets/*/rounds/*/round-*.md ]] \
             && gauntlet_round_event_precedes \
               "$gauntlet_file" "$failure_critic_round" "$critic_round" \
             && gauntlet_progress_pr_event_precedes \
@@ -2822,7 +2822,7 @@ gauntlet_failure_has_merged_remediation() {
       if [[ "$failure_time" < "$opened_time" ]]; then
         failure_precedes_opened=1
       elif [[ "$failure_time" == "$opened_time" ]]; then
-        if [[ "$failure_relative" == .opencaw/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
+        if [[ "$failure_relative" == .hephaera/.cache/gauntlets/*/pr-events/*/event-*.md ]]; then
           gauntlet_progress_pr_event_precedes \
             "$gauntlet_file" "$failure_relative" "$opened_relative" \
             && failure_precedes_opened=1
@@ -2889,9 +2889,9 @@ gauntlet_progress_merge_chain_tip() {
   base_sha="$(gauntlet_section_field "$gauntlet_file" 'Delivery' 'Base commit SHA')"
   base_sha="${base_sha,,}"
   gauntlet_validate_head_sha "$base_sha" 'Gauntlet base commit SHA' || return 1
-  rows="$(mktemp "${TMPDIR:-/tmp}/opencaw-gauntlet-merge-chain.XXXXXX")"
-  consumed="$(mktemp "${TMPDIR:-/tmp}/opencaw-gauntlet-merge-consumed.XXXXXX")"
-  seen_tips="$(mktemp "${TMPDIR:-/tmp}/opencaw-gauntlet-merge-tips.XXXXXX")"
+  rows="$(mktemp "${TMPDIR:-/tmp}/hephaera-gauntlet-merge-chain.XXXXXX")"
+  consumed="$(mktemp "${TMPDIR:-/tmp}/hephaera-gauntlet-merge-consumed.XXXXXX")"
+  seen_tips="$(mktemp "${TMPDIR:-/tmp}/hephaera-gauntlet-merge-tips.XXXXXX")"
   : > "$rows"
   : > "$consumed"
   : > "$seen_tips"
@@ -2900,7 +2900,7 @@ gauntlet_progress_merge_chain_tip() {
       [[ "$(gauntlet_section_field "$event_file" 'PR Event Metadata' 'Event')" == 'merged' ]] || continue
       target_sha="$(gauntlet_section_field "$event_file" 'PR Event Metadata' 'Target base SHA' | tr '[:upper:]' '[:lower:]')"
       merge_sha="$(gauntlet_section_field "$event_file" 'PR Event Metadata' 'Merge commit' | tr '[:upper:]' '[:lower:]')"
-      relative="${event_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+      relative="${event_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
       gauntlet_validate_head_sha "$target_sha" "Merged PR target base SHA ($relative)" || { rm -f "$rows" "$consumed" "$seen_tips"; return 1; }
       gauntlet_validate_head_sha "$merge_sha" "Merged PR merge commit ($relative)" || { rm -f "$rows" "$consumed" "$seen_tips"; return 1; }
       gauntlet_assert_commit_ancestor "$target_sha" "$merge_sha" "Merged PR segment ($relative)" || { rm -f "$rows" "$consumed" "$seen_tips"; return 1; }
@@ -2964,7 +2964,7 @@ gauntlet_remediation_trigger() {
   fi
   previous_event="$(gauntlet_section_field "$previous_event_file" 'PR Event Metadata' 'Event')"
   if [[ "$previous_event" == 'closed' ]]; then
-    printf '%s\n' "${previous_event_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+    printf '%s\n' "${previous_event_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
     return 0
   fi
   [[ "$previous_event" == 'merged' ]] || return 1
@@ -3046,7 +3046,7 @@ gauntlet_round_has_retained_failure() {
   item_id="$(gauntlet_section_field "$round_file" 'Round Metadata' 'Item')"
   [[ "$item_id" != 'integration' ]] || return 1
   gauntlet_dir="$(cd "$(dirname "$gauntlet_file")" && pwd -P)"
-  relative_round="${round_file#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+  relative_round="${round_file#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
   [[ -d "$gauntlet_dir/pr-events/$item_id" ]] || return 1
   while IFS= read -r event_file; do
     [[ "$(gauntlet_section_field "$event_file" 'PR Event Metadata' 'Event')" == 'qa-fail' \
@@ -3080,7 +3080,7 @@ gauntlet_assert_unit_progress_integrated() {
     gauntlet_fail "Work unit requires a latest human-merged progress PR: $item_id"
     return 1
   }
-  latest_round_relative="${latest_round#"$OPENCAW_PROJECT_ROOT_RESOLVED"/}"
+  latest_round_relative="${latest_round#"$HEPHAERA_PROJECT_ROOT_RESOLVED"/}"
   round_pr="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Progress PR')"
   round_pr="${round_pr%/}"
   round_head="$(gauntlet_section_field "$latest_round" 'Round Metadata' 'Head branch')"

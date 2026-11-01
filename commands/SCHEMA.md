@@ -1,6 +1,6 @@
 # Commands Schema
 
-This document defines the structure for all commands in OpenCaw.
+This document defines the structure for all commands in Hephaera.
 
 Commands represent **deterministic execution steps**, typically shell scripts.
 
@@ -174,7 +174,7 @@ Validation may be enforced with:
 - `./commands/validate-styles.sh`
 - `./commands/validate-style-contract.sh`
 - `./commands/validate-cloud-preferences.sh`
-- `./commands/validate-opencaw.sh`
+- `./commands/validate-hephaera.sh`
 
 ## Pinned Bubo execution
 

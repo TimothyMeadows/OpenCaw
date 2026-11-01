@@ -107,8 +107,8 @@ for (const [patch, pattern] of [
   eq(runtime.render(0), true); eq(runtime.inspect().time, .05);
   for (const value of [-1, NaN, Infinity, undefined, .101]) rejects(() => runtime.render(value), /deltaSeconds/);
   runtime.pause(); eq(runtime.render(.05), false); runtime.resume(); eq(runtime.render(.05), true);
-  event(h.lifecycle, 'opencaw:lifecycle', {state: 'suspend'}); runtime.resume(); eq(runtime.render(.05), false);
-  event(h.lifecycle, 'opencaw:lifecycle', {state: 'resume'}); eq(runtime.render(.05), true);
+  event(h.lifecycle, 'hephaera:lifecycle', {state: 'suspend'}); runtime.resume(); eq(runtime.render(.05), false);
+  event(h.lifecycle, 'hephaera:lifecycle', {state: 'resume'}); eq(runtime.render(.05), true);
   h.doc.hidden = true; event(h.doc, 'visibilitychange'); eq(runtime.render(.05), false);
   h.doc.hidden = false; event(h.doc, 'visibilitychange'); eq(runtime.render(.05), true);
   const before = h.renderer.drawCalls; h.gl.lost = true;

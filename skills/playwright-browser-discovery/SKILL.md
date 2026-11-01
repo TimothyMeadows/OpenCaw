@@ -33,6 +33,6 @@ Produce a concise discovery record:
 - Record exact option labels for dropdowns and multiselects; tests should use visible labels only when the application contract supports that.
 - Treat snapshot element refs as temporary. Re-snapshot after navigation or dynamic UI changes.
 - On Windows, do not invent unsupported CLI flags. Use the locally installed `playwright-cli` or `npx playwright-cli` with the flags supported by that version.
-- Store generated discovery artifacts in host scratch locations such as `.playwright-cli/`; do not promote them into OpenCaw unless they are reusable templates or references.
-- Reference docs bundled with OpenCaw live under `assets/playwright-cli/references/`.
-- When the user needs a non-interactive handoff, run `commands/playwright-discovery-report.sh` to summarize snapshots, screenshots, traces, and videos into `.opencaw/.cache/reports/`.
+- Store generated discovery artifacts in host scratch locations such as `.playwright-cli/`; do not promote them into Hephaera unless they are reusable templates or references.
+- Reference docs bundled with Hephaera live under `assets/playwright-cli/references/`.
+- When the user needs a non-interactive handoff, run `commands/playwright-discovery-report.sh` to summarize snapshots, screenshots, traces, and videos into `.hephaera/.cache/reports/`.

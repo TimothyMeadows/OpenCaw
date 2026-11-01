@@ -79,7 +79,7 @@ EOF
 
 next_session_id() {
   local max
-  max="$(grep -Eo 'BS-[0-9]{3,}' "$OPENCAW_BRAINSTORM_FILE" | sed 's/^BS-//' | sort -n | tail -n1 || true)"
+  max="$(grep -Eo 'BS-[0-9]{3,}' "$HEPHAERA_BRAINSTORM_FILE" | sed 's/^BS-//' | sort -n | tail -n1 || true)"
   [[ -n "$max" ]] || max=0
   printf 'BS-%03d' "$((10#$max + 1))"
 }
@@ -125,113 +125,113 @@ case "$action" in
       echo 'Cannot start Brainstorm mode because the existing BRAINSTORM.md state is malformed.' >&2
       exit 1
     fi
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'active' ]]; then
-      brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" active
-      echo "Brainstorm mode is already active: $OPENCAW_BRAINSTORM_FILE"
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'active' ]]; then
+      brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" active
+      echo "Brainstorm mode is already active: $HEPHAERA_BRAINSTORM_FILE"
       exit 0
     fi
-    tmp="$(mktemp "$OPENCAW_PROJECT_ROOT_RESOLVED/.brainstorm-start.XXXXXX")"
+    tmp="$(mktemp "$HEPHAERA_PROJECT_ROOT_RESOLVED/.brainstorm-start.XXXXXX")"
     trap 'rm -f -- "${tmp:-}"' EXIT
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'absent' ]]; then
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'absent' ]]; then
       write_new_brainstorm "$timestamp" > "$tmp"
     else
-      brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" inactive
+      brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" inactive
       session_id="$(next_session_id)"
-      stage_active_copy "$OPENCAW_BRAINSTORM_FILE" "$tmp" "$session_id" "$timestamp"
+      stage_active_copy "$HEPHAERA_BRAINSTORM_FILE" "$tmp" "$session_id" "$timestamp"
     fi
     brainstorm_validate_file "$tmp" active
     if [[ $dry_run -eq 1 ]]; then
-      echo "Dry run: would activate $OPENCAW_BRAINSTORM_FILE"
+      echo "Dry run: would activate $HEPHAERA_BRAINSTORM_FILE"
       cat "$tmp"
       exit 0
     fi
-    mv "$tmp" "$OPENCAW_BRAINSTORM_FILE"
+    mv "$tmp" "$HEPHAERA_BRAINSTORM_FILE"
     trap - EXIT
-    echo "Brainstorm mode activated: $OPENCAW_BRAINSTORM_FILE"
+    echo "Brainstorm mode activated: $HEPHAERA_BRAINSTORM_FILE"
     ;;
   stop)
     if ! brainstorm_detect_state; then
       echo 'Cannot stop Brainstorm mode because BRAINSTORM.md state is malformed.' >&2
       exit 1
     fi
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'absent' ]]; then
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'absent' ]]; then
       echo 'Brainstorm mode has not been started.' >&2
       exit 1
     fi
-    if [[ -L "$OPENCAW_BRAINSTORM_SUMMARY_FILE" ]]; then
-      echo "Cannot stop Brainstorm mode because the summary path is a symbolic link: $OPENCAW_BRAINSTORM_SUMMARY_FILE" >&2
+    if [[ -L "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" ]]; then
+      echo "Cannot stop Brainstorm mode because the summary path is a symbolic link: $HEPHAERA_BRAINSTORM_SUMMARY_FILE" >&2
       exit 1
     fi
     timestamp="$(brainstorm_utc_now)"
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'inactive' ]]; then
-      brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" inactive
-      if brainstorm_validate_summary "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_SUMMARY_FILE" >/dev/null 2>&1; then
-        echo "Brainstorm mode is already inactive and its summary is current: $OPENCAW_BRAINSTORM_SUMMARY_FILE"
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'inactive' ]]; then
+      brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" inactive
+      if brainstorm_validate_summary "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" >/dev/null 2>&1; then
+        echo "Brainstorm mode is already inactive and its summary is current: $HEPHAERA_BRAINSTORM_SUMMARY_FILE"
         exit 0
       fi
-      staged_brainstorm="$OPENCAW_BRAINSTORM_FILE"
+      staged_brainstorm="$HEPHAERA_BRAINSTORM_FILE"
     else
-      brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" active
-      staged_brainstorm="$(mktemp "$OPENCAW_PROJECT_ROOT_RESOLVED/.brainstorm-stop.XXXXXX")"
-      stage_inactive_copy "$OPENCAW_BRAINSTORM_FILE" "$staged_brainstorm" "$OPENCAW_BRAINSTORM_ACTIVE_SESSION" "$timestamp"
+      brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" active
+      staged_brainstorm="$(mktemp "$HEPHAERA_PROJECT_ROOT_RESOLVED/.brainstorm-stop.XXXXXX")"
+      stage_inactive_copy "$HEPHAERA_BRAINSTORM_FILE" "$staged_brainstorm" "$HEPHAERA_BRAINSTORM_ACTIVE_SESSION" "$timestamp"
       brainstorm_validate_file "$staged_brainstorm" inactive
     fi
-    staged_summary="$(mktemp "$OPENCAW_PROJECT_ROOT_RESOLVED/.brainstorm-summary.XXXXXX")"
-    trap '[[ "${staged_brainstorm:-}" == "$OPENCAW_BRAINSTORM_FILE" ]] || rm -f -- "${staged_brainstorm:-}"; rm -f -- "${staged_summary:-}" "${backup_brainstorm:-}" "${backup_summary:-}"' EXIT
+    staged_summary="$(mktemp "$HEPHAERA_PROJECT_ROOT_RESOLVED/.brainstorm-summary.XXXXXX")"
+    trap '[[ "${staged_brainstorm:-}" == "$HEPHAERA_BRAINSTORM_FILE" ]] || rm -f -- "${staged_brainstorm:-}"; rm -f -- "${staged_summary:-}" "${backup_brainstorm:-}" "${backup_summary:-}"' EXIT
     brainstorm_write_summary "$staged_brainstorm" "$staged_summary"
     brainstorm_validate_summary "$staged_brainstorm" "$staged_summary"
     if [[ $dry_run -eq 1 ]]; then
-      echo "Dry run: would deactivate $OPENCAW_BRAINSTORM_FILE"
-      echo "Dry run: would regenerate $OPENCAW_BRAINSTORM_SUMMARY_FILE"
+      echo "Dry run: would deactivate $HEPHAERA_BRAINSTORM_FILE"
+      echo "Dry run: would regenerate $HEPHAERA_BRAINSTORM_SUMMARY_FILE"
       cat "$staged_summary"
       exit 0
     fi
-    backup_brainstorm="$(mktemp "$OPENCAW_PROJECT_ROOT_RESOLVED/.brainstorm-backup.XXXXXX")"
-    cp "$OPENCAW_BRAINSTORM_FILE" "$backup_brainstorm"
+    backup_brainstorm="$(mktemp "$HEPHAERA_PROJECT_ROOT_RESOLVED/.brainstorm-backup.XXXXXX")"
+    cp "$HEPHAERA_BRAINSTORM_FILE" "$backup_brainstorm"
     backup_summary=''
-    if [[ -f "$OPENCAW_BRAINSTORM_SUMMARY_FILE" ]]; then
-      backup_summary="$(mktemp "$OPENCAW_PROJECT_ROOT_RESOLVED/.brainstorm-summary-backup.XXXXXX")"
-      cp "$OPENCAW_BRAINSTORM_SUMMARY_FILE" "$backup_summary"
+    if [[ -f "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" ]]; then
+      backup_summary="$(mktemp "$HEPHAERA_PROJECT_ROOT_RESOLVED/.brainstorm-summary-backup.XXXXXX")"
+      cp "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" "$backup_summary"
     fi
     rollback=0
-    if [[ "$staged_brainstorm" != "$OPENCAW_BRAINSTORM_FILE" ]]; then
-      mv "$staged_brainstorm" "$OPENCAW_BRAINSTORM_FILE" || rollback=1
+    if [[ "$staged_brainstorm" != "$HEPHAERA_BRAINSTORM_FILE" ]]; then
+      mv "$staged_brainstorm" "$HEPHAERA_BRAINSTORM_FILE" || rollback=1
     fi
     if [[ $rollback -eq 0 ]]; then
-      mv "$staged_summary" "$OPENCAW_BRAINSTORM_SUMMARY_FILE" || rollback=1
+      mv "$staged_summary" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" || rollback=1
     fi
     if [[ $rollback -ne 0 ]]; then
-      cp "$backup_brainstorm" "$OPENCAW_BRAINSTORM_FILE"
-      if [[ -n "$backup_summary" ]]; then cp "$backup_summary" "$OPENCAW_BRAINSTORM_SUMMARY_FILE"; else rm -f "$OPENCAW_BRAINSTORM_SUMMARY_FILE"; fi
+      cp "$backup_brainstorm" "$HEPHAERA_BRAINSTORM_FILE"
+      if [[ -n "$backup_summary" ]]; then cp "$backup_summary" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE"; else rm -f "$HEPHAERA_BRAINSTORM_SUMMARY_FILE"; fi
       echo 'Brainstorm deactivation failed; prior artifacts were restored.' >&2
       exit 1
     fi
-    brainstorm_validate_summary "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_SUMMARY_FILE"
+    brainstorm_validate_summary "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE"
     rm -f -- "$backup_brainstorm" ${backup_summary:+"$backup_summary"}
     trap - EXIT
-    echo "Brainstorm mode deactivated: $OPENCAW_BRAINSTORM_FILE"
-    echo "Brainstorm summary generated: $OPENCAW_BRAINSTORM_SUMMARY_FILE"
+    echo "Brainstorm mode deactivated: $HEPHAERA_BRAINSTORM_FILE"
+    echo "Brainstorm summary generated: $HEPHAERA_BRAINSTORM_SUMMARY_FILE"
     ;;
   status)
     if ! brainstorm_detect_state; then
       echo 'BRAINSTORM_STATUS=malformed'
-      echo "BRAINSTORM_FILE=$OPENCAW_BRAINSTORM_FILE"
+      echo "BRAINSTORM_FILE=$HEPHAERA_BRAINSTORM_FILE"
       exit 2
     fi
-    echo "BRAINSTORM_STATUS=$OPENCAW_BRAINSTORM_STATE"
-    echo "BRAINSTORM_FILE=$OPENCAW_BRAINSTORM_FILE"
-    echo "BRAINSTORM_SUMMARY_FILE=$OPENCAW_BRAINSTORM_SUMMARY_FILE"
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'absent' ]]; then
+    echo "BRAINSTORM_STATUS=$HEPHAERA_BRAINSTORM_STATE"
+    echo "BRAINSTORM_FILE=$HEPHAERA_BRAINSTORM_FILE"
+    echo "BRAINSTORM_SUMMARY_FILE=$HEPHAERA_BRAINSTORM_SUMMARY_FILE"
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'absent' ]]; then
       echo 'BRAINSTORM_BRANCHES=0'
       echo 'BRAINSTORM_ELEMENTS=0'
       echo 'BRAINSTORM_SUMMARY_CURRENT=no'
       exit 0
     fi
-    brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_STATE"
-    echo "BRAINSTORM_SESSION=$OPENCAW_BRAINSTORM_ACTIVE_SESSION"
-    echo "BRAINSTORM_BRANCHES=$OPENCAW_BRAINSTORM_BRANCH_COUNT"
-    echo "BRAINSTORM_ELEMENTS=$OPENCAW_BRAINSTORM_ELEMENT_COUNT"
-    if [[ "$OPENCAW_BRAINSTORM_STATE" == 'inactive' ]] && brainstorm_validate_summary "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_SUMMARY_FILE" >/dev/null 2>&1; then
+    brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_STATE"
+    echo "BRAINSTORM_SESSION=$HEPHAERA_BRAINSTORM_ACTIVE_SESSION"
+    echo "BRAINSTORM_BRANCHES=$HEPHAERA_BRAINSTORM_BRANCH_COUNT"
+    echo "BRAINSTORM_ELEMENTS=$HEPHAERA_BRAINSTORM_ELEMENT_COUNT"
+    if [[ "$HEPHAERA_BRAINSTORM_STATE" == 'inactive' ]] && brainstorm_validate_summary "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE" >/dev/null 2>&1; then
       echo 'BRAINSTORM_SUMMARY_CURRENT=yes'
     else
       echo 'BRAINSTORM_SUMMARY_CURRENT=no'

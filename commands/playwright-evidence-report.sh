@@ -3,10 +3,10 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-OPENCAW_PROJECT_ROOT="${OPENCAW_HOST_ROOT:-${OPENCAW_PROJECT_ROOT:-}}"
-opencaw_resolve_paths
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-output_dir="${1:-.opencaw/.cache/reports}"
+HEPHAERA_PROJECT_ROOT="${HEPHAERA_HOST_ROOT:-${HEPHAERA_PROJECT_ROOT:-}}"
+hephaera_resolve_paths
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+output_dir="${1:-.hephaera/.cache/reports}"
 
 cd "$host_root"
 mkdir -p "$output_dir"
@@ -58,7 +58,7 @@ bundle="$output_dir/playwright-evidence-${stamp}.md"
   echo
   echo "## Notes"
   echo
-  echo "- This bundle is intended for OpenCaw sessions where interactive Playwright UI and HTML report viewers are unavailable."
+  echo "- This bundle is intended for Hephaera sessions where interactive Playwright UI and HTML report viewers are unavailable."
 } > "$bundle"
 
 echo "REPORT_FILE=$bundle"

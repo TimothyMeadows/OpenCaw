@@ -12,7 +12,7 @@ export function attachGamePostprocessing({scene, camera, renderer, engineSelecti
 // One host loop: simulation -> presentation -> particles.update(delta) ->
 // postprocessing.render(delta). Do not also renderer.render(scene, camera).
 // Call resize(logicalWidth, logicalHeight, explicitDpr) for bounded sizing.
-// The helper handles MAUI opencaw:lifecycle and document visibility. After context
+// The helper handles MAUI hephaera:lifecycle and document visibility. After context
 // restoration call revalidate() explicitly; inspect() retains native QA unknowns.
 // At final application teardown, retire ALL composer/pass users of this package
 // instance, then explicitly Postprocessing.Pass.fullscreenGeometry.dispose(),

@@ -18,8 +18,12 @@ try {
   equal(fs.existsSync(path.join(root, 'ENGINE.md')), false);
   // Installed definitions and historical/cache fixtures are not project engine
   // evidence. Their native project files must not override the host selection.
-  write(root, '.opencaw/.cache/tasks/history/game/project.godot', '[application]');
-  write(root, '.opencaw/fixtures/ProjectSettings/ProjectVersion.txt', 'fixture');
+  write(root, '.hephaera/.cache/tasks/history/game/project.godot', '[application]');
+  write(root, '.hephaera/fixtures/ProjectSettings/ProjectVersion.txt', 'fixture');
+  equal(engine.resolve(root).existingEngines, []);
+  // Historical hidden-install caches are durable tooling state, never game
+  // evidence. Do not descend into their deep model/package environments.
+  write(root, '.previous-tool/.cache/' + 'history/'.repeat(14) + 'project.godot', '[application]');
   equal(engine.resolve(root).existingEngines, []);
   rejects(() => engine.engineId('nonsense'), /Unknown/);
   const definitions = JSON.parse(fs.readFileSync(path.join(base, '.engine/registry.json'))).engines;
@@ -64,15 +68,15 @@ try {
   write(invalid, 'ENGINE.md', '# Custom contract\n');
   rejects(() => engine.resolve(invalid), /exactly one/);
   rejects(() => engine.generate(invalid, 'UNITY'), /custom content was preserved/);
-  write(invalid, 'ENGINE.md', 'Selected OpenCaw engine:\n- UNKNOWN\n');
+  write(invalid, 'ENGINE.md', 'Selected Hephaera engine:\n- UNKNOWN\n');
   rejects(() => engine.resolve(invalid), /canonical/);
-  write(invalid, 'ENGINE.md', 'Selected OpenCaw engine:\n- UNITY\n- GODOT\n');
+  write(invalid, 'ENGINE.md', 'Selected Hephaera engine:\n- UNITY\n- GODOT\n');
   rejects(() => engine.resolve(invalid), /one canonical/);
-  write(invalid, 'ENGINE.md', 'Selected OpenCaw engine:\n- UNITY\n\nRead `./.engine/UNITY.md` instructions\nSelected OpenCaw engine:\n- UNITY\n');
+  write(invalid, 'ENGINE.md', 'Selected Hephaera engine:\n- UNITY\n\nRead `./.engine/UNITY.md` instructions\nSelected Hephaera engine:\n- UNITY\n');
   rejects(() => engine.resolve(invalid), /exactly one/);
-  write(invalid, 'ENGINE.md', 'Selected OpenCaw engine:\n- UNITY\n\nRead `./.engine/GODOT.md` instructions\n');
+  write(invalid, 'ENGINE.md', 'Selected Hephaera engine:\n- UNITY\n\nRead `./.engine/GODOT.md` instructions\n');
   rejects(() => engine.resolve(invalid), /conflicting/);
-  write(invalid, 'ENGINE.md', 'Selected OpenCaw engine:\n- UNITY\n\n### Inline Engine Definition\n\n# GODOT\n\n<!-- opencaw-engine:end -->');
+  write(invalid, 'ENGINE.md', 'Selected Hephaera engine:\n- UNITY\n\n### Inline Engine Definition\n\n# GODOT\n\n<!-- hephaera-engine:end -->');
   rejects(() => engine.resolve(invalid), /matching/);
   const validLinked = fs.readFileSync(path.join(runtime, 'THREEJS/ENGINE.md'), 'utf8');
   write(invalid, 'ENGINE.md', validLinked + '\n### Inline Engine Definition\n\n# GODOT\n');
@@ -102,7 +106,7 @@ try {
     engine.generate(p, id); equal(engine.resolve(p).existingEngines, [id]);
   }
   const legacy = project('legacy');
-  write(legacy, 'ARCHITECTURE.md', 'Read `./.opencaw/.architecture/BABYLONJS.md` instructions\n');
+  write(legacy, 'ARCHITECTURE.md', 'Read `./.hephaera/.architecture/BABYLONJS.md` instructions\n');
   rejects(() => engine.resolve(legacy), /legacy architecture/);
   engine.generate(legacy, 'BABYLONJS');
   equal(engine.resolve(legacy).effectiveEngine, 'BABYLONJS');
@@ -113,7 +117,7 @@ try {
 
   const override = project('override');
   engine.generate(override, 'THREEJS');
-  write(override, '.opencaw/.cache/tasks/demo/TASK.md', 'Authorized isolated Unity prototype.');
+  write(override, '.hephaera/.cache/tasks/demo/TASK.md', 'Authorized isolated Unity prototype.');
   const before = fs.readFileSync(path.join(override, 'ENGINE.md'), 'utf8');
   rejects(() => engine.resolve(override, { override: 'UNITY' }), /requires/);
   rejects(() => engine.resolve(override, { override: 'UNITY', recordOverride: true, task: 'demo', scope: 'src/game' }), /isolated/);
@@ -122,7 +126,7 @@ try {
   write(override, 'prototypes/occupied/existing.txt', 'Existing game content');
   rejects(() => engine.resolve(override, { override: 'UNITY', recordOverride: true, task: 'demo', scope: 'prototypes/occupied' }), /empty/);
   const receipt = engine.resolve(override, { override: 'UNITY', recordOverride: true, task: 'demo', scope: 'prototypes/unity-demo' });
-  equal(receipt.evidence, '.opencaw/.cache/tasks/demo/engine-override.json');
+  equal(receipt.evidence, '.hephaera/.cache/tasks/demo/engine-override.json');
   const opt = { evidence: receipt.evidence, output: 'prototypes/unity-demo/Assets/Actor.cs' };
   equal(engine.skill(override, 'unity-build-scenes', opt).compatible, true);
   equal(fs.readFileSync(path.join(override, 'ENGINE.md'), 'utf8'), before);
@@ -137,18 +141,18 @@ try {
   write(override, 'prototypes/unity-demo/project.godot', '[application]');
   rejects(() => engine.resolve(override, opt), /prototype engine evidence/);
   fs.unlinkSync(path.join(override, 'prototypes/unity-demo/project.godot'));
-  write(override, '.opencaw/.cache/tasks/demo/TASK.md', 'Changed task instructions');
+  write(override, '.hephaera/.cache/tasks/demo/TASK.md', 'Changed task instructions');
   rejects(() => engine.resolve(override, opt), /Stale/);
-  write(override, '.opencaw/.cache/tasks/demo/TASK.md', 'Authorized isolated Unity prototype.');
+  write(override, '.hephaera/.cache/tasks/demo/TASK.md', 'Authorized isolated Unity prototype.');
   fs.appendFileSync(path.join(override, 'ENGINE.md'), '\nChanged contract.');
   rejects(() => engine.resolve(override, opt), /Stale/);
   write(override, 'ENGINE.md', before);
   const cachedPrototype = project('cached-prototype');
-  write(cachedPrototype, '.opencaw/.cache/tasks/demo/TASK.md', 'Authorized cached Unity prototype.');
-  const cachedReceipt = engine.resolve(cachedPrototype, { override: 'UNITY', recordOverride: true, task: 'demo', scope: '.opencaw/.cache/tasks/demo/prototypes/unity' });
-  equal(engine.skill(cachedPrototype, 'unity-build-scenes', { evidence: cachedReceipt.evidence, output: '.opencaw/.cache/tasks/demo/prototypes/unity/Assets/Actor.cs' }).compatible, true);
-  rejects(() => engine.resolve(cachedPrototype, { output: '.opencaw/.cache/tasks/demo/prototypes/unity/Assets/Actor.cs' }), /recorded/);
-  rejects(() => engine.resolve(cachedPrototype, { evidence: cachedReceipt.evidence, output: '.opencaw/.cache/tasks/demo/prototypes/other/Actor.cs' }), /outside/);
+  write(cachedPrototype, '.hephaera/.cache/tasks/demo/TASK.md', 'Authorized cached Unity prototype.');
+  const cachedReceipt = engine.resolve(cachedPrototype, { override: 'UNITY', recordOverride: true, task: 'demo', scope: '.hephaera/.cache/tasks/demo/prototypes/unity' });
+  equal(engine.skill(cachedPrototype, 'unity-build-scenes', { evidence: cachedReceipt.evidence, output: '.hephaera/.cache/tasks/demo/prototypes/unity/Assets/Actor.cs' }).compatible, true);
+  rejects(() => engine.resolve(cachedPrototype, { output: '.hephaera/.cache/tasks/demo/prototypes/unity/Assets/Actor.cs' }), /recorded/);
+  rejects(() => engine.resolve(cachedPrototype, { evidence: cachedReceipt.evidence, output: '.hephaera/.cache/tasks/demo/prototypes/other/Actor.cs' }), /outside/);
   // Fresh-install semantics do not discover tasks or accept receipts in the
   // retired memory directory, even when their contents are otherwise valid.
   const retired = project('retired-cache');
@@ -166,14 +170,14 @@ try {
   for (const [file, operation] of [['code-model-cli.cjs', 'create'], ['code-character-cli.cjs', 'create'], ['code-character-evidence-cli.cjs', 'capture'], ['code-character-evidence-cli.cjs', 'analyze']]) {
     const p = cp.spawnSync(process.execPath, [path.join(base, 'commands/lib', file), operation, unity, 'blocked'], { encoding: 'utf8' });
     equal(p.status, 1); equal(p.stderr.includes('requires THREEJS'), true);
-    equal(fs.existsSync(path.join(unity, '.opencaw/.cache')), false);
+    equal(fs.existsSync(path.join(unity, '.hephaera/.cache')), false);
   }
   const validPrototype = project('valid-code-prototype');
-  engine.generate(validPrototype, 'UNITY'); write(validPrototype, '.opencaw/.cache/tasks/demo/TASK.md', 'Three.js prototype allowed.');
+  engine.generate(validPrototype, 'UNITY'); write(validPrototype, '.hephaera/.cache/tasks/demo/TASK.md', 'Three.js prototype allowed.');
   const codeReceipt = engine.resolve(validPrototype, { override: 'THREEJS', task: 'demo', scope: 'prototypes/three-demo', recordOverride: true });
   equal(engine.codeProduction(validPrototype, 'model', 'create', ['demo', '--source', 'prototypes/three-demo/model.ts', '--engine-evidence', codeReceipt.evidence])[0], 'demo');
   rejects(() => engine.codeProduction(validPrototype, 'model', 'create', ['demo', '--source', 'src/game/model.ts', '--engine-evidence', codeReceipt.evidence]), /outside/);
-  rejects(() => engine.codeProduction(validPrototype, 'model', 'create', ['demo', '--source', 'prototypes/three-demo/model.ts', '--output', '.opencaw/.cache/tasks/other/model.json', '--engine-evidence', codeReceipt.evidence]), /recorded task/);
+  rejects(() => engine.codeProduction(validPrototype, 'model', 'create', ['demo', '--source', 'prototypes/three-demo/model.ts', '--output', '.hephaera/.cache/tasks/other/model.json', '--engine-evidence', codeReceipt.evidence]), /recorded task/);
   rejects(() => engine.codeProduction(validPrototype, 'model', 'create', ['demo', '--source', 'prototypes/three-demo/model.ts', '--evidence', 'front=.ai/tasks/demo/front.png', '--engine-evidence', codeReceipt.evidence]), /recorded task/);
   const ordinary = project('ordinary-producer');
   write(ordinary, 'prototypes/unity-game/ProjectSettings/ProjectVersion.txt', 'Unity fixture');
@@ -181,8 +185,8 @@ try {
   rejects(() => engine.codeProduction(ordinary, 'model', 'create', ['demo', '--source', 'prototypes/unity-game/Assets/Actor.ts']), /recorded/);
   write(ordinary, 'tests/game/project.godot', '[application]');
   rejects(() => engine.resolve(ordinary, { output: 'tests/game/Actor.ts' }), /incompatible/);
-  write(ordinary, '.opencaw/.cache/tasks/demo/model.json', JSON.stringify({ target: { sourcePath: 'prototypes/unity-game/Assets/Actor.ts' } }));
-  rejects(() => engine.codeProduction(ordinary, 'character', 'create', ['--manifest', '.opencaw/.cache/tasks/demo/model.json', 'demo']), /recorded/);
+  write(ordinary, '.hephaera/.cache/tasks/demo/model.json', JSON.stringify({ target: { sourcePath: 'prototypes/unity-game/Assets/Actor.ts' } }));
+  rejects(() => engine.codeProduction(ordinary, 'character', 'create', ['--manifest', '.hephaera/.cache/tasks/demo/model.json', 'demo']), /recorded/);
   // Classification mutants are actual isolated skill files, never existing skills.
   const name = 'engine-validation-fixture'; const folder = path.join(base, 'skills', name);
   assert(!fs.existsSync(folder)); fs.mkdirSync(folder);

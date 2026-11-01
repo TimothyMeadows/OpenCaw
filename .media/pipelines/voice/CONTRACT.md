@@ -1,6 +1,6 @@
 # VOICE.md
 
-<!-- opencaw-media-pipeline:v1 domain=VOICE -->
+<!-- hephaera-media-pipeline:v1 domain=VOICE -->
 
 ## Pipeline Selection
 - VOICE
@@ -14,7 +14,7 @@ Provider selection comes from MEDIA.md and explicit task authorization. VOICE se
 
 ## Brief Requirements
 
-Use an opencaw-voice-brief/v1 with exact spoken text/purpose, explicit provider, per-kind supported voice controls, spatialization, loopIntent:false, finite maximum* budgets and technical thresholds. LOCAL requires explicit bounded autoregressive sampling, actual native rights/installation evidence and cuda:0/bfloat16/no offload. Cloning additionally binds canonical distinct local audio/transcript/rights/consent and a fifth independent source-consent identity, plus a typed current-purpose localUse assertion. No transcription, fixed-duration/diffusion controls, denoise/editing, lip-sync, loop claims, upload permission or fallback is implied.
+Use a hephaera-voice-brief/v1 with exact spoken text/purpose, explicit provider, per-kind supported voice controls, spatialization, loopIntent:false, finite maximum* budgets and technical thresholds. LOCAL requires explicit bounded autoregressive sampling, actual native rights/installation evidence and cuda:0/bfloat16/no offload. Cloning additionally binds canonical distinct local audio/transcript/rights/consent and a fifth independent source-consent identity, plus a typed current-purpose localUse assertion. No transcription, fixed-duration/diffusion controls, denoise/editing, lip-sync, loop claims, upload permission or fallback is implied.
 
 ## State And Ancestry
 

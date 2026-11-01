@@ -1,9 +1,9 @@
 using Android.Webkit;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
-using OpenCaw.GameHost.Services;
+using Hephaera.GameHost.Services;
 
-namespace OpenCaw.GameHost.Platforms.Android;
+namespace Hephaera.GameHost.Platforms.Android;
 
 public sealed class GameHybridWebViewHandler : HybridWebViewHandler
 {

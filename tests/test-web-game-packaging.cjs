@@ -10,7 +10,7 @@ const engines = require('../commands/lib/engine-contract.cjs');
 const packaging = require('../commands/lib/web-game-package.cjs');
 
 const base = path.resolve(__dirname, '..');
-const parent = path.join(base, '.opencaw/.cache/tasks/opencaw-maui-web-packaging');
+const parent = path.join(base, '.hephaera/.cache/tasks/hephaera-maui-web-packaging');
 fs.mkdirSync(parent, { recursive: true });
 const fixtures = fs.mkdtempSync(path.join(parent, 'qa-fixtures-'));
 const originals = { spawn: cp.spawn, spawnSync: cp.spawnSync, platform: Object.getOwnPropertyDescriptor(process, 'platform') };
@@ -93,7 +93,7 @@ function restoreNative() { cp.spawn = originals.spawn; cp.spawnSync = originals.
 
   const initRoot = initialize('safe-init');
   const nativeHost = path.join(initRoot, defaults.output);
-  const props = fs.readFileSync(path.join(nativeHost, 'OpenCawGame.props'), 'utf8');
+  const props = fs.readFileSync(path.join(nativeHost, 'HephaeraGame.props'), 'utf8');
   ok(props.includes('Game &amp; Friends')); ok(props.includes('<ApplicationId>com.example.game</ApplicationId>'));
   ok(fs.existsSync(path.join(nativeHost, 'Platforms/Windows/Package.appxmanifest')));
   ok(fs.existsSync(path.join(nativeHost, 'Platforms/Android/AndroidManifest.xml')));
@@ -101,7 +101,7 @@ function restoreNative() { cp.spawn = originals.spawn; cp.spawnSync = originals.
   ok(fs.existsSync(path.join(nativeHost, 'Platforms/MacCatalyst/Info.plist')));
   eq(fs.existsSync(path.join(nativeHost, 'Platforms/Linux')), false);
   rejects(() => packaging.init(initRoot, defaults), /already exists/i);
-  eq(fs.readFileSync(path.join(nativeHost, 'OpenCawGame.props'), 'utf8'), props);
+  eq(fs.readFileSync(path.join(nativeHost, 'HephaeraGame.props'), 'utf8'), props);
 
   const foreign = host('foreign'); write(foreign, 'platforms/maui/private.txt', 'preserve foreign source');
   rejects(() => packaging.init(foreign, defaults), /already exists/i);
@@ -111,7 +111,7 @@ function restoreNative() { cp.spawn = originals.spawn; cp.spawnSync = originals.
     ['traversal', { output: '../escape' }], ['absolute', { output: '/tmp/escape' }],
     ['drive', { output: 'C:/escape' }], ['ads', { output: 'native:stream' }],
     ['reserved', { output: 'platforms/CON' }], ['trailing', { output: 'platforms/maui.' }],
-    ['cache', { output: '.opencaw/.cache/native' }], ['git', { output: '.git/native' }],
+    ['cache', { output: '.hephaera/.cache/native' }], ['git', { output: '.git/native' }],
     ['overlap-source', { output: 'dist/native' }], ['overlap-host', { webRoot: 'platforms' }],
     ['config-overlap', { config: 'dist/config.json' }], ['bad-id', { appId: 'not-valid' }],
     ['remote-entry', { entry: 'https://example.com/index.html' }], ['entry-traversal', { entry: '../index.html' }],
@@ -148,7 +148,7 @@ function restoreNative() { cp.spawn = originals.spawn; cp.spawnSync = originals.
   const changedConfig = await ready('changed-config'); changeConfig(changedConfig, { buildNumber: 2 });
   rejects(() => packaging.verifySnapshot(packaging.context(changedConfig)), /inputs changed/i);
   await packaging.sync(changedConfig, {});
-  ok(fs.readFileSync(path.join(changedConfig, 'platforms/maui/OpenCawGame.props'), 'utf8').includes('<ApplicationVersion>2</ApplicationVersion>'));
+  ok(fs.readFileSync(path.join(changedConfig, 'platforms/maui/HephaeraGame.props'), 'utf8').includes('<ApplicationVersion>2</ApplicationVersion>'));
   const owner = initialize('wrong-owner'); changeConfig(owner, { appId: 'com.other.game' });
   rejects(() => packaging.context(owner), /another configuration/i);
   const lockedRoot = await ready('locked'); const state = packaging.context(lockedRoot).state;
@@ -173,18 +173,18 @@ function restoreNative() { cp.spawn = originals.spawn; cp.spawnSync = originals.
   const stateLinkRoot = initialize('state-link'); write(stateLinkRoot, 'dist/index.html', 'game');
   const foreignState = path.join(stateLinkRoot, 'foreign-state'); fs.mkdirSync(foreignState);
   write(foreignState, 'preserve.txt', 'foreign state');
-  const ownedCache = path.join(stateLinkRoot, '.opencaw/.cache'), savedCache = path.join(stateLinkRoot, 'saved-cache');
+  const ownedCache = path.join(stateLinkRoot, '.hephaera/.cache'), savedCache = path.join(stateLinkRoot, 'saved-cache');
   assert.ok(fs.realpathSync(ownedCache).startsWith(fs.realpathSync(stateLinkRoot) + path.sep));
   assert.ok(path.resolve(savedCache).startsWith(path.resolve(stateLinkRoot) + path.sep));
   fs.renameSync(ownedCache, savedCache); // Preserve init journals before substituting the unsafe cache fixture.
-  fs.symlinkSync(foreignState, path.join(stateLinkRoot, '.opencaw/.cache'), process.platform === 'win32' ? 'junction' : 'dir');
+  fs.symlinkSync(foreignState, path.join(stateLinkRoot, '.hephaera/.cache'), process.platform === 'win32' ? 'junction' : 'dir');
   await rejectsAsync(() => packaging.sync(stateLinkRoot, {}), /link|junction/i);
   eq(fs.readdirSync(foreignState), ['preserve.txt']);
 
   // Same source modules mounted at the canonical installed path: no source-checkout
   // relative path assumptions. This is an installed-module fixture, not Git clone QA.
   const installedRoot = host('installed');
-  const baseline = path.join(installedRoot, '.opencaw'); fs.mkdirSync(baseline);
+  const baseline = path.join(installedRoot, '.hephaera'); fs.mkdirSync(baseline);
   for (const rel of ['commands/lib/web-game-package.cjs', 'commands/lib/engine-contract.cjs', '.engine/registry.json']) {
     write(baseline, rel, fs.readFileSync(path.join(base, rel)));
   }

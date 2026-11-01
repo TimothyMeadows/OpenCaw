@@ -54,7 +54,7 @@ try {
   for(const [name,projectEngine,effectiveEngine] of [['web-to-native','THREEJS','UNITY'],['native-to-web','UNITY','PHASERJS'],['web-to-web','THREEJS','BABYLONJS']]) {
     const dir=host(name), task='override-demo';
     engine.generate(dir,projectEngine);
-    write(dir,`.opencaw/.cache/tasks/${task}/TASK.md`,'# Isolated packaging test\n');
+    write(dir,`.hephaera/.cache/tasks/${task}/TASK.md`,'# Isolated packaging test\n');
     const receipt=engine.resolve(dir,{recordOverride:true,override:effectiveEngine,task,scope:'prototypes/package-demo'});
     const web=data.engines[effectiveEngine].runtimeKind==='web';
     selected(receipt,web);
@@ -73,13 +73,13 @@ try {
 
   // Exercise real installed paths and malformed metadata in a private baseline
   // copy, never by mutating the shared registry while other checks are running.
-  const installed=host('installed'), baseline=path.join(installed,'.opencaw');
+  const installed=host('installed'), baseline=path.join(installed,'.hephaera');
   fs.mkdirSync(path.join(baseline,'commands/lib'),{recursive:true});
   fs.copyFileSync(path.join(engine.BASE,'commands/lib/engine-contract.cjs'),path.join(baseline,'commands/lib/engine-contract.cjs'));
   fs.cpSync(path.join(engine.BASE,'.engine'),path.join(baseline,'.engine'),{recursive:true});
   const local=require(path.join(baseline,'commands/lib/engine-contract.cjs'));
   selected(local.generate(installed,'phaser'),true);
-  eq(fs.readFileSync(path.join(installed,'ENGINE.md'),'utf8').includes('Read `./.opencaw/.engine/PHASERJS.md` instructions'),true);
+  eq(fs.readFileSync(path.join(installed,'ENGINE.md'),'utf8').includes('Read `./.hephaera/.engine/PHASERJS.md` instructions'),true);
   selected(local.resolve(installed),true);
   const registry=path.join(baseline,'.engine/registry.json');
   const mutated=JSON.parse(fs.readFileSync(registry,'utf8'));

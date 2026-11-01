@@ -99,7 +99,7 @@ function inventory(root, libraryId) {
   }
   walk(root, '');
   return {
-    schemaVersion: 'opencaw-external-asset-library/v1',
+    schemaVersion: 'hephaera-external-asset-library/v1',
     libraryId,
     readOnly: true,
     supportedAssetCount: assets.length,
@@ -169,12 +169,12 @@ function preflightTree(source) {
 
 function prepareEvidence(projectRoot, evidenceArgument) {
   if (!evidenceArgument || evidenceArgument === '-') return null;
-  const tasksRoot = path.join(projectRoot, '.opencaw', '.cache', 'tasks');
+  const tasksRoot = path.join(projectRoot, '.hephaera', '.cache', 'tasks');
   // Check each component independently: combining the mount and cache in one
-  // segment would bypass a link at .opencaw and fail on a fresh installation.
-  ensureSafeDirectory(projectRoot, ['.opencaw', '.cache', 'tasks']);
+  // segment would bypass a link at .hephaera and fail on a fresh installation.
+  ensureSafeDirectory(projectRoot, ['.hephaera', '.cache', 'tasks']);
   const output = path.resolve(evidenceArgument);
-  if (!inside(tasksRoot, output) || output === tasksRoot) fail('Copy evidence must be a file below the project .opencaw/.cache/tasks directory.');
+  if (!inside(tasksRoot, output) || output === tasksRoot) fail('Copy evidence must be a file below the project .hephaera/.cache/tasks directory.');
   const relativeSegments = path.relative(tasksRoot, path.dirname(output)).split(path.sep).filter(Boolean);
   ensureSafeDirectory(tasksRoot, relativeSegments);
   if (fs.existsSync(output) && fs.lstatSync(output).isSymbolicLink()) fail('Copy evidence must not be a symbolic link.');
@@ -205,7 +205,7 @@ function copyAsset(root, projectArgument, libraryId, sourceArgument, styleSha256
   if (!inside(modelsRoot, destination)) fail('Destination escapes assets/models.');
   if (fs.existsSync(destination)) fail(`Destination already exists; refusing to overwrite: ${portable(path.relative(projectRoot, destination))}`);
 
-  const temporaryRoot = fs.mkdtempSync(path.join(modelsRoot, '.opencaw-copy-'));
+  const temporaryRoot = fs.mkdtempSync(path.join(modelsRoot, '.hephaera-copy-'));
   const staged = path.join(temporaryRoot, 'payload');
   const copied = [];
   try {
@@ -224,7 +224,7 @@ function copyAsset(root, projectArgument, libraryId, sourceArgument, styleSha256
 
   const destinationRelative = portable(path.relative(projectRoot, destination));
   const result = {
-    schemaVersion: 'opencaw-external-asset-copy/v1',
+    schemaVersion: 'hephaera-external-asset-copy/v1',
     libraryId,
     sourceRelativePath: sourceSegments.join('/'),
     sourceReadOnly: true,

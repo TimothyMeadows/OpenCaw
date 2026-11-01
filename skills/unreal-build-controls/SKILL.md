@@ -12,7 +12,7 @@ Implement Unreal player input contexts and device-specific haptic feedback with 
 
 ## Activation and prerequisites
 
-Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-controls` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.opencaw/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
+Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-controls` before edits or tool launches. Continue only when the effective engine is `UNREAL` and `compatible: true`. Skill selection never selects the engine. Revalidate any task override and its permitted isolated output scope before writes. Record observed context and evidence only in the resolved `.hephaera/.cache/tasks/<task>/`; `ENGINE.md` remains the selector.
 
 Read Unreal version, selected input plugins/backend, local player topology, action definitions, binding settings, platform device requirements and feedback policy. Enhanced Input must be an explicit compatible project selection.
 

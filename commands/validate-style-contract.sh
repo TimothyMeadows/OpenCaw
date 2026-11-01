@@ -9,8 +9,8 @@ for argument in "$@"; do
   if [[ "$argument" == --help || "$argument" == -h ]]; then exec "$node_bin" "$node_script" validate --help; fi
 done
 source "$command_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-node_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+hephaera_resolve_paths
+node_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 node_arguments=("$@")
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
   node_root="$(wslpath -w "$node_root")"

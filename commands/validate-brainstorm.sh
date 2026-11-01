@@ -26,8 +26,8 @@ while [[ $# -gt 0 ]]; do
 done
 case "$phase" in any|active|inactive) ;; *) echo "Invalid phase: $phase" >&2; exit 1 ;; esac
 
-brainstorm_validate_file "$OPENCAW_BRAINSTORM_FILE" "$phase"
-if [[ "$phase" == 'inactive' || ( "$phase" == 'any' && "$OPENCAW_BRAINSTORM_MODE_STATUS" == 'inactive' ) ]]; then
-  brainstorm_validate_summary "$OPENCAW_BRAINSTORM_FILE" "$OPENCAW_BRAINSTORM_SUMMARY_FILE"
+brainstorm_validate_file "$HEPHAERA_BRAINSTORM_FILE" "$phase"
+if [[ "$phase" == 'inactive' || ( "$phase" == 'any' && "$HEPHAERA_BRAINSTORM_MODE_STATUS" == 'inactive' ) ]]; then
+  brainstorm_validate_summary "$HEPHAERA_BRAINSTORM_FILE" "$HEPHAERA_BRAINSTORM_SUMMARY_FILE"
 fi
-echo "Brainstorm validation passed (state=$OPENCAW_BRAINSTORM_MODE_STATUS branches=$OPENCAW_BRAINSTORM_BRANCH_COUNT elements=$OPENCAW_BRAINSTORM_ELEMENT_COUNT)."
+echo "Brainstorm validation passed (state=$HEPHAERA_BRAINSTORM_MODE_STATUS branches=$HEPHAERA_BRAINSTORM_BRANCH_COUNT elements=$HEPHAERA_BRAINSTORM_ELEMENT_COUNT)."

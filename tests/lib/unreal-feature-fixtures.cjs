@@ -21,7 +21,7 @@ function configuration(file) {
   for (const raw of fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/)) {
     const line = raw.trim();
     if (!line || line.startsWith(';')) continue;
-    if (line.startsWith('[')) { selected = line === '[OpenCaw.UnrealFeatures]'; continue; }
+    if (line.startsWith('[')) { selected = line === '[Hephaera.UnrealFeatures]'; continue; }
     if (!selected) continue;
     const match = line.match(/^([A-Za-z][A-Za-z0-9]*)\s*=\s*(.*?)\s*$/);
     if (!match || Object.hasOwn(output, match[1])) throw new Error('Invalid or duplicate Unreal feature configuration');
@@ -65,7 +65,7 @@ function inspectEvidence(file, testName, nonce, startedAt, inspectReport) {
   const checked = inspectReport(file, testName);
   const report = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
   const entries = report.tests[0].entries;
-  const marker = 'OpenCawFeatureEvidence run=' + nonce + ' case=' + testName;
+  const marker = 'HephaeraFeatureEvidence run=' + nonce + ' case=' + testName;
   if (!Array.isArray(entries) || entries.filter(entry => entry.event?.message === marker && entry.event?.type === 'Info').length !== 1) throw new Error('Native feature report lacks the fresh invocation marker');
   return { ...checked, runId: nonce, reportSha256: sha(file) };
 }
@@ -82,15 +82,15 @@ async function run(context, api) {
   const meta = manifest();
   const result = (test, status, reason, extra = {}) => ({ engine: 'UNREAL', phase: 'native-feature', test: test.name, status, reason, ...extra });
   const all = (status, reason) => meta.cases.map(test => result(test, status, reason));
-  const selected = process.env.OPENCAW_UNREAL_FEATURE_PROJECT;
-  if (!selected) return all('blocked', 'Select repository-local OPENCAW_UNREAL_FEATURE_PROJECT; this suite requires UE ' + meta.engineMinor);
+  const selected = process.env.HEPHAERA_UNREAL_FEATURE_PROJECT;
+  if (!selected) return all('blocked', 'Select repository-local HEPHAERA_UNREAL_FEATURE_PROJECT; this suite requires UE ' + meta.engineMinor);
   const sourceProject = api.safeLocalFile(selected, DIRECTORY);
   if (path.basename(sourceProject) !== meta.project) throw new Error('Unexpected Unreal feature project identity');
-  const editor = api.executable(process.env.OPENCAW_UNREAL_EDITOR, ['UnrealEditor-Cmd', 'UnrealEditor', 'UnrealEditor.exe']);
+  const editor = api.executable(process.env.HEPHAERA_UNREAL_EDITOR, ['UnrealEditor-Cmd', 'UnrealEditor', 'UnrealEditor.exe']);
   if (!editor) return all('blocked', 'Matching Unreal Editor is unavailable');
-  const version = process.env.OPENCAW_UNREAL_VERSION;
+  const version = process.env.HEPHAERA_UNREAL_VERSION;
   if (!/^5\.\d+(?:\.\d+)?$/.test(version || '') || !(version === meta.engineMinor || version.startsWith(meta.engineMinor + '.'))) return all('blocked', 'Feature fixture requires explicitly matching UE ' + meta.engineMinor + '; no host version was changed');
-  const ubt = api.executable(process.env.OPENCAW_UNREAL_UBT, ['UnrealBuildTool', 'UnrealBuildTool.exe'], true);
+  const ubt = api.executable(process.env.HEPHAERA_UNREAL_UBT, ['UnrealBuildTool', 'UnrealBuildTool.exe'], true);
   const dotnet = ubt && /\.dll$/i.test(ubt) ? api.executable(null, ['dotnet']) : null;
   if (!ubt || (/\.dll$/i.test(ubt) && !dotnet)) return all('blocked', 'Matching Unreal Build Tool/native dotnet prerequisite is unavailable');
   const platform = { win32: 'Win64', linux: 'Linux', darwin: 'Mac' }[process.platform];
@@ -121,7 +121,7 @@ async function run(context, api) {
     const nonce = crypto.randomUUID();
     const reportDirectory = path.join(directory, 'report-' + nonce);
     const startedAt = Date.now();
-    const executed = await context.run(editor, [project, '-unattended', '-nop4', '-nosplash', '-NullRHI', '-stdout', '-FullStdOutLogOutput', '-ExecCmds=Automation RunTests ' + test.name, '-TestExit=Automation Test Queue Empty', '-ReportExportPath=' + reportDirectory], { cwd: directory, log: path.join(directory, nonce + '.log'), env: { OPENCAW_UNREAL_FEATURE_RUN: nonce } });
+    const executed = await context.run(editor, [project, '-unattended', '-nop4', '-nosplash', '-NullRHI', '-stdout', '-FullStdOutLogOutput', '-ExecCmds=Automation RunTests ' + test.name, '-TestExit=Automation Test Queue Empty', '-ReportExportPath=' + reportDirectory], { cwd: directory, log: path.join(directory, nonce + '.log'), env: { HEPHAERA_UNREAL_FEATURE_RUN: nonce } });
     const failed = api.nativeFailure(executed);
     if (failed) { results.push(result(test, 'fail', failed)); continue; }
     try {

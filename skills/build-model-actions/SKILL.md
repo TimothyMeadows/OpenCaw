@@ -21,7 +21,7 @@ Use when several individual clips must play as one named sequence with coordinat
 
 ## Output
 
-- Actual compound animations, editable source and a hash-bound `opencaw-action-package/v1` timeline.
+- Actual compound animations, editable source and a hash-bound `hephaera-action-package/v1` timeline.
 - Original clip ancestry, resolved steps/markers/cues, actual engine integration and full-sequence evidence.
 - Separate review/runtime acceptance and explicit promotion history.
 

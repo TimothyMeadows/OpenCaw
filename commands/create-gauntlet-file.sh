@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/create-gauntlet-file.sh "<name>" ["Title"] --task "<task-name>" [--dry-run]
 
-Creates <project-root>/.opencaw/.cache/gauntlets/<name>/GAUNTLET.md linked to an existing
+Creates <project-root>/.hephaera/.cache/gauntlets/<name>/GAUNTLET.md linked to an existing
 parent task. The command copies the task's GitHub issue URL when one is present.
 EOF
 }
@@ -63,15 +63,15 @@ gauntlet_validate_name "$task_name" 'task-name'
 if [[ -z "$title" ]]; then
   title="$gauntlet_name"
 fi
-opencaw_validate_single_line "$title" 'Title'
+hephaera_validate_single_line "$title" 'Title'
 
 if [[ $dry_run -eq 0 ]]; then
   brainstorm_require_delivery_creation_allowed 'Gauntlet creation'
 fi
 
-task_file="$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name/TASK.md"
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks" 'Task root'
-gauntlet_assert_safe_ai_path "$OPENCAW_PROJECT_CACHE_DIR/tasks/$task_name" 'Parent task directory'
+task_file="$HEPHAERA_PROJECT_CACHE_DIR/tasks/$task_name/TASK.md"
+gauntlet_assert_safe_ai_path "$HEPHAERA_PROJECT_CACHE_DIR/tasks" 'Task root'
+gauntlet_assert_safe_ai_path "$HEPHAERA_PROJECT_CACHE_DIR/tasks/$task_name" 'Parent task directory'
 [[ -f "$task_file" && ! -L "$task_file" ]] || {
   echo "Parent task file not found: $task_file" >&2
   exit 1
@@ -81,10 +81,10 @@ issue_url="$(gauntlet_extract_section "$task_file" 'Issue' \
   | sed -nE 's#.*(https://github\.com/[^[:space:]]+/[^[:space:]]+/issues/[0-9]+).*#\1#p' \
   | head -n 1 || true)"
 
-gauntlet_dir="$OPENCAW_GAUNTLETS_DIR/$gauntlet_name"
+gauntlet_dir="$HEPHAERA_GAUNTLETS_DIR/$gauntlet_name"
 target="$gauntlet_dir/GAUNTLET.md"
-if [[ -e "$OPENCAW_GAUNTLETS_DIR" ]]; then
-  gauntlet_assert_safe_ai_path "$OPENCAW_GAUNTLETS_DIR" 'Gauntlet root'
+if [[ -e "$HEPHAERA_GAUNTLETS_DIR" ]]; then
+  gauntlet_assert_safe_ai_path "$HEPHAERA_GAUNTLETS_DIR" 'Gauntlet root'
 fi
 if [[ -e "$gauntlet_dir" ]]; then
   gauntlet_assert_safe_ai_path "$gauntlet_dir" 'Gauntlet directory'
@@ -115,7 +115,7 @@ write_gauntlet() {
 
 ## Parent Task
 - Task name: $task_name
-- Task file: \`.opencaw/.cache/tasks/$task_name/TASK.md\`
+- Task file: \`.hephaera/.cache/tasks/$task_name/TASK.md\`
 - Issue: $issue_url
 
 ## Objective
@@ -202,7 +202,7 @@ if [[ $dry_run -eq 1 ]]; then
   exit 0
 fi
 
-mkdir -p "$OPENCAW_GAUNTLETS_DIR"
+mkdir -p "$HEPHAERA_GAUNTLETS_DIR"
 if [[ ! -d "$gauntlet_dir" ]]; then
   mkdir "$gauntlet_dir" 2>/dev/null || true
 fi

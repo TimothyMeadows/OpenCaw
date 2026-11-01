@@ -12,4 +12,4 @@ if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
 fi
 source "$script_dir/lib/brainstorm-common.sh"
 brainstorm_require_delivery_creation_allowed 'Task checkpoint validation'
-exec python3 "$script_dir/lib/task-execution.py" --root "$OPENCAW_PROJECT_ROOT_RESOLVED" validate "$@"
+exec python3 "$script_dir/lib/task-execution.py" --root "$HEPHAERA_PROJECT_ROOT_RESOLVED" validate "$@"

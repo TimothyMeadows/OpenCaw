@@ -8,8 +8,8 @@ Author procedural Three.js models as reviewable TypeScript or JavaScript instead
 
 - A text brief and optional authorized reference images.
 - The active `STYLE.md`, intended runtime use, target Three.js version, coordinate system, interaction needs, and performance budgets.
-- The host repository's established model interface, or the OpenCaw default model-instance contract when none exists.
-- For characters and creatures, a linked `opencaw-code-character/v1` profile that freezes identity, presentation sizes, body plan, motion mode, contextual thresholds, reviewer policy, and machine-gate calibration.
+- The host repository's established model interface, or the Hephaera default model-instance contract when none exists.
+- For characters and creatures, a linked `hephaera-code-character/v1` profile that freezes identity, presentation sizes, body plan, motion mode, contextual thresholds, reviewer policy, and machine-gate calibration.
 
 ## Production Rules
 

@@ -25,7 +25,7 @@ For a dance pattern, chained combination or charge/cast sequence assembled from 
 
 ## Output
 
-- Immutable source/model/rig/clip ancestry and a profiled `opencaw-motion-package/v1` package.
+- Immutable source/model/rig/clip ancestry and a profiled `hephaera-motion-package/v1` package.
 - Editable Blender source, real baked/exported animation, complete motion review frames and declared sample/renderer limits.
 - Selected-engine motion/effect implementation, actual runtime/performance evidence and separate acceptance/promotion lineage.
 

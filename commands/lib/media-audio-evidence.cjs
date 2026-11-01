@@ -44,7 +44,7 @@ function revision(root,parameters,native,result,hostContext,originalRoot){
     }else{
       if(!Array.isArray(record.command)||record.command[1]!=='media'||record.command[2]!=='generate'||!Number.isFinite(Date.parse(record.startedAt))||!Number.isFinite(Date.parse(native.completedAt))||Date.parse(record.startedAt)>Date.parse(native.completedAt))fail('Historical source-revision evidence is not the original bounded generation invocation.');
       const option=name=>{const positions=record.command.flatMap((item,index)=>item===name?[index]:[]);if(positions.length!==1||typeof record.command[positions[0]+1]!=='string')fail('Historical invocation is missing its exact '+name+'.');return record.command[positions[0]+1];};
-      if(option('--api-version')!=='1'||!runtime.samePath(path.resolve(runtime.native(option('--root'))),originalRoot))fail('Historical source invocation identifies another root/API.');
+      if(option('--api-version')!==String(result.apiVersion)||!runtime.samePath(path.resolve(runtime.native(option('--root'))),originalRoot))fail('Historical source invocation identifies another root/API.');
       const manifestPath=originalIdentity(root,{path:option('--manifest'),sha256:parameters.sourceRequest.sha256},parameters.historicalRoot).path;
       const contextPath=originalIdentity(root,{path:option('--host-context'),sha256:parameters.hostContext.sha256},parameters.historicalRoot).path;
       if(manifestPath!==parameters.sourceRequest.path||contextPath!==parameters.hostContext.path)fail('Historical invocation differs from retained native request/context evidence.');
@@ -96,7 +96,7 @@ function technical(spec,context){
   const checked=spec.validateBrief(brief,{root,task:record?.task});
   if(!candidate||!Array.isArray(candidate.outputs)||!status?.assetSha256)fail('Current candidate and composite fingerprint are required.');
   if(candidate.provider!==checked.provider)fail('Candidate provider differs from its explicit audio brief.');
-  const report={schemaVersion:'opencaw-media-technical/v1',assetSha256:status.assetSha256,outputs:candidate.outputs,status:'passed',checks:[],measurements:[],references:[],generationIdentities:[],unavailable:{lufs:{unavailable:true,reason:'No loudness analyzer was selected; native metrics are peak/RMS/clipping/silence.'},loopQuality:{unavailable:true,reason:'Only an actual complete listening/seam review establishes a usable loop.'},cleanupCounters:{unavailable:true,reason:spec.cleanupUnavailable||'This domain supplied no independent allocator/driver memory counters.'}}};
+  const report={schemaVersion:'hephaera-media-technical/v1',assetSha256:status.assetSha256,outputs:candidate.outputs,status:'passed',checks:[],measurements:[],references:[],generationIdentities:[],unavailable:{lufs:{unavailable:true,reason:'No loudness analyzer was selected; native metrics are peak/RMS/clipping/silence.'},loopQuality:{unavailable:true,reason:'Only an actual complete listening/seam review establishes a usable loop.'},cleanupCounters:{unavailable:true,reason:spec.cleanupUnavailable||'This domain supplied no independent allocator/driver memory counters.'}}};
   const check=(id,passed,reason)=>{report.checks.push({id,status:passed?'passed':'failed',reason});if(!passed)report.status='failed';};
   if(candidate.provider!=='LOCAL'){
     report.status='failed';report.checks.push({id:'authoritative-analysis',status:'unavailable',reason:'Imported CLOUD media has no compatible native measurement ancestry; provide a supported separately selected analysis capability before technical acceptance.'});return report;
@@ -114,7 +114,9 @@ function technical(spec,context){
     if(typeof recordedRoot!=='string'||!path.isAbsolute(recordedRoot)||!runtime.samePath(path.resolve(recordedRoot),originalRoot))fail('Original host-context projectRoot differs from the declared current project-confined source root.');
     report.references.push(manifestIdentity,parameters.nativeManifest,parameters.nativeResult,parameters.hostContext,parameters.sourceRequest);
     if(native.schemaVersion!=='bubo-media-manifest/v1'||native.status!=='generated-staged'||native.backend!==spec.backend||native.promotion!==false||native.humanReview!=='pending'||!Array.isArray(native.outputs))fail('Only successful native staged audio measurements are accepted.');
-    if(result.schemaVersion!=='bubo-execution-result/v1'||result.apiVersion!==1||result.status!=='succeeded'||result.workflow!=='media'||result.operation!=='generate'||result.hostContextSha256!==parameters.hostContext.sha256||native.hostContextSha256!==parameters.hostContext.sha256)fail('Native result/host-context ancestry differs.');
+    // API1 is retained only as explicitly declared historical import evidence.
+    const compatibleApi=result.apiVersion===2||(checked.historicalRoot!==undefined&&['historical-import','external-import'].includes(candidate.origin)&&result.apiVersion===1);
+    if(result.schemaVersion!=='bubo-execution-result/v1'||!compatibleApi||result.status!=='succeeded'||result.workflow!=='media'||result.operation!=='generate'||result.hostContextSha256!==parameters.hostContext.sha256||native.hostContextSha256!==parameters.hostContext.sha256)fail('Native result/host-context ancestry differs.');
     if(hostContext.schemaVersion!=='bubo-host-context/v1'||hostContext.policy?.purpose!=='local-media'||hostContext.policy.pipeline!=='LOCAL'||hostContext.policy.media?.sha256!==native.mediaPolicySha256)fail('Native host context lacks the recorded LOCAL media authority.');
     object(result.runtime,'actual native runtime build');
     same(result.data,native,'Native returned manifest');same(result.runtime,parameters.runtime?.build,'Native runtime');same(native.runtimeBuild,result.runtime,'Native build');

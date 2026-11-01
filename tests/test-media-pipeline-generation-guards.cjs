@@ -6,15 +6,15 @@ const fs=require('fs'),path=require('path'),cp=require('child_process'),assert=r
 const runtime=require('../commands/lib/bubo-runtime.cjs'),adapter=require('../commands/lib/bubo-media-adapter.cjs');
 const native=process.argv.slice(2).includes('--native-runtime');
 if(process.argv.slice(2).some(arg=>arg!=='--native-runtime'))throw new Error('Unsupported guard-test option.');
-const cache=path.basename(runtime.BASE)==='.opencaw'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.opencaw/.cache');
-const evidence=path.join(cache,'tasks/opencaw-voice-pipeline/evidence/generation-guard-fixtures');fs.mkdirSync(evidence,{recursive:true});
-const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-generation-guards',workspace='.opencaw/.cache/owned-media',observations=[];
+const cache=path.basename(runtime.BASE)==='.hephaera'?path.join(runtime.BASE,'.cache'):path.join(runtime.BASE,'.hephaera/.cache');
+const evidence=path.join(cache,'tasks/hephaera-voice-pipeline/evidence/generation-guard-fixtures');fs.mkdirSync(evidence,{recursive:true});
+const root=fs.mkdtempSync(path.join(evidence,'owned-')),task='owned-generation-guards',workspace='.hephaera/.cache/owned-media',observations=[];
 const check=(value,label)=>{assert(value,label);observations.push(label);};
 const rejects=(action,pattern,label)=>{assert.throws(action,pattern,label);observations.push(label);};
 function write(name,value){const file=path.join(root,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');return name;}
 const ref=name=>({path:name,sha256:runtime.hash(path.join(root,name))});
 function directory(name){fs.mkdirSync(path.join(root,name),{recursive:true});return name;}
-const media='# MEDIA.md\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(heading=>'## '+heading+'\n').join('\n')+'\nImage/music/sound-effect SFX/voice separate. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
+const media='# MEDIA.md\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n---\n'+['Pipeline Availability','Capability Matrix','Destinations And Budgets','Rights, Consent, And Provenance','Review And Promotion'].map(heading=>'## '+heading+'\n').join('\n')+'\nImage/music/sound-effect SFX/voice separate. Require the user to choose a provider. Never switch or fall back between providers silently.\n';
 write('MEDIA.md',media);
 const rights=ref(write('inputs/rights.json',{schemaVersion:'bubo-media-rights/v1',task,owner:'Owned fixture only',promptRightsConfirmed:true,generationAllowed:true}));
 const license=ref(write('inputs/license.json',{fixture:'No actual license acceptance'}));
@@ -25,7 +25,7 @@ write('inputs/request.json',{schemaVersion:'bubo-media-request/v1',task,requestI
   settings:{device:'cuda:0',precision:'float16',offload:'none'},budget:{maximumOutputs:1,maximumBytesPerOutput:4096,maximumTotalBytes:4096,maximumPixels:4096,maximumAudioSeconds:1},
   items:[{id:'owned',prompt:'Owned synthetic input',negativePrompt:'',seed:1,steps:1,guidance:1,seconds:1,loopCandidate:false}]});
 const info={capability:{mediaBackends:[{id:'stable-audio-open',modality:'sfx'}]}};
-const options=adapter.parse(['--root',root,'--task',task,'--manifest','inputs/request.json','--workspace',workspace,'--media-state','.opencaw/.cache/shared-allowance']);
+const options=adapter.parse(['--root',root,'--task',task,'--manifest','inputs/request.json','--workspace',workspace,'--media-state','.hephaera/.cache/shared-allowance']);
 const source=ref(write('inputs/local-use-source.txt','Owned synthetic human source, no actual user permission'));
 const use=ref(write('inputs/local-use.json',{fixture:'Host-only purpose assertion',sourceEvidence:source}));
 const hostContract=ref(write('VOICE.md','# Owned synthetic selected-domain contract\n'));
@@ -40,7 +40,7 @@ fs.writeFileSync(path.join(root,source.path),bytes);
 rejects(()=>prepare([{...source,kind:'consent'}]),/Exact internal/,'A caller cannot inject native authority kinds through policy references');
 rejects(()=>prepare([python]),/alias an executable/,'Host policy cannot alias a registered executable/module');
 rejects(()=>prepare([ref(write(workspace+'/staging/owned.json',{fixture:true}))]),/mutable/,'Host policy cannot overlap mutable staging');
-rejects(()=>prepare([ref(write('.opencaw/.cache/tasks/'+task+'/bubo-media/owned.json',{fixture:true}))]),/mutable/,'Host policy cannot overlap native execution state');
+rejects(()=>prepare([ref(write('.hephaera/.cache/tasks/'+task+'/bubo-media/owned.json',{fixture:true}))]),/mutable/,'Host policy cannot overlap native execution state');
 rejects(()=>prepare(new Array(257).fill(source)),/Bounded/,'Additional policy references have a finite count bound');
 rejects(()=>adapter.parse(['--policy-references','inputs/override.json']),/Unknown|protected/,'No public CLI policy-reference override is introduced');
 write('inputs/native-context.json',admitted.context);

@@ -1,6 +1,6 @@
 ---
 name: maintain-art-style-contract
-description: Maintain, generate, or validate the host STYLE.md contract from OpenCaw art-style and art-pipeline templates. Use when visual work must preserve project art direction and its CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER production path.
+description: Maintain, generate, or validate the host STYLE.md contract from Hephaera art-style and art-pipeline templates. Use when visual work must preserve project art direction and its CLOUD, LOCAL, PROOF_TO_MODEL, CODE, or BLENDER production path.
 engines: [AGNOSTIC]
 ---
 

@@ -5,10 +5,10 @@ usage() {
   cat <<'EOF'
 Usage: ./commands/create-code-character-profile.sh CHARACTER_ID --manifest FILE --brief TEXT --intended-use TEXT [options]
 
-Creates a task-local opencaw-code-character/v1 profile linked to an existing CODE manifest.
+Creates a task-local hephaera-code-character/v1 profile linked to an existing CODE manifest.
 
 Options:
-  --output FILE                 Profile below .opencaw/.cache/tasks (default: .opencaw/.cache/tasks/CHARACTER_ID/code-character.json)
+  --output FILE                 Profile below .hephaera/.cache/tasks (default: .hephaera/.cache/tasks/CHARACTER_ID/code-character.json)
   --title TEXT                  Human-readable title
   --kind VALUE                  character or creature (default: character)
   --presentation-distance VALUE close, mid, far, or mixed (default: mixed)
@@ -39,10 +39,10 @@ EOF
 case "${1:-}" in -h|--help) usage; exit 0 ;; esac
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
+hephaera_resolve_paths
 node_bin="$(command -v node 2>/dev/null || command -v node.exe 2>/dev/null || true)"
 [[ -n "$node_bin" ]] || { echo "Node.js is required for code-character profiles." >&2; exit 1; }
-node_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+node_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 node_cli="$script_dir/lib/code-character-cli.cjs"
 if [[ "$node_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
   node_root="$(wslpath -w "$node_root")"

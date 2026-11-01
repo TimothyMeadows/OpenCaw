@@ -4,7 +4,7 @@ This packaging profile hosts a completed static HTML/JavaScript/CSS build in .NE
 
 ## Targets
 
-| OpenCaw target | MAUI framework | Build host | Release output |
+| Hephaera target | MAUI framework | Build host | Release output |
 | --- | --- | --- | --- |
 | WINDOWS | `net10.0-windows10.0.19041.0` | Windows with MAUI Windows tools and Windows SDK | Published application folder, or explicitly configured signed MSIX |
 | MACOS | `net10.0-maccatalyst` | Mac with compatible Xcode and Mac Catalyst tools | `.app`, or configured signed `.pkg` |
@@ -17,13 +17,13 @@ Minimum OS declarations in this initial host are Windows 10 version 1809, Androi
 
 ## Template contract
 
-Copy `template/` into a new explicitly owned host folder. Its project is `GameHost.csproj` and its namespace is `OpenCaw.GameHost`. OpenCaw's packaging command generates `OpenCawGame.props` with:
+Copy `template/` into a new explicitly owned host folder. Its project is `GameHost.csproj` and its namespace is `Hephaera.GameHost`. Hephaera's packaging command generates `HephaeraGame.props` with:
 
 - `ApplicationId`: application/package identifier chosen by the host project.
 - `ApplicationTitle`: display title.
 - `ApplicationDisplayVersion`: release version, such as `1.2.0`.
 - `ApplicationVersion`: positive monotonically increasing build number.
-- `OpenCawDefaultFile`: relative packaged HTML entry, normally `index.html`.
+- `HephaeraDefaultFile`: relative packaged HTML entry, normally `index.html`.
 
 The native project pins `MauiVersion` to `10.0.20` independently of the installed SDK's default. Updating this initial version requires a reviewed project/template change and fresh native validation; do not inherit an ambient workload package version silently.
 
@@ -31,7 +31,7 @@ The complete compiled web output belongs in `Resources/Raw/wwwroot`. Relative as
 
 Framework lists are narrowed explicitly for the selected build. A Windows host's default framework is Windows; a Mac host's default is Mac Catalyst. Select `--target ANDROID` or `--target IOS` in the packaging command to choose the corresponding framework. The initial CLI accepts only the iOS device RID `ios-arm64`; iOS simulator development uses separately reviewed direct MAUI/Xcode tooling and is outside this CLI's build/package receipts. No target selection installs a workload. Keep the MAUI package, SDK/workload and Xcode/Android tool versions compatible and record their actual versions in release evidence.
 
-`OpenCawSigningProps` may name a separately supplied private MSBuild property file. The project imports it after generated application metadata. Do not put credentials in the command line, a checked-in property file, release receipts or task logs. Signing overrides are trusted build inputs and need separate review; MSBuild property files can execute build logic. This mechanism does not grant signing or publication authorization.
+`HephaeraSigningProps` may name a separately supplied private MSBuild property file. The project imports it after generated application metadata. Do not put credentials in the command line, a checked-in property file, release receipts or task logs. Signing overrides are trusted build inputs and need separate review; MSBuild property files can execute build logic. This mechanism does not grant signing or publication authorization.
 
 ## Native behavior
 
@@ -43,7 +43,7 @@ Android installs a guarded `MauiHybridWebViewClient` subclass after MAUI's base 
 
 These controls do not constitute a network sandbox. The game may still request remote subresources or HTTPS APIs under the platform's network rules; configure and review its CSP, endpoints, permissions, privacy policy, offline requirements and store declarations separately. No blanket cleartext-network exception is enabled. Remote content must not be treated as trusted executable game content.
 
-Native window activation/resumption and deactivation/stopping dispatch `opencaw:lifecycle` DOM events with `{state: "resume"}` or `{state: "suspend"}`. Initial page load receives the current state. The game must explicitly subscribe and pause/resume its own rendering, simulation and audio. It must also handle `visibilitychange`, lost graphics contexts and normal scene disposal. The shell does not guess how an engine pauses, save gameplay, or automatically unlock an `AudioContext`. Notification failure is bounded and does not crash the app.
+Native window activation/resumption and deactivation/stopping dispatch `hephaera:lifecycle` DOM events with `{state: "resume"}` or `{state: "suspend"}`. Initial page load receives the current state. The game must explicitly subscribe and pause/resume its own rendering, simulation and audio. It must also handle `visibilitychange`, lost graphics contexts and normal scene disposal. The shell does not guess how an engine pauses, save gameplay, or automatically unlock an `AudioContext`. Notification failure is bounded and does not crash the app.
 
 The initial .NET 10 host uses partial trimming, enables the HybridWebView feature switch and disables Native AOT. Full trimming/AOT is rejected rather than silently removing the web view. Do not apply .NET 11 source-generation examples to this pinned .NET 10 host.
 
@@ -63,4 +63,4 @@ Retain input web hashes, application identity/version, exact native source/templ
 - [MAUI trimming feature switches](https://learn.microsoft.com/en-us/dotnet/maui/deployment/trimming?view=net-maui-10.0)
 - [Pinned HybridWebView handler source](https://github.com/dotnet/maui/tree/10.0.20/src/Core/src/Handlers/HybridWebView)
 
-The host source and SVG placeholders are independently authored for OpenCaw. MAUI and platform dependencies retain their upstream licenses; no Microsoft source or sample application is bundled here.
+The host source and SVG placeholders are independently authored for Hephaera. MAUI and platform dependencies retain their upstream licenses; no Microsoft source or sample application is bundled here.

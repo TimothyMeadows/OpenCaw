@@ -3,9 +3,9 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-opencaw_ensure_project_files
-target="$OPENCAW_DEBUG_FILE"
+hephaera_resolve_paths
+hephaera_ensure_project_files
+target="$HEPHAERA_DEBUG_FILE"
 
 entry="${1:-}"
 if [[ -z "$entry" ]]; then

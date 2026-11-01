@@ -49,11 +49,11 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
-mount_dir_name="$(basename "$opencaw_root")"
-if [[ "$opencaw_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
+hephaera_resolve_paths
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
+mount_dir_name="$(basename "$hephaera_root")"
+if [[ "$hephaera_root" == "$host_root" ]]; then mount_path_from_host='.'; else mount_path_from_host="./${mount_dir_name}"; fi
 arch_target="$host_root/ARCHITECTURE.md"
 
 selected=()
@@ -61,7 +61,7 @@ for name in "${templates[@]}"; do
   normalized_name="${name//-/_}"
   normalized_name="${normalized_name// /_}"
   upper_name="${normalized_name^^}"
-  template_path="$opencaw_root/.architecture/${upper_name}.md"
+  template_path="$hephaera_root/.architecture/${upper_name}.md"
   if [[ ! -f "$template_path" ]]; then
     echo "Missing architecture template: $template_path" >&2
     exit 1
@@ -74,7 +74,7 @@ done
   echo
   echo "This file is the canonical architecture contract for this repository."
   echo
-  echo "Generated from OpenCaw architecture templates:"
+  echo "Generated from Hephaera architecture templates:"
   for name in "${selected[@]}"; do
     echo "- $name"
   done
@@ -96,7 +96,7 @@ done
     echo "## Inlined Templates"
     echo
     for name in "${selected[@]}"; do
-      template_path="$opencaw_root/.architecture/${name}.md"
+      template_path="$hephaera_root/.architecture/${name}.md"
       echo "<!-- BEGIN TEMPLATE: ${name} -->"
       echo
       cat "$template_path"

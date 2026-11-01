@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.Maui.Controls;
-using OpenCaw.GameHost.Services;
+using Hephaera.GameHost.Services;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 public sealed class GamePage : ContentPage, IDisposable
 {
@@ -15,10 +15,10 @@ public sealed class GamePage : ContentPage, IDisposable
     {
         Padding = 0;
         SafeAreaEdges = new Microsoft.Maui.SafeAreaEdges(Microsoft.Maui.SafeAreaRegions.Container);
-        BackgroundColor = Colors.Black;
+        BackgroundColor = Color.FromArgb("#202A32");
         NavigationPage.SetHasNavigationBar(this, false);
         var entry = typeof(GamePage).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-            .Single(value => value.Key == "OpenCawDefaultFile").Value;
+            .Single(value => value.Key == "HephaeraDefaultFile").Value;
         _webView = new HybridWebView { HybridRoot = "wwwroot", DefaultFile = entry };
         _lifecycle = new GameLifecycle(_webView);
         _webView.WebViewInitializing += WebViewInitializing;

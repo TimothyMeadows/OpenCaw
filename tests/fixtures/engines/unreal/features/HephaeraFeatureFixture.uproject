@@ -1,0 +1,12 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Description": "Isolated, conditional Hephaera Unreal feature tests; not a host-project template.",
+  "Modules": [{ "Name": "HephaeraFeatureFixture", "Type": "Editor", "LoadingPhase": "Default" }],
+  "Plugins": [
+    { "Name": "GameplayAbilities", "Enabled": true },
+    { "Name": "GameFeatures", "Enabled": true },
+    { "Name": "Niagara", "Enabled": true },
+    { "Name": "PCG", "Enabled": true }
+  ]
+}

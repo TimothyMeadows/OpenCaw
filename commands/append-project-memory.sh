@@ -46,8 +46,8 @@ if [[ -z "$tags" || -z "$entry" ]]; then
   exit 1
 fi
 
-opencaw_resolve_paths
-opencaw_ensure_project_files
+hephaera_resolve_paths
+hephaera_ensure_project_files
 
 if [[ -n "$replace" ]]; then
   replacement_count="$(awk -v fact="$replace" '
@@ -61,14 +61,14 @@ if [[ -n "$replace" ]]; then
       if (lower(line) == lower(fact)) count++
     }
     END { print count + 0 }
-  ' "$OPENCAW_PROJECT_MEMORY_FILE")"
+  ' "$HEPHAERA_PROJECT_MEMORY_FILE")"
 
   if [[ "$replacement_count" -ne 1 ]]; then
     echo "Replacement requires exactly one matching old fact; found $replacement_count." >&2
     exit 1
   fi
 
-  opencaw_archive_file "$OPENCAW_PROJECT_MEMORY_FILE" replace "$OPENCAW_PROJECT_CACHE_DIR/archive/memory"
+  hephaera_archive_file "$HEPHAERA_PROJECT_MEMORY_FILE" replace "$HEPHAERA_PROJECT_CACHE_DIR/archive/memory"
   awk -v fact="$replace" '
     {
       original = $0
@@ -81,9 +81,9 @@ if [[ -n "$replace" ]]; then
       }
       print original
     }
-  ' "$OPENCAW_PROJECT_MEMORY_FILE" > "$OPENCAW_PROJECT_MEMORY_FILE.tmp"
-  mv "$OPENCAW_PROJECT_MEMORY_FILE.tmp" "$OPENCAW_PROJECT_MEMORY_FILE"
+  ' "$HEPHAERA_PROJECT_MEMORY_FILE" > "$HEPHAERA_PROJECT_MEMORY_FILE.tmp"
+  mv "$HEPHAERA_PROJECT_MEMORY_FILE.tmp" "$HEPHAERA_PROJECT_MEMORY_FILE"
 fi
 
-opencaw_append_tagged_entry "$OPENCAW_PROJECT_MEMORY_FILE" "$tags" "$entry"
-echo "MEMORY_FILE=$OPENCAW_PROJECT_MEMORY_FILE"
+hephaera_append_tagged_entry "$HEPHAERA_PROJECT_MEMORY_FILE" "$tags" "$entry"
+echo "MEMORY_FILE=$HEPHAERA_PROJECT_MEMORY_FILE"

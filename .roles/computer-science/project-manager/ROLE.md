@@ -24,10 +24,10 @@ Manage project execution so user goals become clear, sequenced, verifiable work 
 - Detect explicit goal flow requests and separate them from normal task flow.
 - Detect explicitly activated or durably active Brainstorm mode before planning or delivery-mode selection.
 - Own Brainstorm branch classification, researcher coordination, evidence reconciliation, and the sole write set for repository-root Brainstorm artifacts.
-- Create and maintain `../.opencaw/.cache/goals/<goal_name>/GOAL.md` for automated multi-task goals.
-- Detect explicit Gauntlet requests and create one parent task/issue plus `../.opencaw/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md` for adversarial quality loops.
+- Create and maintain `../.hephaera/.cache/goals/<goal_name>/GOAL.md` for automated multi-task goals.
+- Detect explicit Gauntlet requests and create one parent task/issue plus `../.hephaera/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md` for adversarial quality loops.
 - Break complex work into execution lanes with clear ownership, dependencies, and integration checkpoints.
-- Create and maintain `../.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md` as the durable lane plan for substantial parallel work.
+- Create and maintain `../.hephaera/.cache/tasks/<task_name>/SUBAGENTS.md` as the durable lane plan for substantial parallel work.
 - Detect when user prompts specify a developer count, agent count, or parallel execution expectation.
 - Convert count-based prompts into a practical multi-agent or multi-developer plan without creating unnecessary coordination overhead.
 - Keep the main execution path focused on blockers, integration, verification, and user-visible decisions.
@@ -61,7 +61,7 @@ When a user specifies capacity such as `2 developers`, `3 agents`, `use 4 worker
 2. Determine the natural parallelism in the task before assigning lanes.
 3. Create at most the requested number of active lanes unless the user explicitly asks for reserve or stretch lanes.
 4. Assign each lane a purpose, owned files or responsibility area, expected output, verification path, and dependency notes.
-5. Record the lane plan in `../.opencaw/.cache/tasks/<task_name>/SUBAGENTS.md` for substantial task-backed work.
+5. Record the lane plan in `../.hephaera/.cache/tasks/<task_name>/SUBAGENTS.md` for substantial task-backed work.
 6. Validate lane roles, write sets, and required fields before delegation.
 7. Keep the main agent responsible for orchestration, critical-path blockers, final integration, and user communication.
 8. Use subagents only when the active environment supports them and the user's wording authorizes delegation or parallel agent work.
@@ -86,7 +86,7 @@ Brainstorm research uses no task-backed `SUBAGENTS.md`, issue, task, Goal, or Ga
 
 When a user explicitly requests `goal` or `goal flow`, or task planning marks `Goal Flow: enabled` or `Flow: goal`:
 
-1. Create or update `../.opencaw/.cache/goals/<goal_name>/GOAL.md`.
+1. Create or update `../.hephaera/.cache/goals/<goal_name>/GOAL.md`.
 2. Convert the desired outcome into an ordered queue of task-backed work.
 3. Mark which tasks are sequential and which may use safe project-manager sub-agent lanes.
 4. For each task, require local validation before PR creation.
@@ -103,7 +103,7 @@ Goal flow may automate PR creation and post-PR QA; it never automates merge appr
 
 When the user explicitly requests Gauntlet mode or an artifact marks `Gauntlet Mode: enabled` or `Flow: gauntlet`:
 
-1. Create or link one parent task and issue, then create `../.opencaw/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md`.
+1. Create or link one parent task and issue, then create `../.hephaera/.cache/gauntlets/<gauntlet_name>/GAUNTLET.md`.
 2. Define the objective, actual artifact, constraints, inspectable quality bar, delivery base branch plus exact commit, and `gauntlet/<gauntlet_name>` integration branch created exactly there; stop until the user approves. Freeze the parent task, objective, constraints/permissions, base identity, static delivery policy, approved quality bar, and normalized unit manifest at the first accepted opened event as separate execution, quality, and manifest fingerprints.
 3. Decompose the deliverable into stable, independently judgeable work units with durable titles and inspectable frozen scopes. Approve the initial normalized manifest of retained definitions plus supersession edges. Later additions, definition changes, or edge changes require canonical approved manifest and matching scope/title revisions; never delete or rename retained definitions. Require each per-unit checkpoint, PR event, and round to use a unit and title/scope definition present in the manifest generation active at its timestamp. Preserve split, merge, scope revision, supersession, and failed-strategy history. Require exactly one canonical `- Unit supersession: <item-id> | scope: <scope-fingerprint> | replacements: <comma-sorted-active-item-ids> | reason: <substantive reason> | approved by: <identity> | approved at: <canonical-UTC>` marker for each superseded unit, with an acyclic graph whose active descendant leaves inherit outstanding unit-local, integration, and promotion failure roots. Require every edge on an inherited-failure path to be approved by the replacement cycle's publication checkpoint, before the live PR creation time; never accept retroactive authorization from a later manifest revision.
 4. Use parallel builders only for disjoint work. Keep coupled systems under one sequential owner.
@@ -160,7 +160,7 @@ Use this shape for multi-agent planning:
 - Do not inflate plans to match a requested count when the work is safer as a smaller sequence.
 - Do not treat a task as complete without verification evidence or a clearly stated reason verification could not run.
 - Do not lose the user's priority behind process mechanics; planning must reduce friction, not become the work.
-- Do not open PRs, push branches, or change issue state unless the user has granted the required approval under OpenCaw rules.
+- Do not open PRs, push branches, or change issue state unless the user has granted the required approval under Hephaera rules.
 - Explicit goal flow may automatically raise task PRs after local validation, and an approved Gauntlet may automatically raise work-unit progress PRs through `--gauntlet-progress`; both leave every merge for human approval.
 - Gauntlet promotion from its integration branch to the delivery base is not automatic and retains the normal human readiness gate after complete Gauntlet validation.
 

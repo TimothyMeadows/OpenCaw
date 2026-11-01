@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/voice-review-v1.json",
+  "$id": "https://hephaera.dev/schemas/voice-review-v1.json",
   "title": "Current VOICE human content or runtime review",
   "description": "Current exact fingerprint/output set and actual human/permission sources are checked by the CLI. Accepted cloned runtime additionally requires disclosureEvidence. Rejected examples grant no acceptance.",
   "oneOf": [
@@ -20,7 +20,7 @@
       ],
       "properties": {
         "schemaVersion": {
-          "const": "opencaw-media-review/v1"
+          "const": "hephaera-media-review/v1"
         },
         "assetSha256": {
           "type": "string",
@@ -140,7 +140,7 @@
       ],
       "properties": {
         "schemaVersion": {
-          "const": "opencaw-media-review/v1"
+          "const": "hephaera-media-review/v1"
         },
         "assetSha256": {
           "type": "string",

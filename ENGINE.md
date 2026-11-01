@@ -2,15 +2,15 @@
 
 This project selects one game engine. Architecture and art pipeline selection remain separate.
 
-<!-- opencaw-engine:start -->
+<!-- hephaera-engine:start -->
 ## Engine Selection
 
-Selected OpenCaw engine:
+Selected Hephaera engine:
 - THREEJS
 
 Read `./.engine/THREEJS.md` instructions
 
-<!-- opencaw-engine:end -->
+<!-- hephaera-engine:end -->
 
 ## Project Engine Instructions
 

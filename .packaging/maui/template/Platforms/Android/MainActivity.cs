@@ -1,7 +1,7 @@
 using Android.App;
 using Android.Content.PM;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, Exported = true,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |

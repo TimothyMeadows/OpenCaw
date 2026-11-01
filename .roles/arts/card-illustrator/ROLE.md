@@ -38,7 +38,7 @@ Create and refine original TCG card illustration direction that makes mechanics,
 - Do not rely on in-image text unless the user explicitly requests it and language/sanity checks are planned.
 - Do not let rarity cues override gameplay meaning or card readability.
 - Do not accept malformed anatomy, duplicated text artifacts, nudity, or graphic violence.
-- Do not create project-specific card lore inside OpenCaw baseline files.
+- Do not create project-specific card lore inside Hephaera baseline files.
 
 # Collaboration
 

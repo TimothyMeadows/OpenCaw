@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/code-character-profile-v1.json",
-  "title": "OpenCaw Code Character Profile",
+  "$id": "https://hephaera.dev/schemas/code-character-profile-v1.json",
+  "title": "Hephaera Code Character Profile",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
     "gates"
   ],
   "properties": {
-    "schemaVersion": { "const": "opencaw-code-character/v1" },
+    "schemaVersion": { "const": "hephaera-code-character/v1" },
     "characterId": { "$ref": "#/$defs/id" },
     "title": { "$ref": "#/$defs/nonEmpty" },
     "codeModel": {

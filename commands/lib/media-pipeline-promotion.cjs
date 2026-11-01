@@ -4,6 +4,7 @@
 // Locks are cooperative ownership guards, not a hostile-filesystem sandbox.
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const runtime=require('./bubo-runtime.cjs'),lifecycle=require('./media-pipeline-state.cjs');
+const transition=require('./state-transition.cjs');
 const fail=message=>{throw new Error(message);};
 const canonical=value=>JSON.stringify(runtime.canonical(value));
 const same=(left,right,message)=>{if(canonical(left)!==canonical(right))fail(message);};
@@ -28,12 +29,12 @@ function targetLock(root,plan,action) {
   const canonicalTarget=relative(root,runtime.projectPath(root,plan.target.directory));
   const key=process.platform==='win32'?canonicalTarget.toLowerCase():canonicalTarget;
   const digest=crypto.createHash('sha256').update(key).digest('hex');
-  const file=runtime.projectPath(root,'.opencaw/.cache/media-promotions/locks/'+digest+'.json');
+  const file=runtime.projectPath(root,'.hephaera/.cache/media-promotions/locks/'+digest+'.json');
   fs.mkdirSync(path.dirname(file),{recursive:true});runtime.components(file);
   let fd;
   try{fd=fs.openSync(file,'wx');}catch(error){if(error.code==='EEXIST')fail('Runtime destination already has an owner. Inspect the recorded lock; stale ownership is never discarded automatically.');throw error;}
   try{
-    fs.writeFileSync(fd,JSON.stringify({schemaVersion:'opencaw-promotion-lock/v1',pid:process.pid,assetSha256:plan.assetSha256,
+    fs.writeFileSync(fd,JSON.stringify({schemaVersion:'hephaera-promotion-lock/v1',pid:process.pid,assetSha256:plan.assetSha256,
       target:plan.target.directory,createdAt:new Date().toISOString()})+'\n');fs.fsyncSync(fd);
     return action();
   }finally{fs.closeSync(fd);fs.unlinkSync(file);}
@@ -45,15 +46,15 @@ function claimKey(root,directory) {
   return key;
 }
 function claimOwner(state,plan) {
-  return {schemaVersion:'opencaw-media-target-claim/v1',state:state.identity,assetSha256:plan.assetSha256,
+  return {schemaVersion:'hephaera-media-target-claim/v1',state:state.identity,assetSha256:plan.assetSha256,
     target:plan.target,authorization:plan.authorization,sourceEvidence:plan.sourceEvidence};
 }
 function overlapping(left,right){return left===right||left.startsWith(right+'/')||right.startsWith(left+'/');}
 function registerTarget(state,plan) {
   const {root}=state,key=claimKey(root,plan.target.directory),owner=claimOwner(state,plan);
-  const directory=runtime.projectPath(root,'.opencaw/.cache/media-promotions/claims');
+  const directory=runtime.projectPath(root,'.hephaera/.cache/media-promotions/claims');
   fs.mkdirSync(directory,{recursive:true});runtime.components(directory);
-  const lock=runtime.projectPath(root,'.opencaw/.cache/media-promotions/.ownership-lock');let fd;
+  const lock=runtime.projectPath(root,'.hephaera/.cache/media-promotions/.ownership-lock');let fd;
   for(let attempt=0;attempt<101;attempt++){
     try{fd=fs.openSync(lock,'wx');break;}catch(error){
       if(error.code!=='EEXIST')throw error;
@@ -70,7 +71,7 @@ function registerTarget(state,plan) {
       const file=runtime.projectPath(root,relative(root,directory)+'/'+name),stat=fs.statSync(file);
       if(!stat.isFile()||stat.size>1048576)fail('Invalid promotion ownership claim.');
       const claim=JSON.parse(fs.readFileSync(file,'utf8'));
-      if(!claim||Object.keys(claim).sort().join(',')!=='assetSha256,authorization,schemaVersion,sourceEvidence,state,target'||claim.schemaVersion!=='opencaw-media-target-claim/v1'||!/^[a-f0-9]{64}$/.test(claim.assetSha256||''))fail('Malformed promotion ownership claim.');
+      if(!claim||Object.keys(claim).sort().join(',')!=='assetSha256,authorization,schemaVersion,sourceEvidence,state,target'||claim.schemaVersion!=='hephaera-media-target-claim/v1'||!/^[a-f0-9]{64}$/.test(claim.assetSha256||''))fail('Malformed promotion ownership claim.');
       lifecycle.identity(root,claim.state);
       const prior=lifecycle.load({root,stateFile:claim.state.path}),priorKey=claimKey(root,claim.target?.directory);
       if(name!==crypto.createHash('sha256').update(priorKey).digest('hex')+'.json')fail('Promotion ownership claim key differs from its target.');
@@ -85,7 +86,7 @@ function registerTarget(state,plan) {
     // Pre-claim revisions may have retained intents/completions. They continue
     // to own their packages even if their content/policy is now stale. Inspect
     // only canonical lifecycle records, never media or private reference bytes.
-    const tasks=runtime.projectPath(root,'.opencaw/.cache/tasks');let visited=0;
+    const tasks=runtime.projectPath(root,'.hephaera/.cache/tasks');let visited=0;
     const children=folder=>{
       runtime.components(folder);const names=fs.readdirSync(folder);if((visited+=names.length)>65536)fail('Historical promotion ownership scan exceeds its bound.');
       return names.map(name=>path.join(folder,name)).filter(file=>{runtime.components(file);return fs.statSync(file).isDirectory();});
@@ -119,6 +120,7 @@ function validatePolicy(options,plan) {
 function execute(options,recovering) {
   if(!options||typeof options.validate!=='function')fail('Explicit current domain validation callback is required for promotion.');
   if(Object.keys(options).some(key=>!['root','stateFile','authorization','validate'].includes(key)))fail('Unknown or protected promotion option.');
+  transition.assertProductionAllowed(options.root, recovering ? 'media promotion recovery' : 'media promotion');
   return lifecycle.promotionTransaction(options,transaction=>{
     const {state,plan}=transaction,{root}=state;
     validatePolicy({...options,root},plan);
@@ -127,7 +129,7 @@ function execute(options,recovering) {
       const completed=latest(state,'promotion-completed'),started=latest(state,'promotion-started');
       if(completed){
         verifyOwner(completed,plan);const runtimeOutputs=ownedDirectory(root,plan);
-        return {schemaVersion:'opencaw-media-promotion-result/v1',promotion:true,alreadyPromoted:true,
+        return {schemaVersion:'hephaera-media-promotion-result/v1',promotion:true,alreadyPromoted:true,
           recovered:false,assetSha256:plan.assetSha256,runtimeOutputs,authorization:plan.authorization,sourceEvidence:plan.sourceEvidence};
       }
       if(started){
@@ -141,7 +143,7 @@ function execute(options,recovering) {
         validatePolicy({...options,root},transaction.revalidate());
         transaction.record('promotion-completed',{transactionId:started.data.transactionId,runtimeDirectory:plan.target.directory,
           runtimeOutputs,recovered:true,recoveryReason:'Owned exact directory was published before completion receipt.'});
-        return {schemaVersion:'opencaw-media-promotion-result/v1',promotion:true,alreadyPromoted:false,recovered:true,
+        return {schemaVersion:'hephaera-media-promotion-result/v1',promotion:true,alreadyPromoted:false,recovered:true,
           assetSha256:plan.assetSha256,runtimeOutputs,authorization:plan.authorization,sourceEvidence:plan.sourceEvidence};
       }
       const transactionId=crypto.randomUUID(),stageRelative=state.directory+'/promotion-staging/'+transactionId;
@@ -166,7 +168,7 @@ function execute(options,recovering) {
         fs.renameSync(stage,destination);published=true;
         const runtimeOutputs=ownedDirectory(root,plan);
         transaction.record('promotion-completed',{transactionId,runtimeDirectory:plan.target.directory,runtimeOutputs,recovered:Boolean(started)});
-        return {schemaVersion:'opencaw-media-promotion-result/v1',promotion:true,alreadyPromoted:false,recovered:Boolean(started),
+        return {schemaVersion:'hephaera-media-promotion-result/v1',promotion:true,alreadyPromoted:false,recovered:Boolean(started),
           assetSha256:plan.assetSha256,runtimeOutputs,authorization:plan.authorization,sourceEvidence:plan.sourceEvidence};
       }catch(error){
         if(!published && fs.existsSync(destination)) {

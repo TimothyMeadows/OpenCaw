@@ -10,7 +10,7 @@ Author the manifest as strict JSON and validate it with:
 
 Use exactly these top-level fields:
 
-- `schemaVersion`: `opencaw-rigged-actor/v1`.
+- `schemaVersion`: `hephaera-rigged-actor/v1`.
 - `actor`: stable `id`, human-readable `displayName`, `kind` (`character` or `monster`), and `deliveryStage` (`source`, `integration`, or `shipped`).
 - `files`: hashed `source` and `runtime` records. Paths use forward-slash repository-relative notation. GLB, GLTF, and FBX are accepted.
 - `coordinateSystem`: positive `unitsPerMeter`, distinct signed `upAxis` and `forwardAxis`, `handedness`, `pivot`, and `grounding`.

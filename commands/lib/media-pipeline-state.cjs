@@ -7,7 +7,7 @@ const runtime = require('./bubo-runtime.cjs');
 const host = require('./bubo-host-adapter.cjs');
 const contracts = require('./media-pipeline-contract.cjs');
 const engines = require('./engine-contract.cjs');
-const CACHE = '.opencaw/.cache', ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/, SHA = /^[a-f0-9]{64}$/;
+const CACHE = '.hephaera/.cache', ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/, SHA = /^[a-f0-9]{64}$/;
 const fail = message => { throw new Error(message); };
 const canonical = value => JSON.stringify(runtime.canonical(value));
 const digest = value => crypto.createHash('sha256').update(typeof value === 'string' ? value : canonical(value)).digest('hex');
@@ -106,7 +106,7 @@ function init(options) {
   const staging=runtime.projectPath(root,options.stagingRoot || '.art-staging/media/'+domain.toLowerCase());
   if ([runtime.projectPath(root,'assets'),runtime.projectPath(root,directory)].some(scope=>runtime.within(scope,staging)||runtime.within(staging,scope)))
     fail('Non-runtime staging must not overlap assets or lifecycle state.');
-  const assetRecord = {schemaVersion:'opencaw-media-asset/v1',task,domain,modality:context.modality,asset,version,
+  const assetRecord = {schemaVersion:'hephaera-media-asset/v1',task,domain,modality:context.modality,asset,version,
     nativeRequestId:nativeId({task,domain,asset,version}),policySha256:context.policySha256,
     stagingRoot:relative(root,staging),selection,brief,references,parent,createdAt:new Date().toISOString()};
   lock(root,directory,() => put(root,stateFile,assetRecord));
@@ -114,7 +114,7 @@ function init(options) {
 }
 function load(options) {
   const root = project(options.root), ref = identity(root,options.stateFile), asset = document(root,ref.path);
-  if (asset.schemaVersion !== 'opencaw-media-asset/v1' || !SHA.test(asset.policySha256 || '')
+  if (asset.schemaVersion !== 'hephaera-media-asset/v1' || !SHA.test(asset.policySha256 || '')
       || statePath(asset) !== ref.path || nativeId(asset) !== asset.nativeRequestId) fail('Invalid asset identity or state ownership.');
   const directory = path.posix.dirname(ref.path), eventsDirectory = runtime.projectPath(root,directory+'/events');
   const events = []; let previous = null;
@@ -126,7 +126,7 @@ function load(options) {
       const expected = String(index+1).padStart(6,'0')+'.json';
       if (files[index] !== expected) fail('Incomplete or unexpected lifecycle event; inspect retained state.');
       const name = directory+'/events/'+files[index], event = document(root,name);
-      if (event.schemaVersion !== 'opencaw-media-event/v1' || event.sequence !== index+1 || event.assetSha256 !== ref.sha256
+      if (event.schemaVersion !== 'hephaera-media-event/v1' || event.sequence !== index+1 || event.assetSha256 !== ref.sha256
           || event.previousSha256 !== previous || !['dispatch-started','dispatch-failed','dispatch-returned','candidate','technical','review','promotion-started','promotion-completed','promotion-failed'].includes(event.kind))
         fail('Lifecycle event chain or asset identity changed.');
       previous = identity(root,name).sha256; events.push(event);
@@ -181,7 +181,7 @@ function fresh(state) {
 function append(state,kind,data) {
   const previous = state.events.length ? identity(state.root,state.directory+'/events/'+String(state.events.length).padStart(6,'0')+'.json').sha256 : null;
   const sequence = state.events.length+1;
-  const record = {schemaVersion:'opencaw-media-event/v1',sequence,assetSha256:state.identity.sha256,previousSha256:previous,kind,data,recordedAt:new Date().toISOString()};
+  const record = {schemaVersion:'hephaera-media-event/v1',sequence,assetSha256:state.identity.sha256,previousSha256:previous,kind,data,recordedAt:new Date().toISOString()};
   put(state.root,state.directory+'/events/'+String(sequence).padStart(6,'0')+'.json',record);
   state.events.push(record);
   return record;
@@ -343,7 +343,7 @@ function evidence(state,observed,name,schema) {
 }
 function recordTechnical(options) {
   return mutate(options,(state,observed)=>{
-    const {ref,value}=evidence(state,observed,options.report,'opencaw-media-technical/v1');
+    const {ref,value}=evidence(state,observed,options.report,'hephaera-media-technical/v1');
     if (!['passed','failed'].includes(value.status) || !Array.isArray(value.checks) || !value.checks.length
         || value.checks.some(check=>!check || !['passed','failed','unavailable'].includes(check.status) || !text(check.id,'check ID') || !text(check.reason,'check reason',4096))
         || (value.status==='passed' && value.checks.some(check=>check.status!=='passed'))) fail('Technical evidence needs explicit honest check verdicts and reasons.');
@@ -357,7 +357,7 @@ function engineIdentity(root) {
 }
 function recordReview(options) {
   return mutate(options,(state,observed)=>{
-    const {ref,value}=evidence(state,observed,options.review,'opencaw-media-review/v1');
+    const {ref,value}=evidence(state,observed,options.review,'hephaera-media-review/v1');
     if (!['content','runtime'].includes(value.kind) || !['accepted','rejected'].includes(value.verdict)) fail('Explicit review kind and verdict required.');
     text(value.reviewer,'reviewer');text(value.reason,'review reason',4096);
     const sourceEvidence=identity(state.root,value.sourceEvidence);
@@ -403,12 +403,12 @@ function admitHandoff(options) {
     totalBytes+=measurement.bytes;totalSeconds+=measurement.durationSeconds;
   }
   if (totalBytes>target.maxOutputBytes || totalSeconds>target.maxAudioSeconds) fail('Candidate exceeds target byte or duration budget.');
-  return {schemaVersion:'opencaw-media-handoff/v1',assetSha256:observed.fingerprint,engine,target,
+  return {schemaVersion:'hephaera-media-handoff/v1',assetSha256:observed.fingerprint,engine,target,
     outputs:observed.candidate.data.outputs,promotion:false};
 }
 function admitPromotion(options) {
   const plan=admitHandoff(options), root=project(options.root), authorization=identity(root,options.authorization), value=document(root,authorization.path);
-  if (value.schemaVersion!=='opencaw-media-promotion/v1' || value.authorized!==true || value.assetSha256!==plan.assetSha256)
+  if (value.schemaVersion!=='hephaera-media-promotion/v1' || value.authorized!==true || value.assetSha256!==plan.assetSha256)
     fail('Explicit current asset promotion authorization is required.');
   equal(value.target,plan.target,'Promotion authorization names a different runtime target.');
   equal(value.outputs,plan.outputs,'Promotion authorization names different staged outputs.');

@@ -1,6 +1,6 @@
 ---
 name: repo-map-dotnet
-description: Inspect a host .NET repository and persist a concise semantic map of solution structure, responsibilities, and common commands. Use when .NET-specific structure is missing or stale in the OpenCaw repository map.
+description: Inspect a host .NET repository and persist a concise semantic map of solution structure, responsibilities, and common commands. Use when .NET-specific structure is missing or stale in the Hephaera repository map.
 engines: [AGNOSTIC]
 ---
 

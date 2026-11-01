@@ -7,13 +7,13 @@ const cp = require('child_process');
 const runtime = require('../commands/lib/bubo-runtime.cjs');
 const styles = require('../commands/lib/style-contract.cjs');
 const adapter = require('../commands/lib/bubo-media-adapter.cjs');
-const cache = path.basename(runtime.BASE) === '.opencaw' ? path.join(runtime.BASE, '.cache') : path.join(runtime.BASE, '.opencaw/.cache');
-const evidence = path.join(cache, 'tasks/opencaw-retire-comfyui/evidence/media-context');
+const cache = path.basename(runtime.BASE) === '.hephaera' ? path.join(runtime.BASE, '.cache') : path.join(runtime.BASE, '.hephaera/.cache');
+const evidence = path.join(cache, 'tasks/hephaera-retire-comfyui/evidence/media-context');
 fs.mkdirSync(evidence, { recursive: true });
 const root = fs.mkdtempSync(path.join(evidence, 'owned-'));
-const task = 'owned-media', workspace = '.opencaw/.cache/bubo-media';
-const stateRoot = '.opencaw/.cache/tasks/' + task + '/bubo-media';
-const mediaState = '.opencaw/.cache/retained-media-ledger';
+const task = 'owned-media', workspace = '.hephaera/.cache/bubo-media';
+const stateRoot = '.hephaera/.cache/tasks/' + task + '/bubo-media';
+const mediaState = '.hephaera/.cache/retained-media-ledger';
 const manifest = 'inputs/request.json';
 let assertions = 0;
 function check(value, message) { assert(value, message); assertions++; }
@@ -37,7 +37,7 @@ function snapshot(folder = root) {
   }
   visit(folder); return JSON.stringify(rows);
 }
-const mediaText = '# MEDIA.md\n\nGenerated from OpenCaw media pipeline templates:\n- CLOUD\n- LOCAL\n\n---\n\n'
+const mediaText = '# MEDIA.md\n\nGenerated from Hephaera media pipeline templates:\n- CLOUD\n- LOCAL\n\n---\n\n'
   + ['Pipeline Availability', 'Capability Matrix', 'Destinations And Budgets', 'Rights, Consent, And Provenance', 'Review And Promotion'].map(value => '## ' + value + '\n').join('\n')
   + '\nDiscover image, music, sound-effect (SFX), and voice independently through the pinned Bubo runtime.\n'
   + '\nRequire the user to choose a provider. Never switch or fall back between providers silently.\n';
@@ -56,10 +56,10 @@ const backends = [
   ['flux-schnell', 'image'], ['stable-audio-open', 'sfx'], ['ace-step-turbo', 'music'],
   ['qwen3-tts-customvoice', 'preset-speech'], ['qwen3-tts-base', 'consented-cloning']
 ].map(([id, modality]) => ({ id, modality }));
-const bundle = dir('.opencaw/runtime/bubo/artifacts/bubo');
+const bundle = dir('.hephaera/runtime/bubo/artifacts/bubo');
 const info = {
-  pinned: { revision: '1'.repeat(40), apiVersion: 1, resourceCatalogSha256: '2'.repeat(64) },
-  root: path.join(root, '.opencaw/runtime/bubo'), folder: path.join(root, bundle),
+  pinned: { revision: '1'.repeat(40), apiVersion: 2, resourceCatalogSha256: '2'.repeat(64) },
+  root: path.join(root, '.hephaera/runtime/bubo'), folder: path.join(root, bundle),
   executable: path.join(root, write(bundle + '/bubo-owned.bin', 'OWNED nonexecutable apphost fixture')),
   capability: { mediaBackends: backends, build: { sourceRevision: '1'.repeat(40), sourceDirty: false } }
 };
@@ -152,7 +152,7 @@ for (const seed of [9007199254740993, Number.MAX_SAFE_INTEGER+1, -1, 1.5, null])
   rejects(() => prepare({ ...base, items: [{ ...base.items[0], seed }] }), /nonnegative safe integers/);
 check(prepare({ ...base, items: [{ ...base.items[0], seed: Number.MAX_SAFE_INTEGER }] }).request.items[0].seed===Number.MAX_SAFE_INTEGER, 'Maximum safe seed is preserved exactly');
 rejects(() => prepare(base, ['--selection', 'inputs/rights.json']), /Audio does not consume/);
-for (const location of ['assets/generated', '.opencaw/.cache', '.opencaw/.cache/tasks/' + task, '.opencaw/.cache/local-media/acceptance-roots', '../outside'])
+for (const location of ['assets/generated', '.hephaera/.cache', '.hephaera/.cache/tasks/' + task, '.hephaera/.cache/local-media/acceptance-roots', '../outside'])
   rejects(() => prepare(base, ['--workspace', location]), /cache child|separate ownership|Traversal/);
 rejects(() => prepare(base, ['--media-state', workspace + '/staging']), /separate ownership/);
 rejects(() => prepare({ ...base, outputDirectory: 'assets/runtime' }), /workspace staging/);
@@ -162,10 +162,10 @@ write(python.path, 'Changed selected tool');
 rejects(() => prepare(), /executable\/module is missing or changed/);
 write(python.path, originalPython);
 let links = 0;
-const linked = path.join(root, '.opencaw/.cache/linked-workspace');
+const linked = path.join(root, '.hephaera/.cache/linked-workspace');
 try {
   fs.symlinkSync(path.join(root, workspace), linked, process.platform === 'win32' ? 'junction' : 'dir'); links++;
-  rejects(() => prepare(base, ['--workspace', '.opencaw/.cache/linked-workspace']), /symbolic links or junctions/);
+  rejects(() => prepare(base, ['--workspace', '.hephaera/.cache/linked-workspace']), /symbolic links or junctions/);
 } catch (error) { if (!['EPERM', 'EACCES', 'ENOTSUP'].includes(error.code)) throw error; }
 
 // Images additionally bind current STYLE and task-local explicit LOCAL choice.
@@ -175,7 +175,7 @@ const imageReceipt = { ...JSON.parse(fs.readFileSync(path.join(root, receiptPath
 const imageInstallation = identity(write(workspace + '/receipts/image.json', imageReceipt));
 const image = { ...base, backend: 'flux-schnell', installation: imageInstallation, items: [{ id: 'owned-output', prompt: 'Owned image fixture', seed: 5, width: 64, height: 64 }] };
 rejects(() => prepare(image), /Images require primary LOCAL/);
-const selectionPath = '.opencaw/.cache/tasks/' + task + '/local-selection.json';
+const selectionPath = '.hephaera/.cache/tasks/' + task + '/local-selection.json';
 const selection = styles.resolve(root, 'STYLE.md', { override: 'LOCAL' });
 write(selectionPath, selection);
 const imageContext = prepare(image, ['--selection', selectionPath]).context;
@@ -227,16 +227,16 @@ write('inputs/owned-transcript.txt', 'Owned synthetic transcript, no private rec
 const approvalPath = write('inputs/approval.json', { schemaVersion: 'bubo-media-acceptance-budget/v1', maximumCandidates: 1, maximumRevisions: 1, sharedStateRoot: mediaState, fixture: 'OWNED policy fixture; never used for inference' });
 const accepted = { ...base, acceptance: { approval: identity(approvalPath) } };
 rejects(() => prepare(accepted), /explicitly retained/);
-rejects(() => prepare(accepted, ['--media-state', '.opencaw/.cache/another-ledger']), /Approval root differs/);
+rejects(() => prepare(accepted, ['--media-state', '.hephaera/.cache/another-ledger']), /Approval root differs/);
 const claim = write(mediaState + '/claims/owned-used-budget.json', { fixture: true, candidateUsed: true, revisionUsed: true });
 const claimBytes = fs.readFileSync(path.join(root, claim));
 const bound = prepare(accepted, ['--media-state', mediaState]);
 const prebind = snapshot();
-check(!fs.existsSync(path.join(root, '.opencaw/.cache/local-media/acceptance-roots')), 'Context does not create acceptance binding');
+check(!fs.existsSync(path.join(root, '.hephaera/.cache/local-media/acceptance-roots')), 'Context does not create acceptance binding');
 check(snapshot() === prebind, 'Shared acceptance context leaves claims unchanged');
 const bindingFile = adapter.bindSharedState(bound), bindingBytes = fs.readFileSync(bindingFile);
 check(adapter.bindSharedState(bound) === bindingFile && fs.readFileSync(bindingFile).equals(bindingBytes), 'Binding is create-new then compare without rewriting');
-const newWorkspace = '.opencaw/.cache/alternate-workspace';
+const newWorkspace = '.hephaera/.cache/alternate-workspace';
 const relocatedReceipt = identity(write(newWorkspace + '/receipts/owned.json', {
   schemaVersion: 'bubo-media-installation/v1', backend: base.backend,
   modelDirectory: dir(newWorkspace + '/tools/models/owned'), licenses: [identity('inputs/license.json')],
@@ -245,16 +245,16 @@ const relocatedReceipt = identity(write(newWorkspace + '/receipts/owned.json', {
 const relocatedRequest = { ...accepted, installation: relocatedReceipt, outputDirectory: newWorkspace + '/staging/owned' };
 const relocated = prepare(relocatedRequest, ['--workspace', newWorkspace, '--media-state', mediaState]);
 check(relocated.sharedBinding.approvalSha256 === bound.sharedBinding.approvalSha256 && relocated.mediaState === mediaState, 'Workspace changes retain the same approval ledger');
-rejects(() => prepare(accepted, ['--media-state', '.opencaw/.cache/another-ledger'], 'inspect'), /already bound/);
+rejects(() => prepare(accepted, ['--media-state', '.hephaera/.cache/another-ledger'], 'inspect'), /already bound/);
 check(fs.readFileSync(bindingFile).equals(bindingBytes) && fs.readFileSync(path.join(root, claim)).equals(claimBytes), 'Rejected root changes preserve policy and consumed claim bytes');
 
 // Explicit platform module identities, never ambient PATH discovery.
 const moduleFile = write('platform/owned-module.bin', 'OWNED nonexecutable platform module');
-const platformPath = write('inputs/platform-modules.json', { schemaVersion: 'opencaw-platform-modules/v1', modules: [identity(moduleFile)] });
+const platformPath = write('inputs/platform-modules.json', { schemaVersion: 'hephaera-platform-modules/v1', modules: [identity(moduleFile)] });
 check(prepare(base, ['--platform-modules', platformPath]).context.tools.some(value => value.kind === 'platform-module' && value.sha256 === identity(moduleFile).sha256), 'Explicit module is separately classified and hash-bound');
-write(platformPath, { schemaVersion: 'opencaw-platform-modules/v1', modules: [{ ...identity(moduleFile), sha256: '0'.repeat(64) }] });
+write(platformPath, { schemaVersion: 'hephaera-platform-modules/v1', modules: [{ ...identity(moduleFile), sha256: '0'.repeat(64) }] });
 rejects(() => prepare(base, ['--platform-modules', platformPath]), /missing or changed/);
-write(platformPath, { schemaVersion: 'opencaw-platform-modules/v1', modules: [identity(moduleFile)], discover: true });
+write(platformPath, { schemaVersion: 'hephaera-platform-modules/v1', modules: [identity(moduleFile)], discover: true });
 rejects(() => prepare(base, ['--platform-modules', platformPath]), /platform module manifest/);
 
 // Registration is dry-run by default and can write only its declared new receipt.
@@ -304,7 +304,7 @@ const native = { status: 'generated-staged', backend: base.backend, requestPath:
 const nativePath = write(stateRoot + '/media/' + base.requestId + '/manifest.json', native);
 const dispatch = dir(stateRoot + '/dispatch/owned/bubo-host/owned');
 write(dispatch + '/host-context.json', provenancePrepared.context);
-const result = { schemaVersion: 'bubo-execution-result/v1', apiVersion: 1, status: 'succeeded', workflow: 'media', operation: 'generate',
+const result = { schemaVersion: 'bubo-execution-result/v1', apiVersion: 2, status: 'succeeded', workflow: 'media', operation: 'generate',
   runtime: info.capability.build, hostContextSha256: identity(dispatch + '/host-context.json').sha256, data: native };
 write(dispatch + '/result.json', result);
 const preserved = [nativePath, dispatch + '/result.json', dispatch + '/host-context.json', settingsPath, outputPath].map(name => [name, identity(name).sha256]);

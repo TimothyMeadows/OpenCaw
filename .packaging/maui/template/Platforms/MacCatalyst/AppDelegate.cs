@@ -1,6 +1,6 @@
 using Foundation;
 
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 [Register("AppDelegate")]
 public sealed class AppDelegate : Microsoft.Maui.MauiUIApplicationDelegate

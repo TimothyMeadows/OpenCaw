@@ -2,7 +2,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using Microsoft.Web.WebView2.Core;
 
-namespace OpenCaw.GameHost.Services;
+namespace Hephaera.GameHost.Services;
 
 public static class GameWebViewPolicy
 {

@@ -42,9 +42,9 @@ resolve_gh() {
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$script_dir/lib/memory-common.sh"
-opencaw_resolve_paths
-opencaw_root="$OPENCAW_ROOT"
-host_root="$OPENCAW_PROJECT_ROOT_RESOLVED"
+hephaera_resolve_paths
+hephaera_root="$HEPHAERA_ROOT"
+host_root="$HEPHAERA_PROJECT_ROOT_RESOLVED"
 
 detect_repo_root() {
   if git -C "$host_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -52,8 +52,8 @@ detect_repo_root() {
     return
   fi
 
-  if git -C "$opencaw_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    printf '%s\n' "$opencaw_root"
+  if git -C "$hephaera_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf '%s\n' "$hephaera_root"
     return
   fi
 

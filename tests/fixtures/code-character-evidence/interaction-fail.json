@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-code-character-observation/v1",
+  "schemaVersion": "hephaera-code-character-observation/v1",
   "capture": {
     "seed": 1337,
     "viewport": { "width": 700, "height": 700, "pixelRatio": 1 },

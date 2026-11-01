@@ -7,7 +7,7 @@ Suggested host `package.json` scripts:
   "scripts": {
     "test": "playwright test",
     "test:ci": "playwright test --project=chromium-ci",
-    "test:report": "./.opencaw/commands/playwright-evidence-report.sh"
+    "test:report": "./.hephaera/commands/playwright-evidence-report.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",

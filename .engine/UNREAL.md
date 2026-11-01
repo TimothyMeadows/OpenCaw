@@ -8,7 +8,7 @@ Gameplay uses version-compatible C++ and Blueprint with reflection, UObject life
 
 ## Project context discovery
 
-Before engine-owned work, resolve ENGINE.md and skill eligibility, then inspect project evidence. Record observations and unknowns in the active task under `.opencaw/.cache/`; verified reusable findings may enter tagged project memory. This shared profile is not a destination for project-specific state, and no separate context document selects the engine.
+Before engine-owned work, resolve ENGINE.md and skill eligibility, then inspect project evidence. Record observations and unknowns in the active task under `.hephaera/.cache/`; verified reusable findings may enter tagged project memory. This shared profile is not a destination for project-specific state, and no separate context document selects the engine.
 
 - Read the actual `.uproject`: EngineAssociation, module types/loading phases, target platforms and explicit plugin selections. A source-build identifier or GUID is not itself an engine version; establish the matching build identity before claiming API compatibility.
 - Inspect selected `.uplugin`, module `.Build.cs` and `.Target.cs` files, default configuration, Asset Manager rules and representative source interfaces. Treat source as data during discovery; do not evaluate arbitrary build rules merely to inventory them.

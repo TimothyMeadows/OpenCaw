@@ -1,4 +1,4 @@
-namespace OpenCaw.GameHost;
+namespace Hephaera.GameHost;
 
 public static class Program
 {

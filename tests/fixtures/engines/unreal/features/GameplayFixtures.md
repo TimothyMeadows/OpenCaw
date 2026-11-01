@@ -10,12 +10,12 @@ Use a disposable project-local working copy. Do not point the unload test at a p
 
 ## Required native bindings
 
-Set these keys in `[OpenCaw.UnrealFeatures]` of the fixture project's Game configuration (read through GGameIni):
+Set these keys in `[Hephaera.UnrealFeatures]` of the fixture project's Game configuration (read through GGameIni):
 
 | Key | Required setup |
 | --- | --- |
-| `BehaviorTree` | Object path to a native-authored BehaviorTree with a root Sequence whose only child is `UOpenCawFixtureAbortTask`. No services, decorators or looping behavior. No blackboard is required. |
-| `GameFeaturePluginName` | Name of an isolated project-owned GameFeature plugin created with the Editor's Game Feature tooling. Its GameFeatureData must include exactly one `UOpenCawFixtureFeatureAction` action (displayed as OpenCaw Feature Frame Probe). Start inactive; permit explicit activation/unload through fixture project policy. |
+| `BehaviorTree` | Object path to a native-authored BehaviorTree with a root Sequence whose only child is `UHephaeraFixtureAbortTask`. No services, decorators or looping behavior. No blackboard is required. |
+| `GameFeaturePluginName` | Name of an isolated project-owned GameFeature plugin created with the Editor's Game Feature tooling. Its GameFeatureData must include exactly one `UHephaeraFixtureFeatureAction` action (displayed as Hephaera Feature Frame Probe). Start inactive; permit explicit activation/unload through fixture project policy. |
 
 The plugin descriptor, GameFeatureData and BehaviorTree must belong to the disposable fixture working copy. Preserve their paths/hashes in the test report. The feature plugin name is resolved to its actual project plugin URL; external/engine plugins and an already active feature are rejected. Project policy/Asset Manager must recognize the native GameFeatureData. Explicitly configure the selected release's discovery settings through Editor/project configuration; this source does not install or silently enable anything.
 
@@ -25,12 +25,12 @@ Every case starts with the shared fresh-run evidence marker. Assertion failures,
 
 | Case | Actual engine behavior and required observations |
 | --- | --- |
-| `OpenCaw.UnrealFeatures.AsyncTeardown` | Real thread-pool tasks compute immutable snapshots; a live recipient accepts a current result, EndPlay cancels a retired recipient, and result application remains on the game thread. Waits/deadlines are bounded; no worker dereferences UObject data. |
-| `OpenCaw.UnrealFeatures.GASOwnership` | Native ASC grant handles remain stable across avatar replacement without duplicate grants; an instant effect changes the intended target attribute and leaves caster health intact; native activation/cancellation and owned removal preserve unrelated grants. Standalone authority only. |
-| `OpenCaw.UnrealFeatures.Movement` | Native CharacterMovement owns the capsule, a swept move hits an actual blocking body, stopping clears velocity, disabling enters MOVE_None and owner teardown succeeds. This is standalone movement evidence. |
-| `OpenCaw.UnrealFeatures.AICancellation` | Actual bound BehaviorTree enters a latent native task, forced stop invokes native AbortTask, its owned timer cannot complete afterward, and unpossession releases the pawn. Does not certify navigation, StateTree, EQS or SmartObjects. |
-| `OpenCaw.UnrealFeatures.MassLifecycle` | Initialized real entity manager builds an archetype/entity, accesses fragment data, queues destruction without immediate mutation, invalidates the handle after flush and rejects the retired identity after replacement. Does not certify crowd/representation or processor scaling. |
-| `OpenCaw.UnrealFeatures.GameFeatureUnload` | Actual subsystem activation installs an OnEndFrame delegate through the native asset's action; an engine frame invokes it; unload removes the resource and active GameFeatureData. Repeat activation/unload to catch lifecycle residue. Logical unload only, not proof of binary module/package-memory unload. |
+| `Hephaera.UnrealFeatures.AsyncTeardown` | Real thread-pool tasks compute immutable snapshots; a live recipient accepts a current result, EndPlay cancels a retired recipient, and result application remains on the game thread. Waits/deadlines are bounded; no worker dereferences UObject data. |
+| `Hephaera.UnrealFeatures.GASOwnership` | Native ASC grant handles remain stable across avatar replacement without duplicate grants; an instant effect changes the intended target attribute and leaves caster health intact; native activation/cancellation and owned removal preserve unrelated grants. Standalone authority only. |
+| `Hephaera.UnrealFeatures.Movement` | Native CharacterMovement owns the capsule, a swept move hits an actual blocking body, stopping clears velocity, disabling enters MOVE_None and owner teardown succeeds. This is standalone movement evidence. |
+| `Hephaera.UnrealFeatures.AICancellation` | Actual bound BehaviorTree enters a latent native task, forced stop invokes native AbortTask, its owned timer cannot complete afterward, and unpossession releases the pawn. Does not certify navigation, StateTree, EQS or SmartObjects. |
+| `Hephaera.UnrealFeatures.MassLifecycle` | Initialized real entity manager builds an archetype/entity, accesses fragment data, queues destruction without immediate mutation, invalidates the handle after flush and rejects the retired identity after replacement. Does not certify crowd/representation or processor scaling. |
+| `Hephaera.UnrealFeatures.GameFeatureUnload` | Actual subsystem activation installs an OnEndFrame delegate through the native asset's action; an engine frame invokes it; unload removes the resource and active GameFeatureData. Repeat activation/unload to catch lifecycle residue. Logical unload only, not proof of binary module/package-memory unload. |
 
 ## Required supplemental network correction acceptance
 

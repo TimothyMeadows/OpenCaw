@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-voice-runtime-evidence/v1",
+  "schemaVersion": "hephaera-voice-runtime-evidence/v1",
   "task": "active-task",
   "engine": {
     "engine": "THREEJS",

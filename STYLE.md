@@ -2,13 +2,13 @@
 
 This file is the canonical art style contract for this repository.
 
-Generated from OpenCaw style templates:
+Generated from Hephaera style templates:
 - CEL_SHADED_COMIC
 
-Primary OpenCaw art pipeline:
+Primary Hephaera art pipeline:
 - PROOF_TO_MODEL
 
-Allowed OpenCaw art pipelines:
+Allowed Hephaera art pipelines:
 - PROOF_TO_MODEL
 - CLOUD
 - LOCAL

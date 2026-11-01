@@ -41,11 +41,11 @@ done
 [[ "$tag" =~ ^(kind|area|tech|env|topic|scope):[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo "Invalid exact tag: $tag" >&2; exit 1; }
 [[ "$target" =~ ^(memory|repo-map|both)$ ]] || { echo "Invalid target: $target" >&2; exit 1; }
 
-opencaw_resolve_paths
+hephaera_resolve_paths
 
 files=()
-if [[ "$target" == 'memory' || "$target" == 'both' ]]; then files+=("$OPENCAW_PROJECT_MEMORY_FILE"); fi
-if [[ "$target" == 'repo-map' || "$target" == 'both' ]]; then files+=("$OPENCAW_REPO_MAP_FILE"); fi
+if [[ "$target" == 'memory' || "$target" == 'both' ]]; then files+=("$HEPHAERA_PROJECT_MEMORY_FILE"); fi
+if [[ "$target" == 'repo-map' || "$target" == 'both' ]]; then files+=("$HEPHAERA_REPO_MAP_FILE"); fi
 
 total=0
 for file in "${files[@]}"; do
@@ -65,7 +65,7 @@ for file in "${files[@]}"; do
   total=$((total + count))
 
   if [[ "$dry_run" == 'false' && "$count" -gt 0 ]]; then
-    opencaw_archive_file "$file" "purge-${tag//:/-}" "$OPENCAW_PROJECT_CACHE_DIR/archive/memory"
+    hephaera_archive_file "$file" "purge-${tag//:/-}" "$HEPHAERA_PROJECT_CACHE_DIR/archive/memory"
     awk -v wanted="$tag" '
       {
         original = $0

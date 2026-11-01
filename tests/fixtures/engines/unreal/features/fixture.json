@@ -2,67 +2,67 @@
   "schemaVersion": 1,
   "engine": "UNREAL",
   "engineMinor": "5.8",
-  "project": "OpenCawFeatureFixture.uproject",
-  "target": "OpenCawFeatureFixtureEditor",
+  "project": "HephaeraFeatureFixture.uproject",
+  "target": "HephaeraFeatureFixtureEditor",
   "files": [
-    "OpenCawFeatureFixture.uproject",
+    "HephaeraFeatureFixture.uproject",
     "Config/DefaultGame.ini",
-    "Source/OpenCawFeatureFixtureEditor.Target.cs",
-    "Source/OpenCawFeatureFixture/OpenCawFeatureFixture.Build.cs",
-    "Source/OpenCawFeatureFixture/Private/OpenCawFeatureFixture.cpp",
-    "Source/OpenCawFeatureFixture/Public/FeatureEvidence.h",
+    "Source/HephaeraFeatureFixtureEditor.Target.cs",
+    "Source/HephaeraFeatureFixture/HephaeraFeatureFixture.Build.cs",
+    "Source/HephaeraFeatureFixture/Private/HephaeraFeatureFixture.cpp",
+    "Source/HephaeraFeatureFixture/Public/FeatureEvidence.h",
     "GameplayFixtures.md",
-    "Source/OpenCawFeatureFixture/Private/GameplayFeatureTests.cpp",
-    "Source/OpenCawFeatureFixture/Public/GameplayFixtureTypes.h",
+    "Source/HephaeraFeatureFixture/Private/GameplayFeatureTests.cpp",
+    "Source/HephaeraFeatureFixture/Public/GameplayFixtureTypes.h",
     "PresentationFixtures.md",
-    "Source/OpenCawFeatureFixture/Private/PresentationFeatureTests.cpp",
-    "Source/OpenCawFeatureFixture/Public/PresentationFixtureTypes.h",
+    "Source/HephaeraFeatureFixture/Private/PresentationFeatureTests.cpp",
+    "Source/HephaeraFeatureFixture/Public/PresentationFixtureTypes.h",
     "WorldFixtures.md",
-    "Source/OpenCawFeatureFixture/Private/WorldFeatureTests.cpp",
-    "Source/OpenCawFeatureFixture/Public/WorldFixtureTypes.h"
+    "Source/HephaeraFeatureFixture/Private/WorldFeatureTests.cpp",
+    "Source/HephaeraFeatureFixture/Public/WorldFixtureTypes.h"
   ],
   "cases": [
     {
-      "name": "OpenCaw.UnrealFeatures.AsyncTeardown",
+      "name": "Hephaera.UnrealFeatures.AsyncTeardown",
       "requires": {},
       "limit": "Native snapshot/cancellation/lifetime; not a universal thread-safety proof"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.GASOwnership",
+      "name": "Hephaera.UnrealFeatures.GASOwnership",
       "requires": {},
       "limit": "Local native grants/target identity; multiplayer prediction and packet loss remain separate"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.Movement",
+      "name": "Hephaera.UnrealFeatures.Movement",
       "requires": {},
       "limit": "CharacterMovement swept collision and teardown; real client/server correction requires multiprocess playtests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.AICancellation",
+      "name": "Hephaera.UnrealFeatures.AICancellation",
       "requires": {
         "BehaviorTree": "asset"
       },
       "limit": "Native task abort; authored StateTree/EQS/navigation variants need selected-system tests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.MassLifecycle",
+      "name": "Hephaera.UnrealFeatures.MassLifecycle",
       "requires": {},
       "limit": "Native entity/command-buffer lifetime; processors, crowds and scale need separate tests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.GameFeatureUnload",
+      "name": "Hephaera.UnrealFeatures.GameFeatureUnload",
       "requires": {
         "GameFeaturePluginName": "plugin"
       },
       "limit": "Native activation/deactivation ownership; packaged feature delivery remains separate"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.CameraOwnership",
+      "name": "Hephaera.UnrealFeatures.CameraOwnership",
       "requires": {},
       "limit": "Controller/target state; framing, comfort and splitscreen input need playtests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.VFXPooling",
+      "name": "Hephaera.UnrealFeatures.VFXPooling",
       "requires": {
         "PresentationMap": "map",
         "NiagaraSystem": "asset"
@@ -70,7 +70,7 @@
       "limit": "CPU Niagara pool/delegates; GPU appearance/scalability require captures"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.SequenceInterruption",
+      "name": "Hephaera.UnrealFeatures.SequenceInterruption",
       "requires": {
         "PresentationMap": "map",
         "LevelSequence": "asset"
@@ -78,7 +78,7 @@
       "limit": "Property evaluation/restoration; cinematic visual/audio acceptance requires playback"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.WorldStreaming",
+      "name": "Hephaera.UnrealFeatures.WorldStreaming",
       "requires": {
         "StreamingLevel": "map",
         "StreamingMarkerTag": "tag"
@@ -86,7 +86,7 @@
       "limit": "Native stream load/unload; World Partition/HLOD/cook require selected-project tests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.ProceduralRegeneration",
+      "name": "Hephaera.UnrealFeatures.ProceduralRegeneration",
       "requires": {
         "ProceduralMap": "map",
         "ProceduralActorTag": "tag"
@@ -94,7 +94,7 @@
       "limit": "Native deterministic PCG cleanup/regeneration; procedural mesh variants need separate tests"
     },
     {
-      "name": "OpenCaw.UnrealFeatures.SaveMigration",
+      "name": "Hephaera.UnrealFeatures.SaveMigration",
       "requires": {},
       "limit": "Native in-memory migration/integrity/transaction; durable file/crash/platform storage need separate tests"
     }

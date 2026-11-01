@@ -38,7 +38,7 @@ class RigidProduction(unittest.TestCase):
     def setUpClass(cls):
         if not Path(BLENDER).is_file():
             raise unittest.SkipTest('Actual Blender4.5 unavailable')
-        evidence = Path(os.environ.get('OPENCAW_PROOF_RIGID_EVIDENCE_ROOT',str(ROOT/'test/pipeline/tb')))
+        evidence = Path(os.environ.get('HEPHAERA_PROOF_RIGID_EVIDENCE_ROOT',str(ROOT/'test/pipeline/tb')))
         evidence.resolve().relative_to(ROOT.resolve())
         cursor = evidence
         while cursor != ROOT:
@@ -126,7 +126,7 @@ bpy.ops.export_scene.gltf(filepath=str(folder/'prepared.glb'),export_format='GLB
         shutil.copyfile(self.work/'prepared.glb',prepared)
         parts = json.loads(json.dumps(self.base_parts))
         source = {'path':'authoring-source.txt','sha256':sha(self.work/'authoring-source.txt'),'role':'SIMULATED controlled authoring source'}
-        handoff = {'schemaVersion':1,'profile':'articulated','coordinateFrame':'opencaw-proof-z-up','sourceRawSha256':sha(self.raw),
+        handoff = {'schemaVersion':1,'profile':'articulated','coordinateFrame':'hephaera-proof-z-up','sourceRawSha256':sha(self.raw),
                    'preparedGlb':relative(prepared),'preparedGlbSha256':sha(prepared),
                    'sourceToPreparedMatrix':[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
                    'authoringEvidence':relative(folder/'authoring.json'),'authoringEvidenceSha256':'','parts':parts}
@@ -135,9 +135,9 @@ bpy.ops.export_scene.gltf(filepath=str(folder/'prepared.glb'),export_format='GLB
                                                   'highTriangles':80 if p['id']!='lamp' else 80,
                                                   'lowTriangles':20 if p['id']!='lamp' else 80,
                                                   'intentionalChanges':'SIMULATED explicit fixture subdivision only'} for p in parts]}
-        review_path = folder/'.opencaw/.cache/tasks/fixture/review.json'
+        review_path = folder/'.hephaera/.cache/tasks/fixture/review.json'
         # All test state is confined to the fixture project, including its review.
-        review_path = self.work/'.opencaw/.cache/tasks/fixture'/ (name+'-review.json')
+        review_path = self.work/'.hephaera/.cache/tasks/fixture'/ (name+'-review.json')
         review_path.parent.mkdir(parents=True,exist_ok=True)
         settings = {'schemaVersion':2,'method':'rigid-parts','topologyPreparation':{'method':'none'},
                     'collision':{'method':'kdop-26','padding':.00001,'maxVolumeRatio':20},
@@ -159,7 +159,7 @@ bpy.ops.export_scene.gltf(filepath=str(folder/'prepared.glb'),export_format='GLB
         settings['rigidParts']['reviewEvidenceSha256']=sha(review_path)
         job = {'schemaVersion':1,'mode':'multi-view','root':str(self.work),'input':'raw.glb','inputFrame':'pixal3d-mv-export',
                'engineToProofScale':123,'outputDir':relative(folder/'outputs'),'result':relative(folder/'outputs/result.json'),
-               'recipe':json.loads(json.dumps(self.recipe)),'finishingSettings':settings,'rigidHandoff':handoff,'taskEvidenceRoot':'.opencaw/.cache/tasks/fixture'}
+               'recipe':json.loads(json.dumps(self.recipe)),'finishingSettings':settings,'rigidHandoff':handoff,'taskEvidenceRoot':'.hephaera/.cache/tasks/fixture'}
         save(folder/'job.json',job)
         return folder,job
 
@@ -287,7 +287,7 @@ print('ALL40PART_TRIANGLE_COLOR_SAMPLES_AND_ORM_UV_NEGATIVES_PASS')
 
     def test_13_wrong_review_task_rejected(self):
         folder,job=self.fixture('wrong-task')
-        job['taskEvidenceRoot']='.opencaw/.cache/tasks/another'
+        job['taskEvidenceRoot']='.hephaera/.cache/tasks/another'
         save(folder/'job.json',job)
         result=self.run_process([BLENDER,'--background','--factory-startup','--disable-autoexec','--python-exit-code','1',
                                  '--python',self.wrapper,'--','--job',folder/'job.json'],'wrong-task',False)
@@ -395,7 +395,7 @@ print('ALL40PART_TRIANGLE_COLOR_SAMPLES_AND_ORM_UV_NEGATIVES_PASS')
     def test_27_fixed_preflight_is_actual_read_only_and_immutable(self):
         folder,job=self.fixture('preflight')
         original={p:sha(p) for p in [self.raw,folder/'prepared.glb',folder/'handoff.json',folder/'authoring.json']}
-        report='.opencaw/.cache/tasks/fixture/preflight-result.json'
+        report='.hephaera/.cache/tasks/fixture/preflight-result.json'
         command=[BLENDER,'--background','--factory-startup','--disable-autoexec','--python-exit-code','1',
                  '--python',SCRIPTS/'rigid_finish.py','--','--preflight','--job',folder/'job.json','--report',report]
         self.run_process(command,'preflight')
@@ -577,7 +577,7 @@ print('PRESERVED_FACTOR_UV_SAMPLER_COLORSPACE_EMISSION_NEGATIVES_PASS',checks)
             edit_glb_document(p,change)
             for item in (h,a,r):item['preparedGlbSha256']=sha(p)
         folder,job=self.fixture('mirrored-preflight',mutate)
-        report='.opencaw/.cache/tasks/fixture/mirror-rejected.json'
+        report='.hephaera/.cache/tasks/fixture/mirror-rejected.json'
         result=self.run_process([BLENDER,'--background','--factory-startup','--disable-autoexec','--python-exit-code','1',
                                  '--python',SCRIPTS/'rigid_finish.py','--','--preflight','--job',folder/'job.json','--report',report],
                                 'mirrored-preflight',False)
@@ -1130,7 +1130,7 @@ path=folder/'numeric.glb'
 stored=rigid._snv_export_static_intent(path,[obj],finish,1_000_000)
 rigid._verify_runtime_preservation(before,obj,finish,'Numeric fixture actual export',exact_world=True)
 assert normal_identity(obj)==original_normals
-assert stored['normalVerificationContract']=='opencaw-rigid-static-normals/v1'
+assert stored['normalVerificationContract']=='hephaera-rigid-static-normals/v1'
 assert stored['residualLimit']==2e-5 and stored['losslessClaim'] is False
 assert stored['geometricNormalQualityMeasured'] is False and stored['runtimeQualityAccepted'] is False
 assert stored['sourceContextUnchangedByExport'] and stored['workingRawDecodedWorldGuardsUnchanged']
@@ -1378,7 +1378,7 @@ def rejection(label,operation,message,injection=None):
 rejection('unknown-frame',lambda:finish.build_kdop26(high,low,dict(settings,frame='automatic'),64),'Unknown explicit')
 valid={'schemaVersion':2,'method':'rigid-parts','topologyPreparation':{'method':'none'},'collision':dict(settings,method='kdop-26'),
        'rigidParts':{'handoff':'inputs/handoff.json','handoffSha256':'0'*64,
-                     'reviewEvidence':'.opencaw/.cache/tasks/fixture/review.json','reviewEvidenceSha256':'0'*64,
+                     'reviewEvidence':'.hephaera/.cache/tasks/fixture/review.json','reviewEvidenceSha256':'0'*64,
                      'maxLod0Triangles':1000,'maxGlbBytes':1_000_000},'resources':{'maxPrivateBytes':1_073_741_824}}
 assert rigid.validate_settings(valid)['collision']['frame']=='principal-axes-v1'
 valid['collision']=dict(settings,method='kdop-26',frame='automatic')
@@ -1489,7 +1489,7 @@ def fixture(baked=False, contact=False, cavity=False):
     (root/'source.txt').write_text('SIMULATED independent local primitive art/rights/review; no human acceptance.\n')
     authoring={'schemaVersion':1,'kind':'rigid-part-authoring','sourceRawSha256':sha(root/'raw.glb'),'preparedGlbSha256':sha(root/'prepared.glb'),
                'sources':[{'path':'source.txt','sha256':sha(root/'source.txt'),'role':'SIMULATED authored source'}],'repairs':repairs}
-    topology_path='.opencaw/.cache/tasks/fixture/source-topology.json'
+    topology_path='.hephaera/.cache/tasks/fixture/source-topology.json'
     if contact or cavity:
         import rigid_source_topology
         receipt=rigid_source_topology.capture(root/'prepared.glb',[obj for obj in sources if obj.name=='core_LOW'],
@@ -1497,12 +1497,12 @@ def fixture(baked=False, contact=False, cavity=False):
         write_json(root/topology_path,receipt)
         authoring['sources'].append({'path':topology_path,'sha256':sha(root/topology_path),'role':'SIMULATED reviewed native source topology'})
     write_json(root/'authoring.json',authoring)
-    handoff={'schemaVersion':1,'profile':'articulated','coordinateFrame':'opencaw-proof-z-up','sourceRawSha256':sha(root/'raw.glb'),
+    handoff={'schemaVersion':1,'profile':'articulated','coordinateFrame':'hephaera-proof-z-up','sourceRawSha256':sha(root/'raw.glb'),
              'preparedGlb':'prepared.glb','preparedGlbSha256':sha(root/'prepared.glb'),
              'sourceToPreparedMatrix':[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
              'authoringEvidence':'authoring.json','authoringEvidenceSha256':sha(root/'authoring.json'),'parts':parts}
     write_json(root/'handoff.json',handoff)
-    review_path='.opencaw/.cache/tasks/fixture/review.json'
+    review_path='.hephaera/.cache/tasks/fixture/review.json'
     write_json(root/review_path,{'schemaVersion':1,'kind':'rigid-preparation','decision':'approved','human':False,
         'reviewer':'SIMULATED fixture technical admission','reason':'Independent numeric fixture; no human model acceptance',
         'sourceRawSha256':sha(root/'raw.glb'),'preparedGlbSha256':sha(root/'prepared.glb'),
@@ -1519,14 +1519,14 @@ def fixture(baked=False, contact=False, cavity=False):
     if contact or cavity:
         settings['rigidParts']['sourceTopology']={'method':'reviewed-source-corners-v1','receipt':topology_path,
                                                  'receiptSha256':sha(root/topology_path)}
-    job={'schemaVersion':1,'mode':'multi-view','root':str(root),'input':'raw.glb','inputFrame':'opencaw-proof-z-up',
+    job={'schemaVersion':1,'mode':'multi-view','root':str(root),'input':'raw.glb','inputFrame':'hephaera-proof-z-up',
          'outputDir':'out','result':'out/result.json','recipe':recipe,'finishingSettings':settings,
-         'rigidHandoff':handoff,'taskEvidenceRoot':'.opencaw/.cache/tasks/fixture'}
+         'rigidHandoff':handoff,'taskEvidenceRoot':'.hephaera/.cache/tasks/fixture'}
     return root,job
 
 def invoke(root,job):
     write_json(root/'job.json',job)
-    protected=('raw.glb','prepared.glb','source.txt','authoring.json','handoff.json','.opencaw/.cache/tasks/fixture/review.json')
+    protected=('raw.glb','prepared.glb','source.txt','authoring.json','handoff.json','.hephaera/.cache/tasks/fixture/review.json')
     before={name:sha(root/name) for name in protected}
     previous=sys.argv
     try:

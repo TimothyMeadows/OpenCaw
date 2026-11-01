@@ -14,7 +14,7 @@ Implement Unreal agent decisions, perception, navigation queries and contextual 
 
 Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh unreal-build-ai` before edits or tool launches. Require effective engine `UNREAL` and `compatible: true`; revalidate task overrides/output scope. Requesting this skill never selects an engine.
 
-Read release, selected AI plugins, controller/pawn topology, decision framework, navigation data, authority and agent budgets. Behavior Tree versus StateTree is a project decision. Record context/evidence in resolved `.opencaw/.cache/tasks/<task>/`; preserve `ENGINE.md`.
+Read release, selected AI plugins, controller/pawn topology, decision framework, navigation data, authority and agent budgets. Behavior Tree versus StateTree is a project decision. Record context/evidence in resolved `.hephaera/.cache/tasks/<task>/`; preserve `ENGINE.md`.
 
 ## Workflow
 

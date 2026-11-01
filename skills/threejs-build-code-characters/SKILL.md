@@ -30,7 +30,7 @@ Run `commands/resolve-engine.sh` and `commands/resolve-skill.sh threejs-build-co
 ## Output
 
 - Host-native Three.js TypeScript or JavaScript with a stable factory, semantic parts and anchors, deterministic inputs, and explicit cleanup.
-- A complete generic code-model manifest and linked `opencaw-code-character/v1` profile.
+- A complete generic code-model manifest and linked `hephaera-code-character/v1` profile.
 - Immutable gate evidence, independent reviewer packets where required, calibrated machine results, and explicit residual risks.
 
 ## Guardrails

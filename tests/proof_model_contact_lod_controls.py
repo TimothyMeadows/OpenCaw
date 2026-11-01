@@ -459,7 +459,7 @@ def replace_fixture_core(root, job, rigid, api, topology, *, scale=1.0, edge_con
     shutil.copyfile(root/'prepared.glb',root/'raw.glb')
     sha=lambda path:hashlib.sha256(Path(path).read_bytes()).hexdigest()
     def write(path, data):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(data,indent=2,allow_nan=False)+'\n',encoding='utf-8')
-    receipt_path='.opencaw/.cache/tasks/fixture/source-topology.json'
+    receipt_path='.hephaera/.cache/tasks/fixture/source-topology.json'
     receipt=topology.capture(root/'prepared.glb',[o for o in sources if o.name.endswith('_LOW')],rigid,max_file_bytes=10000000)
     authored_after_capture={source.name:_snapshot(source)for source in sources}
     assert authored_after_export==authored_after_capture,'Fixture capture changed authored source fields'
@@ -660,7 +660,7 @@ def run_regressions(rigid,api,topology,work,factory):
             elif label=='winding':
                 bm=bmesh.new();bm.from_mesh(mesh);bm.faces.ensure_lookup_table();bmesh.ops.reverse_faces(bm,faces=[bm.faces[actual['polygon']]]);bm.to_mesh(mesh);bm.free()
             elif label=='owner':
-                attr=mesh.attributes.get('opencaw_contact_owner')
+                attr=mesh.attributes.get('hephaera_contact_owner')
                 assert attr is not None and attr.domain=='POINT' and attr.data_type=='INT'
                 vi=actual['vertices'][0];assert attr.data[vi].value>0;attr.data[vi].value=0
             elif label=='merge':
@@ -674,7 +674,7 @@ def run_regressions(rigid,api,topology,work,factory):
                 mesh.vertices[actual['vertices'][0]].co.x=float('nan')
                 assert math.isnan(mesh.vertices[actual['vertices'][0]].co.x)
             elif label=='subfloor':
-                owners=mesh.attributes['opencaw_contact_owner']
+                owners=mesh.attributes['hephaera_contact_owner']
                 eligible=[face for face in faces if all(owners.data[v].value==0 for v in face)]
                 assert eligible
                 a,b,c=max(eligible,key=lambda face:float(points[list(face),0].mean()))
@@ -682,7 +682,7 @@ def run_regressions(rigid,api,topology,work,factory):
                 mesh.update()
                 assert api.topology_measure(obj,allow_degenerate=True)['degenerateFaces']>0
             else:
-                owners=mesh.attributes['opencaw_contact_owner']
+                owners=mesh.attributes['hephaera_contact_owner']
                 free=[i for i in range(len(mesh.vertices))if owners.data[i].value==0]
                 assert free
                 if label=='proper':

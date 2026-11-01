@@ -7,8 +7,8 @@ THREEJS automatically selects [pmndrs postprocessing](https://github.com/pmndrs/
 Use host-locked dependencies and one Three resolution shared with Quarks. The tested fixture is Three0.182.0, postprocessing6.39.5 and Quarks/core0.17.1. Postprocessing6.39.5 declares Three>=0.168.0 <0.187.0. Preserve Zlib and applicable dependency notices. Different versions/lock formats require fresh compatibility evidence; no automatic upgrade or install is performed.
 
 ```bash
-bash .opencaw/commands/threejs-postprocessing.sh inspect --renderer WebGLRenderer
-bash .opencaw/commands/threejs-postprocessing.sh scaffold --output src/engine/postprocessing --renderer WebGLRenderer
+bash .hephaera/commands/threejs-postprocessing.sh inspect --renderer WebGLRenderer
+bash .hephaera/commands/threejs-postprocessing.sh scaffold --output src/engine/postprocessing --renderer WebGLRenderer
 ```
 
 Inspection reads bounded npm manifest/lock/installed metadata without importing host code. An exact tested graph establishes metadata consistency only; installed bytes, real context, shader execution and target readiness remain unverified. Missing/inconsistent dependencies, duplicate/nested Three, links, unsupported package graphs and WebGPU are reported explicitly. Scaffold copies reviewed source into a fresh owned directory with source/engine/dependency receipts; it overwrites nothing and can be prepared before installation. Valid isolated engine overrides must supply `--engine-evidence` and stay inside their recorded prototype scope.

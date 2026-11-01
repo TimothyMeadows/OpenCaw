@@ -111,12 +111,12 @@ function inspect(root, opt = {}) {
 }
 function outputPath(root, value) {
   const target = safe(root, value, 'Output');
-  if (value.split('/').some(p => ['.git', '.opencaw', 'node_modules', 'runtime', '.engine', 'commands', 'skills'].includes(p.toLowerCase()))) fail('Output cannot overwrite baseline, dependency or durable state directories.');
+  if (value.split('/').some(p => ['.git', '.hephaera', 'node_modules', 'runtime', '.engine', 'commands', 'skills'].includes(p.toLowerCase()))) fail('Output cannot overwrite baseline, dependency or durable state directories.');
   let current = root;
   for (const part of value.split('/').slice(0, -1)) {
     current = path.join(current, part);
     if (fs.existsSync(current) && !fs.lstatSync(current).isDirectory()) fail('Output parent must be a directory.');
-    if (fs.existsSync(path.join(current, 'opencaw-particles.json'))) fail('Output cannot nest inside another owned particle module.');
+    if (fs.existsSync(path.join(current, 'hephaera-particles.json'))) fail('Output cannot nest inside another owned particle module.');
   }
   return target;
 }
@@ -132,7 +132,7 @@ function scaffold(root, opt = {}) {
     return { name, sha256: sha(file) };
   });
   if (!files.some(f => f.name === 'three-quarks-runtime.mjs')) fail('Particle runtime template is incomplete.');
-  const stateRelative = '.opencaw/.cache/threejs-particles/scaffolds';
+  const stateRelative = '.hephaera/.cache/threejs-particles/scaffolds';
   const state = engines.inside(root, stateRelative, 'Scaffold state').absolute;
   fs.mkdirSync(state, { recursive: true });
   const lock = path.join(state, 'operation.lock');
@@ -142,14 +142,14 @@ function scaffold(root, opt = {}) {
     fs.mkdirSync(stage);
     for (const f of files) fs.writeFileSync(path.join(stage, f.name), fs.readFileSync(path.join(TEMPLATE, f.name)), { flag: 'wx' });
     const receipt = { schemaVersion: 1, backend: 'THREE_QUARKS', output, engine: { effectiveEngine: selected.effectiveEngine, contractSha256: selected.contractSha256, registrySha256: selected.registrySha256, definitionSha256: selected.definitionSha256, evidence: selected.evidence || null }, source: files, dependencies: inspect(root, opt), installationPerformed: false, runtimeAcceptance: 'unverified' };
-    fs.writeFileSync(path.join(stage, 'opencaw-particles.json'), encode(receipt), { flag: 'wx' });
+    fs.writeFileSync(path.join(stage, 'hephaera-particles.json'), encode(receipt), { flag: 'wx' });
     const fresh = selection(root, { ...opt, output });
     if (JSON.stringify(fresh) !== JSON.stringify(selected) || files.some(f => sha(path.join(TEMPLATE, f.name)) !== f.sha256 || sha(path.join(stage, f.name)) !== f.sha256)) fail('Engine/template changed during scaffold; staged evidence retained, output not published.');
     outputPath(root, output);
     if (fs.existsSync(target)) fail('Output became occupied; unpublished stage retained.');
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.renameSync(stage, target);
-    return { schemaVersion: 1, backend: 'THREE_QUARKS', output, files: [...files.map(f => f.name), 'opencaw-particles.json'], installationPerformed: false, executionReadiness: 'unverified', dependencies: receipt.dependencies };
+    return { schemaVersion: 1, backend: 'THREE_QUARKS', output, files: [...files.map(f => f.name), 'hephaera-particles.json'], installationPerformed: false, executionReadiness: 'unverified', dependencies: receipt.dependencies };
   } finally { fs.rmdirSync(lock); }
 }
 const HELP = `Usage: threejs-particles.sh <inspect|scaffold> [options]

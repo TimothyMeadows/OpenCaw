@@ -17,14 +17,14 @@ The shared foundation supplies domain declarations, optional contract generation
 
 Host contracts remain optional. Loading a project does not create all three contracts or require a Bubo build, MEDIA.md, STYLE.md or ENGINE.md for unrelated nonvisual planning. A requested domain can be configured explicitly. Missing unrelated domains leave other contexts usable. Generation requires current applicable domain and MEDIA/provider policy; an actual engine handoff also requires compatible engine ownership and target evidence.
 
-Commands live under the host installation at `.opencaw/commands/`. Their `--help` output is the current interface reference. Shared declarations and templates live under [.media/pipelines](../.media/pipelines/INDEX.md); visual primary pipelines remain under [.styles/.pipelines](../.styles/.pipelines/INDEX.md). AUDIO, MUSIC and VOICE are not extra primary STYLE choices.
+Commands live under the host installation at `.hephaera/commands/`. Their `--help` output is the current interface reference. Shared declarations and templates live under [.media/pipelines](../.media/pipelines/INDEX.md); visual primary pipelines remain under [.styles/.pipelines](../.styles/.pipelines/INDEX.md). AUDIO, MUSIC and VOICE are not extra primary STYLE choices.
 
 From the project root, configure only the domain requested for the task:
 
 ```bash
-bash .opencaw/commands/generate-media-pipeline-contract.sh AUDIO
-bash .opencaw/commands/validate-media-pipeline-contract.sh AUDIO
-bash .opencaw/commands/resolve-media-pipeline.sh --modality ambience
+bash .hephaera/commands/generate-media-pipeline-contract.sh AUDIO
+bash .hephaera/commands/validate-media-pipeline-contract.sh AUDIO
+bash .hephaera/commands/resolve-media-pipeline.sh --modality ambience
 ```
 
 Use `MUSIC` or `VOICE` in the first two commands to configure those domains. Contract generation defaults to concise read directives; `--inline` embeds the current shared declaration. `--output FILE` creates a different confined contract file, which can be selected explicitly with `--contract FILE` during validation or resolution. An exact existing generated contract is reused with `created: false`; differing existing bytes are preserved and reported as an error.
@@ -32,7 +32,7 @@ Use `MUSIC` or `VOICE` in the first two commands to configure those domains. Con
 Load all independent contexts, including the existing visual selection, without changing their contracts:
 
 ```bash
-bash .opencaw/commands/resolve-media-pipeline.sh --all --visual
+bash .hephaera/commands/resolve-media-pipeline.sh --all --visual
 ```
 
 Commands return JSON. Aggregate resolution returns `contexts.visual`, `contexts.audio`, `contexts.music` and `contexts.voice`; omit `--visual` to avoid loading visual policy. A single-domain resolution reports:
@@ -54,9 +54,9 @@ The canonical modalities are `sfx`, `ambience`, `instrumental`, `supplied-lyrics
 For an existing `town-square` task, prepare three valid domain briefs with their actual rights, source references, explicit provider and finite budgets. The following initialization commands load no model and grant no generation allowance. They intentionally reuse the human asset name `arrival`; the domain remains part of each immutable identity:
 
 ```bash
-bash .opencaw/commands/audio-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-sfx.json --workspace .opencaw/.cache/media-production
-bash .opencaw/commands/music-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-music.json --workspace .opencaw/.cache/media-production
-bash .opencaw/commands/voice-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-speech.json --workspace .opencaw/.cache/media-production
+bash .hephaera/commands/audio-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-sfx.json --workspace .hephaera/.cache/media-production
+bash .hephaera/commands/music-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-music.json --workspace .hephaera/.cache/media-production
+bash .hephaera/commands/voice-pipeline.sh init --task town-square --asset arrival --version v1 --brief inputs/arrival-speech.json --workspace .hephaera/.cache/media-production
 ```
 
 Read each JSON result's `stateFile` into its own `AUDIO_STATE`, `MUSIC_STATE` or `VOICE_STATE` variable. Use those exact project-relative paths; do not guess the hashed folders. Each state belongs to its domain even though the task, asset name and staging workspace match. The visual selection is unchanged. Status, planning and reviews can proceed independently; model execution still follows shared native ownership.
@@ -64,7 +64,7 @@ Read each JSON result's `stateFile` into its own `AUDIO_STATE`, `MUSIC_STATE` or
 Only after separate LOCAL generation authorization, set `APPROVED_MEDIA_STATE` to that approval's already bound shared media-state root. Use the same physical root for image, SFX, music and speech cases covered by that media approval; never allocate one per domain or revision. For example:
 
 ```bash
-bash .opencaw/commands/audio-pipeline.sh generate --state "$AUDIO_STATE" --provider LOCAL --workspace .opencaw/.cache/media-production --media-state "$APPROVED_MEDIA_STATE"
+bash .hephaera/commands/audio-pipeline.sh generate --state "$AUDIO_STATE" --provider LOCAL --workspace .hephaera/.cache/media-production --media-state "$APPROVED_MEDIA_STATE"
 ```
 
 The MUSIC and VOICE commands take their own state with the same approved media-state root. Their brief's explicit provider must match the command. Missing installation, license, rights, consent or remaining allowance stops the requested operation. CLOUD uses separately selected available session generation and actual provenance import; these commands do not replace an unavailable provider. Existing compatible outputs can be imported with their original run ancestry, without claiming new synthesis or a fresh listening verdict.
@@ -74,7 +74,7 @@ After generation or import, run each asset's `validate`, then record its actual 
 Revise only the affected asset, retaining its previous state as ancestry:
 
 ```bash
-bash .opencaw/commands/audio-pipeline.sh revise --state "$AUDIO_STATE" --version v2 --brief inputs/arrival-sfx-v2.json
+bash .hephaera/commands/audio-pipeline.sh revise --state "$AUDIO_STATE" --version v2 --brief inputs/arrival-sfx-v2.json
 ```
 
 Use the returned new state for subsequent work. A revision neither erases failed attempts nor replenishes an exhausted candidate/revision allowance. Domain-specific changes invalidate their dependent evidence; shared MEDIA policy or shared source changes invalidate every affected consumer. Another domain's unchanged review cannot approve this revision.
@@ -90,8 +90,8 @@ The foundation's handoff and promotion admission APIs return guarded plans. The 
 Use `build-audio-assets` and the [AUDIO contract](../.media/pipelines/audio/PIPELINE.md). The command supports `brief`, `init`, `revise`, `status`, `doctor`, `setup-plan`, `generate`, `import`, `validate`, `review`, `handoff`, `promote` and `recover`:
 
 ```bash
-bash .opencaw/commands/audio-pipeline.sh --help
-bash .opencaw/commands/audio-pipeline.sh brief --brief path/to/audio-brief.json
+bash .hephaera/commands/audio-pipeline.sh --help
+bash .hephaera/commands/audio-pipeline.sh brief --brief path/to/audio-brief.json
 ```
 
 Examples and the strict brief schema live beside the AUDIO contract. LOCAL SFX and ambience use the same supported native SFX capability. Unsupported long ambience or controls fail; no implicit tiling, trimming, normalization or provider fallback occurs. CLOUD is an explicit provenance-import path when no unattended session generation capability is available. Missing authoritative technical analysis keeps imported work ineligible for handoff.
@@ -108,7 +108,7 @@ The shared evidence validator retains native48000Hz stereo frames and raw amplit
 
 ## Shared execution and state
 
-State is task-owned under `.opencaw/.cache/tasks/<task>/media/<audio|music|voice>/`. Each asset version retains its original brief, input and policy references, and any resulting native execution identity and staged outputs. Changes create new versions; affected reviews become stale. Native request/output IDs are collision-safe across domains and versions even when human asset names match. All domains still use the approval's physically shared native attempt ledger.
+State is task-owned under `.hephaera/.cache/tasks/<task>/media/<audio|music|voice>/`. Each asset version retains its original brief, input and policy references, and any resulting native execution identity and staged outputs. Changes create new versions; affected reviews become stale. Native request/output IDs are collision-safe across domains and versions even when human asset names match. All domains still use the approval's physically shared native attempt ledger.
 
 LOCAL work uses the pinned, explicitly built Bubo runtime through the existing media adapter. Bubo owns exact model/tool pins, verified installation, synthesis, bounded workers and GPU ownership. Independent context loading does not grant simultaneous GPU inference: proof reconstruction and LOCAL image/audio generation share native GPU exclusion. The six-case media acceptance ledger covers LOCAL image, SFX, instrumental, supplied-lyric, preset-speech and cloning cases under their original media approval. Proof/model workflows retain their own existing approval and attempt records; those records are not moved into the media ledger. Status and ordinary discovery load no model and download nothing. Setup is dry-run unless separately authorized; generation cannot install dependencies or change provider silently.
 
@@ -131,8 +131,8 @@ Contract/task/Goal creation grants no installation, license acceptance, fresh ge
 Generation planning does not require a fabricated engine. Handoff and promotion do require the actual selected engine, current exact output set, distribution rights and target evidence. Resolve that host's engine and obtain the lifecycle's current review identity, which binds its engine contract, definition and registry:
 
 ```bash
-bash .opencaw/commands/resolve-engine.sh
-node -e "console.log(JSON.stringify(require('./.opencaw/commands/lib/media-pipeline-state.cjs').engineIdentity(process.cwd()), null, 2))"
+bash .hephaera/commands/resolve-engine.sh
+node -e "console.log(JSON.stringify(require('./.hephaera/commands/lib/media-pipeline-state.cjs').engineIdentity(process.cwd()), null, 2))"
 ```
 
 Copy neither an example's zero hash nor an earlier engine identity into an accepted review. A changed engine identity requires refreshed runtime acceptance. The runtime review binds `assetSha256`, all ordered `outputs`, `engine`, `target`, and typed human, distribution and target-evidence sources. Applicable cloned-output disclosure remains an additional gate.
@@ -154,7 +154,7 @@ The host admits declared `wav`, `ogg`, `mp3`, `flac`, `opus`, `m4a`, `webm` or `
 
 The UNITY example does not select UNITY in a THREEJS project or install an Editor, middleware or package. Other engines retain their compatible owners. These workflows produce staged assets and evidence contracts, not a portable engine player. Engine-owned audio scheduling, cleanup, accessibility cues and load/dispose behavior must be implemented and reviewed in the host. Playback callbacks never authorize damage, targeting, movement or other gameplay outcomes.
 
-Record actual target source evidence in the domain's runtime form: `opencaw-audio-runtime-evidence/v1`, `opencaw-music-runtime-evidence/v1` or `opencaw-voice-runtime-evidence/v1`. It binds task, current engine identity, exact outputs, spatialization, loop intent, playback/load-dispose observations and a typed source. AUDIO/MUSIC loop intent additionally requires actual seam review. Synthetic forms, a waveform, a successful API call or the admission examples above cannot certify those observations. If the selected browser/player, importer or listening evidence is unavailable, retain an explicit blocked/not-run result and keep handoff/promotion blocked while planning and staged content review continue.
+Record actual target source evidence in the domain's runtime form: `hephaera-audio-runtime-evidence/v1`, `hephaera-music-runtime-evidence/v1` or `hephaera-voice-runtime-evidence/v1`. It binds task, current engine identity, exact outputs, spatialization, loop intent, playback/load-dispose observations and a typed source. AUDIO/MUSIC loop intent additionally requires actual seam review. Synthetic forms, a waveform, a successful API call or the admission examples above cannot certify those observations. If the selected browser/player, importer or listening evidence is unavailable, retain an explicit blocked/not-run result and keep handoff/promotion blocked while planning and staged content review continue.
 
 ## Failure and unavailable states
 

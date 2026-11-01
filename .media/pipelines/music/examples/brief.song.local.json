@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "opencaw-music-brief/v1",
+  "schemaVersion": "hephaera-music-brief/v1",
   "kind": "supplied-lyrics",
   "purpose": "Example only: a short original supplied-lyric song",
   "provider": "LOCAL",
@@ -8,7 +8,7 @@
   "lyricsRights": {"path": "inputs/actual-lyrics-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
   "request": {
     "rights": {"path": "inputs/actual-rights.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    "installation": {"path": ".opencaw/.cache/bubo-media/installations/actual-music.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "installation": {"path": ".hephaera/.cache/bubo-media/installations/actual-music.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
     "settings": {"device": "cuda:0", "precision": "bfloat16", "offload": "none"},
     "budget": {"maximumOutputs": 1, "maximumBytesPerOutput": 33554432, "maximumTotalBytes": 33554432, "maximumPixels": 4096, "maximumAudioSeconds": 20},
     "items": [{"id": "song", "prompt": "A gentle folk song with clear English singing, acoustic guitar, a simple opening and a resolved ending", "negativePrompt": "", "seed": 1205, "steps": 8, "guidance": 1, "seconds": 20, "loopCandidate": false, "music": {"mode": "supplied-lyrics", "lyrics": "We follow morning through the trees\nAnd carry daylight on the breeze", "vocalLanguage": "en", "bpm": 100, "keyScale": "C major", "timeSignature": "4", "shift": 3}}]

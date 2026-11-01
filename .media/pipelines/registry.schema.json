@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://opencaw.dev/schemas/media-pipeline-registry-v1.json",
+  "$id": "https://hephaera.dev/schemas/media-pipeline-registry-v1.json",
   "title": "Independent media production domains",
   "type": "object",
   "additionalProperties": false,
