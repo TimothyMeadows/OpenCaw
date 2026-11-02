@@ -30,6 +30,7 @@ engines: [AGNOSTIC]
 ## References
 
 - Read `skills/build-gameplay-runtime/references/bounded-world-work.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/bounded-world-work.md` from an installed host's root) when profiling identifies world-query, queue, navigation, allocation, or residency costs. Use comparable workloads and distinguish fixture correctness from actual engine/device performance before selecting a custom technique.
+- Read `skills/build-gameplay-runtime/references/rendering-diagnostics.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/rendering-diagnostics.md` from an installed host's root) when render cost or visual defects need paired CPU/GPU/memory and visual evidence. Keep renderer, workload, quality, and target conditions comparable.
 
 ## Guardrails
 

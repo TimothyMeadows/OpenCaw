@@ -719,6 +719,8 @@ Use `design-game-systems` for loops, player decisions, progression and evidence-
 
 The [gameplay concept index](docs/GAMEPLAY_CONCEPTS.md) maps 34 techniques to their applicability, existing skill owners and verification questions. Load relevant entries to make a request more precise while retaining the selected engine and project-specific tuning.
 
+Focused optional guides cover [input and locomotion](skills/build-gameplay-runtime/references/input-and-locomotion-feel.md), [damage windows and contact](skills/build-gameplay-runtime/references/damage-windows-and-contact.md), [bounded world work](skills/build-gameplay-runtime/references/bounded-world-work.md), and [rendering diagnostics](skills/build-gameplay-runtime/references/rendering-diagnostics.md). They define future acceptance requirements; source guidance alone does not establish gameplay, visual, performance, or device results.
+
 
 ## Native Web-Game Packaging
 
