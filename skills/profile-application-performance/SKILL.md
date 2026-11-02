@@ -27,6 +27,10 @@ engines: [AGNOSTIC]
 - Baseline and comparison evidence with units and environment.
 - Root-cause confidence, remediation, residual risk, and regression thresholds.
 
+## References
+
+- Read `skills/build-gameplay-runtime/references/bounded-world-work.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/bounded-world-work.md` from an installed host's root) when profiling identifies world-query, queue, navigation, allocation, or residency costs. Use comparable workloads and distinguish fixture correctness from actual engine/device performance before selecting a custom technique.
+
 ## Guardrails
 
 - Do not optimize from intuition alone.

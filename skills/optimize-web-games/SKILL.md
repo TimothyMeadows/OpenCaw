@@ -27,6 +27,10 @@ engines: [AGNOSTIC]
 - Before-and-after measurements with the limiting subsystem.
 - Remediation, device tradeoffs, and regression protection.
 
+## References
+
+- Read `skills/build-gameplay-runtime/references/bounded-world-work.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/bounded-world-work.md` from an installed host's root) when measurements justify optional indexing, cooperative scheduling, pools, or streaming. Keep correctness, response latency, memory, and existing selected-engine ownership in the acceptance criteria.
+
 ## Guardrails
 
 - Do not reduce gameplay readability to meet a frame target without design review.
