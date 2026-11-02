@@ -28,6 +28,10 @@ engines: [AGNOSTIC]
 - Balance hypotheses with explicit assumptions and representative initial, middle, late, failure, and exploit cases.
 - A playtest plan and findings that distinguish measured behavior, player reports, inference, and blocked or untested questions.
 
+## References
+
+- Read `docs/GAMEPLAY_CONCEPTS.md` in the resolved Hephaera baseline (`.hephaera/docs/GAMEPLAY_CONCEPTS.md` from an installed host's root) when a request about game feel, rendering or runtime systems needs more precise vocabulary and an existing implementation owner. Select only relevant entries and resolve the effective engine's compatible skills before using APIs; the index does not prescribe every listed technique.
+
 ## Guardrails
 
 - Do not prescribe a universal frame rate, session length, reward schedule, or numerical fun score.
