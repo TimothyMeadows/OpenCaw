@@ -717,6 +717,8 @@ The Three.js CODE pipeline requires THREEJS. Selecting Unity never changes art c
 
 Use `design-game-systems` for loops, player decisions, progression and evidence-based balance, and `build-game-ui` for layouts, navigation, modal input ownership and HUD synchronization. `print-gameplay-system-brief.sh --focus design|ui|feedback` creates focused briefs; `validate-gameplay-review.sh --profile general|design|ui|feedback REPORT.md` checks report structure and preserves blocked/not-run results. Gameplay feedback coordinates presentation; haptic feedback means tactile output. Browser tests may inspect a Unity web build, but native UI and physically felt vibration require their actual devices and runtimes.
 
+The [gameplay concept index](docs/GAMEPLAY_CONCEPTS.md) maps 34 techniques to their applicability, existing skill owners and verification questions. Load relevant entries to make a request more precise while retaining the selected engine and project-specific tuning.
+
 
 ## Native Web-Game Packaging
 
