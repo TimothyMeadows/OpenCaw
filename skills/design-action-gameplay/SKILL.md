@@ -28,6 +28,7 @@ Use `build-model-actions` when reviewed clips need an authored dance, chained co
 ## References
 
 - Read `skills/build-gameplay-runtime/references/input-and-locomotion-feel.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/input-and-locomotion-feel.md` from an installed host's root) when a selected verb needs jump grace, buffered intent, or movement-response tuning. Specify eligibility, clocks, priority, consumption, and reset behavior before choosing compatible engine APIs.
+- Read `skills/build-gameplay-runtime/references/damage-windows-and-contact.md` in the resolved Hephaera baseline (`.hephaera/skills/build-gameplay-runtime/references/damage-windows-and-contact.md` from an installed host's root) when designing damage windows, multi-hit rules, immunity, or interruption. Declare attack/strike/recipient identities and authority before adding cosmetic feedback.
 - Read [perception-and-fog.md](references/perception-and-fog.md) for shared perception truth, line-of-sight blockers, presentation-only fog, and AI/targeting integration.
 - Read [encounter-acceptance.md](references/encounter-acceptance.md) for role composition, pressure budgets, fair transitions, tuning, and deterministic encounter fixtures.
 

@@ -6,6 +6,8 @@ Gameplay feedback coordinates visible, audible, timed, and tactile responses to 
 
 Emit presentation events after authoritative transitions. A useful event contains a stable identity, simulation tick or revision, subject, audience/local player, event type, magnitude tier, world position, and expiration. A hit event reflects an accepted hit; a VFX collision or haptic callback never accepts the hit itself. Prevent duplicate delivery from replay, prediction correction, reconnect, or repeated subscriptions using the runtime's event policy.
 
+Use [damage windows and contact](damage-windows-and-contact.md) when defining authoritative attack/strike/recipient identities, accepted hits, immunity, or correction. Feedback deduplication is separate from the ledger that prevents duplicate damage.
+
 Map each event to a bounded set of applicable channels: actor animation, VFX, audio, camera, HUD, and haptics. State duration and concurrency limits, priority, cooldown, intensity mapping, and reduced-motion/flash alternatives. Distinguish a short confirmation from a sustained state with explicit end/cancel. Avoid stacking camera displacements, full-screen flashes, and vibration independently without a combined intensity cap.
 
 For overlapping effects choose a policy per channel: replace, strongest-wins, blend within a limit, coalesce, or bounded queue with expiration. Releasing one effect must not cancel another owner's newer effect. Use handles or generations for ownership. Test rapid repeated impacts, two simultaneous sources, owner destruction, rejected predictions, and a sustained effect interrupted by a modal or scene transition.
@@ -16,7 +18,19 @@ Declare whether each duration follows simulation, presentation/unscaled, audio, 
 
 If hit-stop is selected, make it a scoped request to the existing clock owner with maximum duration, exclusions, and composition rules. Releasing its request restores the effective pause/slow-motion policy, not a hardcoded timescale of one. Never pause network authority, input release collection, or UI cancellation unintentionally. Animation interruption and audio/VFX fades should preserve truthful game state even when a presentation sequence ends early.
 
+Release hit-stop from an unscaled monotonic deadline serviced independently of the clock being frozen. A scaled timer, paused coroutine, or frozen clip-completion callback cannot be the sole release mechanism. Keep essential input releases, cancellation, UI, and selected network processing serviced. Define suspension/resume behavior so overdue requests expire or are invalidated without replaying a backlog.
+
+Give each request an owner/generation handle and bounded lifetime. Removing one request removes only that handle; recompute the effective result with remaining hit-stop, pause, and slow-motion requests. Duplicate delivery must not extend a request implicitly. Distinct overlaps need explicit aggregate duration/intensity limits, and stale releases must not retire a newer request after owner reuse.
+
 Cancel applicable feedback on death, despawn, save/load, owner or scene disposal, player reassignment, and focus/pause transitions. Cleanup must be idempotent. Catch adapter failures at the presentation boundary, record useful diagnostics, and keep simulation progressing.
+
+## Cosmetic deformation and protection cues
+
+If squash/stretch is selected, apply it to an explicitly visual child/subtree whose transform cannot resize authoritative colliders, query shapes, movement roots, or reach. Define pivot, bounded nondegenerate scale, duration/clock, overlap, and rest transform. Compose under one presentation transform owner rather than competing with animation writers.
+
+Restore the authored base transform on completion, cancellation, death, scene exit, and pooled reuse; do not assume its scale is one. A late modifier from an old generation cannot restore over a newer owner's transform. Verify actual colliders and hit eligibility during deformation, and retain a reduced-motion alternative that preserves the essential event.
+
+For immunity, prefer a steady outline, icon, pattern, or other non-flashing protection cue with appropriate text/shape equivalents. Reflect current authoritative protection and expiry; visibility or material state cannot confer immunity. Do not introduce a default blink frequency. Any selected flashing treatment needs separate target accessibility review, with restrained or non-flashing alternatives and relevant saved preferences. Reduced camera motion, flash reduction, sound, and haptic intensity are distinct controls.
 
 ## Haptic adapter contract
 
@@ -31,11 +45,16 @@ Use the compatible engine control skill for the API and selected plugin/platform
 
 ## Acceptance scenarios
 
+These scenarios specify future implementation requirements; this reference does not report executed runtime or physical-device results.
+
 | Scenario | Expected result | Evidence boundary |
 | --- | --- | --- |
 | Two local players and two devices | Each event affects only its owning player's enabled device | Device-routing tests; physical test for actual output |
 | Rapid impacts and sustained effect overlap | Declared cap, priority, expiration, and cancellation hold | Deterministic adapter/clock test and runtime capture |
 | Hit-stop during user pause or slow motion | Ending the effect preserves the clock owner's remaining requests | Controlled clock-state test |
+| Freeze participants, overlap requests, then cancel one owner | Unscaled release still runs; only owned handles end and essential input/UI/network work remains serviced | Clock/lifecycle tests and actual selected-engine runtime |
+| Squash/stretch followed by cancellation or pooled reuse | Authored visual transform restores; collider/query geometry and hit eligibility remain unchanged | Transform/query assertions plus runtime capture |
+| Disable flashing, shake, sound, or haptics during protection | Essential protection state stays readable; immunity is unchanged | Preference/state checks and target accessibility review |
 | Disable haptics or use an unsupported device | No tactile request; equivalent essential cue remains | Adapter logs plus UI/runtime check |
 | API rejects or device disconnects mid-effect | No unhandled error, stale replay, or simulation dependency | Injected error/disconnect plus actual-device test when available |
 | Reconnect under another player, then receive late callback | No cross-player output or cancellation of a new generation | Ownership/generation test |
